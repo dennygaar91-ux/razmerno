@@ -1,0 +1,1 @@
+export const navigation=[{label:'Как работает',to:'/#how'},{label:'Замер',to:'/#measure'},{label:'Сборка',to:'/#assembly'},{label:'Конструктор',to:'/constructor'},{label:'Материалы',to:'/#materials'},{label:'Вопросы',to:'/#faq'}];

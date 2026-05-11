@@ -1,0 +1,1 @@
+export default function Tabs({items,value,onChange}){return <div className="tabs">{items.map(i=><button key={i.value} className={`tab ${value===i.value?'active':''}`} onClick={()=>onChange(i.value)}>{i.label}</button>)}</div>}
