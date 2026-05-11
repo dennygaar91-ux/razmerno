@@ -1,2 +1,0 @@
-import {hardware} from '../../data/materials.js';
-export default function HardwareSelector({state,setState}){return <div className="hardware-grid">{hardware.map(h=><button key={h.id} className={`hardware-btn ${state.hardware===h.id?'active':''}`} onClick={()=>setState({...state,hardware:h.id})}>{h.name}<small style={{display:'block',opacity:.7,fontWeight:500}}>{h.id==='hettich'?'Премиум':'Стандарт'}</small></button>)}</div>}

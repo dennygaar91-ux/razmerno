@@ -1,0 +1,84 @@
+/* ══════════════════════════════════════════════════════════
+   TOKENS — дизайн-система проекта Размерно.
+   Все цвета, шрифты, отступы и тени в одном месте
+   ══════════════════════════════════════════════════════════ */
+:root {
+  /* Surfaces */
+  --bg:           #FAFAF9;
+  --bg-soft:      #F4F4F2;
+  --bg-2:         #EFEFED;
+  --card:         #fff;
+
+  /* Brand */
+  --ink:          #0A0A0A;
+  --ink-2:        #161616;
+  --ink-3:        #232323;
+  --orange:       #E8612C;
+  --orange-h:     #D44E1B;
+  --orange-soft:  rgba(232, 97, 44, 0.08);
+  --orange-mid:   rgba(232, 97, 44, 0.16);
+  --orange-glow:  rgba(232, 97, 44, 0.30);
+
+  /* Status */
+  --green:        #16A34A;
+  --green-soft:   rgba(22, 163, 74, 0.10);
+  --yellow:       #D97706;
+  --yellow-soft:  rgba(217, 119, 6, 0.10);
+
+  /* Text */
+  --text:         #0A0A0A;
+  --text-2:       #2F2F2F;
+  --text-soft:    #6B6B6B;
+  --text-muted:   #9E9E9E;
+  --text-faint:   #C8C8C8;
+
+  /* Borders */
+  --border:       rgba(10, 10, 10, 0.07);
+  --border-2:     rgba(10, 10, 10, 0.12);
+  --border-dk:    rgba(255, 255, 255, 0.10);
+
+  /* Typography */
+  --fh: 'Montserrat', sans-serif;
+  --fb: 'Inter', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --fs: 'Instrument Serif', Georgia, serif;
+
+  /* Radii */
+  --r-xs:   6px;
+  --r-sm:  10px;
+  --r-md:  14px;
+  --r-lg:  20px;
+  --r-xl:  28px;
+  --r-2xl: 36px;
+  --r-pill: 999px;
+
+  /* Shadows */
+  --sh-1: 0 1px 2px rgba(10,10,10,.04);
+  --sh-2: 0 2px 8px rgba(10,10,10,.05), 0 1px 2px rgba(10,10,10,.03);
+  --sh-3: 0 8px 24px rgba(10,10,10,.07), 0 2px 6px rgba(10,10,10,.04);
+  --sh-4: 0 18px 48px rgba(10,10,10,.09), 0 4px 12px rgba(10,10,10,.04);
+  --sh-5: 0 32px 80px rgba(10,10,10,.12);
+}
+
+/* ── RESET ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; text-size-adjust: 100%; }
+body {
+  font-family: var(--fb);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+a    { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: 0; background: none; }
+img, svg { display: block; max-width: 100%; }
+input, select, textarea { font-family: inherit; min-width: 0; }
+::selection { background: var(--ink); color: #fff; }
+:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

@@ -1,1 +1,0 @@
-import {Link} from 'react-router-dom';export default function AccountTopbar(){return <header className="account-topbar"><Link to="/" className="logo">Размерно<em>.</em></Link><div style={{display:'flex',gap:12,alignItems:'center'}}><span className="profile-ic">🔔</span><span className="profile-ic" style={{background:'var(--ink)',color:'#fff'}}>ИП</span></div></header>}

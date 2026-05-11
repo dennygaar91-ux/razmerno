@@ -1,0 +1,29 @@
+/* ── FOOTER ─────────────────────────────────────────────── */
+.ft { padding: 56px 0 32px; background: #171719; color: #fff; }
+.ft__g {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 44px;
+}
+.ft__logo { font-family: var(--fh); font-size: 21px; font-weight: 900; letter-spacing: -.06em; color: #fff; margin-bottom: 12px; }
+.ft__logo em { font-style: normal; color: var(--orange); }
+.ft__d { font-size: 13.5px; color: rgba(255,255,255,.4); line-height: 1.62; max-width: 240px; }
+.ft__ct { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.32); margin-bottom: 14px; }
+.ft__col a { display: block; font-size: 13.5px; color: rgba(255,255,255,.55); margin-bottom: 10px; transition: color .15s; text-decoration: none; }
+.ft__col a:hover { color: #fff; }
+.ft__b {
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.ft__cp { font-size: 12px; color: rgba(255,255,255,.28); }
+.ft__lk { display: flex; gap: 20px; }
+.ft__lk a { font-size: 12px; color: rgba(255,255,255,.28); transition: color .15s; text-decoration: none; }
+.ft__lk a:hover { color: #fff; }
+@media (max-width: 860px) { .ft__g { grid-template-columns: 1fr 1fr; gap: 32px; } }
+@media (max-width: 480px) { .ft__g { grid-template-columns: 1fr; gap: 26px; } .ft__b { flex-direction: column; align-items: flex-start; } }

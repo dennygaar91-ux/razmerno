@@ -1,1 +1,0 @@
-export default function OrderDelivery(){return <div className="card"><div style={{padding:16}}><h3>Доставка</h3></div><div className="rows">{[['Получатель','Иван Петров'],['Телефон','+7 (999) 123-45-67'],['Email','ivan.petrov@mail.ru'],['Адрес','Москва, ул. Лесная, д. 12']].map(r=><div className="row" key={r[0]}><span>{r[0]}</span><b>{r[1]}</b></div>)}</div></div>}

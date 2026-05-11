@@ -1,0 +1,165 @@
+/* ── HERO ────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--bg);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 55%; height: 100%;
+  background-image: radial-gradient(circle at 1px 1px, rgba(10,10,10,.04) 1px, transparent 0);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 80% 70% at 20% 50%, #000 30%, transparent 80%);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero__l {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 130px 64px 80px 0;
+}
+.hero__title {
+  font-family: var(--fh);
+  font-size: clamp(44px, 6.5vw, 88px);
+  font-weight: 900;
+  letter-spacing: -.06em;
+  line-height: .93;
+  color: var(--ink);
+  margin: 22px 0 24px;
+}
+.hero__lead {
+  max-width: 500px;
+  font-size: clamp(15px, 1.35vw, 17.5px);
+  line-height: 1.62;
+  color: var(--text-soft);
+  margin-bottom: 32px;
+}
+.hero__acts { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+
+/* Fear chips */
+.fchips  { display: flex; flex-direction: column; gap: 9px; max-width: 490px; }
+.fchip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: var(--r-md);
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh-1);
+  font-size: 13px;
+  color: var(--text-2);
+  font-weight: 500;
+  transition: transform .2s;
+}
+.fchip:hover { transform: translateX(3px); }
+.fchip-ic {
+  width: 26px; height: 26px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--green-soft);
+  color: var(--green);
+  display: grid;
+  place-items: center;
+}
+
+/* Right column — full-height photo */
+.hero__r { position: relative; overflow: hidden; }
+.hero__r img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.hero__r::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--bg) 0%, transparent 18%);
+  pointer-events: none;
+}
+
+/* Floating card */
+.hero__float {
+  position: absolute;
+  left: 28px; bottom: 36px;
+  z-index: 5;
+  padding: 20px 22px;
+  background: rgba(255,255,255,.94);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-4);
+  max-width: 340px;
+}
+.hero__float-t {
+  font-family: var(--fh);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.15;
+}
+.hero__float-d { font-size: 13px; color: var(--text-soft); line-height: 1.55; margin-bottom: 14px; }
+.hero__float-dims { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.hdim {
+  padding: 9px 10px;
+  border-radius: var(--r-sm);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.hdim-l { font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 3px; }
+.hdim-v { font-family: var(--fm); font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: -.02em; }
+
+/* Live badge */
+.hero__live {
+  position: absolute;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 9px;
+  border-radius: var(--r-pill);
+  background: rgba(10,10,10,.90);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ldot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.22);
+  animation: ldotPulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes ldotPulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.6; transform:scale(.78); }
+}
+
+@media (max-width: 1080px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero__l { padding: 110px 0 52px; }
+  .hero__r { min-height: 440px; }
+  .hero__r::after { background: linear-gradient(180deg, var(--bg) 0%, transparent 22%); }
+  .hero__float { left: 20px; bottom: 20px; max-width: none; right: 20px; }
+  .hero__live  { left: 20px; }
+}
+@media (max-width: 600px) {
+  .hero__title { font-size: clamp(40px, 12vw, 56px); }
+  .hero__acts  { flex-direction: column; }
+  .hero__acts .btn { width: 100%; }
+  .hero__r { min-height: 340px; }
+  .fchips  { max-width: none; }
+}

@@ -1,0 +1,6 @@
+.tbar { padding: 26px 0; background: var(--bg-soft); border-block: 1px solid var(--border); }
+.tbar__row { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.tbar__item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: var(--text-2); }
+.tbar__item strong { color: var(--ink); font-weight: 700; }
+.tbar__ic { width: 28px; height: 28px; border-radius: 9px; background: var(--card); border: 1px solid var(--border); color: var(--orange); display: grid; place-items: center; flex-shrink: 0; box-shadow: var(--sh-1); }
+@media (max-width: 860px) { .tbar__row { justify-content: flex-start; gap: 12px 26px; } }

@@ -1,1 +1,0 @@
-export default function Modal({open,onClose,children}){if(!open)return null;return <div className="modal-back" onClick={onClose}><div className="modal-card" onClick={e=>e.stopPropagation()}>{children}</div></div>}
