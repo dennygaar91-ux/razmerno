@@ -95,7 +95,7 @@ export default function Header() {
               <Icon name="person" size={16} />
             </Link>
             <Link to="/constructor" className="btn btn-cta btn-sm">
-              Рассчитать мебель
+              Конструктор
               <Icon name="arrow-right" className="arr" size={14} />
             </Link>
             <button
@@ -117,7 +117,7 @@ export default function Header() {
         <div className="mnav__foot">
           <Link to="/auth"        className="btn btn-pr" onClick={() => setMenuOpen(false)}>Личный кабинет</Link>
           <Link to="/constructor" className="btn btn-cta" onClick={() => setMenuOpen(false)}>
-            Рассчитать мебель
+            Конструктор
           </Link>
         </div>
       </div>
