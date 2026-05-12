@@ -164,7 +164,7 @@
 .cst-panel-card {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
   min-height: 0;
 }
 
@@ -253,6 +253,13 @@
   font-family: var(--fm);
   font-size: 14px;
   color: var(--ink);
+  font-weight: 700;
+}
+
+.cst-field-row input:focus {
+  outline: none;
+  border-color: var(--ink);
+  background: var(--card);
 }
 
 .cst-layout-grid {
@@ -328,10 +335,16 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  font-weight: 800;
+  font-size: 16px;
+  transition: all .18s;
+  box-shadow: 0 4px 12px rgba(10, 15, 29, 0.15);
+  margin-top: 4px;
 }
 
 .cst-button-primary:hover {
   background: var(--ink-2);
+  box-shadow: 0 6px 16px rgba(10, 15, 29, 0.2);
 }
 
 .cst-button-quote {
@@ -499,7 +512,7 @@
 
 .cst-summary-card {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .cst-summary-label {
@@ -512,14 +525,17 @@
 
 .cst-summary-price {
   font-family: var(--fh);
-  font-size: clamp(34px, 3.5vw, 42px);
+  font-size: clamp(36px, 4vw, 48px);
   font-weight: 900;
   color: var(--ink);
+  line-height: 1;
+  margin: -8px 0 0;
 }
 
 .cst-summary-save {
   color: var(--green);
   font-weight: 700;
+  font-size: 15px;
 }
 
 .cst-summary-meta {
@@ -647,16 +663,21 @@
 
 .cst-option-card {
   border-radius: 18px;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   background: var(--bg-soft);
   color: var(--ink);
-  padding: 16px;
+  padding: 14px 16px;
   text-align: left;
   cursor: pointer;
   transition: all .18s;
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.cst-option-card:hover {
+  border-color: var(--ink);
+  background: var(--card);
 }
 
 .cst-option-card.active {

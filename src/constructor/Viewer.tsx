@@ -62,6 +62,107 @@ function DimensionLabel({
   );
 }
 
+function SectionInteriors({
+  section,
+  sectionX,
+  sectionWidth,
+  heightMeters,
+  depthMeters,
+  facadeMaterialColor,
+  bodyMaterialColor,
+  is2D,
+}: {
+  section: any;
+  sectionX: number;
+  sectionWidth: number;
+  heightMeters: number;
+  depthMeters: number;
+  facadeMaterialColor: string;
+  bodyMaterialColor: string;
+  is2D: boolean;
+}) {
+  const shelfThickness = 0.012;
+  const shelfMargin = 0.018;
+  const drawerGap = 0.004;
+
+  const shelves = section.items.find((item: any) => item.type === "shelf");
+  const drawers = section.items.find((item: any) => item.type === "drawer");
+  const hangerRail = section.items.find((item: any) => item.type === "hanger_rail");
+
+  const shelfCount = shelves?.count || 0;
+  const drawerCount = drawers?.count || 0;
+  const hasRail = hangerRail && hangerRail.count > 0;
+
+  const interiorHeight = heightMeters - shelfMargin * 2;
+  const drawerStackHeight = drawerCount > 0 ? Math.min(interiorHeight * 0.45, heightMeters * 0.4) : 0;
+  const shelfAreaHeight = interiorHeight - drawerStackHeight;
+  const shelfSpacing = shelfCount > 0 ? shelfAreaHeight / (shelfCount + 1) : 0;
+
+  const interiorZ = -depthMeters / 2 + depthMeters * 0.65;
+
+  return (
+    <group>
+      {shelfCount > 0 && (
+        <group>
+          {Array.from({ length: shelfCount }).map((_, i) => {
+            const shelfY = shelfMargin + (i + 1) * shelfSpacing;
+            return (
+              <mesh
+                key={`shelf-${section.id}-${i}`}
+                position={[sectionX, shelfY, interiorZ]}
+              >
+                <boxGeometry
+                  args={[sectionWidth - 0.04, shelfThickness, depthMeters * 0.6]}
+                />
+                <meshStandardMaterial
+                  color={bodyMaterialColor}
+                  metalness={0.05}
+                  roughness={0.7}
+                />
+              </mesh>
+            );
+          })}
+        </group>
+      )}
+
+      {drawerCount > 0 && (
+        <group>
+          {Array.from({ length: drawerCount }).map((_, i) => {
+            const drawerHeight = (drawerStackHeight - drawerGap * (drawerCount - 1)) / drawerCount;
+            const drawerY = shelfMargin - drawerStackHeight / 2 + (i + 0.5) * (drawerHeight + drawerGap);
+            return (
+              <mesh
+                key={`drawer-${section.id}-${i}`}
+                position={[sectionX, drawerY, interiorZ - 0.01]}
+              >
+                <boxGeometry
+                  args={[sectionWidth - 0.02, drawerHeight - drawerGap / 2, depthMeters * 0.55]}
+                />
+                <meshStandardMaterial
+                  color={facadeMaterialColor}
+                  metalness={0.08}
+                  roughness={0.6}
+                />
+              </mesh>
+            );
+          })}
+        </group>
+      )}
+
+      {hasRail && (
+        <mesh position={[sectionX, heightMeters * 0.75, interiorZ]}>
+          <cylinderGeometry args={[0.008, 0.008, sectionWidth - 0.04, 16]} rotation={[0, 0, Math.PI / 2]} />
+          <meshStandardMaterial
+            color="#c0c0c0"
+            metalness={0.6}
+            roughness={0.4}
+          />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
 export function CabinetViewer({
   parts,
   config,
@@ -124,6 +225,9 @@ export function CabinetViewer({
   const sectionOverlayZ = -depthMeters / 2 - 0.01;
 
   const silhouetteHeight = userHeight * SCALE;
+
+  const bodyColor = getColor(config.materials.bodyMaterialId);
+  const facadeColor = getColor(config.materials.facadeMaterialId || config.materials.bodyMaterialId);
 
   return (
     <div
@@ -282,59 +386,68 @@ export function CabinetViewer({
           {config.sections?.map((section, index) => {
             const sectionId = String(section.id);
             const isActive = activeSectionId === sectionId;
-
-            const x =
-              -widthMeters / 2 +
-              sectionWidthMeters / 2 +
-              index * sectionWidthMeters;
+            const x = -widthMeters / 2 + sectionWidthMeters / 2 + index * sectionWidthMeters;
 
             return (
-              <group key={`section-hit-${sectionId}`}>
-                <mesh
-                  position={[x, sectionOverlayY, sectionOverlayZ]}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onSectionSelect?.(sectionId);
-                  }}
-                  onPointerOver={(event) => {
-                    event.stopPropagation();
-                    document.body.style.cursor = "pointer";
-                  }}
-                  onPointerOut={() => {
-                    document.body.style.cursor = "default";
-                  }}
-                >
-                  <boxGeometry args={[sectionWidthMeters, heightMeters, 0.018]} />
-                  <meshStandardMaterial
-                    color={isActive ? "#E8612C" : "#ffffff"}
-                    transparent
-                    opacity={isActive ? 0.18 : 0.02}
-                  />
-                  {isActive ? <Edges threshold={15} color="#E8612C" /> : null}
-                </mesh>
+              <group key={`section-${sectionId}`}>
+                <SectionInteriors
+                  section={section}
+                  sectionX={x}
+                  sectionWidth={sectionWidthMeters}
+                  heightMeters={heightMeters}
+                  depthMeters={depthMeters}
+                  facadeMaterialColor={facadeColor}
+                  bodyMaterialColor={bodyColor}
+                  is2D={is2D}
+                />
 
-                <Html
-                  position={[x, heightMeters + 0.12, sectionOverlayZ]}
-                  center
-                >
-                  <div
-                    style={{
-                      padding: "4px 10px",
-                      borderRadius: 999,
-                      background: isActive
-                        ? "#E8612C"
-                        : "rgba(255,255,255,0.9)",
-                      color: isActive ? "#fff" : "#111",
-                      border: "1px solid rgba(0,0,0,0.08)",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      whiteSpace: "nowrap",
-                      boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+                <group key={`section-hit-${sectionId}`}>
+                  <mesh
+                    position={[x, sectionOverlayY, sectionOverlayZ]}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onSectionSelect?.(sectionId);
+                    }}
+                    onPointerOver={(event) => {
+                      event.stopPropagation();
+                      document.body.style.cursor = "pointer";
+                    }}
+                    onPointerOut={() => {
+                      document.body.style.cursor = "default";
                     }}
                   >
-                    Секция {index + 1}
-                  </div>
-                </Html>
+                    <boxGeometry args={[sectionWidthMeters, heightMeters, 0.018]} />
+                    <meshStandardMaterial
+                      color={isActive ? "#E8612C" : "#ffffff"}
+                      transparent
+                      opacity={isActive ? 0.18 : 0.02}
+                    />
+                    {isActive ? <Edges threshold={15} color="#E8612C" /> : null}
+                  </mesh>
+
+                  <Html
+                    position={[x, heightMeters + 0.12, sectionOverlayZ]}
+                    center
+                  >
+                    <div
+                      style={{
+                        padding: "4px 10px",
+                        borderRadius: 999,
+                        background: isActive
+                          ? "#E8612C"
+                          : "rgba(255,255,255,0.9)",
+                        color: isActive ? "#fff" : "#111",
+                        border: "1px solid rgba(0,0,0,0.08)",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        whiteSpace: "nowrap",
+                        boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      Секция {index + 1}
+                    </div>
+                  </Html>
+                </group>
               </group>
             );
           })}
