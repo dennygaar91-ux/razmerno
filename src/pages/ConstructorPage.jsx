@@ -486,13 +486,15 @@ const activeSection =
 
             <div className="cst-view-stage">
               <CabinetViewer
-                parts={result.parts}
-                config={config}
-                viewMode={viewMode}
-                viewType={viewType}
-                zoom={zoom}
-                userHeight={humanHeight}
-              />
+  parts={result.parts}
+  config={config}
+  viewMode={viewMode}
+  viewType={viewType}
+  zoom={zoom}
+  userHeight={humanHeight}
+  activeSectionId={activeSectionId}
+  onSectionSelect={selectSection}
+/>
             </div>
 
             <div className="cst-view-footer">
