@@ -12,49 +12,37 @@ export const defaultCabinetConfig: CabinetConfig = {
 
   materials: {
     bodyMaterialId: "egger_w980_16",
-    facadeMaterialId: "egger_w980_16",
+    facadeMaterialId: "mdf_white_18",
     backPanelMaterialId: "hdf_white_3",
   },
 
   facade: {
     enabled: true,
     openingType: "with_handles",
-    materialId: "egger_w980_16",
+    materialId: "mdf_white_18",
+    handleVariant: "rail_96"
+  },
+
+  options: {
+    hardwareBrand: "Hettich",
+    hasLegs: true
   },
 
   sections: [
     {
       id: "section_1",
-      width: 600,
+      width: 1768,
       items: [
         {
           id: "section_1_shelves",
           type: "shelf",
-          count: 4,
-        },
-      ],
-    },
-    {
-      id: "section_2",
-      width: 600,
-      items: [
-        {
-          id: "section_2_drawers",
-          type: "drawer",
           count: 3,
-          height: 200,
         },
-      ],
-    },
-    {
-      id: "section_3",
-      width: 600,
-      items: [
         {
-          id: "section_3_hanger_rail",
+          id: "section_1_hanger_rail",
           type: "hanger_rail",
           count: 1,
-        },
+        }
       ],
     },
   ],

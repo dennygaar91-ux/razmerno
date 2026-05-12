@@ -32,10 +32,18 @@ export function calculatePrice(
     return sum + (shelfItem?.count || 0);
   }, 0);
 
+  const hangerRails = config.sections.reduce((sum, section) => {
+    const railItem = section.items.find((item) => item.type === "hanger_rail");
+    return sum + (railItem?.count || 0);
+  }, 0);
+
   const showHandles = config.facade.enabled && config.facade.openingType === "with_handles";
+  const legsCost = config.options?.hasLegs ? 4 * 180 : 0;
+  const handleCost = showHandles ? drawers * 250 : 0;
+  const brandMultiplier = config.options?.hardwareBrand === "Firmax" ? 1.08 : 1;
 
   const hardwareCost =
-    shelves * 4 * 55 + drawers * 2 * 1200 + (showHandles ? drawers * 250 : 0) + 4 * 180 + 16 * 35;
+    (shelves * 4 * 55 + drawers * 2 * 1200 + handleCost + legsCost + hangerRails * 40) * brandMultiplier + 16 * 35;
 
   const cutting = materialCost * 0.09;
   const edging = materialCost * 0.06;

@@ -47,6 +47,11 @@ export type CabinetConfig = {
    */
   facade: CabinetFacade;
 
+  options: {
+    hardwareBrand: "Hettich" | "Firmax";
+    hasLegs: boolean;
+  };
+
   /**
    * Секции шкафа.
    */

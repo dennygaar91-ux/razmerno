@@ -197,6 +197,33 @@ export function calculateCabinet(
       }
     }
 
+    const railItem = section.items.find((item) => item.type === "hanger_rail");
+    if (railItem?.count) {
+      const railCount = railItem.count;
+      const railHeight = 10;
+      const railDepth = 24;
+      const baseY = cabinetHeight - BODY_THICKNESS - 120;
+
+      for (let index = 0; index < railCount; index += 1) {
+        parts.push({
+          id: `hanger-rail-${sectionIndex + 1}-${index + 1}`,
+          name: `Hanger rail ${sectionIndex + 1}-${index + 1}`,
+          materialId: backPanelMaterialId,
+          size: {
+            width: sectionWidth - 32,
+            height: railHeight,
+            thickness: railDepth
+          },
+          edge: createEdgeMap(bodyEdgeId),
+          position: {
+            x: sectionLeft + 16,
+            y: round(baseY - index * 40),
+            z: 0
+          }
+        });
+      }
+    }
+
     currentX += sectionWidth;
     if (sectionIndex < config.sections.length - 1) {
       parts.push({
@@ -245,7 +272,7 @@ export function calculateCabinet(
       id: "drawer-slides",
       type: "drawer_slide",
       name: "Drawer slides",
-      brand: "Hettich",
+      brand: config.options.hardwareBrand,
       quantity: totalDrawers * 2
     });
   }
@@ -254,19 +281,21 @@ export function calculateCabinet(
     hardware.push({
       id: "handles",
       type: "handle",
-      name: "Handles",
-      brand: "Other",
+      name: `Ручки ${config.facade.handleVariant || "стандарт"}`,
+      brand: config.options.hardwareBrand,
       quantity: totalDrawers
     });
   }
 
-  hardware.push({
-    id: "legs",
-    type: "leg",
-    name: "Legs",
-    brand: "Other",
-    quantity: 4
-  });
+  if (config.options.hasLegs) {
+    hardware.push({
+      id: "legs",
+      type: "leg",
+      name: "Ножки",
+      brand: config.options.hardwareBrand,
+      quantity: 4
+    });
+  }
 
   const price = calculatePrice(parts, config);
 

@@ -15,4 +15,9 @@ export type CabinetFacade = {
    * Материал фасада.
    */
   materialId: string;
+
+  /**
+   * Тип ручки.
+   */
+  handleVariant?: string;
 };

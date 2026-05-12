@@ -29,6 +29,13 @@ export type CabinetStoreState = {
   updateSectionWidth: (sectionId: string, width: number) => void;
   setSectionShelves: (sectionId: string, count: number) => void;
   setSectionDrawers: (sectionId: string, count: number) => void;
+  setSectionHangerRails: (sectionId: string, count: number) => void;
+  setBodyMaterial: (materialId: string) => void;
+  setFacadeMaterial: (materialId: string) => void;
+  setHardwareBrand: (brand: "Hettich" | "Firmax") => void;
+  toggleLegs: (enabled: boolean) => void;
+  toggleHandles: (enabled: boolean) => void;
+  setHandleVariant: (variant: string) => void;
   addSection: () => void;
   removeSection: (sectionId: string) => void;
   autoDistributeSections: () => void;
@@ -76,13 +83,11 @@ export const useCabinetStore = create<CabinetStoreState>((set, get) => ({
             return section;
           }
 
-          const items = section.items.filter(
-            (item) => item.type !== "shelf"
-          );
+          const items = section.items.filter((item) => item.type !== "shelf");
 
           if (count > 0) {
             items.push({
-              id: `section_${sectionId}_shelves`,
+              id: `section_${section.id}_shelves`,
               type: "shelf",
               count
             });
@@ -108,13 +113,11 @@ export const useCabinetStore = create<CabinetStoreState>((set, get) => ({
             return section;
           }
 
-          const items = section.items.filter(
-            (item) => item.type !== "drawer"
-          );
+          const items = section.items.filter((item) => item.type !== "drawer");
 
           if (count > 0) {
             items.push({
-              id: `section_${sectionId}_drawers`,
+              id: `section_${section.id}_drawers`,
               type: "drawer",
               count,
               height: 200
@@ -126,6 +129,131 @@ export const useCabinetStore = create<CabinetStoreState>((set, get) => ({
             items
           };
         })
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  setSectionHangerRails: (sectionId, count) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        sections: state.config.sections.map((section) => {
+          if (section.id !== sectionId) {
+            return section;
+          }
+
+          const items = section.items.filter((item) => item.type !== "hanger_rail");
+
+          if (count > 0) {
+            items.push({
+              id: `section_${section.id}_hanger_rails`,
+              type: "hanger_rail",
+              count
+            });
+          }
+
+          return {
+            ...section,
+            items
+          };
+        })
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  setBodyMaterial: (materialId) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        materials: {
+          ...state.config.materials,
+          bodyMaterialId: materialId
+        }
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  setFacadeMaterial: (materialId) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        materials: {
+          ...state.config.materials,
+          facadeMaterialId: materialId
+        },
+        facade: {
+          ...state.config.facade,
+          materialId: materialId
+        }
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  setHardwareBrand: (brand) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        options: {
+          ...state.config.options,
+          hardwareBrand: brand
+        }
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  toggleLegs: (enabled) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        options: {
+          ...state.config.options,
+          hasLegs: enabled
+        }
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  toggleHandles: (enabled) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        facade: {
+          ...state.config.facade,
+          enabled,
+          openingType: enabled
+            ? state.config.facade.openingType === "handleless"
+              ? "with_handles"
+              : state.config.facade.openingType
+            : "handleless"
+        }
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  setHandleVariant: (variant) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        facade: {
+          ...state.config.facade,
+          handleVariant: variant,
+          enabled: true,
+          openingType: "with_handles"
+        }
       };
 
       return createState(nextConfig);

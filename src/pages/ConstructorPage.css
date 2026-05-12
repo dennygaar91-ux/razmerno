@@ -559,6 +559,265 @@
   color: var(--text-2);
 }
 
+.cst-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 28px 0;
+}
+
+.cst-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cst-header-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(8, 15, 29, 0.08);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+}
+
+.cst-header-title {
+  font-family: var(--fh);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+}
+
+.cst-header-subtitle {
+  font-size: 15px;
+  color: var(--text-2);
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+.cst-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cst-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cst-card-section {
+  display: grid;
+  gap: 14px;
+}
+
+.cst-section-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.cst-option-card {
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--ink);
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all .18s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cst-option-card.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.cst-control-row {
+  display: grid;
+  gap: 14px;
+}
+
+.cst-counter-block {
+  display: grid;
+  gap: 10px;
+}
+
+.cst-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 16px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+}
+
+.cst-counter-button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cst-counter-button:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+.cst-counter-value {
+  min-width: 36px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cst-zoom-value {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.cst-view-hotspot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(17, 24, 39, 0.06);
+  color: var(--ink);
+}
+
+.cst-summary-breakdown {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.cst-summary-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+.cst-hint {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  background: rgba(250, 250, 250, 0.8);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+
+.cst-view-hint {
+  margin-top: 14px;
+}
+
+@media (max-width: 1240px) {
+  .cst-shell {
+    grid-template-columns: minmax(280px, 1fr) minmax(480px, 1.5fr) minmax(260px, 320px);
+  }
+}
+
+@media (max-width: 980px) {
+  .cst-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .cst-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cst-header-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .cst-header-actions .cst-button-primary,
+  .cst-header-actions .cst-button-outline {
+    flex: 1;
+  }
++
++  .cst-sidebar {
++    flex-direction: row;
++    justify-content: space-between;
++    align-items: center;
++    padding: 14px;
++  }
++
++  .cst-sidebar-group {
++    flex-direction: row;
++    gap: 8px;
++  }
++
++  .cst-nav-item,
++  .cst-nav-help {
++    width: 44px;
++    height: 44px;
++  }
++
++  .cst-card.cst-view-card {
++    padding: 18px;
++  }
++
++  .cst-view-stage {
++    min-height: 340px;
++  }
++
++  .cst-panel-card,
++  .cst-summary-card,
++  .cst-material-card {
++    padding: 20px;
++  }
++
++  .cst-info-grid {
++    grid-template-columns: 1fr;
++  }
++
++  .cst-section-controls {
++    grid-template-columns: 1fr;
++  }
++
++  .cst-view-toolbar,
++  .cst-view-footer,
++  .cst-header-actions {
++    flex-wrap: wrap;
++    gap: 10px;
++  }
++
++  .cst-view-actions,
++  .cst-view-mode {
++    width: 100%;
++  }
+ }
+
+
+
 .cst-info-row strong {
   font-weight: 700;
   color: var(--ink);
