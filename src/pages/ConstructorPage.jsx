@@ -233,79 +233,159 @@ const activeSection =
             </div>
           )}
 
-          {panelTab === "fill" && (
-            <div className="cst-card cst-panel-card">
-              <div className="cst-panel-head">
-                <div className="cst-small-label">Наполнение</div>
-                <h2 className="cst-panel-title">Полки, ящики и рейлинги</h2>
-              </div>
+          {panelTab === "fill" && activeSection && (
+  <div className="cst-card cst-panel-card">
+    <div className="cst-panel-head">
+      <div className="cst-small-label">Наполнение</div>
+      <h2 className="cst-panel-title">
+        {activeSection.name || "Выбранная секция"}
+      </h2>
+    </div>
 
-              <div className="cst-control-row">
-                <div className="cst-counter-block">
-                  <span>Полки</span>
-                  <div className="cst-counter">
-                    <button type="button" className="cst-counter-button" onClick={() => distributeCount("shelf", Math.max(0, totals.shelfCount - 1))}>−</button>
-                    <span className="cst-counter-value">{totals.shelfCount}</span>
-                    <button type="button" className="cst-counter-button" onClick={() => distributeCount("shelf", totals.shelfCount + 1)}>+</button>
-                  </div>
-                </div>
-                <div className="cst-counter-block">
-                  <span>Ящики</span>
-                  <div className="cst-counter">
-                    <button type="button" className="cst-counter-button" onClick={() => distributeCount("drawer", Math.max(0, totals.drawerCount - 1))}>−</button>
-                    <span className="cst-counter-value">{totals.drawerCount}</span>
-                    <button type="button" className="cst-counter-button" onClick={() => distributeCount("drawer", totals.drawerCount + 1)}>+</button>
-                  </div>
-                </div>
-              </div>
+    <div className="cst-hint">
+      Настраивайте не весь шкаф сразу, а выбранную секцию. Нажмите на другую секцию в блоке “Параметры”, чтобы переключиться.
+    </div>
 
-              <div className="cst-control-row">
-                <div className="cst-counter-block">
-                  <span>Рейлинги</span>
-                  <div className="cst-counter">
-                    <button type="button" className="cst-counter-button" onClick={() => distributeRails(Math.max(0, totals.hangerCount - 1))}>−</button>
-                    <span className="cst-counter-value">{totals.hangerCount}</span>
-                    <button type="button" className="cst-counter-button" onClick={() => distributeRails(totals.hangerCount + 1)}>+</button>
-                  </div>
-                </div>
-                <div className="cst-toggle-group">
-                  <button
-                    type="button"
-                    className={`cst-toggle-btn ${config.options.hasLegs ? "active" : ""}`}
-                    onClick={() => toggleLegs(!config.options.hasLegs)}
-                  >
-                    Ножки
-                  </button>
-                  <button
-                    type="button"
-                    className={`cst-toggle-btn ${showHandles ? "active" : ""}`}
-                    onClick={() => toggleHandles(!showHandles)}
-                  >
-                    Ручки
-                  </button>
-                </div>
-              </div>
+    <div className="cst-control-row">
+      <div className="cst-counter-block">
+        <span>Полки</span>
+        <div className="cst-counter">
+          <button
+            type="button"
+            className="cst-counter-button"
+            onClick={() =>
+              setSectionShelves(
+                activeSection.id,
+                Math.max(0, (activeSection.items.find((item) => item.type === "shelf")?.count || 0) - 1)
+              )
+            }
+          >
+            −
+          </button>
+          <span className="cst-counter-value">
+            {activeSection.items.find((item) => item.type === "shelf")?.count || 0}
+          </span>
+          <button
+            type="button"
+            className="cst-counter-button"
+            onClick={() =>
+              setSectionShelves(
+                activeSection.id,
+                Math.min(12, (activeSection.items.find((item) => item.type === "shelf")?.count || 0) + 1)
+              )
+            }
+          >
+            +
+          </button>
+        </div>
+      </div>
 
-              {showHandles ? (
-                <div className="cst-card-section">
-                  <div className="cst-card-head">Вариант ручки</div>
-                  <div className="cst-section-controls">
-                    {handleOptions.map((option) => (
-                      <button
-                        key={option.id}
-                        type="button"
-                        className={`cst-option-card ${config.facade.handleVariant === option.id ? "active" : ""}`}
-                        onClick={() => setHandleVariant(option.id)}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-              <div className="cst-hint">Ручки появляются только при активной опции фасада.</div>
-            </div>
-          )}
+      <div className="cst-counter-block">
+        <span>Ящики</span>
+        <div className="cst-counter">
+          <button
+            type="button"
+            className="cst-counter-button"
+            onClick={() =>
+              setSectionDrawers(
+                activeSection.id,
+                Math.max(0, (activeSection.items.find((item) => item.type === "drawer")?.count || 0) - 1)
+              )
+            }
+          >
+            −
+          </button>
+          <span className="cst-counter-value">
+            {activeSection.items.find((item) => item.type === "drawer")?.count || 0}
+          </span>
+          <button
+            type="button"
+            className="cst-counter-button"
+            onClick={() =>
+              setSectionDrawers(
+                activeSection.id,
+                Math.min(6, (activeSection.items.find((item) => item.type === "drawer")?.count || 0) + 1)
+              )
+            }
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div className="cst-control-row">
+      <div className="cst-counter-block">
+        <span>Штанга</span>
+        <div className="cst-counter">
+          <button
+            type="button"
+            className="cst-counter-button"
+            onClick={() =>
+              setSectionHangerRails(
+                activeSection.id,
+                Math.max(0, (activeSection.items.find((item) => item.type === "hanger_rail")?.count || 0) - 1)
+              )
+            }
+          >
+            −
+          </button>
+          <span className="cst-counter-value">
+            {activeSection.items.find((item) => item.type === "hanger_rail")?.count || 0}
+          </span>
+          <button
+            type="button"
+            className="cst-counter-button"
+            onClick={() =>
+              setSectionHangerRails(
+                activeSection.id,
+                Math.min(3, (activeSection.items.find((item) => item.type === "hanger_rail")?.count || 0) + 1)
+              )
+            }
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <div className="cst-toggle-group">
+        <button
+          type="button"
+          className={`cst-toggle-btn ${config.options.hasLegs ? "active" : ""}`}
+          onClick={() => toggleLegs(!config.options.hasLegs)}
+        >
+          Ножки
+        </button>
+
+        <button
+          type="button"
+          className={`cst-toggle-btn ${showHandles ? "active" : ""}`}
+          onClick={() => toggleHandles(!showHandles)}
+        >
+          Ручки
+        </button>
+      </div>
+    </div>
+
+    <div className={`cst-card-section ${!showHandles ? "is-disabled" : ""}`}>
+      <div className="cst-card-head">Вариант ручки</div>
+
+      <div className="cst-section-controls">
+        {handleOptions.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            disabled={!showHandles}
+            className={`cst-option-card ${config.facade.handleVariant === option.id ? "active" : ""}`}
+            onClick={() => setHandleVariant(option.id)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 
           {panelTab === "materials" && (
             <div className="cst-card cst-panel-card">
