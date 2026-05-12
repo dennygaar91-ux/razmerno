@@ -49,8 +49,8 @@ export function CabinetViewer({ parts }: { parts: CabinetPart[] }) {
   const cameraPosition: [number, number, number] = [sceneSize * 1.2, sceneSize * 0.9, sceneSize * 1.8];
 
   return (
-    <div style={{ width: "100%", height: "100%", minHeight: 420, position: "relative" }}>
-      <Canvas shadows camera={{ position: cameraPosition, fov: 40 }}>
+    <div style={{ width: "100%", height: "100%", position: "relative", minHeight: 0 }}>
+      <Canvas style={{ width: '100%', height: '100%' }} shadows camera={{ position: cameraPosition, fov: 40 }}>
         <color attach="background" args={["#111111"]} />
         <ambientLight intensity={0.55} />
         <directionalLight position={[5, 10, 5]} intensity={0.9} />
