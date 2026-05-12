@@ -1,32 +1,26 @@
-import { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../icons/Icon';
 import { useCabinetStore } from '../store/cabinetStore';
-import { SectionsEditor } from '../constructor/components/SectionsEditor';
-import { ValidationPanel } from '../constructor/components/ValidationPanel';
-import { PartsTable } from '../constructor/components/PartsTable';
 import { CabinetViewer } from '../constructor/Viewer';
 import './ConstructorPage.css';
 
 export default function ConstructorPage() {
   const navigate = useNavigate();
+  const [cabinetType, setCabinetType] = useState('Корпусный');
   const {
     config,
     result,
-    validation,
     updateDimensions,
-    updateSectionWidth,
-    setSectionShelves,
-    setSectionDrawers,
     addSection,
     removeSection,
     autoDistributeSections
   } = useCabinetStore();
 
   const price = result.price?.total ?? 0;
-  const parts = result.parts.length;
-  const errors = validation.filter((message) => message.type === 'error');
-  const warnings = validation.filter((message) => message.type === 'warning');
+  const priceFormatted = price.toLocaleString('ru-RU');
+  const savings = Math.max(0, Math.round(price * 0.13));
+  const sectionCount = config.sections.length;
 
   const stats = useMemo(() => {
     const drawerCount = config.sections.reduce((sum, section) => {
@@ -45,178 +39,182 @@ export default function ConstructorPage() {
     };
   }, [config.sections]);
 
+  function setSectionCount(count) {
+    if (count === sectionCount) return;
+
+    if (count > sectionCount) {
+      for (let index = sectionCount; index < count; index += 1) {
+        addSection();
+      }
+    } else {
+      const removeIds = config.sections.slice(count).map((section) => section.id);
+      removeIds.forEach((sectionId) => removeSection(sectionId));
+    }
+
+    autoDistributeSections();
+  }
+
   return (
-    <div className="cst-app">
-      <header className="cst-hdr">
-        <button className="cst-back" onClick={() => navigate(-1)}>
-          <Icon name="arrow-left" size={14} /> Back
+    <div className="cst-shell">
+      <aside className="cst-sidebar">
+        <button className="cst-nav-item active" type="button">
+          <Icon name="cube" size={18} />
         </button>
+        <button className="cst-nav-item" type="button">
+          <Icon name="layers" size={18} />
+        </button>
+        <button className="cst-nav-item" type="button">
+          <Icon name="projects" size={18} />
+        </button>
+        <button className="cst-nav-item" type="button">
+          <Icon name="star" size={18} />
+        </button>
+        <button className="cst-nav-item" type="button">
+          <Icon name="doc" size={18} />
+        </button>
+      </aside>
 
-        <Link to="/" className="cst-logo">
-          Razmerno<em>.</em>
-        </Link>
-
-        <nav className="cst-tabs">
-          <button className="cst-tab active">Wardrobe</button>
-        </nav>
-
-        <div className="cst-hdr-r">
-          <div className="cst-price-wrap">
-            <div className="cst-price">{price.toLocaleString('ru-RU')} ?</div>
-            <div className="cst-price-sub">Estimated price</div>
+      <aside className="cst-left-panel">
+        <div className="cst-card cst-panel-card">
+          <div className="cst-panel-header">
+            <div>
+              <div className="cst-small-label">Конструктор шкафа</div>
+              <div className="cst-panel-title">Шаг 2 из 4 — Секции</div>
+            </div>
           </div>
-          <button className="btn btn-cta btn-sm" onClick={() => navigate('/auth')}>
-            Request quote
-          </button>
-        </div>
-      </header>
 
-      <aside className="cst-left">
-        <div className="cst-panel">
-          <div className="cst-section">
-            <div className="cst-section-title">Cabinet dimensions</div>
+          <div className="cst-form-group">
+            <div className="cst-form-title">Параметры шкафа</div>
             {[
-              { label: 'Width', value: config.dimensions.width, key: 'width', min: 400, max: 2600 },
-              { label: 'Height', value: config.dimensions.height, key: 'height', min: 600, max: 2800 },
-              { label: 'Depth', value: config.dimensions.depth, key: 'depth', min: 300, max: 900 }
-            ].map((dimension) => (
-              <div key={dimension.key} className="cst-dim">
-                <div className="cst-dim-label">
-                  <span>{dimension.label}</span>
-                  <span className="cst-dim-val">
-                    {dimension.value} <span className="cst-dim-mm">mm</span>
-                  </span>
-                </div>
+              { label: 'Высота, мм', key: 'height', min: 600, max: 2800 },
+              { label: 'Ширина, мм', key: 'width', min: 400, max: 2600 },
+              { label: 'Глубина, мм', key: 'depth', min: 300, max: 900 }
+            ].map((field) => (
+              <label key={field.key} className="cst-field-row">
+                <span>{field.label}</span>
                 <input
-                  type="range"
-                  className="cst-slider"
-                  min={dimension.min}
-                  max={dimension.max}
-                  step={10}
-                  value={dimension.value}
-                  onChange={(event) =>
-                    updateDimensions(dimension.key, Number(event.target.value))
-                  }
+                  type="number"
+                  min={field.min}
+                  max={field.max}
+                  value={config.dimensions[field.key]}
+                  onChange={(event) => updateDimensions(field.key, Number(event.target.value))}
                 />
-              </div>
+              </label>
             ))}
           </div>
 
-          <div className="cst-section">
-            <SectionsEditor
-              sections={config.sections}
-              onUpdateWidth={updateSectionWidth}
-              onUpdateShelves={setSectionShelves}
-              onUpdateDrawers={setSectionDrawers}
-              onAddSection={addSection}
-              onRemoveSection={removeSection}
-              onAutoDistribute={autoDistributeSections}
-            />
+          <div className="cst-form-group">
+            <div className="cst-form-title">Конфигурация</div>
+            <div className="cst-layout-grid">
+              {[2, 3, 4].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  className={`cst-layout-btn ${sectionCount === count ? 'active' : ''}`}
+                  onClick={() => setSectionCount(count)}
+                >
+                  <span>{count} секции</span>
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="cst-section">
-            <div className="cst-section-title">Contents</div>
-            <div className="cst-stepper-row">
-              <span className="cst-stepper-label">Shelves</span>
-              <strong>{stats.shelfCount}</strong>
-            </div>
-            <div className="cst-stepper-row">
-              <span className="cst-stepper-label">Drawers</span>
-              <strong>{stats.drawerCount}</strong>
-            </div>
-            <div className="cst-stepper-row">
-              <span className="cst-stepper-label">Sections</span>
-              <strong>{config.sections.length}</strong>
+          <div className="cst-form-group">
+            <div className="cst-form-title">Тип шкафа</div>
+            <div className="cst-toggle-group">
+              {['Корпусный', 'Встроенный'].map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  className={`cst-toggle-btn ${cabinetType === type ? 'active' : ''}`}
+                  onClick={() => setCabinetType(type)}
+                >
+                  {type}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
 
-        <div className="cst-summary">
-          <div className="cst-summary-row">
-            <span>Parts</span>
-            <strong>{parts}</strong>
-          </div>
-          <div className="cst-summary-row">
-            <span>Errors</span>
-            <strong>{errors.length}</strong>
-          </div>
-          <div className="cst-summary-row">
-            <span>Warnings</span>
-            <strong>{warnings.length}</strong>
-          </div>
-          <div className="cst-summary-price">
-            <span className="cst-summary-pl">Total</span>
-            <span className="cst-summary-pv">{price.toLocaleString('ru-RU')} ?</span>
-          </div>
+          <button className="cst-button-primary" type="button" onClick={() => navigate('/auth')}>
+            Далее: Наполнение
+            <Icon name="arrow-right" size={16} />
+          </button>
         </div>
       </aside>
 
-      <div className="cst-view">
-        <div className="cst-view-grid" />
-        <div className="cst-view-glow" />
-
-        <div className="cst-view-top">
-          <div className="cst-view-top-l">
-            <span className="cst-live-dot" />
-            <span className="cst-view-status">3D preview – {config.dimensions.width} x {config.dimensions.height} x {config.dimensions.depth} mm</span>
-          </div>
-          <span className="cst-view-tag">three.js</span>
-        </div>
-
-        <div className="cst-stage">
-          <CabinetViewer parts={result.parts} />
-        </div>
-
-        <div className="cst-view-bot">
-          <div className="cst-stat"><div className="cst-stat-l">Width</div><div className="cst-stat-v">{config.dimensions.width} mm</div></div>
-          <div className="cst-stat"><div className="cst-stat-l">Height</div><div className="cst-stat-v">{config.dimensions.height} mm</div></div>
-          <div className="cst-stat"><div className="cst-stat-l">Depth</div><div className="cst-stat-v">{config.dimensions.depth} mm</div></div>
-          <div className="cst-stat"><div className="cst-stat-l">Parts</div><div className="cst-stat-v">{parts}</div></div>
-        </div>
-
-        <div className="cst-controls">
-          <div className="cst-ctrl">1</div>
-          <div className="cst-ctrl">2</div>
-          <div className="cst-ctrl">3</div>
-        </div>
-      </div>
-
-      <aside className="cst-right">
-        <div className="cst-right-body">
-          <div className="cst-section-title">Summary</div>
-          <div className="cst-spec-name">Flat wardrobe</div>
-          <div className="cst-spec-dims">{config.dimensions.width} x {config.dimensions.height} x {config.dimensions.depth} mm</div>
-
-          <div className="cst-spec-rows">
-            {[
-              ['Sections', `${config.sections.length}`],
-              ['Shelves', `${stats.shelfCount}`],
-              ['Drawers', `${stats.drawerCount}`],
-              ['Price', `${price.toLocaleString('ru-RU')} ?`]
-            ].map(([label, value]) => (
-              <div key={label} className="cst-spec-row">
-                <span className="cst-spec-l">{label}</span>
-                <span className="cst-spec-v">{value}</span>
-              </div>
-            ))}
+      <main className="cst-view-area">
+        <div className="cst-card cst-view-card">
+          <div className="cst-view-actions">
+            <button type="button" className="cst-icon-action">
+              <Icon name="arrow-left" size={18} />
+            </button>
+            <button type="button" className="cst-icon-action">
+              <Icon name="arrow-right" size={18} />
+            </button>
           </div>
 
-          <div style={{ marginTop: 24 }}>
-            <ValidationPanel messages={validation} />
+          <div className="cst-view-stage">
+            <div className="cst-view-edge" />
+            <div className="cst-view-edge cst-view-edge--second" />
+            <CabinetViewer parts={result.parts} />
           </div>
 
-          <div style={{ marginTop: 24 }}>
-            <div className="cst-section-title">Parts list</div>
-            <PartsTable parts={result.parts} />
+          <div className="cst-view-footer">
+            <div className="cst-view-mode">
+              <button type="button" className="cst-view-mode-btn active">3D</button>
+              <button type="button" className="cst-view-mode-btn">2D</button>
+            </div>
+            <div className="cst-view-zoom">
+              <button type="button" className="cst-icon-action">−</button>
+              <button type="button" className="cst-icon-action">+</button>
+            </div>
           </div>
         </div>
+      </main>
 
-        <div className="cst-right-cta">
-          <div className="cst-cta-price">{price.toLocaleString('ru-RU')} ?</div>
-          <div className="cst-cta-note">Price includes materials and standard hardware estimate.</div>
-          <button className="btn btn-cta btn-sm" type="button" onClick={() => navigate('/auth')}>
-            Request order
+      <aside className="cst-right-panel">
+        <div className="cst-card cst-summary-card">
+          <div className="cst-summary-label">Итоговая стоимость</div>
+          <div className="cst-summary-price">{priceFormatted} ₽</div>
+          <div className="cst-summary-save">Экономия: {savings.toLocaleString('ru-RU')} ₽</div>
+          <div className="cst-summary-meta">
+            <Icon name="clock" size={16} />
+            <span>Срок изготовления 10–14 дней</span>
+          </div>
+          <button className="cst-button-quote" type="button">Получить расчет</button>
+          <button className="cst-button-outline" type="button">
+            <Icon name="star" size={16} /> Сохранить проект
           </button>
+        </div>
+
+        <div className="cst-card cst-material-card">
+          <div className="cst-card-head">Материалы</div>
+          <div className="cst-material-row">
+            <div className="cst-material-swatch" />
+            <div>
+              <div className="cst-material-name">ЛДСП Дуб Сонома</div>
+              <div className="cst-material-sub">16 мм</div>
+            </div>
+          </div>
+          <div className="cst-material-row">
+            <div className="cst-material-swatch cst-material-swatch--edge" />
+            <div>
+              <div className="cst-material-name">Кромка</div>
+              <div className="cst-material-sub">ПВХ 2 мм</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="cst-card cst-info-card">
+          <div className="cst-card-head">Размеры шкафа</div>
+          <div className="cst-info-row"><span>Высота</span><strong>{config.dimensions.height} мм</strong></div>
+          <div className="cst-info-row"><span>Ширина</span><strong>{config.dimensions.width} мм</strong></div>
+          <div className="cst-info-row"><span>Глубина</span><strong>{config.dimensions.depth} мм</strong></div>
+        </div>
+
+        <div className="cst-card cst-info-card">
+          <div className="cst-card-head">Секции</div>
+          <div className="cst-info-row"><span>Количество</span><strong>{sectionCount}</strong></div>
         </div>
       </aside>
     </div>

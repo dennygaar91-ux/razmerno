@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { CabinetPart } from "../engine/types";
 
 type PartsTableProps = {
@@ -54,7 +55,7 @@ export function PartsTable({ parts }: PartsTableProps) {
   );
 }
 
-const thStyle = {
+const thStyle: CSSProperties = {
   textAlign: "left",
   padding: "12px 10px",
   borderBottom: "1px solid #eee",
@@ -63,7 +64,7 @@ const thStyle = {
   background: "#fcfcfc"
 };
 
-const tdStyle = {
+const tdStyle: CSSProperties = {
   padding: "12px 10px",
   borderBottom: "1px solid #f1f1f1",
   color: "#444",
