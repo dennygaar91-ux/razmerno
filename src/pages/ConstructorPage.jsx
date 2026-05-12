@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "../icons/Icon";
 import Header from "../components/Header/Header";
 import { useCabinetStore } from "../store/cabinetStore";
@@ -11,13 +12,21 @@ import {
 } from "../data/constructorOptions";
 import "./ConstructorPage.css";
 
+const DIMENSION_LIMITS = {
+  height: { min: 600, max: 2800, step: 50 },
+  width: { min: 400, max: 3600, step: 50 },
+  depth: { min: 300, max: 900, step: 50 },
+};
+
 export default function ConstructorPage() {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("3D");
   const [viewType, setViewType] = useState("front");
   const [panelTab, setPanelTab] = useState("params");
   const [zoom, setZoom] = useState(1);
   const [humanHeight, setHumanHeight] = useState(1750);
   const [materialDrawerOpen, setMaterialDrawerOpen] = useState(null);
+  const [notice, setNotice] = useState("");
 
   const {
     config,
@@ -35,41 +44,28 @@ export default function ConstructorPage() {
     toggleLegs,
     toggleHandles,
     setHandleVariant,
+    resetConfig,
   } = useCabinetStore();
 
   const sectionCount = config.sections.length;
-  const [activeSectionId, setActiveSectionId] = useState(
-    config.sections[0]?.id || null
-  );
+  const [activeSectionId, setActiveSectionId] = useState(config.sections[0]?.id || null);
 
   const activeSection =
-    config.sections.find((section) => section.id === activeSectionId) ||
-    config.sections[0];
+    config.sections.find((section) => section.id === activeSectionId) || config.sections[0];
 
   const showHandles =
     config.facade.enabled && config.facade.openingType === "with_handles";
 
   const totals = useMemo(() => {
-    const drawerCount = config.sections.reduce((sum, section) => {
-      const drawer = section.items.find((item) => item.type === "drawer");
-      return sum + (drawer?.count || 0);
-    }, 0);
-
-    const shelfCount = config.sections.reduce((sum, section) => {
-      const shelf = section.items.find((item) => item.type === "shelf");
-      return sum + (shelf?.count || 0);
-    }, 0);
-
-    const hangerCount = config.sections.reduce((sum, section) => {
-      const rail = section.items.find((item) => item.type === "hanger_rail");
-      return sum + (rail?.count || 0);
-    }, 0);
-
-    return {
-      drawerCount,
-      shelfCount,
-      hangerCount,
-    };
+    return config.sections.reduce(
+      (acc, section) => {
+        acc.drawerCount += getSectionItemCount(section, "drawer");
+        acc.shelfCount += getSectionItemCount(section, "shelf");
+        acc.hangerCount += getSectionItemCount(section, "hanger_rail");
+        return acc;
+      },
+      { drawerCount: 0, shelfCount: 0, hangerCount: 0 }
+    );
   }, [config.sections]);
 
   const price = result.price?.total ?? 0;
@@ -86,6 +82,26 @@ export default function ConstructorPage() {
   const bodyMaterialName = bodyMaterial?.name || "ЛДСП";
   const facadeMaterialName = facadeMaterial?.name || "МДФ";
 
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function getSectionItemCount(section, type) {
+    return section?.items?.find((item) => item.type === type)?.count || 0;
+  }
+
+  function updateDimensionByStep(key, delta) {
+    const limits = DIMENSION_LIMITS[key];
+    const nextValue = clamp(config.dimensions[key] + delta, limits.min, limits.max);
+    updateDimensions(key, nextValue);
+  }
+
+  function setDimensionValue(key, value) {
+    const limits = DIMENSION_LIMITS[key];
+    const nextValue = clamp(Number(value) || limits.min, limits.min, limits.max);
+    updateDimensions(key, nextValue);
+  }
+
   function setSectionCount(count) {
     const safeCount = Math.max(1, Math.min(6, count));
 
@@ -96,10 +112,7 @@ export default function ConstructorPage() {
         addSection();
       }
     } else {
-      const removeIds = config.sections
-        .slice(safeCount)
-        .map((section) => section.id);
-
+      const removeIds = config.sections.slice(safeCount).map((section) => section.id);
       removeIds.forEach((sectionId) => removeSection(sectionId));
 
       if (
@@ -119,15 +132,82 @@ export default function ConstructorPage() {
   }
 
   function updateZoom(delta) {
-    setZoom((prev) => Math.max(0.7, Math.min(1.5, prev + delta)));
+    setZoom((prev) => Math.max(0.7, Math.min(1.5, Number((prev + delta).toFixed(2)))));
   }
 
   function updateHumanHeight(delta) {
     setHumanHeight((prev) => Math.max(1000, Math.min(2150, prev + delta)));
   }
 
-  function getSectionItemCount(section, type) {
-    return section.items.find((item) => item.type === type)?.count || 0;
+  function clearActiveSection() {
+    if (!activeSection) return;
+    setSectionShelves(activeSection.id, 0);
+    setSectionDrawers(activeSection.id, 0);
+    setSectionHangerRails(activeSection.id, 0);
+  }
+
+  function resetConstructor() {
+    resetConfig();
+    setActiveSectionId(config.sections[0]?.id || null);
+    setPanelTab("params");
+    setViewMode("3D");
+    setViewType("front");
+    setZoom(1);
+    setNotice("Конструктор сброшен до базовой конфигурации");
+  }
+
+  function saveDraft() {
+    const draft = {
+      config,
+      price,
+      updatedAt: new Date().toISOString(),
+    };
+
+    window.localStorage.setItem("razmerno_constructor_draft", JSON.stringify(draft));
+    setNotice("Проект сохранён в этом браузере");
+  }
+
+  function createOrder() {
+    saveDraft();
+    navigate("/account/order");
+  }
+
+  function renderDimensionControl(label, key) {
+    const limits = DIMENSION_LIMITS[key];
+
+    return (
+      <div key={key} className="cst-dimension-control">
+        <div className="cst-dimension-head">
+          <span>{label}, мм</span>
+          <small>
+            {limits.min}–{limits.max}
+          </small>
+        </div>
+        <div className="cst-inline-counter">
+          <button
+            type="button"
+            className="cst-counter-button"
+            onClick={() => updateDimensionByStep(key, -limits.step)}
+          >
+            −
+          </button>
+          <input
+            type="number"
+            min={limits.min}
+            max={limits.max}
+            value={config.dimensions[key]}
+            onChange={(event) => setDimensionValue(key, event.target.value)}
+          />
+          <button
+            type="button"
+            className="cst-counter-button"
+            onClick={() => updateDimensionByStep(key, limits.step)}
+          >
+            +
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -137,31 +217,30 @@ export default function ConstructorPage() {
       <div className="cst-page">
         <div className="cst-shell">
           <section className="cst-left-panel">
-  <div className="cst-horizontal-tabs">
-    <button
-      type="button"
-      className={`cst-tab-btn ${panelTab === "params" ? "active" : ""}`}
-      onClick={() => setPanelTab("params")}
-    >
-      Параметры
-    </button>
+            <div className="cst-horizontal-tabs">
+              <button
+                type="button"
+                className={`cst-tab-btn ${panelTab === "params" ? "active" : ""}`}
+                onClick={() => setPanelTab("params")}
+              >
+                Параметры
+              </button>
+              <button
+                type="button"
+                className={`cst-tab-btn ${panelTab === "fill" ? "active" : ""}`}
+                onClick={() => setPanelTab("fill")}
+              >
+                Наполнение
+              </button>
+              <button
+                type="button"
+                className={`cst-tab-btn ${panelTab === "materials" ? "active" : ""}`}
+                onClick={() => setPanelTab("materials")}
+              >
+                Материалы
+              </button>
+            </div>
 
-    <button
-      type="button"
-      className={`cst-tab-btn ${panelTab === "fill" ? "active" : ""}`}
-      onClick={() => setPanelTab("fill")}
-    >
-      Наполнение
-    </button>
-
-    <button
-      type="button"
-      className={`cst-tab-btn ${panelTab === "materials" ? "active" : ""}`}
-      onClick={() => setPanelTab("materials")}
-    >
-      Материалы
-    </button>
-  </div>
             {panelTab === "params" && (
               <div className="cst-card cst-panel-card">
                 <div className="cst-panel-head">
@@ -169,38 +248,16 @@ export default function ConstructorPage() {
                   <h2 className="cst-panel-title">Размеры и секции</h2>
                 </div>
 
-                <div className="cst-info-grid">
-                  {[
-                    { label: "Высота", key: "height" },
-                    { label: "Ширина", key: "width" },
-                    { label: "Глубина", key: "depth" },
-                  ].map((field) => (
-                    <label key={field.key} className="cst-field-row">
-                      <span>{field.label}, мм</span>
-                      <input
-                        type="number"
-                        min={600}
-                        max={2800}
-                        value={config.dimensions[field.key]}
-                        onChange={(event) =>
-                          updateDimensions(field.key, Number(event.target.value))
-                        }
-                      />
-                    </label>
-                  ))}
-                </div>
-
-                <div className="cst-hint">
-                  Размеры задаются в миллиметрах. Изменения сразу применяются к
-                  3D-просмотру.
+                <div className="cst-dimensions-grid">
+                  {renderDimensionControl("Высота", "height")}
+                  {renderDimensionControl("Ширина", "width")}
+                  {renderDimensionControl("Глубина", "depth")}
                 </div>
 
                 <div className="cst-card-section">
                   <div className="cst-card-head">Секции</div>
-
                   <div className="cst-counter-block cst-counter-block--wide">
                     <span>Количество секций</span>
-
                     <div className="cst-counter cst-counter--large">
                       <button
                         type="button"
@@ -209,11 +266,9 @@ export default function ConstructorPage() {
                       >
                         −
                       </button>
-
                       <span className="cst-counter-value cst-counter-value--large">
                         {sectionCount}
                       </span>
-
                       <button
                         type="button"
                         className="cst-counter-button"
@@ -229,23 +284,23 @@ export default function ConstructorPage() {
                       <button
                         key={section.id}
                         type="button"
-                        className={`cst-section-item ${
-                          activeSection?.id === section.id ? "active" : ""
-                        }`}
+                        className={`cst-section-item ${activeSection?.id === section.id ? "active" : ""}`}
                         onClick={() => selectSection(section.id)}
                       >
                         <span>Секция {index + 1}</span>
-                        <small>
-                          {Math.round(config.dimensions.width / sectionCount)} мм
-                        </small>
+                        <small>{Math.round(config.dimensions.width / sectionCount)} мм</small>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="cst-hint">
-                  Начните с одной секции. Нажмите на секцию в модели, чтобы
-                  настроить её наполнение.
+                <div className="cst-panel-actions">
+                  <button type="button" className="cst-secondary-action" onClick={() => setPanelTab("fill")}>
+                    Перейти к наполнению
+                  </button>
+                  <button type="button" className="cst-ghost-action" onClick={resetConstructor}>
+                    Сбросить
+                  </button>
                 </div>
               </div>
             )}
@@ -254,14 +309,20 @@ export default function ConstructorPage() {
               <div className="cst-card cst-panel-card">
                 <div className="cst-panel-head">
                   <div className="cst-small-label">Наполнение</div>
-                  <h2 className="cst-panel-title">
-                    {activeSection.name || "Выбранная секция"}
-                  </h2>
+                  <h2 className="cst-panel-title">{activeSection.name || "Выбранная секция"}</h2>
                 </div>
 
-                <div className="cst-hint">
-                  Настраивайте не весь шкаф сразу, а выбранную секцию. Нажмите
-                  на другую секцию в блоке “Параметры”, чтобы переключиться.
+                <div className="cst-section-chip-row">
+                  {config.sections.map((section, index) => (
+                    <button
+                      key={section.id}
+                      type="button"
+                      className={`cst-mini-section-chip ${activeSection.id === section.id ? "active" : ""}`}
+                      onClick={() => setActiveSectionId(section.id)}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="cst-control-row">
@@ -272,33 +333,17 @@ export default function ConstructorPage() {
                         type="button"
                         className="cst-counter-button"
                         onClick={() =>
-                          setSectionShelves(
-                            activeSection.id,
-                            Math.max(
-                              0,
-                              getSectionItemCount(activeSection, "shelf") - 1
-                            )
-                          )
+                          setSectionShelves(activeSection.id, Math.max(0, getSectionItemCount(activeSection, "shelf") - 1))
                         }
                       >
                         −
                       </button>
-
-                      <span className="cst-counter-value">
-                        {getSectionItemCount(activeSection, "shelf")}
-                      </span>
-
+                      <span className="cst-counter-value">{getSectionItemCount(activeSection, "shelf")}</span>
                       <button
                         type="button"
                         className="cst-counter-button"
                         onClick={() =>
-                          setSectionShelves(
-                            activeSection.id,
-                            Math.min(
-                              12,
-                              getSectionItemCount(activeSection, "shelf") + 1
-                            )
-                          )
+                          setSectionShelves(activeSection.id, Math.min(12, getSectionItemCount(activeSection, "shelf") + 1))
                         }
                       >
                         +
@@ -313,33 +358,17 @@ export default function ConstructorPage() {
                         type="button"
                         className="cst-counter-button"
                         onClick={() =>
-                          setSectionDrawers(
-                            activeSection.id,
-                            Math.max(
-                              0,
-                              getSectionItemCount(activeSection, "drawer") - 1
-                            )
-                          )
+                          setSectionDrawers(activeSection.id, Math.max(0, getSectionItemCount(activeSection, "drawer") - 1))
                         }
                       >
                         −
                       </button>
-
-                      <span className="cst-counter-value">
-                        {getSectionItemCount(activeSection, "drawer")}
-                      </span>
-
+                      <span className="cst-counter-value">{getSectionItemCount(activeSection, "drawer")}</span>
                       <button
                         type="button"
                         className="cst-counter-button"
                         onClick={() =>
-                          setSectionDrawers(
-                            activeSection.id,
-                            Math.min(
-                              6,
-                              getSectionItemCount(activeSection, "drawer") + 1
-                            )
-                          )
+                          setSectionDrawers(activeSection.id, Math.min(6, getSectionItemCount(activeSection, "drawer") + 1))
                         }
                       >
                         +
@@ -356,39 +385,17 @@ export default function ConstructorPage() {
                         type="button"
                         className="cst-counter-button"
                         onClick={() =>
-                          setSectionHangerRails(
-                            activeSection.id,
-                            Math.max(
-                              0,
-                              getSectionItemCount(
-                                activeSection,
-                                "hanger_rail"
-                              ) - 1
-                            )
-                          )
+                          setSectionHangerRails(activeSection.id, Math.max(0, getSectionItemCount(activeSection, "hanger_rail") - 1))
                         }
                       >
                         −
                       </button>
-
-                      <span className="cst-counter-value">
-                        {getSectionItemCount(activeSection, "hanger_rail")}
-                      </span>
-
+                      <span className="cst-counter-value">{getSectionItemCount(activeSection, "hanger_rail")}</span>
                       <button
                         type="button"
                         className="cst-counter-button"
                         onClick={() =>
-                          setSectionHangerRails(
-                            activeSection.id,
-                            Math.min(
-                              3,
-                              getSectionItemCount(
-                                activeSection,
-                                "hanger_rail"
-                              ) + 1
-                            )
-                          )
+                          setSectionHangerRails(activeSection.id, Math.min(3, getSectionItemCount(activeSection, "hanger_rail") + 1))
                         }
                       >
                         +
@@ -399,19 +406,14 @@ export default function ConstructorPage() {
                   <div className="cst-toggle-group">
                     <button
                       type="button"
-                      className={`cst-toggle-btn ${
-                        config.options.hasLegs ? "active" : ""
-                      }`}
+                      className={`cst-toggle-btn ${config.options.hasLegs ? "active" : ""}`}
                       onClick={() => toggleLegs(!config.options.hasLegs)}
                     >
                       Ножки
                     </button>
-
                     <button
                       type="button"
-                      className={`cst-toggle-btn ${
-                        showHandles ? "active" : ""
-                      }`}
+                      className={`cst-toggle-btn ${showHandles ? "active" : ""}`}
                       onClick={() => toggleHandles(!showHandles)}
                     >
                       Ручки
@@ -419,30 +421,30 @@ export default function ConstructorPage() {
                   </div>
                 </div>
 
-                <div
-                  className={`cst-card-section ${
-                    !showHandles ? "is-disabled" : ""
-                  }`}
-                >
+                <div className={`cst-card-section ${!showHandles ? "is-disabled" : ""}`}>
                   <div className="cst-card-head">Вариант ручки</div>
-
                   <div className="cst-section-controls">
                     {handleOptions.map((option) => (
                       <button
                         key={option.id}
                         type="button"
                         disabled={!showHandles}
-                        className={`cst-option-card ${
-                          config.facade.handleVariant === option.id
-                            ? "active"
-                            : ""
-                        }`}
+                        className={`cst-option-card ${config.facade.handleVariant === option.id ? "active" : ""}`}
                         onClick={() => setHandleVariant(option.id)}
                       >
                         {option.label}
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div className="cst-panel-actions">
+                  <button type="button" className="cst-secondary-action" onClick={() => setPanelTab("materials")}>
+                    Выбрать материалы
+                  </button>
+                  <button type="button" className="cst-ghost-action" onClick={clearActiveSection}>
+                    Очистить секцию
+                  </button>
                 </div>
               </div>
             )}
@@ -457,50 +459,26 @@ export default function ConstructorPage() {
                 <div className="cst-material-summary">
                   <div className="cst-material-block">
                     <div className="cst-material-block-head">
-                      <span
-                        className="cst-material-swatch cst-material-swatch-small"
-                        style={{ background: bodyMaterial?.color || "#ccc" }}
-                      />
+                      <span className="cst-material-swatch cst-material-swatch-small" style={{ background: bodyMaterial?.color || "#ccc" }} />
                       <div className="cst-material-block-text">
-                        <div className="cst-material-block-title">
-                          {bodyMaterialName}
-                        </div>
-                        <div className="cst-material-block-sub">
-                          ЛДСП 16 мм
-                        </div>
+                        <div className="cst-material-block-title">{bodyMaterialName}</div>
+                        <div className="cst-material-block-sub">ЛДСП 16 мм</div>
                       </div>
                     </div>
-
-                    <button
-                      type="button"
-                      className="cst-material-change-btn"
-                      onClick={() => setMaterialDrawerOpen("body")}
-                    >
+                    <button type="button" className="cst-material-change-btn" onClick={() => setMaterialDrawerOpen("body")}>
                       Изменить
                     </button>
                   </div>
 
                   <div className="cst-material-block">
                     <div className="cst-material-block-head">
-                      <span
-                        className="cst-material-swatch cst-material-swatch-small"
-                        style={{ background: facadeMaterial?.color || "#ccc" }}
-                      />
+                      <span className="cst-material-swatch cst-material-swatch-small" style={{ background: facadeMaterial?.color || "#ccc" }} />
                       <div className="cst-material-block-text">
-                        <div className="cst-material-block-title">
-                          {facadeMaterialName}
-                        </div>
-                        <div className="cst-material-block-sub">
-                          МДФ / ЛДСП
-                        </div>
+                        <div className="cst-material-block-title">{facadeMaterialName}</div>
+                        <div className="cst-material-block-sub">МДФ / ЛДСП</div>
                       </div>
                     </div>
-
-                    <button
-                      type="button"
-                      className="cst-material-change-btn"
-                      onClick={() => setMaterialDrawerOpen("facade")}
-                    >
+                    <button type="button" className="cst-material-change-btn" onClick={() => setMaterialDrawerOpen("facade")}>
                       Изменить
                     </button>
                   </div>
@@ -508,28 +486,23 @@ export default function ConstructorPage() {
                   <div className="cst-material-block">
                     <div className="cst-material-block-head">
                       <div className="cst-material-block-text">
-                        <div className="cst-material-block-title">
-                          {config.options.hardwareBrand || "Hettich"}
-                        </div>
-                        <div className="cst-material-block-sub">
-                          петли и направляющие
-                        </div>
+                        <div className="cst-material-block-title">{config.options.hardwareBrand || "Hettich"}</div>
+                        <div className="cst-material-block-sub">петли и направляющие</div>
                       </div>
                     </div>
-
-                    <button
-                      type="button"
-                      className="cst-material-change-btn"
-                      onClick={() => setMaterialDrawerOpen("hardware")}
-                    >
+                    <button type="button" className="cst-material-change-btn" onClick={() => setMaterialDrawerOpen("hardware")}>
                       Изменить
                     </button>
                   </div>
                 </div>
 
-                <div className="cst-hint">
-                  Нажмите «Изменить», чтобы выбрать другие материалы и
-                  фурнитуру.
+                <div className="cst-panel-actions">
+                  <button type="button" className="cst-secondary-action" onClick={saveDraft}>
+                    Сохранить проект
+                  </button>
+                  <button type="button" className="cst-ghost-action" onClick={() => setPanelTab("params")}>
+                    К размерам
+                  </button>
                 </div>
               </div>
             )}
@@ -548,9 +521,7 @@ export default function ConstructorPage() {
                     <button
                       key={option.id}
                       type="button"
-                      className={`cst-view-pill ${
-                        viewType === option.id ? "active" : ""
-                      }`}
+                      className={`cst-view-pill ${viewType === option.id ? "active" : ""}`}
                       onClick={() => setViewType(option.id)}
                     >
                       {option.label}
@@ -559,23 +530,10 @@ export default function ConstructorPage() {
                 </div>
 
                 <div className="cst-view-actions">
-                  <button
-                    type="button"
-                    className={`cst-view-mode-btn ${
-                      viewMode === "3D" ? "active" : ""
-                    }`}
-                    onClick={() => setViewMode("3D")}
-                  >
+                  <button type="button" className={`cst-view-mode-btn ${viewMode === "3D" ? "active" : ""}`} onClick={() => setViewMode("3D")}>
                     3D
                   </button>
-
-                  <button
-                    type="button"
-                    className={`cst-view-mode-btn ${
-                      viewMode === "2D" ? "active" : ""
-                    }`}
-                    onClick={() => setViewMode("2D")}
-                  >
+                  <button type="button" className={`cst-view-mode-btn ${viewMode === "2D" ? "active" : ""}`} onClick={() => setViewMode("2D")}>
                     2D
                   </button>
                 </div>
@@ -598,46 +556,16 @@ export default function ConstructorPage() {
                 <div className="cst-view-hotspot">
                   <span>Рост человека</span>
                   <div className="cst-counter">
-                    <button
-                      type="button"
-                      className="cst-counter-button"
-                      onClick={() => updateHumanHeight(-50)}
-                    >
-                      −
-                    </button>
-
-                    <span className="cst-counter-value">
-                      {humanHeight} мм
-                    </span>
-
-                    <button
-                      type="button"
-                      className="cst-counter-button"
-                      onClick={() => updateHumanHeight(50)}
-                    >
-                      +
-                    </button>
+                    <button type="button" className="cst-counter-button" onClick={() => updateHumanHeight(-50)}>−</button>
+                    <span className="cst-counter-value">{humanHeight} мм</span>
+                    <button type="button" className="cst-counter-button" onClick={() => updateHumanHeight(50)}>+</button>
                   </div>
                 </div>
 
                 <div className="cst-view-zoom">
-                  <button
-                    type="button"
-                    className="cst-counter-button"
-                    onClick={() => updateZoom(-0.1)}
-                  >
-                    −
-                  </button>
-
-                  <span className="cst-zoom-value">
-                    {Math.round(zoom * 100)}%
-                  </span>
-
-                  <button
-                    type="button"
-                    className="cst-counter-button"
-                    onClick={() => updateZoom(0.1)}
-                  >
+                  <button type="button" className="cst-counter-button" onClick={() => updateZoom(-0.1)}>−</button>
+                  <span className="cst-zoom-value">{Math.round(zoom * 100)}%</span>
+                  <button type="button" className="cst-counter-button" onClick={() => updateZoom(0.1)}>
                     <Icon name="plus" size={16} />
                   </button>
                 </div>
@@ -648,15 +576,8 @@ export default function ConstructorPage() {
           <aside className="cst-right-panel">
             <div className="cst-card cst-summary-card">
               <div className="cst-summary-label">Итого</div>
-
-              <div className="cst-summary-price">
-                {price.toLocaleString("ru-RU")} ₽
-              </div>
-
-              <div className="cst-summary-save">
-                Экономия до {savings.toLocaleString("ru-RU")} ₽
-              </div>
-
+              <div className="cst-summary-price">{price.toLocaleString("ru-RU")} ₽</div>
+              <div className="cst-summary-save">Экономия до {savings.toLocaleString("ru-RU")} ₽</div>
               <div className="cst-summary-meta">
                 <Icon name="clock" size={16} />
                 <span>Срок изготовления 10–14 дней</span>
@@ -664,37 +585,29 @@ export default function ConstructorPage() {
 
               <div className="cst-summary-breakdown">
                 <div className="cst-summary-line">
+                  <span>Размеры</span>
+                  <strong>{config.dimensions.width}×{config.dimensions.height}×{config.dimensions.depth}</strong>
+                </div>
+                <div className="cst-summary-line">
                   <span>Корпус: {bodyMaterialName}</span>
                   <strong>{config.sections.length} секц.</strong>
                 </div>
-
                 <div className="cst-summary-line">
                   <span>Фасад: {facadeMaterialName}</span>
                   <strong>{config.options.hardwareBrand}</strong>
                 </div>
-
-                <div className="cst-summary-line">
-                  <span>Ящики</span>
-                  <strong>{totals.drawerCount}</strong>
-                </div>
-
-                <div className="cst-summary-line">
-                  <span>Полки</span>
-                  <strong>{totals.shelfCount}</strong>
-                </div>
-
-                <div className="cst-summary-line">
-                  <span>Рейлинги</span>
-                  <strong>{totals.hangerCount}</strong>
-                </div>
+                <div className="cst-summary-line"><span>Ящики</span><strong>{totals.drawerCount}</strong></div>
+                <div className="cst-summary-line"><span>Полки</span><strong>{totals.shelfCount}</strong></div>
+                <div className="cst-summary-line"><span>Рейлинги</span><strong>{totals.hangerCount}</strong></div>
               </div>
 
-              <div className="cst-hint">
-                В стоимость уже включена доставка, упаковка и НДС.
-              </div>
+              {notice ? <div className="cst-notice">{notice}</div> : null}
 
-              <button className="cst-button-primary" type="button">
+              <button className="cst-button-primary" type="button" onClick={createOrder}>
                 Создать
+              </button>
+              <button className="cst-summary-link" type="button" onClick={saveDraft}>
+                Сохранить проект
               </button>
             </div>
           </aside>
@@ -703,11 +616,7 @@ export default function ConstructorPage() {
 
       {materialDrawerOpen && (
         <>
-          <div
-            className="cst-drawer-overlay"
-            onClick={() => setMaterialDrawerOpen(null)}
-          />
-
+          <div className="cst-drawer-overlay" onClick={() => setMaterialDrawerOpen(null)} />
           <div className="cst-material-drawer">
             <div className="cst-drawer-header">
               <h3>
@@ -715,14 +624,7 @@ export default function ConstructorPage() {
                 {materialDrawerOpen === "facade" && "Материал фасадов"}
                 {materialDrawerOpen === "hardware" && "Фурнитура"}
               </h3>
-
-              <button
-                type="button"
-                className="cst-drawer-close"
-                onClick={() => setMaterialDrawerOpen(null)}
-              >
-                ✕
-              </button>
+              <button type="button" className="cst-drawer-close" onClick={() => setMaterialDrawerOpen(null)}>✕</button>
             </div>
 
             <div className="cst-drawer-content">
@@ -732,25 +634,16 @@ export default function ConstructorPage() {
                     <button
                       key={option.id}
                       type="button"
-                      className={`cst-material-option ${
-                        config.materials.bodyMaterialId === option.id
-                          ? "active"
-                          : ""
-                      }`}
+                      className={`cst-material-option ${config.materials.bodyMaterialId === option.id ? "active" : ""}`}
                       onClick={() => {
                         setBodyMaterial(option.id);
                         setMaterialDrawerOpen(null);
                       }}
                     >
-                      <span
-                        className="cst-material-swatch"
-                        style={{ background: option.color }}
-                      />
+                      <span className="cst-material-swatch" style={{ background: option.color }} />
                       <div>
                         <div className="cst-material-name">{option.name}</div>
-                        <div className="cst-material-sub">
-                          {option.subtitle}
-                        </div>
+                        <div className="cst-material-sub">{option.subtitle}</div>
                       </div>
                     </button>
                   ))}
@@ -763,25 +656,16 @@ export default function ConstructorPage() {
                     <button
                       key={option.id}
                       type="button"
-                      className={`cst-material-option ${
-                        config.materials.facadeMaterialId === option.id
-                          ? "active"
-                          : ""
-                      }`}
+                      className={`cst-material-option ${config.materials.facadeMaterialId === option.id ? "active" : ""}`}
                       onClick={() => {
                         setFacadeMaterial(option.id);
                         setMaterialDrawerOpen(null);
                       }}
                     >
-                      <span
-                        className="cst-material-swatch"
-                        style={{ background: option.color }}
-                      />
+                      <span className="cst-material-swatch" style={{ background: option.color }} />
                       <div>
                         <div className="cst-material-name">{option.name}</div>
-                        <div className="cst-material-sub">
-                          {option.subtitle}
-                        </div>
+                        <div className="cst-material-sub">{option.subtitle}</div>
                       </div>
                     </button>
                   ))}
@@ -794,11 +678,7 @@ export default function ConstructorPage() {
                     <button
                       key={option.id}
                       type="button"
-                      className={`cst-hardware-option ${
-                        config.options.hardwareBrand === option.id
-                          ? "active"
-                          : ""
-                      }`}
+                      className={`cst-hardware-option ${config.options.hardwareBrand === option.id ? "active" : ""}`}
                       onClick={() => {
                         setHardwareBrand(option.id);
                         setMaterialDrawerOpen(null);
@@ -806,8 +686,7 @@ export default function ConstructorPage() {
                     >
                       <div className="cst-hardware-name">{option.label}</div>
                       <div className="cst-hardware-desc">
-                        {option.label === "Hettich" &&
-                          "Премиальная фурнитура"}
+                        {option.label === "Hettich" && "Премиальная фурнитура"}
                         {option.label === "Firmax" && "Надёжный стандарт"}
                       </div>
                     </button>
