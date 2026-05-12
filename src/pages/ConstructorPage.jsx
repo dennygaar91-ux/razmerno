@@ -116,7 +116,7 @@ export default function ConstructorPage() {
   }
 
   function updateHumanHeight(delta) {
-    setHumanHeight((prev) => Math.max(1600, Math.min(1900, prev + delta)));
+    setHumanHeight((prev) => Math.max(1000, Math.min(2150, prev + delta)));
   }
 
   return (

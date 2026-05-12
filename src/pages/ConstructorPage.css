@@ -831,68 +831,6 @@
   }
 }
 
-  .cst-header-actions {
-    width: 100%;
-    justify-content: stretch;
-  }
-
-  .cst-header-actions .cst-button-primary,
-  .cst-header-actions .cst-button-outline {
-    flex: 1;
-  }
-+
-+  .cst-sidebar {
-+    flex-direction: row;
-+    justify-content: space-between;
-+    align-items: center;
-+    padding: 14px;
-+  }
-+
-+  .cst-sidebar-group {
-+    flex-direction: row;
-+    gap: 8px;
-+  }
-+
-+  .cst-nav-item,
-+  .cst-nav-help {
-+    width: 44px;
-+    height: 44px;
-+  }
-+
-+  .cst-card.cst-view-card {
-+    padding: 18px;
-+  }
-+
-+  .cst-view-stage {
-+    min-height: 340px;
-+  }
-+
-+  .cst-panel-card,
-+  .cst-summary-card,
-+  .cst-material-card {
-+    padding: 20px;
-+  }
-+
-+  .cst-info-grid {
-+    grid-template-columns: 1fr;
-+  }
-+
-+  .cst-section-controls {
-+    grid-template-columns: 1fr;
-+  }
-+
-+  .cst-view-toolbar,
-+  .cst-view-footer,
-+  .cst-header-actions {
-+    flex-wrap: wrap;
-+    gap: 10px;
-+  }
-+
-+  .cst-view-actions,
-+  .cst-view-mode {
-+    width: 100%;
-+  }
- }
 
 
 

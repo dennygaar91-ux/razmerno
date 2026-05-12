@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Edges } from "@react-three/drei";
+import { OrbitControls, Edges, Html } from "@react-three/drei";
 import type { CabinetConfig, CabinetPart } from "./engine/types";
 import { useMemo } from "react";
 
@@ -79,6 +79,11 @@ export function CabinetViewer({
   const is2D = viewMode === "2D";
 
   const centerOffset = scaledParts[0]?.center ?? { x: 0, y: 0, z: 0 };
+  const widthMeters = bounds.x * 0.0018;
+  const heightMeters = bounds.y * 0.0018;
+  const depthMeters = bounds.z * 0.0018;
+  const silhouetteHeight = userHeight * 0.0018;
+  const canRotate = viewMode === "3D" || viewType === "free";
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative", minHeight: 0 }}>
@@ -104,10 +109,67 @@ export function CabinetViewer({
             );
           })}
 
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
-            <planeGeometry args={[30, 30]} />
-            <meshStandardMaterial color={is2D ? "#f4f0e7" : "#e8e2d6"} />
+          {((viewType === "front" || viewType === "free") && bounds.x > 0) && (() => {
+            const silhouetteDepth = Math.min(depthMeters * 0.55, 0.18);
+            const silhouetteWidth = 0.14;
+            const silhouetteX = -widthMeters / 2 - silhouetteWidth - 0.08;
+            const silhouetteZ = -depthMeters / 2 + silhouetteDepth / 2 + 0.02;
+
+            return (
+              <group position={[silhouetteX, silhouetteHeight / 2, silhouetteZ]}>
+                <mesh position={[0, silhouetteHeight / 2 + 0.05, 0]}>
+                  <sphereGeometry args={[0.08, 24, 24]} />
+                  <meshStandardMaterial color="#8f8f8f" transparent opacity={0.85} />
+                </mesh>
+                <mesh position={[0, silhouetteHeight * 0.28, 0]}>
+                  <boxGeometry args={[silhouetteWidth, silhouetteHeight * 0.36, silhouetteDepth]} />
+                  <meshStandardMaterial color="#8f8f8f" transparent opacity={0.7} />
+                </mesh>
+                <mesh position={[-silhouetteWidth * 0.22, silhouetteHeight * 0.12, 0]}>
+                  <boxGeometry args={[0.06, silhouetteHeight * 0.24, silhouetteDepth]} />
+                  <meshStandardMaterial color="#8f8f8f" transparent opacity={0.7} />
+                </mesh>
+                <mesh position={[silhouetteWidth * 0.22, silhouetteHeight * 0.12, 0]}>
+                  <boxGeometry args={[0.06, silhouetteHeight * 0.24, silhouetteDepth]} />
+                  <meshStandardMaterial color="#8f8f8f" transparent opacity={0.7} />
+                </mesh>
+              </group>
+            );
+          })()}
+
+          <mesh position={[0, 0.01, -depthMeters / 2 - 0.06]}>
+            <boxGeometry args={[widthMeters + 0.08, 0.004, 0.004]} />
+            <meshStandardMaterial color="#5f5f5f" />
           </mesh>
+          <Html position={[0, 0.03, -depthMeters / 2 - 0.14]} center>
+            <div style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.88)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, color: '#111' }}>
+              Ширина {Math.round(bounds.x)} мм
+            </div>
+          </Html>
+
+          <mesh position={[widthMeters / 2 + 0.06, heightMeters / 2, -depthMeters / 2]}>
+            <boxGeometry args={[0.004, heightMeters, 0.004]} />
+            <meshStandardMaterial color="#5f5f5f" />
+          </mesh>
+          <Html position={[widthMeters / 2 + 0.12, heightMeters / 2, -depthMeters / 2]} center>
+            <div style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.88)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, color: '#111' }}>
+              Высота {Math.round(bounds.y)} мм
+            </div>
+          </Html>
+
+          {viewType !== "front" && (
+            <>
+              <mesh position={[widthMeters / 2 + 0.06, 0.01, -depthMeters / 2 + depthMeters / 2]}>
+                <boxGeometry args={[0.004, 0.004, depthMeters]} />
+                <meshStandardMaterial color="#5f5f5f" />
+              </mesh>
+              <Html position={[widthMeters / 2 + 0.12, 0.03, -depthMeters / 2 + depthMeters / 2]} center>
+                <div style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.88)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, color: '#111' }}>
+                  Глубина {Math.round(bounds.z)} мм
+                </div>
+              </Html>
+            </>
+          )}
 
           {config.options.hasLegs && (
             <group>
@@ -123,14 +185,9 @@ export function CabinetViewer({
               })}
             </group>
           )}
-
-          <mesh position={[-sceneSize * 0.7, (userHeight * 0.0018) / 2, sceneSize * 0.7]}>
-            <boxGeometry args={[0.08, userHeight * 0.0018, 0.08]} />
-            <meshStandardMaterial color="#9a9a9a" opacity={0.24} transparent />
-          </mesh>
         </group>
 
-        <OrbitControls enablePan={!is2D} enableRotate={!is2D} enableZoom={true} />
+        <OrbitControls enablePan={canRotate} enableRotate={canRotate} enableZoom={true} />
       </Canvas>
     </div>
   );
