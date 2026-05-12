@@ -454,5 +454,6 @@ export default function ConstructorPage() {
         </aside>
       </div>
     </div>
+    </>
   );
 }
