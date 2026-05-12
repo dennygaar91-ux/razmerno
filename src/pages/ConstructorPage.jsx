@@ -179,21 +179,37 @@ export default function ConstructorPage() {
               <div className="cst-hint">Размеры задаются в миллиметрах. Изменения сразу применяются к 3D-просмотру.</div>
 
               <div className="cst-card-section">
-                <div className="cst-card-head">Секции</div>
-                <div className="cst-section-controls">
-                  {[1, 2, 3, 4].map((count) => (
-                    <button
-                      key={count}
-                      type="button"
-                      className={`cst-option-card ${sectionCount === count ? "active" : ""}`}
-                      onClick={() => setSectionCount(count)}
-                    >
-                      {count} секции
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="cst-hint">Выберите количество секций — ширина автоматически перерассчитывается.</div>
+  <div className="cst-card-head">Секции</div>
+
+  <div className="cst-counter-block cst-counter-block--wide">
+    <span>Количество секций</span>
+
+    <div className="cst-counter cst-counter--large">
+      <button
+        type="button"
+        className="cst-counter-button"
+        onClick={() => setSectionCount(Math.max(1, sectionCount - 1))}
+      >
+        −
+      </button>
+
+      <span className="cst-counter-value cst-counter-value--large">
+        {sectionCount}
+      </span>
+
+      <button
+        type="button"
+        className="cst-counter-button"
+        onClick={() => setSectionCount(Math.min(6, sectionCount + 1))}
+      >
+        +
+      </button>
+    </div>
+  </div>
+</div>
+              <div className="cst-hint">
+  Начните с одной секции. Нажмите на секцию в модели, чтобы настроить её наполнение.
+</div>
             </div>
           )}
 
