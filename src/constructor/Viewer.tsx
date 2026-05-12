@@ -3,7 +3,7 @@ import { OrbitControls, Edges, Html } from "@react-three/drei";
 import type { CabinetConfig, CabinetPart } from "./engine/types";
 import { useMemo } from "react";
 
-const SCALE = 0.0018;
+const SCALE = 0.0038;
 
 const MATERIAL_COLORS: Record<string, string> = {
   hdf_white_3: "#e8e8e3",
@@ -18,10 +18,10 @@ const MATERIAL_COLORS: Record<string, string> = {
 };
 
 const VIEW_POSITIONS: Record<string, [number, number, number]> = {
-  front: [0, 0.8, 2.5],
-  side: [2.5, 0.8, 0],
-  top: [0, 2.6, 0.1],
-  free: [2.2, 1.2, 2.2],
+  front: [0, 0.15, 1.25],
+  side: [1.25, 0.15, 0],
+  top: [0, 1.7, 0.01],
+  free: [1.3, 0.55, 1.3],
 };
 
 function getColor(materialId: string) {
@@ -40,11 +40,7 @@ function computeBounds(parts: CabinetPart[]) {
   return box;
 }
 
-function DimensionLabel({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function DimensionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
@@ -70,7 +66,6 @@ function SectionInteriors({
   depthMeters,
   facadeMaterialColor,
   bodyMaterialColor,
-  is2D,
 }: {
   section: any;
   sectionX: number;
@@ -79,7 +74,6 @@ function SectionInteriors({
   depthMeters: number;
   facadeMaterialColor: string;
   bodyMaterialColor: string;
-  is2D: boolean;
 }) {
   const shelfThickness = 0.012;
   const shelfMargin = 0.018;
@@ -94,71 +88,50 @@ function SectionInteriors({
   const hasRail = hangerRail && hangerRail.count > 0;
 
   const interiorHeight = heightMeters - shelfMargin * 2;
-  const drawerStackHeight = drawerCount > 0 ? Math.min(interiorHeight * 0.45, heightMeters * 0.4) : 0;
+  const drawerStackHeight =
+    drawerCount > 0 ? Math.min(interiorHeight * 0.45, heightMeters * 0.4) : 0;
   const shelfAreaHeight = interiorHeight - drawerStackHeight;
   const shelfSpacing = shelfCount > 0 ? shelfAreaHeight / (shelfCount + 1) : 0;
-
   const interiorZ = -depthMeters / 2 + depthMeters * 0.65;
 
   return (
     <group>
-      {shelfCount > 0 && (
-        <group>
-          {Array.from({ length: shelfCount }).map((_, i) => {
-            const shelfY = shelfMargin + (i + 1) * shelfSpacing;
-            return (
-              <mesh
-                key={`shelf-${section.id}-${i}`}
-                position={[sectionX, shelfY, interiorZ]}
-              >
-                <boxGeometry
-                  args={[sectionWidth - 0.04, shelfThickness, depthMeters * 0.6]}
-                />
-                <meshStandardMaterial
-                  color={bodyMaterialColor}
-                  metalness={0.05}
-                  roughness={0.7}
-                />
-              </mesh>
-            );
-          })}
-        </group>
-      )}
+      {Array.from({ length: shelfCount }).map((_, index) => {
+        const shelfY = shelfMargin + drawerStackHeight + (index + 1) * shelfSpacing;
 
-      {drawerCount > 0 && (
-        <group>
-          {Array.from({ length: drawerCount }).map((_, i) => {
-            const drawerHeight = (drawerStackHeight - drawerGap * (drawerCount - 1)) / drawerCount;
-            const drawerY = shelfMargin - drawerStackHeight / 2 + (i + 0.5) * (drawerHeight + drawerGap);
-            return (
-              <mesh
-                key={`drawer-${section.id}-${i}`}
-                position={[sectionX, drawerY, interiorZ - 0.01]}
-              >
-                <boxGeometry
-                  args={[sectionWidth - 0.02, drawerHeight - drawerGap / 2, depthMeters * 0.55]}
-                />
-                <meshStandardMaterial
-                  color={facadeMaterialColor}
-                  metalness={0.08}
-                  roughness={0.6}
-                />
-              </mesh>
-            );
-          })}
-        </group>
-      )}
+        return (
+          <mesh key={`shelf-${section.id}-${index}`} position={[sectionX, shelfY, interiorZ]}>
+            <boxGeometry args={[sectionWidth - 0.04, shelfThickness, depthMeters * 0.6]} />
+            <meshStandardMaterial color={bodyMaterialColor} metalness={0.05} roughness={0.7} />
+          </mesh>
+        );
+      })}
 
-      {hasRail && (
+      {Array.from({ length: drawerCount }).map((_, index) => {
+        const drawerHeight =
+          (drawerStackHeight - drawerGap * Math.max(0, drawerCount - 1)) / drawerCount;
+        const drawerY =
+          shelfMargin + drawerHeight / 2 + index * (drawerHeight + drawerGap);
+
+        return (
+          <mesh
+            key={`drawer-${section.id}-${index}`}
+            position={[sectionX, drawerY, interiorZ - 0.01]}
+          >
+            <boxGeometry
+              args={[sectionWidth - 0.02, drawerHeight - drawerGap / 2, depthMeters * 0.55]}
+            />
+            <meshStandardMaterial color={facadeMaterialColor} metalness={0.08} roughness={0.6} />
+          </mesh>
+        );
+      })}
+
+      {hasRail ? (
         <mesh position={[sectionX, heightMeters * 0.75, interiorZ]}>
-          <cylinderGeometry args={[0.008, 0.008, sectionWidth - 0.04, 16]} rotation={[0, 0, Math.PI / 2]} />
-          <meshStandardMaterial
-            color="#c0c0c0"
-            metalness={0.6}
-            roughness={0.4}
-          />
+          <cylinderGeometry args={[0.008, 0.008, sectionWidth - 0.04, 16]} />
+          <meshStandardMaterial color="#c0c0c0" metalness={0.6} roughness={0.4} />
         </mesh>
-      )}
+      ) : null}
     </group>
   );
 }
@@ -202,13 +175,13 @@ export function CabinetViewer({
   const is2D = viewMode === "2D";
   const canRotate = viewMode === "3D" || viewType === "free";
 
-  const sceneSize = Math.max(bounds.x, bounds.y, bounds.z) * SCALE || 1;
   const cameraBase = VIEW_POSITIONS[viewType] || VIEW_POSITIONS.free;
+  const zoomFactor = 1 / zoom;
 
   const cameraPosition: [number, number, number] = [
-    cameraBase[0] * sceneSize * (1 / zoom),
-    cameraBase[1] * sceneSize * (1 / zoom),
-    cameraBase[2] * sceneSize * (1 / zoom),
+    cameraBase[0] * zoomFactor,
+    cameraBase[1] * zoomFactor,
+    cameraBase[2] * zoomFactor,
   ];
 
   const centerOffset = scaledParts[0]?.center ?? { x: 0, y: 0, z: 0 };
@@ -217,6 +190,7 @@ export function CabinetViewer({
   const heightMeters = bounds.y * SCALE;
   const depthMeters = bounds.z * SCALE;
 
+  const sceneSize = Math.max(widthMeters, heightMeters, depthMeters) || 1;
   const sectionCount = config.sections?.length || 0;
   const sectionWidthMeters =
     sectionCount > 0 ? widthMeters / sectionCount : widthMeters;
@@ -227,53 +201,37 @@ export function CabinetViewer({
   const silhouetteHeight = userHeight * SCALE;
 
   const bodyColor = getColor(config.materials.bodyMaterialId);
-  const facadeColor = getColor(config.materials.facadeMaterialId || config.materials.bodyMaterialId);
+  const facadeColor = getColor(
+    config.materials.facadeMaterialId || config.materials.bodyMaterialId
+  );
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        position: "relative",
-        minHeight: 0,
-      }}
-    >
+    <div style={{ width: "100%", height: "100%", position: "relative", minHeight: 0 }}>
       <Canvas
         style={{ width: "100%", height: "100%" }}
         shadows
         camera={{
           position: cameraPosition,
-          fov: is2D ? 28 : 45,
+          fov: is2D ? 20 : 34,
         }}
       >
         <color attach="background" args={[is2D ? "#f7f5ef" : "#f2efe8"]} />
 
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[5, 10, 5]} intensity={0.9} />
+        <ambientLight intensity={0.75} />
+        <directionalLight position={[5, 10, 5]} intensity={1} />
 
-        <group position={[-centerOffset.x, -centerOffset.y, -centerOffset.z]}>
+        <group position={[-centerOffset.x - 0.18, -centerOffset.y + 0.16, -centerOffset.z]}>
           {scaledParts.map((part) => {
             const x =
-              (part.position.x + part.size.width / 2) * part.scale -
-              part.center.x;
+              (part.position.x + part.size.width / 2) * part.scale - part.center.x;
             const y =
-              (part.position.y + part.size.height / 2) * part.scale -
-              part.center.y;
+              (part.position.y + part.size.height / 2) * part.scale - part.center.y;
             const z =
-              (part.position.z + part.size.thickness / 2) * part.scale -
-              part.center.z;
+              (part.position.z + part.size.thickness / 2) * part.scale - part.center.z;
 
             const materialProps = is2D
-              ? {
-                  color: "#ffffff",
-                  opacity: 0.18,
-                  transparent: true,
-                }
-              : {
-                  color: part.color,
-                  metalness: 0.1,
-                  roughness: 0.65,
-                };
+              ? { color: "#ffffff", opacity: 0.18, transparent: true }
+              : { color: part.color, metalness: 0.1, roughness: 0.65 };
 
             return (
               <mesh key={part.id} position={[x, y, z]}>
@@ -293,7 +251,7 @@ export function CabinetViewer({
           {(viewType === "front" || viewType === "free") && bounds.x > 0 ? (
             <group
               position={[
-                -widthMeters / 2 - 0.22,
+                -widthMeters / 2 - 0.34,
                 silhouetteHeight / 2,
                 -depthMeters / 2 + Math.min(depthMeters * 0.55, 0.18) / 2 + 0.02,
               ]}
@@ -305,7 +263,7 @@ export function CabinetViewer({
 
               <mesh position={[0, silhouetteHeight * 0.28, 0]}>
                 <boxGeometry
-                  args={[0.14, silhouetteHeight * 0.36, Math.min(depthMeters * 0.55, 0.18)]}
+                  args={[0.1, silhouetteHeight * 0.36, Math.min(depthMeters * 0.55, 0.18)]}
                 />
                 <meshStandardMaterial color="#8f8f8f" transparent opacity={0.7} />
               </mesh>
@@ -331,7 +289,7 @@ export function CabinetViewer({
             <meshStandardMaterial color="#5f5f5f" />
           </mesh>
 
-          <Html position={[0, 0.03, -depthMeters / 2 - 0.14]} center>
+          <Html position={[0, -0.22, -depthMeters / 2 - 0.12]} center>
             <DimensionLabel>Ширина {Math.round(bounds.x)} мм</DimensionLabel>
           </Html>
 
@@ -372,11 +330,7 @@ export function CabinetViewer({
                 return (
                   <mesh key={`leg-${index}`} position={[x, 0.08, z]}>
                     <cylinderGeometry args={[0.03, 0.03, 0.16, 12]} />
-                    <meshStandardMaterial
-                      color="#333"
-                      metalness={0.4}
-                      roughness={0.7}
-                    />
+                    <meshStandardMaterial color="#333" metalness={0.4} roughness={0.7} />
                   </mesh>
                 );
               })}
@@ -386,7 +340,8 @@ export function CabinetViewer({
           {config.sections?.map((section, index) => {
             const sectionId = String(section.id);
             const isActive = activeSectionId === sectionId;
-            const x = -widthMeters / 2 + sectionWidthMeters / 2 + index * sectionWidthMeters;
+            const x =
+              -widthMeters / 2 + sectionWidthMeters / 2 + index * sectionWidthMeters;
 
             return (
               <group key={`section-${sectionId}`}>
@@ -398,7 +353,6 @@ export function CabinetViewer({
                   depthMeters={depthMeters}
                   facadeMaterialColor={facadeColor}
                   bodyMaterialColor={bodyColor}
-                  is2D={is2D}
                 />
 
                 <group key={`section-hit-${sectionId}`}>
@@ -420,22 +374,17 @@ export function CabinetViewer({
                     <meshStandardMaterial
                       color={isActive ? "#E8612C" : "#ffffff"}
                       transparent
-                      opacity={isActive ? 0.18 : 0.02}
+                      opacity={isActive ? 0.08 : 0.015}
                     />
-                    {isActive ? <Edges threshold={15} color="#E8612C" /> : null}
+                    {isActive ? <Edges threshold={15} color="#FB6E3B" /> : null}
                   </mesh>
 
-                  <Html
-                    position={[x, heightMeters + 0.12, sectionOverlayZ]}
-                    center
-                  >
+                  <Html position={[x, heightMeters + 0.12, sectionOverlayZ]} center>
                     <div
                       style={{
                         padding: "4px 10px",
                         borderRadius: 999,
-                        background: isActive
-                          ? "#E8612C"
-                          : "rgba(255,255,255,0.9)",
+                        background: isActive ? "#E8612C" : "rgba(255,255,255,0.9)",
                         color: isActive ? "#fff" : "#111",
                         border: "1px solid rgba(0,0,0,0.08)",
                         fontSize: 12,
@@ -453,11 +402,7 @@ export function CabinetViewer({
           })}
         </group>
 
-        <OrbitControls
-          enablePan={canRotate}
-          enableRotate={canRotate}
-          enableZoom
-        />
+        <OrbitControls enablePan={canRotate} enableRotate={canRotate} enableZoom />
       </Canvas>
     </div>
   );

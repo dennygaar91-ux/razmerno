@@ -136,41 +136,32 @@ export default function ConstructorPage() {
 
       <div className="cst-page">
         <div className="cst-shell">
-          <aside className="cst-sidebar">
-            <div className="cst-sidebar-group">
-              <button
-                type="button"
-                className={`cst-tab-btn ${
-                  panelTab === "params" ? "active" : ""
-                }`}
-                onClick={() => setPanelTab("params")}
-              >
-                Параметры
-              </button>
-
-              <button
-                type="button"
-                className={`cst-tab-btn ${
-                  panelTab === "fill" ? "active" : ""
-                }`}
-                onClick={() => setPanelTab("fill")}
-              >
-                Наполнение
-              </button>
-
-              <button
-                type="button"
-                className={`cst-tab-btn ${
-                  panelTab === "materials" ? "active" : ""
-                }`}
-                onClick={() => setPanelTab("materials")}
-              >
-                Материалы
-              </button>
-            </div>
-          </aside>
-
           <section className="cst-left-panel">
+  <div className="cst-horizontal-tabs">
+    <button
+      type="button"
+      className={`cst-tab-btn ${panelTab === "params" ? "active" : ""}`}
+      onClick={() => setPanelTab("params")}
+    >
+      Параметры
+    </button>
+
+    <button
+      type="button"
+      className={`cst-tab-btn ${panelTab === "fill" ? "active" : ""}`}
+      onClick={() => setPanelTab("fill")}
+    >
+      Наполнение
+    </button>
+
+    <button
+      type="button"
+      className={`cst-tab-btn ${panelTab === "materials" ? "active" : ""}`}
+      onClick={() => setPanelTab("materials")}
+    >
+      Материалы
+    </button>
+  </div>
             {panelTab === "params" && (
               <div className="cst-card cst-panel-card">
                 <div className="cst-panel-head">
