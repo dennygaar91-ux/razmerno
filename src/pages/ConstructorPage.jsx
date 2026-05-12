@@ -123,20 +123,6 @@ export default function ConstructorPage() {
     <>
       <Header />
       <div className="cst-page">
-        <div className="cst-header">
-          <div className="cst-header-text">
-            <span className="cst-header-badge">Шаг 1</span>
-            <h1 className="cst-header-title">Конструктор шкафа</h1>
-            <p className="cst-header-subtitle">Настройте секции, наполнения и материалы для шкафа в реальном времени.</p>
-          </div>
-          <div className="cst-header-actions">
-            <button type="button" className="cst-button-outline">
-              <Icon name="star" size={16} /> Сохранить проект
-            </button>
-            <button type="button" className="cst-button-primary" onClick={() => navigate("/auth")}>Получить расчет</button>
-          </div>
-        </div>
-
         <div className="cst-shell">
         <aside className="cst-sidebar">
           <div className="cst-sidebar-group">
