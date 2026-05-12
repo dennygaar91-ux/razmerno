@@ -6,12 +6,12 @@
   height: 68px;
   background: rgba(250,250,249,.86);
   backdrop-filter: blur(20px) saturate(180%);
-  transition: height .2s, background .2s, box-shadow .2s;
+  transition: height .2s, background .2s;
+  border-bottom: none;
 }
 .hdr.scrolled {
   height: 62px;
   background: rgba(250,250,249,.97);
-  box-shadow: 0 4px 20px rgba(10,10,10,.05);
 }
 .hdr__in {
   height: 100%;
