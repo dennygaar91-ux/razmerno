@@ -39,6 +39,11 @@ export default function ConstructorPage() {
   } = useCabinetStore();
 
   const sectionCount = config.sections.length;
+  const [activeSectionId, setActiveSectionId] = useState(config.sections[0]?.id || null);
+
+const activeSection =
+  config.sections.find((section) => section.id === activeSectionId) ||
+  config.sections[0];
   const showHandles = config.facade.enabled && config.facade.openingType === "with_handles";
 
   const totals = useMemo(() => {
@@ -83,6 +88,9 @@ export default function ConstructorPage() {
 
     autoDistributeSections();
   }
+  function selectSection(sectionId) {
+  setActiveSectionId(sectionId);
+}
 
   function distributeCount(type, count) {
     const sections = [...config.sections];
@@ -180,7 +188,6 @@ export default function ConstructorPage() {
 
               <div className="cst-card-section">
   <div className="cst-card-head">Секции</div>
-
   <div className="cst-counter-block cst-counter-block--wide">
     <span>Количество секций</span>
 
@@ -205,6 +212,19 @@ export default function ConstructorPage() {
         +
       </button>
     </div>
+    <div className="cst-section-list">
+  {config.sections.map((section, index) => (
+    <button
+      key={section.id}
+      type="button"
+      className={`cst-section-item ${activeSection?.id === section.id ? "active" : ""}`}
+      onClick={() => selectSection(section.id)}
+    >
+      <span>Секция {index + 1}</span>
+      <small>{section.width} мм</small>
+    </button>
+  ))}
+</div>
   </div>
 </div>
               <div className="cst-hint">
