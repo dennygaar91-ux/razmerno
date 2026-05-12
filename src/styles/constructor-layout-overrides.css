@@ -42,8 +42,8 @@
 
 .cst-panel-card {
   width: 100% !important;
-  padding: 20px !important;
-  gap: 14px !important;
+  padding: 22px !important;
+  gap: 18px !important;
 }
 
 .cst-panel-head {
@@ -56,9 +56,98 @@
 }
 
 .cst-panel-title {
-  font-size: 22px !important;
+  font-size: 24px !important;
   line-height: 1.05 !important;
   letter-spacing: -0.03em !important;
+}
+
+.cst-dimensions-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+}
+
+.cst-dimension-control {
+  display: grid !important;
+  grid-template-columns: minmax(120px, 1fr) auto !important;
+  align-items: center !important;
+  column-gap: 24px !important;
+  row-gap: 8px !important;
+}
+
+.cst-dimension-head {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+}
+
+.cst-dimension-head span {
+  display: block !important;
+  font-size: 15px !important;
+  line-height: 1.15 !important;
+  font-weight: 800 !important;
+  color: #0a0a0a !important;
+}
+
+.cst-dimension-head small {
+  display: block !important;
+  font-size: 12px !important;
+  line-height: 1.1 !important;
+  font-weight: 650 !important;
+  color: rgba(10, 10, 10, 0.45) !important;
+}
+
+.cst-inline-counter {
+  display: grid !important;
+  grid-template-columns: 44px 112px 44px !important;
+  align-items: center !important;
+  gap: 16px !important;
+  margin-left: 24px !important;
+}
+
+.cst-inline-counter .cst-counter-button {
+  width: 44px !important;
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+  border: 1px solid #0a0a0a !important;
+  background: #0a0a0a !important;
+  color: #fff !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  transition: transform 0.16s ease, background 0.16s ease !important;
+}
+
+.cst-inline-counter .cst-counter-button:hover {
+  background: #242424 !important;
+  transform: translateY(-1px) !important;
+}
+
+.cst-inline-counter input {
+  width: 112px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  box-sizing: border-box !important;
+  padding: 0 14px !important;
+  border-radius: 14px !important;
+  border: 1px solid #0a0a0a !important;
+  background: #fff !important;
+  color: #0a0a0a !important;
+  font-size: 18px !important;
+  line-height: 44px !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  outline: none !important;
+}
+
+.cst-inline-counter input:focus {
+  border-color: #e8612c !important;
+  box-shadow: 0 0 0 3px rgba(232, 97, 44, 0.16) !important;
 }
 
 .cst-info-grid {
@@ -177,6 +266,37 @@
   font-size: 12px !important;
 }
 
+.cst-panel-actions {
+  display: flex !important;
+  gap: 12px !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+}
+
+.cst-secondary-action,
+.cst-ghost-action,
+.cst-summary-link {
+  min-height: 42px !important;
+  padding: 0 18px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  font-weight: 850 !important;
+  cursor: pointer !important;
+}
+
+.cst-secondary-action {
+  border: 1px solid #0a0a0a !important;
+  background: #0a0a0a !important;
+  color: #fff !important;
+}
+
+.cst-ghost-action,
+.cst-summary-link {
+  border: 1px solid rgba(10, 10, 10, 0.12) !important;
+  background: #fff !important;
+  color: #0a0a0a !important;
+}
+
 .cst-view-area {
   min-width: 0 !important;
   height: calc(100vh - 158px) !important;
@@ -225,6 +345,15 @@
 
 .cst-button-primary:hover {
   background: #d95522 !important;
+}
+
+.cst-notice {
+  padding: 10px 12px !important;
+  border-radius: 14px !important;
+  background: rgba(35, 176, 94, 0.1) !important;
+  color: #0f7a3a !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
 }
 
 @media (max-width: 1320px) {
@@ -292,6 +421,19 @@
 @media (max-width: 560px) {
   .cst-horizontal-tabs {
     grid-template-columns: 1fr !important;
+  }
+
+  .cst-dimension-control {
+    grid-template-columns: 1fr !important;
+  }
+
+  .cst-inline-counter {
+    margin-left: 0 !important;
+    grid-template-columns: 44px minmax(110px, 1fr) 44px !important;
+  }
+
+  .cst-inline-counter input {
+    width: 100% !important;
   }
 
   .cst-info-grid {
