@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   background: var(--bg-soft);
+  padding-top: 88px;
 }
 
 .cst-topbar {
@@ -60,7 +61,7 @@
 .cst-shell {
   flex: 1;
   display: grid;
-  grid-template-columns: 72px minmax(320px, 360px) minmax(520px, 1fr) minmax(280px, 340px);
+  grid-template-columns: 170px minmax(320px, 360px) minmax(520px, 1fr) minmax(280px, 340px);
   gap: 22px;
   padding: 24px 28px 28px;
   min-height: 0;
@@ -69,9 +70,9 @@
 .cst-sidebar {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 18px 10px;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: 18px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 28px;
@@ -81,6 +82,26 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.cst-tab-btn {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--ink);
+  padding: 16px 18px;
+  text-align: left;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s;
+}
+
+.cst-tab-btn.active,
+.cst-tab-btn:hover {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
 }
 
 .cst-nav-item,
@@ -752,6 +773,63 @@
     flex-direction: column;
     align-items: stretch;
   }
+
+  .cst-sidebar {
+    flex-direction: row;
+    padding: 14px;
+  }
+
+  .cst-sidebar-group {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .cst-tab-btn {
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  .cst-nav-item,
+  .cst-nav-help {
+    width: 44px;
+    height: 44px;
+  }
+
+  .cst-card.cst-view-card {
+    padding: 18px;
+  }
+
+  .cst-view-stage {
+    min-height: 340px;
+  }
+
+  .cst-panel-card,
+  .cst-summary-card,
+  .cst-material-card {
+    padding: 20px;
+  }
+
+  .cst-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cst-section-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .cst-view-toolbar,
+  .cst-view-footer,
+  .cst-header-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .cst-view-actions,
+  .cst-view-mode {
+    width: 100%;
+  }
+}
 
   .cst-header-actions {
     width: 100%;

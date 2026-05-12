@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Icon from "../icons/Icon";
+import Header from "../components/Header/Header";
 import { useCabinetStore } from "../store/cabinetStore";
 import { CabinetViewer } from "../constructor/Viewer";
 import {
@@ -15,6 +16,7 @@ export default function ConstructorPage() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("3D");
   const [viewType, setViewType] = useState("front");
+  const [panelTab, setPanelTab] = useState("params");
   const [zoom, setZoom] = useState(1);
   const [humanHeight, setHumanHeight] = useState(1750);
 
@@ -118,222 +120,236 @@ export default function ConstructorPage() {
   }
 
   return (
-    <div className="cst-page">
-      <div className="cst-header">
-        <div className="cst-header-text">
-          <span className="cst-header-badge">Шаг 1</span>
-          <h1 className="cst-header-title">Конструктор шкафа</h1>
-          <p className="cst-header-subtitle">Настройте секции, наполнения и материалы для шкафа в реальном времени.</p>
+    <>
+      <Header />
+      <div className="cst-page">
+        <div className="cst-header">
+          <div className="cst-header-text">
+            <span className="cst-header-badge">Шаг 1</span>
+            <h1 className="cst-header-title">Конструктор шкафа</h1>
+            <p className="cst-header-subtitle">Настройте секции, наполнения и материалы для шкафа в реальном времени.</p>
+          </div>
+          <div className="cst-header-actions">
+            <button type="button" className="cst-button-outline">
+              <Icon name="star" size={16} /> Сохранить проект
+            </button>
+            <button type="button" className="cst-button-primary" onClick={() => navigate("/auth")}>Получить расчет</button>
+          </div>
         </div>
-        <div className="cst-header-actions">
-          <button type="button" className="cst-button-outline">
-            <Icon name="star" size={16} /> Сохранить проект
-          </button>
-          <button type="button" className="cst-button-primary" onClick={() => navigate("/auth")}>Получить расчет</button>
-        </div>
-      </div>
 
-      <div className="cst-shell">
+        <div className="cst-shell">
         <aside className="cst-sidebar">
           <div className="cst-sidebar-group">
-            <button className="cst-nav-item active" type="button">
-              <Icon name="layers" size={18} />
+            <button
+              type="button"
+              className={`cst-tab-btn ${panelTab === "params" ? "active" : ""}`}
+              onClick={() => setPanelTab("params")}
+            >
+              Параметры
             </button>
-            <button className="cst-nav-item" type="button">
-              <Icon name="ruler" size={18} />
+            <button
+              type="button"
+              className={`cst-tab-btn ${panelTab === "fill" ? "active" : ""}`}
+              onClick={() => setPanelTab("fill")}
+            >
+              Наполнение
             </button>
-            <button className="cst-nav-item" type="button">
-              <Icon name="package" size={18} />
-            </button>
-            <button className="cst-nav-item" type="button">
-              <Icon name="message" size={18} />
+            <button
+              type="button"
+              className={`cst-tab-btn ${panelTab === "materials" ? "active" : ""}`}
+              onClick={() => setPanelTab("materials")}
+            >
+              Материалы
             </button>
           </div>
-          <button className="cst-nav-help" type="button">
-            <Icon name="message" size={18} />
-          </button>
         </aside>
 
         <section className="cst-left-panel">
-          <div className="cst-card cst-panel-card">
-            <div className="cst-panel-head">
-              <div className="cst-small-label">Параметры</div>
-              <h2 className="cst-panel-title">Размеры и секции</h2>
-            </div>
+          {panelTab === "params" && (
+            <div className="cst-card cst-panel-card">
+              <div className="cst-panel-head">
+                <div className="cst-small-label">Параметры</div>
+                <h2 className="cst-panel-title">Размеры и секции</h2>
+              </div>
 
-            <div className="cst-info-grid">
-              {[
-                { label: "Высота", key: "height" },
-                { label: "Ширина", key: "width" },
-                { label: "Глубина", key: "depth" }
-              ].map((field) => (
-                <label key={field.key} className="cst-field-row">
-                  <span>{field.label}, мм</span>
-                  <input
-                    type="number"
-                    min={600}
-                    max={2800}
-                    value={config.dimensions[field.key]}
-                    onChange={(event) => updateDimensions(field.key, Number(event.target.value))}
-                  />
-                </label>
-              ))}
-            </div>
-            <div className="cst-hint">Размеры задаются в миллиметрах. Изменения сразу применяются к 3D-просмотру.</div>
-
-            <div className="cst-card-section">
-              <div className="cst-card-head">Секции</div>
-              <div className="cst-section-controls">
-                {[1, 2, 3, 4].map((count) => (
-                  <button
-                    key={count}
-                    type="button"
-                    className={`cst-option-card ${sectionCount === count ? "active" : ""}`}
-                    onClick={() => setSectionCount(count)}
-                  >
-                    {count} секции
-                  </button>
+              <div className="cst-info-grid">
+                {[
+                  { label: "Высота", key: "height" },
+                  { label: "Ширина", key: "width" },
+                  { label: "Глубина", key: "depth" }
+                ].map((field) => (
+                  <label key={field.key} className="cst-field-row">
+                    <span>{field.label}, мм</span>
+                    <input
+                      type="number"
+                      min={600}
+                      max={2800}
+                      value={config.dimensions[field.key]}
+                      onChange={(event) => updateDimensions(field.key, Number(event.target.value))}
+                    />
+                  </label>
                 ))}
               </div>
-            </div>
-            <div className="cst-hint">Выберите количество секций — ширина автоматически перерассчитывается.</div>
-          </div>
+              <div className="cst-hint">Размеры задаются в миллиметрах. Изменения сразу применяются к 3D-просмотру.</div>
 
-          <div className="cst-card cst-panel-card">
-            <div className="cst-panel-head">
-              <div className="cst-small-label">Наполнение</div>
-              <h2 className="cst-panel-title">Полки, ящики и рейлинги</h2>
-            </div>
-
-            <div className="cst-control-row">
-              <div className="cst-counter-block">
-                <span>Полки</span>
-                <div className="cst-counter">
-                  <button type="button" className="cst-counter-button" onClick={() => distributeCount("shelf", Math.max(0, totals.shelfCount - 1))}>−</button>
-                  <span className="cst-counter-value">{totals.shelfCount}</span>
-                  <button type="button" className="cst-counter-button" onClick={() => distributeCount("shelf", totals.shelfCount + 1)}>+</button>
-                </div>
-              </div>
-              <div className="cst-counter-block">
-                <span>Ящики</span>
-                <div className="cst-counter">
-                  <button type="button" className="cst-counter-button" onClick={() => distributeCount("drawer", Math.max(0, totals.drawerCount - 1))}>−</button>
-                  <span className="cst-counter-value">{totals.drawerCount}</span>
-                  <button type="button" className="cst-counter-button" onClick={() => distributeCount("drawer", totals.drawerCount + 1)}>+</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="cst-control-row">
-              <div className="cst-counter-block">
-                <span>Рейлинги</span>
-                <div className="cst-counter">
-                  <button type="button" className="cst-counter-button" onClick={() => distributeRails(Math.max(0, totals.hangerCount - 1))}>−</button>
-                  <span className="cst-counter-value">{totals.hangerCount}</span>
-                  <button type="button" className="cst-counter-button" onClick={() => distributeRails(totals.hangerCount + 1)}>+</button>
-                </div>
-              </div>
-              <div className="cst-toggle-group">
-                <button
-                  type="button"
-                  className={`cst-toggle-btn ${config.options.hasLegs ? "active" : ""}`}
-                  onClick={() => toggleLegs(!config.options.hasLegs)}
-                >
-                  Ножки
-                </button>
-                <button
-                  type="button"
-                  className={`cst-toggle-btn ${showHandles ? "active" : ""}`}
-                  onClick={() => toggleHandles(!showHandles)}
-                >
-                  Ручки
-                </button>
-              </div>
-            </div>
-
-            {showHandles ? (
               <div className="cst-card-section">
-                <div className="cst-card-head">Вариант ручки</div>
+                <div className="cst-card-head">Секции</div>
                 <div className="cst-section-controls">
-                  {handleOptions.map((option) => (
+                  {[1, 2, 3, 4].map((count) => (
+                    <button
+                      key={count}
+                      type="button"
+                      className={`cst-option-card ${sectionCount === count ? "active" : ""}`}
+                      onClick={() => setSectionCount(count)}
+                    >
+                      {count} секции
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="cst-hint">Выберите количество секций — ширина автоматически перерассчитывается.</div>
+            </div>
+          )}
+
+          {panelTab === "fill" && (
+            <div className="cst-card cst-panel-card">
+              <div className="cst-panel-head">
+                <div className="cst-small-label">Наполнение</div>
+                <h2 className="cst-panel-title">Полки, ящики и рейлинги</h2>
+              </div>
+
+              <div className="cst-control-row">
+                <div className="cst-counter-block">
+                  <span>Полки</span>
+                  <div className="cst-counter">
+                    <button type="button" className="cst-counter-button" onClick={() => distributeCount("shelf", Math.max(0, totals.shelfCount - 1))}>−</button>
+                    <span className="cst-counter-value">{totals.shelfCount}</span>
+                    <button type="button" className="cst-counter-button" onClick={() => distributeCount("shelf", totals.shelfCount + 1)}>+</button>
+                  </div>
+                </div>
+                <div className="cst-counter-block">
+                  <span>Ящики</span>
+                  <div className="cst-counter">
+                    <button type="button" className="cst-counter-button" onClick={() => distributeCount("drawer", Math.max(0, totals.drawerCount - 1))}>−</button>
+                    <span className="cst-counter-value">{totals.drawerCount}</span>
+                    <button type="button" className="cst-counter-button" onClick={() => distributeCount("drawer", totals.drawerCount + 1)}>+</button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="cst-control-row">
+                <div className="cst-counter-block">
+                  <span>Рейлинги</span>
+                  <div className="cst-counter">
+                    <button type="button" className="cst-counter-button" onClick={() => distributeRails(Math.max(0, totals.hangerCount - 1))}>−</button>
+                    <span className="cst-counter-value">{totals.hangerCount}</span>
+                    <button type="button" className="cst-counter-button" onClick={() => distributeRails(totals.hangerCount + 1)}>+</button>
+                  </div>
+                </div>
+                <div className="cst-toggle-group">
+                  <button
+                    type="button"
+                    className={`cst-toggle-btn ${config.options.hasLegs ? "active" : ""}`}
+                    onClick={() => toggleLegs(!config.options.hasLegs)}
+                  >
+                    Ножки
+                  </button>
+                  <button
+                    type="button"
+                    className={`cst-toggle-btn ${showHandles ? "active" : ""}`}
+                    onClick={() => toggleHandles(!showHandles)}
+                  >
+                    Ручки
+                  </button>
+                </div>
+              </div>
+
+              {showHandles ? (
+                <div className="cst-card-section">
+                  <div className="cst-card-head">Вариант ручки</div>
+                  <div className="cst-section-controls">
+                    {handleOptions.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        className={`cst-option-card ${config.facade.handleVariant === option.id ? "active" : ""}`}
+                        onClick={() => setHandleVariant(option.id)}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+              <div className="cst-hint">Ручки появляются только при активной опции фасада.</div>
+            </div>
+          )}
+
+          {panelTab === "materials" && (
+            <div className="cst-card cst-panel-card">
+              <div className="cst-panel-head">
+                <div className="cst-small-label">Материалы</div>
+                <h2 className="cst-panel-title">Выберите отделку</h2>
+              </div>
+
+              <div className="cst-card-section">
+                <div className="cst-card-head">Корпус</div>
+                <div className="cst-section-controls">
+                  {bodyMaterialOptions.map((option) => (
                     <button
                       key={option.id}
                       type="button"
-                      className={`cst-option-card ${config.facade.handleVariant === option.id ? "active" : ""}`}
-                      onClick={() => setHandleVariant(option.id)}
+                      className={`cst-option-card ${config.materials.bodyMaterialId === option.id ? "active" : ""}`}
+                      onClick={() => setBodyMaterial(option.id)}
+                    >
+                      <span className="cst-material-swatch" style={{ background: option.color }} />
+                      <div>
+                        <div className="cst-material-name">{option.name}</div>
+                        <div className="cst-material-sub">{option.subtitle}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="cst-card-section">
+                <div className="cst-card-head">Фасад</div>
+                <div className="cst-section-controls">
+                  {facadeMaterialOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={`cst-option-card ${config.materials.facadeMaterialId === option.id ? "active" : ""}`}
+                      onClick={() => setFacadeMaterial(option.id)}
+                    >
+                      <span className="cst-material-swatch" style={{ background: option.color }} />
+                      <div>
+                        <div className="cst-material-name">{option.name}</div>
+                        <div className="cst-material-sub">{option.subtitle}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="cst-card-section">
+                <div className="cst-card-head">Фурнитура</div>
+                <div className="cst-section-controls">
+                  {hardwareBrandOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={`cst-option-card ${config.options.hardwareBrand === option.id ? "active" : ""}`}
+                      onClick={() => setHardwareBrand(option.id)}
                     >
                       {option.label}
                     </button>
                   ))}
                 </div>
               </div>
-            ) : null}
-            <div className="cst-hint">Ручки появляются только при активной опции фасада.</div>
-          </div>
-
-          <div className="cst-card cst-panel-card">
-            <div className="cst-panel-head">
-              <div className="cst-small-label">Материалы</div>
-              <h2 className="cst-panel-title">Выберите отделку</h2>
+              <div className="cst-hint">Выбор бренда влияет на стоимость фурнитуры и общий расчет.</div>
             </div>
-
-            <div className="cst-card-section">
-              <div className="cst-card-head">Корпус</div>
-              <div className="cst-section-controls">
-                {bodyMaterialOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    className={`cst-option-card ${config.materials.bodyMaterialId === option.id ? "active" : ""}`}
-                    onClick={() => setBodyMaterial(option.id)}
-                  >
-                    <span className="cst-material-swatch" style={{ background: option.color }} />
-                    <div>
-                      <div className="cst-material-name">{option.name}</div>
-                      <div className="cst-material-sub">{option.subtitle}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="cst-card-section">
-              <div className="cst-card-head">Фасад</div>
-              <div className="cst-section-controls">
-                {facadeMaterialOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    className={`cst-option-card ${config.materials.facadeMaterialId === option.id ? "active" : ""}`}
-                    onClick={() => setFacadeMaterial(option.id)}
-                  >
-                    <span className="cst-material-swatch" style={{ background: option.color }} />
-                    <div>
-                      <div className="cst-material-name">{option.name}</div>
-                      <div className="cst-material-sub">{option.subtitle}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="cst-card-section">
-              <div className="cst-card-head">Фурнитура</div>
-              <div className="cst-section-controls">
-                {hardwareBrandOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    className={`cst-option-card ${config.options.hardwareBrand === option.id ? "active" : ""}`}
-                    onClick={() => setHardwareBrand(option.id)}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="cst-hint">Выбор бренда влияет на стоимость фурнитуры и общий расчет.</div>
-          </div>
+          )}
         </section>
 
         <main className="cst-view-area">
