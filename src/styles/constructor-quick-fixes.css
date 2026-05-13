@@ -1,7 +1,7 @@
 /* Constructor quick fixes */
 
 .cst-inline-counter input {
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   letter-spacing: -0.03em !important;
 }
 
@@ -15,11 +15,63 @@
   -moz-appearance: textfield !important;
 }
 
-.cst-dimension-head small {
-  font-weight: 700 !important;
-  color: rgba(10, 10, 10, 0.42) !important;
-}
-
 .cst-empty-state {
   display: none !important;
+}
+
+/* Restore readable labels for dimensions without showing “шаг 50”.
+   The JSX currently renders only the counter, so labels are restored safely via CSS. */
+.cst-dimensions-grid {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+.cst-dimension-control {
+  display: grid !important;
+  grid-template-columns: minmax(150px, 1fr) auto !important;
+  align-items: center !important;
+  column-gap: 22px !important;
+}
+
+.cst-dimension-control::before {
+  display: block !important;
+  color: #0a0a0a !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  line-height: 1.18 !important;
+  white-space: pre-line !important;
+  letter-spacing: -0.02em !important;
+}
+
+.cst-dimension-control:nth-child(1)::before {
+  content: "Высота, мм\A 200–2800" !important;
+}
+
+.cst-dimension-control:nth-child(2)::before {
+  content: "Ширина, мм\A 200–3600" !important;
+}
+
+.cst-dimension-control:nth-child(3)::before {
+  content: "Глубина, мм\A 200–900" !important;
+}
+
+.cst-dimension-control::first-line {
+  color: #0a0a0a !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+.cst-dimension-control .cst-inline-counter {
+  justify-self: end !important;
+}
+
+@media (max-width: 640px) {
+  .cst-dimension-control {
+    grid-template-columns: 1fr !important;
+    row-gap: 10px !important;
+  }
+
+  .cst-dimension-control .cst-inline-counter {
+    justify-self: start !important;
+  }
 }
