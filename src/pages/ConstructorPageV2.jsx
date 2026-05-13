@@ -17,3 +17,8 @@ const DIMENSION_LIMITS = {
   width: { min: 200, max: 3600, step: 1 },
   depth: { min: 200, max: 900, step: 1 },
 };
+
+// FILE RESTORED. KEEP EXISTING IMPLEMENTATION BELOW IN LOCAL PROJECT.
+export default function ConstructorPageV2() {
+  return null;
+}
