@@ -1,0 +1,56 @@
+.pv-root {
+  --pv-light-angle: 132deg;
+}
+
+.pv-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 14%, rgba(255,255,255,0.28), transparent 36%),
+    radial-gradient(circle at 82% 18%, rgba(255,255,255,0.14), transparent 32%),
+    linear-gradient(var(--pv-light-angle), rgba(255,255,255,0.08), transparent 42%);
+  opacity: 0.92;
+}
+
+.pv-cabinet::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.16),
+      transparent 18%,
+      transparent 72%,
+      rgba(10,10,10,0.05));
+  mix-blend-mode: soft-light;
+}
+
+.pv-section.active {
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.16),
+    0 18px 36px rgba(10,10,10,0.12);
+}
+
+.pv-root:not(.pv-2d) .pv-cabinet:hover .pv-facade {
+  filter: brightness(1.015) saturate(1.03);
+}
+
+.pv-root:not(.pv-2d) .pv-cabinet:hover .pv-drawers i {
+  transform: translateY(-1px);
+}
+
+.pv-view-free .pv-depth-shadow {
+  filter: blur(22px);
+}
+
+.pv-view-side .pv-depth-shadow {
+  opacity: 0.92;
+}
+
+.pv-2d .pv-canvas::before,
+.pv-2d .pv-cabinet::before {
+  display: none;
+}
