@@ -6,6 +6,8 @@ import "../styles/premium-viewer-materials.css";
 import "../styles/premium-viewer-resize.css";
 import "../styles/premium-viewer-adaptive-sections.css";
 import "../styles/premium-viewer-semantic-facades.css";
+import "../styles/premium-viewer-facade-topology.css";
+import "../styles/premium-viewer-cabinet-anatomy.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
