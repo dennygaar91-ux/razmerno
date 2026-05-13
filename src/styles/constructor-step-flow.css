@@ -1,0 +1,146 @@
+/* Constructor step flow — guided tabs and clearer filling stage */
+
+.cst-horizontal-tabs {
+  position: relative !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  padding: 8px !important;
+}
+
+.cst-horizontal-tabs .cst-tab-btn {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+.cst-horizontal-tabs .cst-tab-btn::before {
+  width: 24px !important;
+  height: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+  background: rgba(10, 10, 10, 0.06) !important;
+  color: rgba(10, 10, 10, 0.62) !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  flex: 0 0 auto !important;
+}
+
+.cst-horizontal-tabs .cst-tab-btn:nth-child(1)::before {
+  content: "1";
+}
+
+.cst-horizontal-tabs .cst-tab-btn:nth-child(2)::before {
+  content: "2";
+}
+
+.cst-horizontal-tabs .cst-tab-btn:nth-child(3)::before {
+  content: "3";
+}
+
+.cst-horizontal-tabs .cst-tab-btn.active::before {
+  background: #fff !important;
+  color: #0a0a0a !important;
+}
+
+.cst-section-chip-row::before {
+  content: "Выберите секцию";
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 10px !important;
+  min-height: 42px !important;
+  border-radius: 14px !important;
+  color: rgba(10, 10, 10, 0.52) !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+}
+
+.cst-control-row .cst-counter-block {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.cst-control-row .cst-counter-block::after {
+  content: "";
+  position: absolute !important;
+  right: 14px !important;
+  top: 14px !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 12px !important;
+  background: rgba(232, 97, 44, 0.1) !important;
+  pointer-events: none !important;
+}
+
+.cst-control-row:nth-of-type(1) .cst-counter-block:nth-child(1)::after {
+  background: linear-gradient(180deg, rgba(232, 97, 44, 0.16), rgba(232, 97, 44, 0.05)) !important;
+}
+
+.cst-control-row:nth-of-type(1) .cst-counter-block:nth-child(2)::after {
+  background: linear-gradient(180deg, rgba(10, 10, 10, 0.12), rgba(10, 10, 10, 0.04)) !important;
+}
+
+.cst-control-row:nth-of-type(2) .cst-counter-block:nth-child(1)::after {
+  background: linear-gradient(180deg, rgba(35, 176, 94, 0.16), rgba(35, 176, 94, 0.05)) !important;
+}
+
+.cst-control-row .cst-counter-block > span::after {
+  display: block !important;
+  margin-top: 4px !important;
+  max-width: 150px !important;
+  color: rgba(10, 10, 10, 0.45) !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  line-height: 1.25 !important;
+}
+
+.cst-control-row:nth-of-type(1) .cst-counter-block:nth-child(1) > span::after {
+  content: "для хранения вещей";
+}
+
+.cst-control-row:nth-of-type(1) .cst-counter-block:nth-child(2) > span::after {
+  content: "удобный доступ снизу";
+}
+
+.cst-control-row:nth-of-type(2) .cst-counter-block:nth-child(1) > span::after {
+  content: "для одежды на плечиках";
+}
+
+.cst-toggle-group {
+  position: relative !important;
+}
+
+.cst-toggle-group::before {
+  content: "Опции";
+  position: absolute !important;
+  left: 14px !important;
+  top: -22px !important;
+  color: rgba(10, 10, 10, 0.45) !important;
+  font-size: 11px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+.cst-panel-actions {
+  padding-top: 6px !important;
+  border-top: 1px solid rgba(10, 10, 10, 0.06) !important;
+}
+
+.cst-secondary-action {
+  box-shadow: 0 10px 22px rgba(10, 10, 10, 0.12) !important;
+}
+
+@media (max-width: 560px) {
+  .cst-horizontal-tabs .cst-tab-btn {
+    justify-content: flex-start !important;
+  }
+
+  .cst-section-chip-row::before {
+    width: 100% !important;
+  }
+}
