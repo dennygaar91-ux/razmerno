@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import type {
   CabinetConfig,
-  CabinetHardware,
   CalculationResult,
   ValidationMessage
 } from "../constructor/engine/types";
@@ -47,7 +46,7 @@ export type CabinetStoreState = {
   resetConfig: () => void;
 };
 
-export const useCabinetStore = create<CabinetStoreState>((set, get) => ({
+export const useCabinetStore = create<CabinetStoreState>((set) => ({
   config: defaultCabinetConfig,
   validation: initialValidation,
   result: initialResult,
