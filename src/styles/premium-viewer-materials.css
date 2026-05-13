@@ -1,0 +1,112 @@
+.pv-cabinet,
+.pv-section,
+.pv-top-panel,
+.pv-bottom-panel,
+.pv-left-panel,
+.pv-right-panel,
+.pv-shelves i,
+.pv-drawers i {
+  isolation: isolate;
+}
+
+.pv-top-panel::after,
+.pv-bottom-panel::after,
+.pv-left-panel::after,
+.pv-right-panel::after,
+.pv-shelves i::before,
+.pv-drawers i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pv-top-panel::after,
+.pv-bottom-panel::after,
+.pv-left-panel::after,
+.pv-right-panel::after,
+.pv-shelves i::before {
+  opacity: 0.22;
+  background-image:
+    linear-gradient(115deg, rgba(255,255,255,0.32), transparent 42%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.07) 0 1px, transparent 1px 13px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 19px);
+  mix-blend-mode: overlay;
+}
+
+.pv-top-panel::after,
+.pv-bottom-panel::after {
+  border-radius: 0;
+}
+
+.pv-left-panel::after,
+.pv-right-panel::after {
+  opacity: 0.18;
+}
+
+.pv-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.13;
+  background-image:
+    linear-gradient(110deg, rgba(255,255,255,0.32), transparent 36%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 18px);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pv-section > * {
+  position: relative;
+}
+
+.pv-facade {
+  opacity: 0.16;
+}
+
+.pv-facade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(255,255,255,0.36), transparent 32%),
+    linear-gradient(115deg, rgba(255,255,255,0.22), transparent 44%);
+  pointer-events: none;
+}
+
+.pv-drawers i::after {
+  opacity: 0.2;
+  border-radius: inherit;
+  background-image:
+    linear-gradient(115deg, rgba(255,255,255,0.32), transparent 36%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.07) 0 1px, transparent 1px 15px);
+  mix-blend-mode: overlay;
+}
+
+.pv-drawers i,
+.pv-shelves i {
+  overflow: hidden;
+}
+
+.pv-cabinet::before {
+  opacity: 0.42;
+}
+
+.pv-cabinet::after {
+  background:
+    linear-gradient(90deg, transparent, rgba(10,10,10,0.14)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 12px);
+}
+
+.pv-2d .pv-top-panel::after,
+.pv-2d .pv-bottom-panel::after,
+.pv-2d .pv-left-panel::after,
+.pv-2d .pv-right-panel::after,
+.pv-2d .pv-section::after,
+.pv-2d .pv-shelves i::before,
+.pv-2d .pv-drawers i::after,
+.pv-2d .pv-facade::after {
+  display: none;
+}
