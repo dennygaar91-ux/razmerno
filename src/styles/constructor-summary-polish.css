@@ -1,0 +1,111 @@
+/* Constructor summary polish — premium checkout card */
+
+.cst-summary-card {
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+.cst-summary-card::before {
+  content: "Комплект для самостоятельной сборки" !important;
+  display: inline-flex !important;
+  width: fit-content !important;
+  align-items: center !important;
+  min-height: 30px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  background: #0a0a0a !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  font-weight: 850 !important;
+  letter-spacing: -0.01em !important;
+  margin-bottom: 2px !important;
+}
+
+.cst-summary-label {
+  margin-top: 2px !important;
+}
+
+.cst-summary-price {
+  padding-bottom: 4px !important;
+}
+
+.cst-summary-save::before {
+  content: "✓" !important;
+  display: inline-flex !important;
+  margin-right: 6px !important;
+  font-weight: 900 !important;
+}
+
+.cst-summary-meta {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: rgba(10, 10, 10, 0.72) !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+}
+
+.cst-summary-breakdown {
+  padding: 12px !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid rgba(10, 10, 10, 0.06) !important;
+}
+
+.cst-summary-breakdown::before {
+  content: "Состав проекта" !important;
+  display: block !important;
+  margin-bottom: 8px !important;
+  color: rgba(10, 10, 10, 0.45) !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.cst-summary-line:last-child {
+  border-bottom: 0 !important;
+}
+
+.cst-summary-card .cst-hint {
+  display: none !important;
+}
+
+.cst-summary-card::after {
+  content: "Включено: распил · кромление · присадка · упаковка" !important;
+  display: block !important;
+  padding: 12px 14px !important;
+  border-radius: 18px !important;
+  background: rgba(232, 97, 44, 0.08) !important;
+  color: rgba(10, 10, 10, 0.7) !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+  font-weight: 750 !important;
+  border: 1px solid rgba(232, 97, 44, 0.12) !important;
+}
+
+.cst-button-primary {
+  margin-top: 2px !important;
+  letter-spacing: -0.01em !important;
+}
+
+.cst-summary-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease !important;
+}
+
+.cst-summary-link:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(10, 10, 10, 0.24) !important;
+  background: #f7f6f2 !important;
+}
+
+@media (max-width: 900px) {
+  .cst-summary-card {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+}
