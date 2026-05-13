@@ -1,0 +1,110 @@
+.cp-summary.is-price-updated > strong,
+.cp-mobile-bar.is-price-updated .cp-mobile-bar-price strong {
+  color: #e8612c;
+  transform: scale(1.025);
+}
+
+.cp-summary > strong,
+.cp-mobile-bar-price strong {
+  transition: color 0.22s ease, transform 0.22s ease;
+  transform-origin: left center;
+}
+
+.cp-mobile-bar {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .cp-page {
+    padding-bottom: 112px;
+  }
+
+  .cp-mobile-bar {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    z-index: 70;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(10, 10, 10, 0.08);
+    box-shadow: 0 22px 70px rgba(10, 10, 10, 0.18);
+    backdrop-filter: blur(18px) saturate(1.15);
+  }
+
+  .cp-mobile-bar-price {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+  }
+
+  .cp-mobile-bar-price span {
+    color: rgba(10, 10, 10, 0.48);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .cp-mobile-bar-price strong {
+    color: #0a0a0a;
+    font-size: 20px;
+    font-weight: 950;
+    line-height: 1;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+  }
+
+  .cp-mobile-bar-price small {
+    color: rgba(10, 10, 10, 0.5);
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cp-mobile-bar-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .cp-mobile-bar-actions button {
+    border: 0;
+    cursor: pointer;
+    font-family: inherit;
+    min-height: 44px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+  }
+
+  .cp-mobile-bar-actions button:first-child {
+    width: 44px;
+    padding: 0;
+    background: #f4f2ed;
+    color: #0a0a0a;
+  }
+
+  .cp-mobile-bar-actions button:last-child {
+    padding: 0 16px;
+    background: #e8612c;
+    color: #fff;
+    box-shadow: 0 12px 26px rgba(232, 97, 44, 0.26);
+  }
+}
+
+@media (max-width: 390px) {
+  .cp-mobile-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-mobile-bar-actions button:last-child {
+    flex: 1;
+  }
+}
