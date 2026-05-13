@@ -54,6 +54,7 @@ export default function ConstructorPageNew() {
     addSection,
     removeSection,
     autoDistributeSections,
+    resizeSectionPair,
     setSectionShelves,
     setSectionDrawers,
     setSectionHangerRails,
@@ -384,6 +385,7 @@ export default function ConstructorPageNew() {
                 userHeight={humanHeight}
                 activeSectionId={activeSection?.id}
                 onSectionSelect={selectSection}
+                onResizeSectionPair={resizeSectionPair}
               />
             </div>
 
