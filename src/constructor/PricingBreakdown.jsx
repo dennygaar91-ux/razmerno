@@ -22,19 +22,24 @@ export default function PricingBreakdown({ price }) {
   }, 0);
 
   return (
-    <section className="cp-pricing-breakdown" aria-label="Детализация стоимости">
-      <button type="button" className="cp-pricing-breakdown__head">
-        <span>Из чего складывается цена</span>
-        <b>{formatPrice(subtotal)}</b>
-      </button>
+    <section className="cp-price-breakdown" aria-label="Детализация стоимости">
+      <div className="cp-price-breakdown-head">
+        <strong>Из чего складывается цена</strong>
+        <small>До НДС: {formatPrice(subtotal)}</small>
+      </div>
 
-      <div className="cp-pricing-breakdown__list">
+      <div className="cp-price-breakdown-list">
         {PRICE_ROWS.map(([key, label]) => (
-          <div key={key} className={key === "vat" ? "is-muted" : ""}>
+          <div key={key}>
             <span>{label}</span>
             <b>{formatPrice(price[key])}</b>
           </div>
         ))}
+      </div>
+
+      <div className="cp-price-breakdown-note">
+        <span>Расчёт предварительный</span>
+        <span>обновляется автоматически</span>
       </div>
     </section>
   );
