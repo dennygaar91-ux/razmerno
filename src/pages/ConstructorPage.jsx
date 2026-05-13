@@ -556,9 +556,9 @@ export default function ConstructorPage() {
                 <div className="cst-view-hotspot">
                   <span>Рост человека</span>
                   <div className="cst-counter">
-                    <button type="button" className="cst-counter-button" onClick={() => updateHumanHeight(-50)}>−</button>
-                    <span className="cst-counter-value">{humanHeight} мм</span>
-                    <button type="button" className="cst-counter-button" onClick={() => updateHumanHeight(50)}>+</button>
+                    <button type="button" className="cst-counter-button" onClick={() => updateHumanHeight(-10)}>−</button>
+                    <span className="cst-counter-value">{Math.round(humanHeight / 10)} см</span>
+                    <button type="button" className="cst-counter-button" onClick={() => updateHumanHeight(10)}>+</button>
                   </div>
                 </div>
 
