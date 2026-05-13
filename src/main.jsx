@@ -8,6 +8,7 @@ import "./styles/constructor-viewport-polish.css";
 import "./styles/constructor-fill-polish.css";
 import "./styles/constructor-step-flow.css";
 import "./styles/constructor-commercial-polish.css";
+import "./styles/constructor-quick-fixes.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
