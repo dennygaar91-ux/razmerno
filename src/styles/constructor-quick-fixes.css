@@ -1,0 +1,25 @@
+/* Constructor quick fixes */
+
+.cst-inline-counter input {
+  font-weight: 750 !important;
+  letter-spacing: -0.03em !important;
+}
+
+.cst-inline-counter input::-webkit-outer-spin-button,
+.cst-inline-counter input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+.cst-inline-counter input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
+.cst-dimension-head small {
+  font-weight: 700 !important;
+  color: rgba(10, 10, 10, 0.42) !important;
+}
+
+.cst-empty-state {
+  display: none !important;
+}
