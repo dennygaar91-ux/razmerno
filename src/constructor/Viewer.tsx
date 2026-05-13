@@ -45,12 +45,13 @@ function DimensionLabel({ children }: { children: React.ReactNode }) {
     <div
       style={{
         padding: "4px 10px",
-        background: "rgba(255,255,255,0.88)",
+        background: "rgba(255,255,255,0.9)",
         borderRadius: 12,
         border: "1px solid rgba(0,0,0,0.08)",
         fontSize: 12,
         color: "#111",
         whiteSpace: "nowrap",
+        boxShadow: "0 8px 22px rgba(0,0,0,0.06)",
       }}
     >
       {children}
@@ -66,6 +67,7 @@ function SectionInteriors({
   depthMeters,
   facadeMaterialColor,
   bodyMaterialColor,
+  is2D,
 }: {
   section: any;
   sectionX: number;
@@ -74,6 +76,7 @@ function SectionInteriors({
   depthMeters: number;
   facadeMaterialColor: string;
   bodyMaterialColor: string;
+  is2D: boolean;
 }) {
   const shelfThickness = 0.012;
   const shelfMargin = 0.018;
@@ -101,8 +104,9 @@ function SectionInteriors({
 
         return (
           <mesh key={`shelf-${section.id}-${index}`} position={[sectionX, shelfY, interiorZ]}>
-            <boxGeometry args={[sectionWidth - 0.04, shelfThickness, depthMeters * 0.6]} />
-            <meshStandardMaterial color={bodyMaterialColor} metalness={0.05} roughness={0.7} />
+            <boxGeometry args={[sectionWidth - 0.04, shelfThickness, depthMeters * 0.62]} />
+            <meshStandardMaterial color={is2D ? "#ffffff" : bodyMaterialColor} metalness={0.05} roughness={0.7} transparent={is2D} opacity={is2D ? 0.18 : 1} />
+            <Edges threshold={15} color={is2D ? "#2f5f9f" : "rgba(0,0,0,0.14)"} />
           </mesh>
         );
       })}
@@ -119,17 +123,18 @@ function SectionInteriors({
             position={[sectionX, drawerY, interiorZ - 0.01]}
           >
             <boxGeometry
-              args={[sectionWidth - 0.02, drawerHeight - drawerGap / 2, depthMeters * 0.55]}
+              args={[sectionWidth - 0.03, drawerHeight - drawerGap / 2, depthMeters * 0.56]}
             />
-            <meshStandardMaterial color={facadeMaterialColor} metalness={0.08} roughness={0.6} />
+            <meshStandardMaterial color={is2D ? "#ffffff" : facadeMaterialColor} metalness={0.08} roughness={0.6} transparent={is2D} opacity={is2D ? 0.16 : 1} />
+            <Edges threshold={15} color={is2D ? "#2f5f9f" : "rgba(0,0,0,0.16)"} />
           </mesh>
         );
       })}
 
       {hasRail ? (
         <mesh position={[sectionX, heightMeters * 0.75, interiorZ]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.008, 0.008, sectionWidth - 0.04, 16]} />
-          <meshStandardMaterial color="#c0c0c0" metalness={0.6} roughness={0.4} />
+          <cylinderGeometry args={[0.008, 0.008, sectionWidth - 0.05, 16]} />
+          <meshStandardMaterial color={is2D ? "#2f5f9f" : "#c0c0c0"} metalness={0.6} roughness={0.4} />
         </mesh>
       ) : null}
     </group>
@@ -196,7 +201,9 @@ export function CabinetViewer({
     sectionCount > 0 ? widthMeters / sectionCount : widthMeters;
 
   const sectionOverlayY = heightMeters / 2;
-  const sectionOverlayZ = -depthMeters / 2 - 0.01;
+  const sectionOverlayZ = -depthMeters / 2 - 0.022;
+  const facadeZ = -depthMeters / 2 - 0.026;
+  const facadeGap = Math.min(0.018, Math.max(0.008, sectionWidthMeters * 0.025));
 
   const silhouetteHeight = userHeight * SCALE;
 
@@ -217,12 +224,13 @@ export function CabinetViewer({
       >
         <color attach="background" args={[is2D ? "#ffffff" : "#f2efe8"]} />
 
-        <ambientLight intensity={is2D ? 1 : 0.75} />
-        <directionalLight position={[5, 10, 5]} intensity={is2D ? 0.35 : 1} />
+        <ambientLight intensity={is2D ? 1 : 0.72} />
+        <directionalLight position={[5, 10, 5]} intensity={is2D ? 0.35 : 1.05} />
+        {!is2D ? <directionalLight position={[-4, 4, 7]} intensity={0.28} /> : null}
 
         {is2D ? (
           <gridHelper
-            args={[sceneSize * 2.2, 24, "#d9dde3", "#eef0f4"]}
+            args={[sceneSize * 2.2, 28, "#d7dde8", "#eef1f6"]}
             position={[0, -0.72, -depthMeters / 2 - 0.22]}
             rotation={[Math.PI / 2, 0, 0]}
           />
@@ -238,11 +246,11 @@ export function CabinetViewer({
               (part.position.z + part.size.thickness / 2) * part.scale - part.center.z;
 
             const materialProps = is2D
-              ? { color: "#ffffff", opacity: 0.08, transparent: true }
-              : { color: part.color, metalness: 0.1, roughness: 0.65 };
+              ? { color: "#ffffff", opacity: 0.07, transparent: true }
+              : { color: part.color, metalness: 0.08, roughness: 0.68 };
 
             return (
-              <mesh key={part.id} position={[x, y, z]}>
+              <mesh key={part.id} position={[x, y, z]} castShadow={!is2D} receiveShadow={!is2D}>
                 <boxGeometry
                   args={[
                     part.size.width * part.scale,
@@ -251,7 +259,7 @@ export function CabinetViewer({
                   ]}
                 />
                 <meshStandardMaterial {...materialProps} />
-                <Edges threshold={15} color={is2D ? "#2f5f9f" : "rgba(0,0,0,0.22)"} />
+                <Edges threshold={15} color={is2D ? "#2f5f9f" : "rgba(0,0,0,0.2)"} />
               </mesh>
             );
           })}
@@ -266,28 +274,28 @@ export function CabinetViewer({
             >
               <mesh position={[0, silhouetteHeight / 2 + 0.05, 0]}>
                 <sphereGeometry args={[0.08, 24, 24]} />
-                <meshStandardMaterial color="#8f8f8f" transparent opacity={is2D ? 0.28 : 0.85} />
+                <meshStandardMaterial color="#8f8f8f" transparent opacity={is2D ? 0.22 : 0.78} />
               </mesh>
 
               <mesh position={[0, silhouetteHeight * 0.28, 0]}>
                 <boxGeometry
                   args={[0.1, silhouetteHeight * 0.36, Math.min(depthMeters * 0.55, 0.18)]}
                 />
-                <meshStandardMaterial color="#8f8f8f" transparent opacity={is2D ? 0.18 : 0.7} />
+                <meshStandardMaterial color="#8f8f8f" transparent opacity={is2D ? 0.14 : 0.58} />
               </mesh>
 
               <mesh position={[-0.035, silhouetteHeight * 0.12, 0]}>
                 <boxGeometry
                   args={[0.06, silhouetteHeight * 0.24, Math.min(depthMeters * 0.55, 0.18)]}
                 />
-                <meshStandardMaterial color="#8f8f8f" transparent opacity={is2D ? 0.18 : 0.7} />
+                <meshStandardMaterial color="#8f8f8f" transparent opacity={is2D ? 0.14 : 0.58} />
               </mesh>
 
               <mesh position={[0.035, silhouetteHeight * 0.12, 0]}>
                 <boxGeometry
                   args={[0.06, silhouetteHeight * 0.24, Math.min(depthMeters * 0.55, 0.18)]}
                 />
-                <meshStandardMaterial color="#8f8f8f" transparent opacity={is2D ? 0.18 : 0.7} />
+                <meshStandardMaterial color="#8f8f8f" transparent opacity={is2D ? 0.14 : 0.58} />
               </mesh>
             </group>
           ) : null}
@@ -336,7 +344,7 @@ export function CabinetViewer({
                     : sceneSize / 2 - 0.08;
 
                 return (
-                  <mesh key={`leg-${index}`} position={[x, 0.08, z]}>
+                  <mesh key={`leg-${index}`} position={[x, 0.08, z]} castShadow={!is2D}>
                     <cylinderGeometry args={[0.03, 0.03, 0.16, 12]} />
                     <meshStandardMaterial color="#333" metalness={0.4} roughness={0.7} />
                   </mesh>
@@ -349,10 +357,10 @@ export function CabinetViewer({
             const x = -widthMeters / 2 + sectionWidthMeters * (index + 1);
 
             return (
-              <mesh key={`divider-${section.id}`} position={[x, heightMeters / 2, 0]}>
-                <boxGeometry args={[0.018, heightMeters, Math.max(depthMeters * 0.88, 0.08)]} />
-                <meshStandardMaterial color={bodyColor} metalness={0.05} roughness={0.7} transparent opacity={is2D ? 0.08 : 1} />
-                <Edges threshold={15} color={is2D ? "#2f5f9f" : "rgba(0,0,0,0.18)"} />
+              <mesh key={`divider-${section.id}`} position={[x, heightMeters / 2, 0]} castShadow={!is2D} receiveShadow={!is2D}>
+                <boxGeometry args={[0.02, heightMeters, Math.max(depthMeters * 0.9, 0.08)]} />
+                <meshStandardMaterial color={is2D ? "#ffffff" : bodyColor} metalness={0.04} roughness={0.72} transparent={is2D} opacity={is2D ? 0.1 : 1} />
+                <Edges threshold={15} color={is2D ? "#2f5f9f" : "rgba(0,0,0,0.2)"} />
               </mesh>
             );
           })}
@@ -361,18 +369,23 @@ export function CabinetViewer({
             <group>
               {config.sections?.map((section, index) => {
                 const x = -widthMeters / 2 + sectionWidthMeters / 2 + index * sectionWidthMeters;
-                const handleX = x + sectionWidthMeters * 0.33;
+                const handleX = x + sectionWidthMeters * 0.34;
 
                 return (
                   <group key={`facade-${section.id}`}>
-                    <mesh position={[x, heightMeters / 2, -depthMeters / 2 - 0.018]}>
-                      <boxGeometry args={[sectionWidthMeters - 0.026, heightMeters - 0.032, 0.018]} />
-                      <meshStandardMaterial color={facadeColor} metalness={0.04} roughness={0.72} transparent opacity={0.42} />
-                      <Edges threshold={15} color="rgba(0,0,0,0.16)" />
+                    <mesh position={[x, heightMeters / 2, facadeZ]} castShadow receiveShadow>
+                      <boxGeometry args={[sectionWidthMeters - facadeGap, heightMeters - 0.044, 0.018]} />
+                      <meshStandardMaterial color={facadeColor} metalness={0.03} roughness={0.76} transparent opacity={0.58} />
+                      <Edges threshold={15} color="rgba(0,0,0,0.18)" />
+                    </mesh>
+
+                    <mesh position={[x, heightMeters / 2, facadeZ - 0.012]}>
+                      <boxGeometry args={[sectionWidthMeters - facadeGap - 0.018, heightMeters - 0.064, 0.004]} />
+                      <meshStandardMaterial color="#ffffff" transparent opacity={0.08} roughness={0.9} />
                     </mesh>
 
                     {config.facade.openingType === "with_handles" ? (
-                      <mesh position={[handleX, heightMeters * 0.52, -depthMeters / 2 - 0.036]}>
+                      <mesh position={[handleX, heightMeters * 0.52, facadeZ - 0.026]} castShadow>
                         <boxGeometry args={[0.018, heightMeters * 0.18, 0.016]} />
                         <meshStandardMaterial color="#1f1f1f" metalness={0.35} roughness={0.55} />
                       </mesh>
@@ -399,6 +412,7 @@ export function CabinetViewer({
                   depthMeters={depthMeters}
                   facadeMaterialColor={facadeColor}
                   bodyMaterialColor={bodyColor}
+                  is2D={is2D}
                 />
 
                 <group key={`section-hit-${sectionId}`}>
@@ -416,13 +430,13 @@ export function CabinetViewer({
                       document.body.style.cursor = "default";
                     }}
                   >
-                    <boxGeometry args={[sectionWidthMeters, heightMeters, 0.018]} />
+                    <boxGeometry args={[sectionWidthMeters - 0.01, heightMeters, 0.014]} />
                     <meshStandardMaterial
                       color={isActive ? "#E8612C" : "#ffffff"}
                       transparent
-                      opacity={isActive ? 0.08 : 0.015}
+                      opacity={isActive ? 0.045 : 0.01}
                     />
-                    {isActive ? <Edges threshold={15} color="#FB6E3B" /> : null}
+                    {isActive ? <Edges threshold={15} color="#E8612C" /> : null}
                   </mesh>
 
                   <Html position={[x, heightMeters + 0.12, sectionOverlayZ]} center>
