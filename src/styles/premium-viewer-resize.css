@@ -1,0 +1,139 @@
+.pv-resize-handles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.pv-resize-handle {
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  width: 22px;
+  margin-left: -11px;
+  border: 0;
+  background: transparent;
+  cursor: col-resize;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.pv-resize-handle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent, rgba(232,97,44,0.54), transparent);
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.pv-resize-handle span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 54px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(10,10,10,0.08);
+  box-shadow:
+    0 10px 22px rgba(10,10,10,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.42);
+  opacity: 0;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+.pv-resize-handle span::before {
+  content: "⋮";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(10,10,10,0.46);
+  font-size: 12px;
+  letter-spacing: -1px;
+}
+
+.pv-cabinet:hover .pv-resize-handle::before,
+.pv-cabinet:hover .pv-resize-handle span,
+.pv-root.is-resizing .pv-resize-handle::before,
+.pv-root.is-resizing .pv-resize-handle span {
+  opacity: 1;
+}
+
+.pv-resize-handle:hover::before,
+.pv-root.is-resizing .pv-resize-handle::before {
+  opacity: 1;
+  transform: translateX(-50%) scaleY(1.02);
+}
+
+.pv-resize-handle:hover span,
+.pv-root.is-resizing .pv-resize-handle span {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.04);
+  background: rgba(255,255,255,0.92);
+}
+
+.pv-root.is-resizing .pv-section {
+  transition: none;
+}
+
+.pv-root.is-resizing .pv-cabinet {
+  box-shadow:
+    calc(var(--pv-depth-offset, 34px) * 0.18) calc(var(--pv-depth-offset, 34px) * 0.34) calc(var(--pv-depth-offset, 34px) * 1.45) rgba(10,10,10,0.18),
+    0 0 0 1px rgba(232,97,44,0.22),
+    inset 0 0 0 2px rgba(255,255,255,0.18);
+}
+
+.pv-resize-preview {
+  position: absolute;
+  top: -18px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(10,10,10,0.08);
+  box-shadow: 0 18px 40px rgba(10,10,10,0.14);
+  backdrop-filter: blur(16px);
+  z-index: 80;
+  animation: pvResizePreviewIn 0.16s ease;
+}
+
+.pv-resize-preview span {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.pv-resize-preview b {
+  color: rgba(10,10,10,0.28);
+}
+
+body.pv-is-resizing-section {
+  cursor: col-resize;
+  user-select: none;
+}
+
+@keyframes pvResizePreviewIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
