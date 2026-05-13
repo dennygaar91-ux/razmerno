@@ -1,4 +1,5 @@
 import "../styles/premium-cabinet-viewer.css";
+import "../styles/premium-viewer-camera.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
