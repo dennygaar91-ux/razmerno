@@ -51,6 +51,16 @@ function getSectionGridTemplate(sections) {
     .join(" ");
 }
 
+function getResizeHandlePosition(sections, index) {
+  const totalWidth = sections.reduce((sum, section) => sum + (Number(section.width) || 0), 0);
+  const widthBeforeHandle = sections
+    .slice(0, index + 1)
+    .reduce((sum, section) => sum + (Number(section.width) || 0), 0);
+
+  if (!totalWidth) return 0;
+  return (widthBeforeHandle / totalWidth) * 100;
+}
+
 export default function PremiumCabinetViewer({
   config,
   viewMode,
@@ -59,6 +69,7 @@ export default function PremiumCabinetViewer({
   userHeight = 1750,
   activeSectionId,
   onSectionSelect,
+  onResizeSectionPair,
 }) {
   const width = config.dimensions.width;
   const height = config.dimensions.height;
@@ -72,6 +83,38 @@ export default function PremiumCabinetViewer({
   const humanPercent = Math.max(38, Math.min(100, Math.round((userHeight / Math.max(height, 1)) * 86)));
   const viewerStyle = getProportionalViewerStyle({ width, height, depth, zoom });
   const sectionGridTemplate = getSectionGridTemplate(sections);
+
+  function startResize(event, leftSection, rightSection) {
+    if (!onResizeSectionPair || !leftSection || !rightSection) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const startX = event.clientX;
+    const startLeftWidth = Number(leftSection.width) || 0;
+    let lastDelta = 0;
+
+    function handlePointerMove(moveEvent) {
+      const pixelDelta = moveEvent.clientX - startX;
+      const millimeterDelta = Math.round(pixelDelta * 4);
+      const nextDelta = millimeterDelta - lastDelta;
+
+      if (Math.abs(nextDelta) < 4) return;
+
+      lastDelta += nextDelta;
+      onResizeSectionPair(leftSection.id, rightSection.id, nextDelta);
+    }
+
+    function handlePointerUp() {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      document.body.classList.remove("pv-is-resizing-section");
+    }
+
+    document.body.classList.add("pv-is-resizing-section");
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp, { once: true });
+  }
 
   return (
     <div className={`pv-root pv-${viewMode?.toLowerCase()} pv-view-${viewType}`} style={viewerStyle}>
@@ -139,6 +182,28 @@ export default function PremiumCabinetViewer({
                 );
               })}
             </div>
+
+            {sections.length > 1 ? (
+              <div className="pv-resize-handles" aria-hidden="true">
+                {sections.slice(0, -1).map((section, index) => {
+                  const nextSection = sections[index + 1];
+                  const left = getResizeHandlePosition(sections, index);
+
+                  return (
+                    <button
+                      type="button"
+                      key={`${section.id}-${nextSection.id}`}
+                      className="pv-resize-handle"
+                      style={{ left: `${left}%` }}
+                      onPointerDown={(event) => startResize(event, section, nextSection)}
+                      title="Изменить ширину секций"
+                    >
+                      <span />
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
 
           <div className="pv-dimension pv-dimension-width">{width} мм</div>
