@@ -1,8 +1,30 @@
-/* Constructor viewport polish — floating toolbar, viewport stage, footer controls */
+/* Constructor viewport polish — premium viewport shell, segmented toolbar, floating controls */
 
 .cst-view-card {
   position: relative !important;
   overflow: hidden !important;
+  padding: 16px !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 34%),
+    linear-gradient(180deg, #ffffff 0%, #fbfaf7 100%) !important;
+  border: 1px solid rgba(10, 10, 10, 0.06) !important;
+  box-shadow: 0 22px 64px rgba(10, 10, 10, 0.065) !important;
+}
+
+.cst-view-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 16px !important;
+  border-radius: 26px !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(rgba(10, 10, 10, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 10, 10, 0.028) 1px, transparent 1px) !important;
+  background-size: 42px 42px !important;
+  mask-image: linear-gradient(180deg, transparent 0%, black 16%, black 78%, transparent 100%) !important;
+  opacity: 0.42 !important;
+  z-index: 0 !important;
 }
 
 .cst-view-toolbar {
@@ -10,22 +32,33 @@
   grid-template-columns: minmax(0, 1fr) auto !important;
   align-items: center !important;
   gap: 14px !important;
-  position: relative !important;
-  z-index: 3 !important;
+  position: absolute !important;
+  top: 28px !important;
+  left: 28px !important;
+  right: 28px !important;
+  z-index: 5 !important;
+  pointer-events: none !important;
 }
 
 .cst-view-pill-group,
 .cst-view-actions {
   width: fit-content !important;
+  max-width: 100% !important;
   display: inline-flex !important;
   align-items: center !important;
   flex-wrap: nowrap !important;
-  gap: 8px !important;
-  padding: 7px !important;
+  gap: 6px !important;
+  padding: 6px !important;
   border-radius: 999px !important;
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(10, 10, 10, 0.06) !important;
-  box-shadow: 0 12px 28px rgba(10, 10, 10, 0.04) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  border: 1px solid rgba(10, 10, 10, 0.07) !important;
+  box-shadow: 0 14px 34px rgba(10, 10, 10, 0.08) !important;
+  backdrop-filter: blur(18px) saturate(1.1) !important;
+  pointer-events: auto !important;
+}
+
+.cst-view-actions {
+  justify-self: end !important;
 }
 
 .cst-view-pill-group {
@@ -39,18 +72,19 @@
 
 .cst-view-pill,
 .cst-view-mode-btn {
-  min-height: 38px !important;
-  padding: 0 16px !important;
+  min-height: 36px !important;
+  padding: 0 15px !important;
   border-radius: 999px !important;
   border: 1px solid transparent !important;
   background: transparent !important;
-  color: rgba(10, 10, 10, 0.72) !important;
-  font-size: 12px !important;
+  color: rgba(10, 10, 10, 0.66) !important;
+  font-size: 11px !important;
   font-weight: 900 !important;
-  letter-spacing: 0.04em !important;
+  letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
+  cursor: pointer !important;
   transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease !important;
 }
 
@@ -67,17 +101,59 @@
 }
 
 .cst-view-stage {
+  position: relative !important;
+  z-index: 1 !important;
+  min-height: 520px !important;
+  height: 100% !important;
   border-radius: 26px !important;
   overflow: hidden !important;
-  background: #f4f1ea !important;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.34) 34%, rgba(235, 230, 219, 0.8) 100%),
+    linear-gradient(180deg, #f7f4ed 0%, #eee8dc 100%) !important;
+  border: 1px solid rgba(10, 10, 10, 0.055) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -32px 70px rgba(10, 10, 10, 0.035) !important;
+}
+
+.cst-view-stage::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 8% !important;
+  right: 8% !important;
+  bottom: 14% !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.14), transparent) !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+.cst-view-stage::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 18% !important;
+  right: 18% !important;
+  bottom: 8% !important;
+  height: 70px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(ellipse at center, rgba(10, 10, 10, 0.105) 0%, rgba(10, 10, 10, 0.035) 42%, transparent 72%) !important;
+  filter: blur(4px) !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
 }
 
 .cst-view-footer {
+  position: absolute !important;
+  left: 28px !important;
+  right: 28px !important;
+  bottom: 28px !important;
+  z-index: 5 !important;
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  gap: 16px !important;
+  gap: 14px !important;
   flex-wrap: wrap !important;
+  pointer-events: none !important;
 }
 
 .cst-view-hotspot,
@@ -86,27 +162,29 @@
   align-items: center !important;
   justify-content: space-between !important;
   gap: 10px !important;
-  min-height: 42px !important;
-  padding: 6px 10px !important;
+  min-height: 40px !important;
+  padding: 5px 8px 5px 12px !important;
   border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.92) !important;
-  border: 1px solid rgba(10, 10, 10, 0.06) !important;
-  box-shadow: 0 10px 20px rgba(10, 10, 10, 0.04) !important;
+  background: rgba(255, 255, 255, 0.84) !important;
+  border: 1px solid rgba(10, 10, 10, 0.07) !important;
+  box-shadow: 0 14px 34px rgba(10, 10, 10, 0.075) !important;
+  backdrop-filter: blur(18px) saturate(1.08) !important;
   flex-shrink: 0 !important;
+  pointer-events: auto !important;
 }
 
 .cst-view-hotspot {
-  min-width: 230px !important;
+  min-width: 218px !important;
 }
 
 .cst-view-zoom {
-  min-width: 160px !important;
+  min-width: 154px !important;
 }
 
 .cst-view-hotspot span,
 .cst-zoom-value {
   font-size: 12px !important;
-  font-weight: 800 !important;
+  font-weight: 850 !important;
   color: #0a0a0a !important;
   white-space: nowrap !important;
 }
@@ -115,18 +193,18 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 8px !important;
-  background: #f3f2ef !important;
+  gap: 6px !important;
+  background: rgba(243, 242, 239, 0.94) !important;
   border: 1px solid rgba(10, 10, 10, 0.06) !important;
-  border-radius: 14px !important;
-  padding: 4px !important;
+  border-radius: 13px !important;
+  padding: 3px !important;
 }
 
 .cst-view-footer .cst-counter-button {
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px !important;
-  border-radius: 12px !important;
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  border-radius: 10px !important;
   background: #fff !important;
   color: #0a0a0a !important;
   border: 1px solid rgba(10, 10, 10, 0.08) !important;
@@ -134,14 +212,41 @@
   align-items: center !important;
   justify-content: center !important;
   padding: 0 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+}
+
+.cst-view-footer .cst-counter-button:hover {
+  background: #0a0a0a !important;
+  color: #fff !important;
 }
 
 .cst-view-footer .cst-counter-value,
 .cst-view-footer .cst-zoom-value {
-  min-width: 70px !important;
+  min-width: 64px !important;
   text-align: center !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 900 !important;
+}
+
+@media (max-width: 900px) {
+  .cst-view-toolbar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    margin-bottom: 12px !important;
+    pointer-events: auto !important;
+  }
+
+  .cst-view-footer {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin-top: 12px !important;
+    pointer-events: auto !important;
+  }
 }
 
 @media (max-width: 560px) {
@@ -163,5 +268,9 @@
 
   .cst-view-actions {
     justify-content: center !important;
+  }
+
+  .cst-view-stage {
+    min-height: 420px !important;
   }
 }
