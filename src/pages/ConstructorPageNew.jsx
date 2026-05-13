@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header";
 import PremiumCabinetViewer from "../constructor/PremiumCabinetViewer";
+import PricingBreakdown from "../constructor/PricingBreakdown";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
   bodyMaterialOptions,
@@ -10,6 +11,7 @@ import {
   handleOptions,
 } from "../data/constructorOptions";
 import "../styles/constructor-premium.css";
+import "../styles/constructor-pricing-breakdown.css";
 import "../styles/constructor-mobile-action-bar.css";
 
 const DIMENSION_LIMITS = {
@@ -423,6 +425,7 @@ export default function ConstructorPageNew() {
               <div><span>Ящики</span><b>{totals.drawers}</b></div>
               <div><span>Штанги</span><b>{totals.rails}</b></div>
             </div>
+            <PricingBreakdown price={result.price} />
             {notice ? <p className="cp-notice">{notice}</p> : null}
             <button type="button" className="cp-primary" onClick={() => navigate("/account/order")}>В корзину</button>
             <button type="button" onClick={saveDraft}>Сохранить проект</button>
