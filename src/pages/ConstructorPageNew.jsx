@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header";
-import Icon from "../icons/Icon";
 import { CabinetViewer } from "../constructor/Viewer";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
@@ -60,7 +59,6 @@ export default function ConstructorPageNew() {
     toggleLegs,
     toggleHandles,
     setHandleVariant,
-    resetConfig,
   } = useCabinetStore();
 
   const [draft, setDraft] = useState(() => ({
@@ -103,6 +101,12 @@ export default function ConstructorPageNew() {
     );
   }, [config.sections]);
 
+  const activeSectionIsEmpty =
+    activeSection &&
+    getItemCount(activeSection, "shelf") === 0 &&
+    getItemCount(activeSection, "drawer") === 0 &&
+    getItemCount(activeSection, "hanger_rail") === 0;
+
   function commitDimension(key, value) {
     const limits = DIMENSION_LIMITS[key];
     const numeric = Number(value);
@@ -132,12 +136,44 @@ export default function ConstructorPageNew() {
     setNotice(`Секции перераспределены: ${safeCount}`);
   }
 
+  function selectSection(sectionId) {
+    setActiveSectionId(sectionId);
+    setActiveStep("fill");
+  }
+
   function applyPreset(preset) {
     if (!activeSection) return;
     setSectionShelves(activeSection.id, preset.shelves);
     setSectionDrawers(activeSection.id, preset.drawers);
     setSectionHangerRails(activeSection.id, preset.rails);
     setNotice(`Пресет «${preset.label}» применён`);
+  }
+
+  function addShelfToActiveSection() {
+    if (!activeSection) return;
+    setSectionShelves(activeSection.id, Math.min(12, getItemCount(activeSection, "shelf") + 1));
+    setNotice("Полка добавлена в активную секцию");
+  }
+
+  function addDrawerToActiveSection() {
+    if (!activeSection) return;
+    setSectionDrawers(activeSection.id, Math.min(6, getItemCount(activeSection, "drawer") + 1));
+    setNotice("Ящик добавлен в активную секцию");
+  }
+
+  function toggleRailInActiveSection() {
+    if (!activeSection) return;
+    const next = getItemCount(activeSection, "hanger_rail") > 0 ? 0 : 1;
+    setSectionHangerRails(activeSection.id, next);
+    setNotice(next ? "Штанга добавлена" : "Штанга убрана");
+  }
+
+  function clearActiveSection() {
+    if (!activeSection) return;
+    setSectionShelves(activeSection.id, 0);
+    setSectionDrawers(activeSection.id, 0);
+    setSectionHangerRails(activeSection.id, 0);
+    setNotice("Активная секция очищена");
   }
 
   function saveDraft() {
@@ -241,6 +277,13 @@ export default function ConstructorPageNew() {
                   ))}
                 </div>
 
+                {activeSectionIsEmpty ? (
+                  <div className="cp-empty-state">
+                    <strong>Секция пока пустая</strong>
+                    <small>Выберите готовый пресет или добавьте полку, ящик, штангу вручную.</small>
+                  </div>
+                ) : null}
+
                 <div className="cp-presets">
                   {FILL_PRESETS.map((preset) => (
                     <button type="button" key={preset.id} onClick={() => applyPreset(preset)}>
@@ -251,9 +294,9 @@ export default function ConstructorPageNew() {
                 </div>
 
                 <div className="cp-fill-grid">
-                  <FillCounter label="Полки" value={getItemCount(activeSection, "shelf")} onMinus={() => setSectionShelves(activeSection.id, Math.max(0, getItemCount(activeSection, "shelf") - 1))} onPlus={() => setSectionShelves(activeSection.id, Math.min(12, getItemCount(activeSection, "shelf") + 1))} />
-                  <FillCounter label="Ящики" value={getItemCount(activeSection, "drawer")} onMinus={() => setSectionDrawers(activeSection.id, Math.max(0, getItemCount(activeSection, "drawer") - 1))} onPlus={() => setSectionDrawers(activeSection.id, Math.min(6, getItemCount(activeSection, "drawer") + 1))} />
-                  <FillCounter label="Штанга" value={getItemCount(activeSection, "hanger_rail")} onMinus={() => setSectionHangerRails(activeSection.id, 0)} onPlus={() => setSectionHangerRails(activeSection.id, 1)} />
+                  <FillCounter label="Полки" value={getItemCount(activeSection, "shelf")} onMinus={() => setSectionShelves(activeSection.id, Math.max(0, getItemCount(activeSection, "shelf") - 1))} onPlus={addShelfToActiveSection} />
+                  <FillCounter label="Ящики" value={getItemCount(activeSection, "drawer")} onMinus={() => setSectionDrawers(activeSection.id, Math.max(0, getItemCount(activeSection, "drawer") - 1))} onPlus={addDrawerToActiveSection} />
+                  <FillCounter label="Штанга" value={getItemCount(activeSection, "hanger_rail")} onMinus={() => setSectionHangerRails(activeSection.id, 0)} onPlus={toggleRailInActiveSection} />
                 </div>
 
                 <div className="cp-toggles">
@@ -311,11 +354,29 @@ export default function ConstructorPageNew() {
                 zoom={zoom}
                 userHeight={humanHeight}
                 activeSectionId={activeSection?.id}
-                onSectionSelect={(sectionId) => {
-                  setActiveSectionId(sectionId);
-                  setActiveStep("fill");
-                }}
+                onSectionSelect={selectSection}
               />
+            </div>
+
+            <div className="cp-viewer-tools">
+              <div className="cp-quick-actions">
+                <button type="button" onClick={addShelfToActiveSection}>+ полка</button>
+                <button type="button" onClick={addDrawerToActiveSection}>+ ящик</button>
+                <button type="button" onClick={toggleRailInActiveSection}>штанга</button>
+                <button type="button" onClick={clearActiveSection}>очистить</button>
+              </div>
+              <div className="cp-mini-map" style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(34px, 1fr))` }}>
+                {config.sections.map((section, index) => {
+                  const isActive = section.id === activeSection?.id;
+                  const isEmpty = getItemCount(section, "shelf") + getItemCount(section, "drawer") + getItemCount(section, "hanger_rail") === 0;
+                  return (
+                    <button key={section.id} type="button" className={`${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`} onClick={() => selectSection(section.id)}>
+                      <span>{index + 1}</span>
+                      <i />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="cp-viewer-footer">
