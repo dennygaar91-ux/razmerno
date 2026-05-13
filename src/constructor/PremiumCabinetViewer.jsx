@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "../styles/premium-cabinet-viewer.css";
 import "../styles/premium-viewer-camera.css";
 import "../styles/premium-viewer-realism.css";
@@ -61,6 +62,10 @@ function getResizeHandlePosition(sections, index) {
   return (widthBeforeHandle / totalWidth) * 100;
 }
 
+function formatWidth(value) {
+  return `${Math.round(Number(value) || 0)} мм`;
+}
+
 export default function PremiumCabinetViewer({
   config,
   viewMode,
@@ -71,6 +76,7 @@ export default function PremiumCabinetViewer({
   onSectionSelect,
   onResizeSectionPair,
 }) {
+  const [resizePreview, setResizePreview] = useState(null);
   const width = config.dimensions.width;
   const height = config.dimensions.height;
   const depth = config.dimensions.depth;
@@ -84,7 +90,7 @@ export default function PremiumCabinetViewer({
   const viewerStyle = getProportionalViewerStyle({ width, height, depth, zoom });
   const sectionGridTemplate = getSectionGridTemplate(sections);
 
-  function startResize(event, leftSection, rightSection) {
+  function startResize(event, leftSection, rightSection, handleLeft) {
     if (!onResizeSectionPair || !leftSection || !rightSection) return;
 
     event.preventDefault();
@@ -92,7 +98,14 @@ export default function PremiumCabinetViewer({
 
     const startX = event.clientX;
     const startLeftWidth = Number(leftSection.width) || 0;
+    const startRightWidth = Number(rightSection.width) || 0;
     let lastDelta = 0;
+
+    setResizePreview({
+      left: handleLeft,
+      leftWidth: startLeftWidth,
+      rightWidth: startRightWidth,
+    });
 
     function handlePointerMove(moveEvent) {
       const pixelDelta = moveEvent.clientX - startX;
@@ -103,12 +116,18 @@ export default function PremiumCabinetViewer({
 
       lastDelta += nextDelta;
       onResizeSectionPair(leftSection.id, rightSection.id, nextDelta);
+      setResizePreview({
+        left: handleLeft,
+        leftWidth: startLeftWidth + lastDelta,
+        rightWidth: startRightWidth - lastDelta,
+      });
     }
 
     function handlePointerUp() {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
       document.body.classList.remove("pv-is-resizing-section");
+      setResizePreview(null);
     }
 
     document.body.classList.add("pv-is-resizing-section");
@@ -117,7 +136,7 @@ export default function PremiumCabinetViewer({
   }
 
   return (
-    <div className={`pv-root pv-${viewMode?.toLowerCase()} pv-view-${viewType}`} style={viewerStyle}>
+    <div className={`pv-root pv-${viewMode?.toLowerCase()} pv-view-${viewType} ${resizePreview ? "is-resizing" : ""}`} style={viewerStyle}>
       <div className="pv-grid" />
 
       <div className="pv-canvas">
@@ -195,13 +214,21 @@ export default function PremiumCabinetViewer({
                       key={`${section.id}-${nextSection.id}`}
                       className="pv-resize-handle"
                       style={{ left: `${left}%` }}
-                      onPointerDown={(event) => startResize(event, section, nextSection)}
+                      onPointerDown={(event) => startResize(event, section, nextSection, left)}
                       title="Изменить ширину секций"
                     >
                       <span />
                     </button>
                   );
                 })}
+              </div>
+            ) : null}
+
+            {resizePreview ? (
+              <div className="pv-resize-preview" style={{ left: `${resizePreview.left}%` }}>
+                <span>{formatWidth(resizePreview.leftWidth)}</span>
+                <b>|</b>
+                <span>{formatWidth(resizePreview.rightWidth)}</span>
               </div>
             ) : null}
           </div>
