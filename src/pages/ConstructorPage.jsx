@@ -678,7 +678,7 @@ export default function ConstructorPage() {
                   <button type="button" onClick={toggleRailInActiveSection}>штанга</button>
                   <button type="button" onClick={clearActiveSection}>очистить</button>
                 </div>
-                {renderMiniMap()}
+                
               </div>
 
               <div className="cst-view-footer">
