@@ -19,8 +19,6 @@
   display: none !important;
 }
 
-/* Restore readable labels for dimensions without showing “шаг 50”.
-   The JSX currently renders only the counter, so labels are restored safely via CSS. */
 .cst-dimensions-grid {
   display: grid !important;
   gap: 18px !important;
@@ -34,31 +32,32 @@
 }
 
 .cst-dimension-control::before {
-  display: block !important;
+  content: none !important;
+  display: none !important;
+}
+
+.cst-dimension-label {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.cst-dimension-label-title {
   color: #0a0a0a !important;
   font-size: 18px !important;
-  font-weight: 900 !important;
-  line-height: 1.18 !important;
-  white-space: pre-line !important;
+  font-weight: 800 !important;
+  line-height: 1.14 !important;
+  letter-spacing: -0.03em !important;
+}
+
+.cst-dimension-label-range {
+  color: rgba(10, 10, 10, 0.42) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
   letter-spacing: -0.02em !important;
-}
-
-.cst-dimension-control:nth-child(1)::before {
-  content: "Высота, мм\A 200–2800" !important;
-}
-
-.cst-dimension-control:nth-child(2)::before {
-  content: "Ширина, мм\A 200–3600" !important;
-}
-
-.cst-dimension-control:nth-child(3)::before {
-  content: "Глубина, мм\A 200–900" !important;
-}
-
-.cst-dimension-control::first-line {
-  color: #0a0a0a !important;
-  font-size: 18px !important;
-  font-weight: 900 !important;
 }
 
 .cst-dimension-control .cst-inline-counter {
