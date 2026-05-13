@@ -68,6 +68,7 @@ export default function ConstructorPageNew() {
   }));
 
   const sectionCount = config.sections.length;
+  const autoSectionWidth = sectionCount > 0 ? Math.round(config.dimensions.width / sectionCount) : config.dimensions.width;
   const activeSection = config.sections.find((section) => section.id === activeSectionId) || config.sections[0];
   const price = result.price?.total ?? 0;
 
@@ -257,6 +258,25 @@ export default function ConstructorPageNew() {
                     <button type="button" onClick={() => setSectionCount(sectionCount - 1)}>−</button>
                     <span>{sectionCount}</span>
                     <button type="button" onClick={() => setSectionCount(sectionCount + 1)}>+</button>
+                  </div>
+                </div>
+
+                <div className="cp-section-widths">
+                  <div className="cp-section-widths-head">
+                    <strong>Секции шкафа</strong>
+                    <small>сейчас ширина распределяется автоматически</small>
+                  </div>
+                  <div className="cp-section-width-grid" style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(44px, 1fr))` }}>
+                    {config.sections.map((section, index) => {
+                      const isActive = section.id === activeSection?.id;
+                      return (
+                        <button key={section.id} type="button" className={isActive ? "active" : ""} onClick={() => selectSection(section.id)}>
+                          <span>{index + 1}</span>
+                          <b>{autoSectionWidth} мм</b>
+                          <i />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
