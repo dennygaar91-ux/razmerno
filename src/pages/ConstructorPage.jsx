@@ -18,6 +18,41 @@ const DIMENSION_LIMITS = {
   depth: { min: 300, max: 900, step: 50 },
 };
 
+const FILL_PRESETS = [
+  {
+    id: "shelves",
+    label: "Полки",
+    description: "для коробок, одежды и бытовых вещей",
+    shelves: 4,
+    drawers: 0,
+    rails: 0,
+  },
+  {
+    id: "wardrobe",
+    label: "Гардероб",
+    description: "штанга и верхняя полка для плечиков",
+    shelves: 1,
+    drawers: 0,
+    rails: 1,
+  },
+  {
+    id: "drawers",
+    label: "Ящики снизу",
+    description: "ящики + полки над ними",
+    shelves: 2,
+    drawers: 3,
+    rails: 0,
+  },
+  {
+    id: "mixed",
+    label: "Комбо",
+    description: "полки, ящики и штанга в одной секции",
+    shelves: 2,
+    drawers: 2,
+    rails: 1,
+  },
+];
+
 export default function ConstructorPage() {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("3D");
@@ -137,6 +172,15 @@ export default function ConstructorPage() {
 
   function updateHumanHeight(delta) {
     setHumanHeight((prev) => Math.max(1000, Math.min(2150, prev + delta)));
+  }
+
+  function applyFillPreset(preset) {
+    if (!activeSection) return;
+
+    setSectionShelves(activeSection.id, preset.shelves);
+    setSectionDrawers(activeSection.id, preset.drawers);
+    setSectionHangerRails(activeSection.id, preset.rails);
+    setNotice(`Пресет «${preset.label}» применён к выбранной секции`);
   }
 
   function clearActiveSection() {
@@ -321,6 +365,23 @@ export default function ConstructorPage() {
                       onClick={() => setActiveSectionId(section.id)}
                     >
                       {index + 1}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="cst-preset-grid" aria-label="Быстрые пресеты наполнения">
+                  {FILL_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      className="cst-preset-card"
+                      onClick={() => applyFillPreset(preset)}
+                    >
+                      <span className="cst-preset-icon" aria-hidden="true" />
+                      <span className="cst-preset-text">
+                        <strong>{preset.label}</strong>
+                        <small>{preset.description}</small>
+                      </span>
                     </button>
                   ))}
                 </div>
