@@ -21,12 +21,17 @@ function createState(config: CabinetConfig) {
   };
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
 export type CabinetStoreState = {
   config: CabinetConfig;
   validation: ValidationMessage[];
   result: CalculationResult;
   updateDimensions: (key: keyof CabinetConfig["dimensions"], value: number) => void;
   updateSectionWidth: (sectionId: string, width: number) => void;
+  resizeSectionPair: (leftSectionId: string, rightSectionId: string, delta: number) => void;
   setSectionShelves: (sectionId: string, count: number) => void;
   setSectionDrawers: (sectionId: string, count: number) => void;
   setSectionHangerRails: (sectionId: string, count: number) => void;
@@ -68,6 +73,39 @@ export const useCabinetStore = create<CabinetStoreState>((set, get) => ({
         sections: state.config.sections.map((section) =>
           section.id === sectionId ? { ...section, width } : section
         )
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  resizeSectionPair: (leftSectionId, rightSectionId, delta) => {
+    set((state) => {
+      const leftSection = state.config.sections.find((section) => section.id === leftSectionId);
+      const rightSection = state.config.sections.find((section) => section.id === rightSectionId);
+
+      if (!leftSection || !rightSection) {
+        return { ...state };
+      }
+
+      const pairWidth = leftSection.width + rightSection.width;
+      const maxLeftWidth = pairWidth - MIN_SECTION_WIDTH;
+      const nextLeftWidth = clamp(leftSection.width + delta, MIN_SECTION_WIDTH, maxLeftWidth);
+      const nextRightWidth = pairWidth - nextLeftWidth;
+
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        sections: state.config.sections.map((section) => {
+          if (section.id === leftSectionId) {
+            return { ...section, width: Math.round(nextLeftWidth * 10) / 10 };
+          }
+
+          if (section.id === rightSectionId) {
+            return { ...section, width: Math.round(nextRightWidth * 10) / 10 };
+          }
+
+          return section;
+        })
       };
 
       return createState(nextConfig);
