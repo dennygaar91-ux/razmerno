@@ -8,6 +8,9 @@ import "../styles/premium-viewer-adaptive-sections.css";
 import "../styles/premium-viewer-semantic-facades.css";
 import "../styles/premium-viewer-facade-topology.css";
 import "../styles/premium-viewer-cabinet-anatomy.css";
+import "../styles/premium-viewer-depth-upgrade.css";
+import "../styles/premium-viewer-side-anatomy.css";
+import "../styles/premium-viewer-pseudo-cad.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
