@@ -53,6 +53,12 @@ function getSectionGridTemplate(sections) {
     .join(" ");
 }
 
+function getSectionSizeClass(width) {
+  if (width < 420) return "is-narrow";
+  if (width > 850) return "is-wide";
+  return "is-medium";
+}
+
 function getResizeHandlePosition(sections, index) {
   const totalWidth = sections.reduce((sum, section) => sum + (Number(section.width) || 0), 0);
   const widthBeforeHandle = sections
@@ -171,12 +177,15 @@ export default function PremiumCabinetViewer({
                 const drawerCount = getItemCount(section, "drawer");
                 const railCount = getItemCount(section, "hanger_rail");
                 const isEmpty = shelfCount + drawerCount + railCount === 0;
+                const sectionWidth = Number(section.width) || averageSectionWidth;
+                const sizeClass = getSectionSizeClass(sectionWidth);
 
                 return (
                   <button
                     type="button"
                     key={section.id}
-                    className={`pv-section ${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`}
+                    className={`pv-section ${sizeClass} ${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`}
+                    style={{ "--pv-section-width": sectionWidth }}
                     onClick={() => onSectionSelect?.(section.id)}
                   >
                     <span className="pv-section-label">{index + 1}</span>
