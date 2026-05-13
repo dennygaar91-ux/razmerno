@@ -11,6 +11,7 @@ import "../styles/premium-viewer-cabinet-anatomy.css";
 import "../styles/premium-viewer-depth-upgrade.css";
 import "../styles/premium-viewer-side-anatomy.css";
 import "../styles/premium-viewer-pseudo-cad.css";
+import "../styles/premium-viewer-orbit.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
@@ -35,7 +36,7 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-function getProportionalViewerStyle({ width, height, depth, zoom }) {
+function getProportionalViewerStyle({ width, height, depth, zoom, orbitX = 0, orbitY = 0 }) {
   const widthRatio = clamp(width / 2400, 0.56, 1.18);
   const heightRatio = clamp(height / 2200, 0.58, 1.16);
   const depthRatio = clamp(depth / 600, 0.72, 1.28);
@@ -49,6 +50,10 @@ function getProportionalViewerStyle({ width, height, depth, zoom }) {
     "--pv-visual-height": `${Math.round(visualHeight)}px`,
     "--pv-depth-offset": `${Math.round(depthOffset)}px`,
     "--pv-depth-scale": depthRatio.toFixed(2),
+    "--pv-orbit-x": `${orbitX.toFixed(2)}deg`,
+    "--pv-orbit-y": `${orbitY.toFixed(2)}deg`,
+    "--pv-parallax-x": `${(orbitY * 1.2).toFixed(2)}px`,
+    "--pv-parallax-y": `${(orbitX * -0.9).toFixed(2)}px`,
   };
 }
 
@@ -104,6 +109,7 @@ export default function PremiumCabinetViewer({
   onResizeSectionPair,
 }) {
   const [resizePreview, setResizePreview] = useState(null);
+  const [orbit, setOrbit] = useState({ x: 0, y: 0 });
   const width = config.dimensions.width;
   const height = config.dimensions.height;
   const depth = config.dimensions.depth;
@@ -114,8 +120,32 @@ export default function PremiumCabinetViewer({
   const facadeColor = getMaterialColor(config.materials.facadeMaterialId || config.materials.bodyMaterialId);
   const showHandles = config.facade?.enabled && config.facade?.openingType === "with_handles";
   const humanPercent = Math.max(38, Math.min(100, Math.round((userHeight / Math.max(height, 1)) * 86)));
-  const viewerStyle = getProportionalViewerStyle({ width, height, depth, zoom });
+  const viewerStyle = getProportionalViewerStyle({
+    width,
+    height,
+    depth,
+    zoom,
+    orbitX: orbit.x,
+    orbitY: orbit.y,
+  });
   const sectionGridTemplate = getSectionGridTemplate(sections);
+
+  function handleSceneMove(event) {
+    if (resizePreview || viewMode === "2D") return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+
+    setOrbit({
+      x: clamp(y * -2.8, -4, 4),
+      y: clamp(x * 4.2, -6, 6),
+    });
+  }
+
+  function resetSceneMove() {
+    setOrbit({ x: 0, y: 0 });
+  }
 
   function startResize(event, leftSection, rightSection, handleLeft) {
     if (!onResizeSectionPair || !leftSection || !rightSection) return;
@@ -163,7 +193,12 @@ export default function PremiumCabinetViewer({
   }
 
   return (
-    <div className={`pv-root pv-${viewMode?.toLowerCase()} pv-view-${viewType} ${resizePreview ? "is-resizing" : ""}`} style={viewerStyle}>
+    <div
+      className={`pv-root pv-${viewMode?.toLowerCase()} pv-view-${viewType} ${resizePreview ? "is-resizing" : ""}`}
+      style={viewerStyle}
+      onPointerMove={handleSceneMove}
+      onPointerLeave={resetSceneMove}
+    >
       <div className="pv-grid" />
 
       <div className="pv-canvas">
