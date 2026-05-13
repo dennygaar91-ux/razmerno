@@ -43,6 +43,14 @@ function getProportionalViewerStyle({ width, height, depth, zoom }) {
   };
 }
 
+function getSectionGridTemplate(sections) {
+  if (!sections.length) return "1fr";
+
+  return sections
+    .map((section) => `${Math.max(80, Math.round(Number(section.width) || 0))}fr`)
+    .join(" ");
+}
+
 export default function PremiumCabinetViewer({
   config,
   viewMode,
@@ -57,12 +65,13 @@ export default function PremiumCabinetViewer({
   const depth = config.dimensions.depth;
   const sections = config.sections || [];
   const sectionCount = Math.max(1, sections.length);
-  const sectionWidth = Math.round(width / sectionCount);
+  const averageSectionWidth = Math.round(width / sectionCount);
   const bodyColor = getMaterialColor(config.materials.bodyMaterialId);
   const facadeColor = getMaterialColor(config.materials.facadeMaterialId || config.materials.bodyMaterialId);
   const showHandles = config.facade?.enabled && config.facade?.openingType === "with_handles";
   const humanPercent = Math.max(38, Math.min(100, Math.round((userHeight / Math.max(height, 1)) * 86)));
   const viewerStyle = getProportionalViewerStyle({ width, height, depth, zoom });
+  const sectionGridTemplate = getSectionGridTemplate(sections);
 
   return (
     <div className={`pv-root pv-${viewMode?.toLowerCase()} pv-view-${viewType}`} style={viewerStyle}>
@@ -92,7 +101,7 @@ export default function PremiumCabinetViewer({
             <div className="pv-right-panel" />
             <div className="pv-back-panel" />
 
-            <div className="pv-sections">
+            <div className="pv-sections" style={{ gridTemplateColumns: sectionGridTemplate }}>
               {sections.map((section, index) => {
                 const isActive = activeSectionId === section.id;
                 const shelfCount = getItemCount(section, "shelf");
@@ -140,7 +149,7 @@ export default function PremiumCabinetViewer({
 
       <div className="pv-status">
         <span>{viewMode === "2D" ? "Blueprint 2D" : "Premium 3D preview"}</span>
-        <b>{sectionCount} секц. · {sectionWidth} мм</b>
+        <b>{sectionCount} секц. · средняя {averageSectionWidth} мм</b>
       </div>
     </div>
   );
