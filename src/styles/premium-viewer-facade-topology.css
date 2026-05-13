@@ -1,0 +1,58 @@
+.pv-facade {
+  overflow: hidden;
+}
+
+.pv-section.has-double-facade .pv-facade {
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,0.03) 0%,
+      rgba(255,255,255,0.08) 48%,
+      rgba(0,0,0,0.02) 50%,
+      rgba(255,255,255,0.08) 52%,
+      rgba(255,255,255,0.03) 100%);
+}
+
+.pv-section.has-double-facade .pv-facade::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: calc(50% - 1px);
+  width: 2px;
+  background: rgba(10,10,10,0.06);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.12),
+    0 0 12px rgba(10,10,10,0.04);
+}
+
+.pv-section.has-drawer-stack .pv-drawers {
+  position: absolute;
+  inset: 16% 8% 10% 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.pv-section.has-drawer-stack .pv-drawers i:last-child {
+  min-height: 32%;
+}
+
+.pv-section.has-drawer-stack .pv-drawers i:not(:last-child) {
+  min-height: 18%;
+}
+
+.pv-section.has-drawers .pv-drawers i {
+  position: relative;
+  overflow: hidden;
+}
+
+.pv-section.has-drawers .pv-drawers i::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.14),
+      transparent 24%,
+      rgba(0,0,0,0.03) 100%);
+}
