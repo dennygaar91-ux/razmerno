@@ -54,7 +54,9 @@
 .cp-steps button,
 .cp-viewer-toolbar button,
 .cp-toggles button,
-.cp-handle-options button {
+.cp-handle-options button,
+.cp-quick-actions button,
+.cp-mini-map button {
   border: 0;
   cursor: pointer;
   font-family: inherit;
@@ -265,6 +267,33 @@
   color: #fff;
 }
 
+.cp-empty-state {
+  padding: 14px;
+  margin-bottom: 14px;
+  border-radius: 20px;
+  background: rgba(232, 97, 44, 0.08);
+  border: 1px solid rgba(232, 97, 44, 0.14);
+}
+
+.cp-empty-state strong,
+.cp-empty-state small {
+  display: block;
+}
+
+.cp-empty-state strong {
+  color: #d95522;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.cp-empty-state small {
+  margin-top: 4px;
+  color: rgba(10, 10, 10, 0.58);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
 .cp-presets {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -427,6 +456,114 @@
   overflow: hidden;
   background: #f2efe8;
   border: 1px solid rgba(10, 10, 10, 0.06);
+}
+
+.cp-viewer-tools {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.cp-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cp-quick-actions button {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: #0a0a0a;
+  border: 1px solid rgba(10, 10, 10, 0.08);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.cp-quick-actions button:first-child,
+.cp-quick-actions button:nth-child(2) {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.cp-mini-map {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 20px;
+  background: #f7f6f2;
+  border: 1px solid rgba(10, 10, 10, 0.06);
+}
+
+.cp-mini-map button {
+  min-height: 54px;
+  padding: 8px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid rgba(10, 10, 10, 0.08);
+  color: #0a0a0a;
+  display: grid;
+  gap: 5px;
+  align-content: center;
+  justify-items: center;
+}
+
+.cp-mini-map button.active {
+  border-color: #e8612c;
+  box-shadow: 0 0 0 3px rgba(232, 97, 44, 0.13);
+}
+
+.cp-mini-map button.empty {
+  opacity: 0.68;
+}
+
+.cp-mini-map span {
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.cp-mini-map i {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.12);
+}
+
+.cp-mini-map button.active i {
+  background: #e8612c;
+}
+
+.cp-viewer-footer {
+  padding-top: 4px;
+}
+
+.cp-viewer-footer .cp-fill-counter {
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: #f7f6f2;
+  box-shadow: none;
+}
+
+.cp-viewer-footer .cp-fill-counter > span {
+  font-size: 13px;
+}
+
+.cp-viewer-footer .cp-fill-counter div {
+  grid-template-columns: 36px minmax(56px, auto) 36px;
+  gap: 8px;
+}
+
+.cp-viewer-footer .cp-fill-counter button {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+}
+
+.cp-viewer-footer .cp-fill-counter b {
+  height: 36px;
+  min-width: 56px;
+  font-size: 13px;
 }
 
 .cp-summary {
@@ -638,5 +775,9 @@
 
   .cp-viewer-stage {
     height: 460px;
+  }
+
+  .cp-mini-map {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }
