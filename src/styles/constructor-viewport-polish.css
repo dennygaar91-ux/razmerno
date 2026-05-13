@@ -73,52 +73,85 @@
 }
 
 .cst-view-footer {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto !important;
-  gap: 14px !important;
+  display: flex !important;
+  justify-content: space-between !important;
   align-items: center !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
 }
 
 .cst-view-hotspot,
 .cst-view-zoom {
-  width: fit-content !important;
-  display: inline-flex !important;
+  display: flex !important;
   align-items: center !important;
-  gap: 12px !important;
-  min-height: 54px !important;
-  padding: 8px 10px 8px 16px !important;
-  border-radius: 18px !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  min-height: 42px !important;
+  padding: 6px 10px !important;
+  border-radius: 16px !important;
   background: rgba(255, 255, 255, 0.92) !important;
   border: 1px solid rgba(10, 10, 10, 0.06) !important;
-  box-shadow: 0 12px 28px rgba(10, 10, 10, 0.04) !important;
+  box-shadow: 0 10px 20px rgba(10, 10, 10, 0.04) !important;
+  flex-shrink: 0 !important;
+}
+
+.cst-view-hotspot {
+  min-width: 230px !important;
 }
 
 .cst-view-zoom {
-  justify-self: end !important;
+  min-width: 160px !important;
 }
 
 .cst-view-hotspot span,
 .cst-zoom-value {
-  font-size: 13px !important;
-  font-weight: 850 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
   color: #0a0a0a !important;
+  white-space: nowrap !important;
 }
 
 .cst-view-footer .cst-counter {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
   background: #f3f2ef !important;
   border: 1px solid rgba(10, 10, 10, 0.06) !important;
+  border-radius: 14px !important;
+  padding: 4px !important;
 }
 
 .cst-view-footer .cst-counter-button {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  border-radius: 12px !important;
   background: #fff !important;
   color: #0a0a0a !important;
   border: 1px solid rgba(10, 10, 10, 0.08) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+.cst-view-footer .cst-counter-value,
+.cst-view-footer .cst-zoom-value {
+  min-width: 70px !important;
+  text-align: center !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
 }
 
 @media (max-width: 560px) {
-  .cst-view-toolbar,
-  .cst-view-footer {
+  .cst-view-toolbar {
     grid-template-columns: 1fr !important;
+  }
+
+  .cst-view-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
   }
 
   .cst-view-pill-group,
@@ -126,7 +159,6 @@
   .cst-view-hotspot,
   .cst-view-zoom {
     width: 100% !important;
-    justify-content: flex-start !important;
   }
 
   .cst-view-actions {
