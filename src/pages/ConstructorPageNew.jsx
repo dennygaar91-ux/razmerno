@@ -6,6 +6,10 @@ import ConstructorSummary from "../constructor/components/ConstructorSummary";
 import FillCounter from "../constructor/components/FillCounter";
 import MaterialDrawer from "../constructor/components/MaterialDrawer";
 import MaterialSelect from "../constructor/components/MaterialSelect";
+import ViewerFooter from "../constructor/components/ViewerFooter";
+import ViewerMiniMap from "../constructor/components/ViewerMiniMap";
+import ViewerQuickActions from "../constructor/components/ViewerQuickActions";
+import ViewerToolbar from "../constructor/components/ViewerToolbar";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
   bodyMaterialOptions,
@@ -303,26 +307,38 @@ export default function ConstructorPageNew() {
           </aside>
 
           <section className="cp-viewer-card">
-            <div className="cp-viewer-toolbar">
-              <div>{["front", "side", "top", "free"].map((item) => <button key={item} type="button" className={viewType === item ? "active" : ""} onClick={() => setViewType(item)}>{item === "front" ? "Спереди" : item === "side" ? "Сбоку" : item === "top" ? "Сверху" : "Свободно"}</button>)}</div>
-              <div><button type="button" className={viewMode === "3D" ? "active" : ""} onClick={() => setViewMode("3D")}>3D</button><button type="button" className={viewMode === "2D" ? "active" : ""} onClick={() => setViewMode("2D")}>2D</button></div>
-            </div>
+            <ViewerToolbar
+              viewType={viewType}
+              viewMode={viewMode}
+              onViewTypeChange={setViewType}
+              onViewModeChange={setViewMode}
+            />
+
             <div className="cp-viewer-stage">
               <PremiumCabinetViewer config={config} viewMode={viewMode} viewType={viewType} zoom={zoom} userHeight={humanHeight} activeSectionId={activeSection?.id} onSectionSelect={selectSection} onResizeSectionPair={resizeSectionPair} />
             </div>
+
             <div className="cp-viewer-tools">
-              <div className="cp-quick-actions"><button type="button" onClick={addShelfToActiveSection}>+ полка</button><button type="button" onClick={addDrawerToActiveSection}>+ ящик</button><button type="button" onClick={toggleRailInActiveSection}>штанга</button><button type="button" onClick={clearActiveSection}>очистить</button></div>
-              <div className="cp-mini-map" style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(34px, 1fr))` }}>
-                {config.sections.map((section, index) => {
-                  const isEmpty = getItemCount(section, "shelf") + getItemCount(section, "drawer") + getItemCount(section, "hanger_rail") === 0;
-                  return <button key={section.id} type="button" className={`${section.id === activeSection?.id ? "active" : ""} ${isEmpty ? "empty" : ""}`} onClick={() => selectSection(section.id)}><span>{index + 1}</span><i /></button>;
-                })}
-              </div>
+              <ViewerQuickActions
+                onAddShelf={addShelfToActiveSection}
+                onAddDrawer={addDrawerToActiveSection}
+                onToggleRail={toggleRailInActiveSection}
+                onClear={clearActiveSection}
+              />
+              <ViewerMiniMap
+                sections={config.sections}
+                activeSectionId={activeSection?.id}
+                onSelect={selectSection}
+                getItemCount={getItemCount}
+              />
             </div>
-            <div className="cp-viewer-footer">
-              <FillCounter label="Рост" value={`${Math.round(humanHeight / 10)} см`} onMinus={() => setHumanHeight(clamp(humanHeight - 10, 1000, 2150))} onPlus={() => setHumanHeight(clamp(humanHeight + 10, 1000, 2150))} />
-              <FillCounter label="Масштаб" value={`${Math.round(zoom * 100)}%`} onMinus={() => setZoom(clamp(Number((zoom - 0.1).toFixed(2)), 0.7, 1.5))} onPlus={() => setZoom(clamp(Number((zoom + 0.1).toFixed(2)), 0.7, 1.5))} />
-            </div>
+
+            <ViewerFooter
+              zoom={zoom}
+              userHeight={humanHeight}
+              onZoomChange={setZoom}
+              onUserHeightChange={setHumanHeight}
+            />
           </section>
 
           <ConstructorSummary
