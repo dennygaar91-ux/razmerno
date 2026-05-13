@@ -144,3 +144,14 @@
     width: 100% !important;
   }
 }
+
+/* убрать системные стрелки */
+.cst-inline-counter input::-webkit-outer-spin-button,
+.cst-inline-counter input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cst-inline-counter input[type="number"] {
+  -moz-appearance: textfield;
+}

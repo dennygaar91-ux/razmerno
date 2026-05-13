@@ -1364,3 +1364,15 @@ overflow: hidden;
   font-size: 13px;
   font-weight: 700;
 }
+
+.cst-card-section--compact,
+.cst-card-section--compact:hover {
+  background: #f7f6f2;
+  border-color: rgba(10, 10, 10, 0.08);
+  box-shadow: none;
+  transform: none;
+}
+
+.cst-inline-counter input {
+  font-weight: 650;
+}

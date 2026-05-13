@@ -13,9 +13,9 @@ import {
 import "./ConstructorPage.css";
 
 const DIMENSION_LIMITS = {
-  height: { min: 600, max: 2800, step: 50 },
-  width: { min: 400, max: 3600, step: 50 },
-  depth: { min: 300, max: 900, step: 50 },
+  height: { min: 200, max: 2800, step: 1 },
+  width: { min: 200, max: 3600, step: 1 },
+  depth: { min: 200, max: 900, step: 1 },
 };
 
 const FILL_PRESETS = [
@@ -280,32 +280,27 @@ export default function ConstructorPage() {
 
     return (
       <div key={key} className="cst-dimension-control">
-        <div className="cst-dimension-head">
-          <span>{label}, мм</span>
-          <small>
-            {limits.min}–{limits.max} · шаг {limits.step}
-          </small>
-        </div>
+        
         <div className="cst-inline-counter">
           <button
             type="button"
             className="cst-counter-button"
-            onClick={() => updateDimensionByStep(key, -limits.step)}
+            onClick={() => updateDimensionByStep(key, -1)}
           >
             −
           </button>
           <input
-            type="number"
-            min={limits.min}
-            max={limits.max}
-            value={config.dimensions[key]}
-            onChange={(event) => setDimensionValue(key, event.target.value)}
-            onBlur={(event) => setDimensionValue(key, event.target.value, true)}
-          />
+  type="number"
+  min={limits.min}
+  max={limits.max}
+  step={1}
+  value={config.dimensions[key]}
+  onChange={(event) => setDimensionValue(key, event.target.value)}
+/>
           <button
             type="button"
             className="cst-counter-button"
-            onClick={() => updateDimensionByStep(key, limits.step)}
+            onClick={() => updateDimensionByStep(key, 1)}
           >
             +
           </button>
@@ -420,23 +415,7 @@ export default function ConstructorPage() {
                     </div>
                   </div>
 
-                  <div className="cst-section-list">
-                    {config.sections.map((section, index) => (
-                      <button
-                        key={section.id}
-                        type="button"
-                        draggable
-                        className={`cst-section-item ${activeSection?.id === section.id ? "active" : ""}`}
-                        onClick={() => selectSection(section.id)}
-                        onDragStart={() => setDragSectionId(section.id)}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={() => handleMiniMapDrop(section.id)}
-                      >
-                        <span>Секция {index + 1}</span>
-                        <small>{Math.round(config.dimensions.width / sectionCount)} мм</small>
-                      </button>
-                    ))}
-                  </div>
+                  
                 </div>
 
                 <div className="cst-panel-actions">
