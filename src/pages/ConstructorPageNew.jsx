@@ -10,6 +10,7 @@ import {
   handleOptions,
 } from "../data/constructorOptions";
 import "../styles/constructor-premium.css";
+import "../styles/constructor-mobile-action-bar.css";
 
 const DIMENSION_LIMITS = {
   height: { label: "Высота", min: 200, max: 2800 },
@@ -42,6 +43,7 @@ export default function ConstructorPageNew() {
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [drawerType, setDrawerType] = useState(null);
   const [notice, setNotice] = useState("");
+  const [pricePulse, setPricePulse] = useState(false);
 
   const {
     config,
@@ -89,6 +91,12 @@ export default function ConstructorPageNew() {
       depth: String(config.dimensions.depth),
     });
   }, [config.dimensions.height, config.dimensions.width, config.dimensions.depth]);
+
+  useEffect(() => {
+    setPricePulse(true);
+    const timer = window.setTimeout(() => setPricePulse(false), 220);
+    return () => window.clearTimeout(timer);
+  }, [price]);
 
   const totals = useMemo(() => {
     return config.sections.reduce(
@@ -404,7 +412,7 @@ export default function ConstructorPageNew() {
             </div>
           </section>
 
-          <aside className="cp-summary">
+          <aside className={`cp-summary ${pricePulse ? "is-price-updated" : ""}`}>
             <span className="cp-eyebrow">Итого</span>
             <strong>{price.toLocaleString("ru-RU")} ₽</strong>
             <small>Ориентировочная стоимость комплекта</small>
@@ -421,6 +429,19 @@ export default function ConstructorPageNew() {
             <button type="button" onClick={() => setNotice("Экспорт чертежей подключим после стабилизации деталировки")}>Скачать чертежи</button>
           </aside>
         </section>
+
+        <div className={`cp-mobile-bar ${pricePulse ? "is-price-updated" : ""}`}>
+          <div className="cp-mobile-bar-price">
+            <span>Стоимость</span>
+            <strong>{price.toLocaleString("ru-RU")} ₽</strong>
+            <small>{config.dimensions.width} × {config.dimensions.height} × {config.dimensions.depth} мм</small>
+          </div>
+
+          <div className="cp-mobile-bar-actions">
+            <button type="button" onClick={saveDraft} aria-label="Сохранить">♡</button>
+            <button type="button" onClick={() => navigate("/account/order")}>В корзину</button>
+          </div>
+        </div>
       </main>
 
       {drawerType ? (
