@@ -1,0 +1,45 @@
+.pv-view-side .pv-section {
+  overflow: visible;
+}
+
+.pv-view-side .pv-section::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: calc(-1 * var(--pv-depth-offset, 34px) * 0.66);
+  bottom: 10px;
+  width: calc(var(--pv-depth-offset, 34px) * 0.66);
+  transform: skewY(-18deg);
+  transform-origin: left top;
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,0.08),
+      rgba(10,10,10,0.14));
+  opacity: 0.82;
+}
+
+.pv-view-side .pv-shelves i::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: calc(-1 * var(--pv-depth-offset, 34px) * 0.42);
+  width: calc(var(--pv-depth-offset, 34px) * 0.42);
+  bottom: 0;
+  transform: skewY(-18deg);
+  background: rgba(10,10,10,0.08);
+}
+
+.pv-view-side .pv-drawers i {
+  transform-style: preserve-3d;
+}
+
+.pv-view-side .pv-drawers i::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: calc(-1 * var(--pv-depth-offset, 34px) * 0.34);
+  width: calc(var(--pv-depth-offset, 34px) * 0.34);
+  bottom: 6px;
+  transform: skewY(-18deg);
+  background: rgba(10,10,10,0.12);
+}
