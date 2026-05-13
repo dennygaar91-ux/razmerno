@@ -1,0 +1,58 @@
+.pv-top-panel,
+.pv-bottom-panel,
+.pv-left-panel,
+.pv-right-panel,
+.pv-shelves i,
+.pv-drawers i,
+.pv-facade {
+  outline: 1px solid rgba(10,10,10,0.035);
+  outline-offset: -1px;
+}
+
+.pv-top-panel,
+.pv-bottom-panel {
+  border-top: 1px solid rgba(255,255,255,0.22);
+  border-bottom: 1px solid rgba(10,10,10,0.08);
+}
+
+.pv-left-panel,
+.pv-right-panel {
+  border-left: 1px solid rgba(255,255,255,0.18);
+  border-right: 1px solid rgba(10,10,10,0.08);
+}
+
+.pv-shelves i {
+  border-top: 1px solid rgba(255,255,255,0.28);
+  border-bottom: 2px solid rgba(10,10,10,0.1);
+}
+
+.pv-drawers i {
+  border-top: 1px solid rgba(255,255,255,0.26);
+  border-right: 1px solid rgba(10,10,10,0.09);
+  border-bottom: 2px solid rgba(10,10,10,0.12);
+  border-left: 1px solid rgba(255,255,255,0.12);
+}
+
+.pv-section.has-double-facade .pv-facade::before,
+.pv-section.has-double-facade .pv-facade::after {
+  box-shadow:
+    1px 0 0 rgba(255,255,255,0.16),
+    -1px 0 0 rgba(10,10,10,0.08);
+}
+
+.pv-view-side .pv-right-panel::before,
+.pv-view-free .pv-right-panel::before {
+  border-left: 1px solid rgba(255,255,255,0.16);
+  border-right: 1px solid rgba(10,10,10,0.1);
+}
+
+.pv-2d .pv-top-panel,
+.pv-2d .pv-bottom-panel,
+.pv-2d .pv-left-panel,
+.pv-2d .pv-right-panel,
+.pv-2d .pv-shelves i,
+.pv-2d .pv-drawers i,
+.pv-2d .pv-facade {
+  outline-color: rgba(10,10,10,0.16);
+  border-color: rgba(10,10,10,0.18);
+}
