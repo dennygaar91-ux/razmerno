@@ -1,0 +1,145 @@
+/* Constructor fill polish — section chips, filling controls, handles */
+
+.cst-section-chip-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  border-radius: 20px !important;
+  background: #f5f3ee !important;
+  border: 1px solid rgba(10, 10, 10, 0.06) !important;
+}
+
+.cst-mini-section-chip {
+  width: 42px !important;
+  height: 42px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(10, 10, 10, 0.08) !important;
+  background: #fff !important;
+  color: rgba(10, 10, 10, 0.72) !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease, border-color 0.16s ease !important;
+}
+
+.cst-mini-section-chip:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(10, 10, 10, 0.22) !important;
+}
+
+.cst-mini-section-chip.active {
+  background: #0a0a0a !important;
+  color: #fff !important;
+  border-color: #0a0a0a !important;
+  box-shadow: 0 10px 20px rgba(10, 10, 10, 0.14) !important;
+}
+
+.cst-control-row {
+  align-items: stretch !important;
+}
+
+.cst-counter-block {
+  min-height: 96px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-content: space-between !important;
+  padding: 14px !important;
+  border-radius: 20px !important;
+  background: #f7f6f2 !important;
+  border: 1px solid rgba(10, 10, 10, 0.06) !important;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease !important;
+}
+
+.cst-counter-block:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(10, 10, 10, 0.14) !important;
+  box-shadow: 0 12px 28px rgba(10, 10, 10, 0.05) !important;
+}
+
+.cst-counter-block > span {
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  color: #0a0a0a !important;
+}
+
+.cst-counter-block .cst-counter {
+  justify-self: start !important;
+  background: #fff !important;
+  border: 1px solid rgba(10, 10, 10, 0.06) !important;
+}
+
+.cst-counter-block .cst-counter-button {
+  background: #0a0a0a !important;
+  color: #fff !important;
+  border: 1px solid #0a0a0a !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+.cst-counter-block .cst-counter-value {
+  min-width: 28px !important;
+  text-align: center !important;
+}
+
+.cst-toggle-group {
+  min-height: 96px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  padding: 14px !important;
+  border-radius: 20px !important;
+  background: #f7f6f2 !important;
+  border: 1px solid rgba(10, 10, 10, 0.06) !important;
+}
+
+.cst-toggle-btn {
+  min-height: 48px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(10, 10, 10, 0.1) !important;
+  background: #fff !important;
+  color: #0a0a0a !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease !important;
+}
+
+.cst-toggle-btn:hover {
+  transform: translateY(-1px) !important;
+}
+
+.cst-toggle-btn.active {
+  background: #0a0a0a !important;
+  color: #fff !important;
+  border-color: #0a0a0a !important;
+}
+
+.cst-card-section.is-disabled {
+  opacity: 0.48 !important;
+  filter: grayscale(0.2) !important;
+}
+
+.cst-card-section .cst-card-head {
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  color: rgba(10, 10, 10, 0.72) !important;
+}
+
+.cst-option-card:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.55 !important;
+}
+
+.cst-panel-actions {
+  padding-top: 2px !important;
+}
+
+@media (max-width: 900px) {
+  .cst-toggle-group {
+    grid-template-columns: 1fr !important;
+  }
+}
