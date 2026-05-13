@@ -20,6 +20,27 @@ function getMaterialColor(materialId) {
   return colors[materialId] || "#d8cab7";
 }
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function getProportionalViewerStyle({ width, height, depth, zoom }) {
+  const widthRatio = clamp(width / 2400, 0.56, 1.18);
+  const heightRatio = clamp(height / 2200, 0.58, 1.16);
+  const depthRatio = clamp(depth / 600, 0.72, 1.28);
+  const visualWidth = clamp(widthRatio * 760, 430, 860);
+  const visualHeight = clamp(heightRatio * 460, 300, 540);
+  const depthOffset = clamp(depthRatio * 34, 24, 48);
+
+  return {
+    "--pv-zoom": zoom,
+    "--pv-visual-width": `${Math.round(visualWidth)}px`,
+    "--pv-visual-height": `${Math.round(visualHeight)}px`,
+    "--pv-depth-offset": `${Math.round(depthOffset)}px`,
+    "--pv-depth-scale": depthRatio.toFixed(2),
+  };
+}
+
 export default function PremiumCabinetViewer({
   config,
   viewMode,
@@ -39,9 +60,10 @@ export default function PremiumCabinetViewer({
   const facadeColor = getMaterialColor(config.materials.facadeMaterialId || config.materials.bodyMaterialId);
   const showHandles = config.facade?.enabled && config.facade?.openingType === "with_handles";
   const humanPercent = Math.max(38, Math.min(100, Math.round((userHeight / Math.max(height, 1)) * 86)));
+  const viewerStyle = getProportionalViewerStyle({ width, height, depth, zoom });
 
   return (
-    <div className={`pv-root pv-${viewMode?.toLowerCase()} pv-view-${viewType}`} style={{ "--pv-zoom": zoom }}>
+    <div className={`pv-root pv-${viewMode?.toLowerCase()} pv-view-${viewType}`} style={viewerStyle}>
       <div className="pv-grid" />
 
       <div className="pv-canvas">
