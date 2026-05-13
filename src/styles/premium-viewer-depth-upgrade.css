@@ -1,0 +1,84 @@
+.pv-cabinet {
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+.pv-cabinet::before {
+  z-index: 18;
+}
+
+.pv-cabinet::after {
+  z-index: 14;
+}
+
+.pv-depth-shadow {
+  opacity: 0.78;
+  transform:
+    translateX(calc(var(--pv-depth-offset, 34px) * 0.32))
+    scaleX(calc(1 + (var(--pv-depth-scale, 1) - 1) * 0.18));
+}
+
+.pv-top-panel::before,
+.pv-right-panel::before,
+.pv-bottom-panel::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.pv-top-panel::before {
+  left: 10px;
+  right: calc(-1 * var(--pv-depth-offset, 34px));
+  top: calc(-1 * var(--pv-depth-offset, 34px) * 0.42);
+  height: calc(var(--pv-depth-offset, 34px) * 0.42);
+  transform: skewX(-36deg);
+  transform-origin: left bottom;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.24), rgba(10,10,10,0.08)),
+    var(--body-color);
+  opacity: 0.72;
+}
+
+.pv-right-panel::before {
+  top: calc(-1 * var(--pv-depth-offset, 34px) * 0.42);
+  right: calc(-1 * var(--pv-depth-offset, 34px));
+  bottom: 10px;
+  width: var(--pv-depth-offset, 34px);
+  transform: skewY(-18deg);
+  transform-origin: left top;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.16), rgba(10,10,10,0.14)),
+    var(--body-color);
+  opacity: 0.7;
+}
+
+.pv-bottom-panel::before {
+  left: 16px;
+  right: calc(-1 * var(--pv-depth-offset, 34px) * 0.8);
+  bottom: calc(-1 * var(--pv-depth-offset, 34px) * 0.24);
+  height: calc(var(--pv-depth-offset, 34px) * 0.24);
+  transform: skewX(42deg);
+  transform-origin: left top;
+  background:
+    linear-gradient(180deg, rgba(10,10,10,0.08), rgba(10,10,10,0.18)),
+    var(--body-color);
+  opacity: 0.55;
+}
+
+.pv-view-front .pv-cabinet {
+  transform: perspective(1200px) rotateX(1deg) rotateY(-2deg);
+}
+
+.pv-view-free .pv-cabinet {
+  transform: perspective(1200px) rotateX(5deg) rotateY(-11deg) translateZ(0);
+}
+
+.pv-view-side .pv-cabinet {
+  transform: perspective(1200px) rotateX(3deg) rotateY(-24deg) scaleX(0.82);
+}
+
+.pv-2d .pv-top-panel::before,
+.pv-2d .pv-right-panel::before,
+.pv-2d .pv-bottom-panel::before {
+  display: none;
+}
