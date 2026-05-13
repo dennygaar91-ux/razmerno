@@ -15,6 +15,7 @@ import "../styles/premium-viewer-depth-upgrade.css";
 import "../styles/premium-viewer-side-anatomy.css";
 import "../styles/premium-viewer-pseudo-cad.css";
 import "../styles/premium-viewer-orbit.css";
+import "../styles/premium-viewer-production.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
@@ -227,6 +228,8 @@ export default function PremiumCabinetViewer({
             <div className="pv-left-panel" />
             <div className="pv-right-panel" />
             <div className="pv-back-panel" />
+            <div className="pv-production-label pv-production-label-top">верхняя панель</div>
+            <div className="pv-production-label pv-production-label-side">боковина</div>
 
             <div className="pv-sections" style={{ gridTemplateColumns: sectionGridTemplate }}>
               {sections.map((section, index) => {
@@ -248,12 +251,16 @@ export default function PremiumCabinetViewer({
                     onClick={() => onSectionSelect?.(section.id)}
                   >
                     <span className="pv-section-label">{index + 1}</span>
+                    <span className="pv-production-tag">{Math.round(sectionWidth)} мм</span>
 
                     {railCount > 0 ? <span className="pv-rail" /> : null}
 
                     <span className="pv-shelves">
                       {Array.from({ length: shelfCount }).map((_, shelfIndex) => (
-                        <i key={`shelf-${section.id}-${shelfIndex}`} />
+                        <i key={`shelf-${section.id}-${shelfIndex}`}>
+                          <em className="pv-drill pv-drill-left" />
+                          <em className="pv-drill pv-drill-right" />
+                        </i>
                       ))}
                     </span>
 
@@ -261,6 +268,7 @@ export default function PremiumCabinetViewer({
                       {Array.from({ length: drawerCount }).map((_, drawerIndex) => (
                         <i key={`drawer-${section.id}-${drawerIndex}`}>
                           {showHandles ? <em /> : null}
+                          <span className="pv-drill-row" />
                         </i>
                       ))}
                     </span>
@@ -269,6 +277,11 @@ export default function PremiumCabinetViewer({
                   </button>
                 );
               })}
+            </div>
+
+            <div className="pv-exploded-hint">
+              <span>EXPLODED PREVIEW</span>
+              <b>панели · кромка · присадка</b>
             </div>
 
             {sections.length > 1 ? (
