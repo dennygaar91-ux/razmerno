@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Icon from "../icons/Icon";
 import Header from "../components/Header/Header";
@@ -62,6 +62,10 @@ export default function ConstructorPage() {
   const [humanHeight, setHumanHeight] = useState(1750);
   const [materialDrawerOpen, setMaterialDrawerOpen] = useState(null);
   const [notice, setNotice] = useState("");
+  const [activeSectionId, setActiveSectionId] = useState(null);
+  const [dragSectionId, setDragSectionId] = useState(null);
+  const [isViewerReady, setIsViewerReady] = useState(false);
+  const [pricePulse, setPricePulse] = useState(false);
 
   const {
     config,
@@ -83,7 +87,25 @@ export default function ConstructorPage() {
   } = useCabinetStore();
 
   const sectionCount = config.sections.length;
-  const [activeSectionId, setActiveSectionId] = useState(config.sections[0]?.id || null);
+
+  useEffect(() => {
+    if (!activeSectionId && config.sections[0]?.id) {
+      setActiveSectionId(config.sections[0].id);
+    }
+  }, [activeSectionId, config.sections]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsViewerReady(true), 480);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const price = result.price?.total ?? 0;
+
+  useEffect(() => {
+    setPricePulse(true);
+    const timer = window.setTimeout(() => setPricePulse(false), 520);
+    return () => window.clearTimeout(timer);
+  }, [price]);
 
   const activeSection =
     config.sections.find((section) => section.id === activeSectionId) || config.sections[0];
@@ -103,7 +125,6 @@ export default function ConstructorPage() {
     );
   }, [config.sections]);
 
-  const price = result.price?.total ?? 0;
   const savings = Math.max(0, Math.round(price * 0.12));
 
   const bodyMaterial = bodyMaterialOptions.find(
@@ -116,9 +137,18 @@ export default function ConstructorPage() {
 
   const bodyMaterialName = bodyMaterial?.name || "ЛДСП";
   const facadeMaterialName = facadeMaterial?.name || "МДФ";
+  const hasEmptyActiveSection =
+    activeSection &&
+    getSectionItemCount(activeSection, "shelf") === 0 &&
+    getSectionItemCount(activeSection, "drawer") === 0 &&
+    getSectionItemCount(activeSection, "hanger_rail") === 0;
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
+  }
+
+  function snapToStep(value, step) {
+    return Math.round(value / step) * step;
   }
 
   function getSectionItemCount(section, type) {
@@ -131,9 +161,11 @@ export default function ConstructorPage() {
     updateDimensions(key, nextValue);
   }
 
-  function setDimensionValue(key, value) {
+  function setDimensionValue(key, value, shouldSnap = false) {
     const limits = DIMENSION_LIMITS[key];
-    const nextValue = clamp(Number(value) || limits.min, limits.min, limits.max);
+    const rawValue = Number(value) || limits.min;
+    const preparedValue = shouldSnap ? snapToStep(rawValue, limits.step) : rawValue;
+    const nextValue = clamp(preparedValue, limits.min, limits.max);
     updateDimensions(key, nextValue);
   }
 
@@ -183,11 +215,31 @@ export default function ConstructorPage() {
     setNotice(`Пресет «${preset.label}» применён к выбранной секции`);
   }
 
+  function addShelfToActiveSection() {
+    if (!activeSection) return;
+    setSectionShelves(activeSection.id, Math.min(12, getSectionItemCount(activeSection, "shelf") + 1));
+    setNotice("Полка добавлена в выбранную секцию");
+  }
+
+  function addDrawerToActiveSection() {
+    if (!activeSection) return;
+    setSectionDrawers(activeSection.id, Math.min(6, getSectionItemCount(activeSection, "drawer") + 1));
+    setNotice("Ящик добавлен в выбранную секцию");
+  }
+
+  function toggleRailInActiveSection() {
+    if (!activeSection) return;
+    const nextValue = getSectionItemCount(activeSection, "hanger_rail") > 0 ? 0 : 1;
+    setSectionHangerRails(activeSection.id, nextValue);
+    setNotice(nextValue ? "Штанга добавлена" : "Штанга убрана");
+  }
+
   function clearActiveSection() {
     if (!activeSection) return;
     setSectionShelves(activeSection.id, 0);
     setSectionDrawers(activeSection.id, 0);
     setSectionHangerRails(activeSection.id, 0);
+    setNotice("Выбранная секция очищена");
   }
 
   function resetConstructor() {
@@ -216,6 +268,13 @@ export default function ConstructorPage() {
     navigate("/account/order");
   }
 
+  function handleMiniMapDrop(sectionId) {
+    if (!dragSectionId || dragSectionId === sectionId) return;
+    setActiveSectionId(sectionId);
+    setNotice("Секция выбрана через мини-карту. Перестановку секций подключим на этапе логики backend.");
+    setDragSectionId(null);
+  }
+
   function renderDimensionControl(label, key) {
     const limits = DIMENSION_LIMITS[key];
 
@@ -224,7 +283,7 @@ export default function ConstructorPage() {
         <div className="cst-dimension-head">
           <span>{label}, мм</span>
           <small>
-            {limits.min}–{limits.max}
+            {limits.min}–{limits.max} · шаг {limits.step}
           </small>
         </div>
         <div className="cst-inline-counter">
@@ -241,6 +300,7 @@ export default function ConstructorPage() {
             max={limits.max}
             value={config.dimensions[key]}
             onChange={(event) => setDimensionValue(key, event.target.value)}
+            onBlur={(event) => setDimensionValue(key, event.target.value, true)}
           />
           <button
             type="button"
@@ -249,6 +309,43 @@ export default function ConstructorPage() {
           >
             +
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  function renderMiniMap() {
+    return (
+      <div className="cst-mini-map" aria-label="Мини-карта шкафа">
+        <div className="cst-mini-map-head">
+          <span>Мини-карта</span>
+          <small>{sectionCount} секц.</small>
+        </div>
+        <div className="cst-mini-map-grid" style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(22px, 1fr))` }}>
+          {config.sections.map((section, index) => {
+            const isActive = activeSection?.id === section.id;
+            const sectionShelves = getSectionItemCount(section, "shelf");
+            const sectionDrawers = getSectionItemCount(section, "drawer");
+            const sectionRails = getSectionItemCount(section, "hanger_rail");
+            const isEmpty = sectionShelves + sectionDrawers + sectionRails === 0;
+
+            return (
+              <button
+                key={section.id}
+                type="button"
+                draggable
+                className={`cst-mini-map-section ${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`}
+                onClick={() => selectSection(section.id)}
+                onDragStart={() => setDragSectionId(section.id)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => handleMiniMapDrop(section.id)}
+                title={`Секция ${index + 1}`}
+              >
+                <span>{index + 1}</span>
+                <i />
+              </button>
+            );
+          })}
         </div>
       </div>
     );
@@ -328,8 +425,12 @@ export default function ConstructorPage() {
                       <button
                         key={section.id}
                         type="button"
+                        draggable
                         className={`cst-section-item ${activeSection?.id === section.id ? "active" : ""}`}
                         onClick={() => selectSection(section.id)}
+                        onDragStart={() => setDragSectionId(section.id)}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => handleMiniMapDrop(section.id)}
                       >
                         <span>Секция {index + 1}</span>
                         <small>{Math.round(config.dimensions.width / sectionCount)} мм</small>
@@ -361,13 +462,24 @@ export default function ConstructorPage() {
                     <button
                       key={section.id}
                       type="button"
+                      draggable
                       className={`cst-mini-section-chip ${activeSection.id === section.id ? "active" : ""}`}
                       onClick={() => setActiveSectionId(section.id)}
+                      onDragStart={() => setDragSectionId(section.id)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={() => handleMiniMapDrop(section.id)}
                     >
                       {index + 1}
                     </button>
                   ))}
                 </div>
+
+                {hasEmptyActiveSection ? (
+                  <div className="cst-empty-state">
+                    <strong>Секция пока пустая</strong>
+                    <span>Выберите пресет ниже или добавьте полку, ящик, штангу быстрыми кнопками.</span>
+                  </div>
+                ) : null}
 
                 <div className="cst-preset-grid" aria-label="Быстрые пресеты наполнения">
                   {FILL_PRESETS.map((preset) => (
@@ -403,9 +515,7 @@ export default function ConstructorPage() {
                       <button
                         type="button"
                         className="cst-counter-button"
-                        onClick={() =>
-                          setSectionShelves(activeSection.id, Math.min(12, getSectionItemCount(activeSection, "shelf") + 1))
-                        }
+                        onClick={addShelfToActiveSection}
                       >
                         +
                       </button>
@@ -428,9 +538,7 @@ export default function ConstructorPage() {
                       <button
                         type="button"
                         className="cst-counter-button"
-                        onClick={() =>
-                          setSectionDrawers(activeSection.id, Math.min(6, getSectionItemCount(activeSection, "drawer") + 1))
-                        }
+                        onClick={addDrawerToActiveSection}
                       >
                         +
                       </button>
@@ -455,9 +563,7 @@ export default function ConstructorPage() {
                       <button
                         type="button"
                         className="cst-counter-button"
-                        onClick={() =>
-                          setSectionHangerRails(activeSection.id, Math.min(3, getSectionItemCount(activeSection, "hanger_rail") + 1))
-                        }
+                        onClick={toggleRailInActiveSection}
                       >
                         +
                       </button>
@@ -577,7 +683,7 @@ export default function ConstructorPage() {
                     { id: "front", label: "СПЕРЕДИ" },
                     { id: "side", label: "СБОКУ" },
                     { id: "top", label: "СВЕРХУ" },
-                    { id: "free", label: "Свободно" },
+                    { id: "free", label: "СВОБОДНО" },
                   ].map((option) => (
                     <button
                       key={option.id}
@@ -601,6 +707,11 @@ export default function ConstructorPage() {
               </div>
 
               <div className="cst-view-stage">
+                {!isViewerReady ? <div className="cst-view-skeleton" aria-hidden="true" /> : null}
+                <div className="cst-floating-hint">
+                  <strong>{viewMode === "2D" ? "Blueprint режим" : "Интерактивная секция"}</strong>
+                  <span>{viewMode === "2D" ? "Белый фон, сетка и технические контуры" : "Нажмите на секцию, чтобы настроить наполнение"}</span>
+                </div>
                 <CabinetViewer
                   parts={result.parts}
                   config={config}
@@ -611,6 +722,13 @@ export default function ConstructorPage() {
                   activeSectionId={activeSectionId}
                   onSectionSelect={selectSection}
                 />
+                <div className="cst-section-quick-actions">
+                  <button type="button" onClick={addShelfToActiveSection}>+ полка</button>
+                  <button type="button" onClick={addDrawerToActiveSection}>+ ящик</button>
+                  <button type="button" onClick={toggleRailInActiveSection}>штанга</button>
+                  <button type="button" onClick={clearActiveSection}>очистить</button>
+                </div>
+                {renderMiniMap()}
               </div>
 
               <div className="cst-view-footer">
@@ -635,7 +753,7 @@ export default function ConstructorPage() {
           </main>
 
           <aside className="cst-right-panel">
-            <div className="cst-card cst-summary-card">
+            <div className={`cst-card cst-summary-card ${pricePulse ? "is-price-updated" : ""}`}>
               <div className="cst-summary-label">Итого</div>
               <div className="cst-summary-price">{price.toLocaleString("ru-RU")} ₽</div>
               <div className="cst-summary-save">Экономия до {savings.toLocaleString("ru-RU")} ₽</div>
