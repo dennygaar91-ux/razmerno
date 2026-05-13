@@ -5,6 +5,7 @@ import "../styles/premium-viewer-realism.css";
 import "../styles/premium-viewer-materials.css";
 import "../styles/premium-viewer-resize.css";
 import "../styles/premium-viewer-adaptive-sections.css";
+import "../styles/premium-viewer-semantic-facades.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
@@ -58,6 +59,19 @@ function getSectionSizeClass(width) {
   if (width < 420) return "is-narrow";
   if (width > 850) return "is-wide";
   return "is-medium";
+}
+
+function getSectionSemanticClass({ shelfCount, drawerCount, railCount, sectionWidth }) {
+  const classes = [];
+
+  if (drawerCount > 0) classes.push("has-drawers");
+  if (shelfCount > 0) classes.push("has-shelves");
+  if (railCount > 0) classes.push("has-rail");
+  if (drawerCount > 1) classes.push("has-drawer-stack");
+  if (drawerCount === 0 && railCount > 0 && sectionWidth > 720) classes.push("is-wardrobe-zone");
+  if (sectionWidth > 850) classes.push("has-double-facade");
+
+  return classes.join(" ");
 }
 
 function getResizeHandlePosition(sections, index) {
@@ -180,12 +194,13 @@ export default function PremiumCabinetViewer({
                 const isEmpty = shelfCount + drawerCount + railCount === 0;
                 const sectionWidth = Number(section.width) || averageSectionWidth;
                 const sizeClass = getSectionSizeClass(sectionWidth);
+                const semanticClass = getSectionSemanticClass({ shelfCount, drawerCount, railCount, sectionWidth });
 
                 return (
                   <button
                     type="button"
                     key={section.id}
-                    className={`pv-section ${sizeClass} ${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`}
+                    className={`pv-section ${sizeClass} ${semanticClass} ${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`}
                     style={{ "--pv-section-width": sectionWidth }}
                     onClick={() => onSectionSelect?.(section.id)}
                   >
