@@ -275,76 +275,47 @@ export default function ConstructorPage() {
     setDragSectionId(null);
   }
 
-  function renderDimensionControl(label, key) {
-    const limits = DIMENSION_LIMITS[key];
+ function renderDimensionControl(label, key) {
+  const limits = DIMENSION_LIMITS[key];
 
-    return (
-      <div key={key} className="cst-dimension-control">
-        
-        <div className="cst-inline-counter">
-          <button
-            type="button"
-            className="cst-counter-button"
-            onClick={() => updateDimensionByStep(key, -1)}
-          >
-            −
-          </button>
-          <input
-  type="number"
-  min={limits.min}
-  max={limits.max}
-  step={1}
-  value={config.dimensions[key]}
-  onChange={(event) => setDimensionValue(key, event.target.value)}
-/>
-          <button
-            type="button"
-            className="cst-counter-button"
-            onClick={() => updateDimensionByStep(key, 1)}
-          >
-            +
-          </button>
-        </div>
+  return (
+    <div key={key} className="cst-dimension-control">
+      <div className="cst-dimension-label">
+        <span className="cst-dimension-label-title">{label}, мм</span>
+        <span className="cst-dimension-label-range">
+          {limits.min}–{limits.max}
+        </span>
       </div>
-    );
-  }
 
-  function renderMiniMap() {
-    return (
-      <div className="cst-mini-map" aria-label="Мини-карта шкафа">
-        <div className="cst-mini-map-head">
-          <span>Мини-карта</span>
-          <small>{sectionCount} секц.</small>
-        </div>
-        <div className="cst-mini-map-grid" style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(22px, 1fr))` }}>
-          {config.sections.map((section, index) => {
-            const isActive = activeSection?.id === section.id;
-            const sectionShelves = getSectionItemCount(section, "shelf");
-            const sectionDrawers = getSectionItemCount(section, "drawer");
-            const sectionRails = getSectionItemCount(section, "hanger_rail");
-            const isEmpty = sectionShelves + sectionDrawers + sectionRails === 0;
+      <div className="cst-inline-counter">
+        <button
+          type="button"
+          className="cst-counter-button"
+          onClick={() => updateDimensionByStep(key, -1)}
+        >
+          −
+        </button>
 
-            return (
-              <button
-                key={section.id}
-                type="button"
-                draggable
-                className={`cst-mini-map-section ${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`}
-                onClick={() => selectSection(section.id)}
-                onDragStart={() => setDragSectionId(section.id)}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={() => handleMiniMapDrop(section.id)}
-                title={`Секция ${index + 1}`}
-              >
-                <span>{index + 1}</span>
-                <i />
-              </button>
-            );
-          })}
-        </div>
+        <input
+          type="number"
+          min={limits.min}
+          max={limits.max}
+          step={1}
+          value={config.dimensions[key]}
+          onChange={(event) => setDimensionValue(key, event.target.value)}
+        />
+
+        <button
+          type="button"
+          className="cst-counter-button"
+          onClick={() => updateDimensionByStep(key, 1)}
+        >
+          +
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <>

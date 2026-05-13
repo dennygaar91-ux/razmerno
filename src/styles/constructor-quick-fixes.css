@@ -1,4 +1,6 @@
-/* Constructor quick fixes */
+.cst-empty-state {
+  display: none !important;
+}
 
 .cst-inline-counter input {
   font-weight: 700 !important;
@@ -13,10 +15,6 @@
 
 .cst-inline-counter input[type="number"] {
   -moz-appearance: textfield !important;
-}
-
-.cst-empty-state {
-  display: none !important;
 }
 
 .cst-dimensions-grid {
@@ -41,14 +39,13 @@
   flex-direction: column !important;
   gap: 2px !important;
   min-width: 0 !important;
-  font-family: "Montserrat", sans-serif !important;
 }
 
 .cst-dimension-label-title {
   color: #0a0a0a !important;
   font-size: 18px !important;
   font-weight: 800 !important;
-  line-height: 1.14 !important;
+  line-height: 1.12 !important;
   letter-spacing: -0.03em !important;
 }
 
