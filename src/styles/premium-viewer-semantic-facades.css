@@ -1,0 +1,87 @@
+.pv-section.has-double-facade .pv-facade::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(10,10,10,0.08);
+  border-radius: 999px;
+}
+
+.pv-section.has-double-facade .pv-facade {
+  border-radius: 16px;
+}
+
+.pv-section.has-double-facade .pv-drawers i em {
+  right: 18%;
+}
+
+.pv-section.has-double-facade .pv-drawers i::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 18%;
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background: rgba(10,10,10,0.24);
+}
+
+.pv-section.has-drawer-stack .pv-drawers {
+  gap: 8px;
+}
+
+.pv-section.has-drawer-stack .pv-drawers i {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.24),
+    0 6px 12px rgba(10,10,10,0.08);
+}
+
+.pv-section.has-drawer-stack .pv-drawers i + i {
+  margin-top: 2px;
+}
+
+.pv-section.has-rail.is-wardrobe-zone .pv-rail {
+  top: 18%;
+  height: 6px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.92), rgba(190,190,190,0.9));
+  box-shadow:
+    0 2px 6px rgba(10,10,10,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.62);
+}
+
+.pv-section.is-wardrobe-zone .pv-facade {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.08),
+      rgba(255,255,255,0.02));
+}
+
+.pv-section.has-shelves:not(.has-drawers) .pv-shelves i {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.92),
+      rgba(224,224,224,0.96));
+}
+
+.pv-section.has-drawers .pv-facade {
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.04),
+      rgba(0,0,0,0.03));
+}
+
+.pv-section.has-drawers.active .pv-drawers i {
+  transform: translateY(-1px);
+}
+
+.pv-section.has-double-facade.active .pv-facade {
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.24),
+    0 18px 32px rgba(10,10,10,0.12);
+}
