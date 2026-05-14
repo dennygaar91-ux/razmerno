@@ -194,6 +194,12 @@ export default function ConstructorPageNew() {
     setNotice("Активная секция очищена");
   }
 
+  function resetViewerView() {
+    setViewType("front");
+    setViewMode("3D");
+    setZoom(1);
+  }
+
   function saveDraft() {
     window.localStorage.setItem(
       "razmerno_constructor_draft",
@@ -376,17 +382,17 @@ export default function ConstructorPageNew() {
           </aside>
 
           <section className="cp-viewer-card">
-            <div className="cp-viewer-toolbar">
-              <div>
-                {["front", "side", "top", "free"].map((item) => (
-                  <button key={item} type="button" className={viewType === item ? "active" : ""} onClick={() => setViewType(item)}>
-                    {item === "front" ? "Спереди" : item === "side" ? "Сбоку" : item === "top" ? "Сверху" : "Свободно"}
-                  </button>
-                ))}
+            <div className="cp-viewer-toolbar cp-viewer-toolbar-simple">
+              <div className="cp-viewer-title">
+                <span>Визуализация</span>
+                <strong>Смотрите модель сразу после каждого изменения</strong>
               </div>
-              <div>
+              <div className="cp-viewer-actions">
                 <button type="button" className={viewMode === "3D" ? "active" : ""} onClick={() => setViewMode("3D")}>3D</button>
                 <button type="button" className={viewMode === "2D" ? "active" : ""} onClick={() => setViewMode("2D")}>2D</button>
+                <button type="button" onClick={resetViewerView}>Авто</button>
+                <button type="button" aria-label="Уменьшить масштаб" onClick={() => setZoom(clamp(Number((zoom - 0.1).toFixed(2)), 0.7, 1.5))}>−</button>
+                <button type="button" aria-label="Увеличить масштаб" onClick={() => setZoom(clamp(Number((zoom + 0.1).toFixed(2)), 0.7, 1.5))}>+</button>
               </div>
             </div>
 
