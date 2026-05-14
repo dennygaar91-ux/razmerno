@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header";
 import PremiumCabinetViewer from "../constructor/PremiumCabinetViewer";
+import AdvancedSettingsPanel from "../constructor/components/AdvancedSettingsPanel";
 import ProjectKitPanel from "../constructor/components/ProjectKitPanel";
 import ProjectReadinessPanel from "../constructor/components/ProjectReadinessPanel";
 import { useCabinetStore } from "../store/cabinetStore";
@@ -431,6 +432,7 @@ export default function ConstructorPageNew() {
             </div>
             <ProjectReadinessPanel config={config} validation={validation} />
             <ProjectKitPanel result={result} />
+            <AdvancedSettingsPanel />
             {notice ? <p className="cp-notice">{notice}</p> : null}
             <button type="button" className="cp-primary" onClick={() => navigate("/account/order")}>В корзину</button>
             <button type="button" onClick={saveDraft}>Сохранить проект</button>
