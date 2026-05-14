@@ -1,6 +1,7 @@
 import SectionFillPreview from "./SectionFillPreview";
 import "../styles/constructor-v2-viewer.css";
 import "../styles/constructor-v2-viewer-tools.css";
+import "../styles/constructor-v2-fill-preview.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
