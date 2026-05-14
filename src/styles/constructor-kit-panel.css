@@ -1,0 +1,96 @@
+.cp-kit {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.88), rgba(247,247,245,0.84));
+  border: 1px solid rgba(10,10,10,0.07);
+  box-shadow:
+    0 18px 36px rgba(10,10,10,0.055),
+    inset 0 1px 0 rgba(255,255,255,0.66);
+}
+
+.cp-kit-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.cp-kit-head div {
+  display: grid;
+  gap: 4px;
+}
+
+.cp-kit-head span {
+  color: rgba(10,10,10,0.46);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cp-kit-head strong {
+  color: rgba(10,10,10,0.86);
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+
+.cp-kit-head b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(232,97,44,0.12);
+  color: #d65422;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.cp-kit-list {
+  display: grid;
+  gap: 8px;
+}
+
+.cp-kit-list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.58);
+  border: 1px solid rgba(10,10,10,0.045);
+}
+
+.cp-kit-list span {
+  color: rgba(10,10,10,0.62);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cp-kit-list b {
+  color: rgba(10,10,10,0.86);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.cp-kit-note {
+  margin: 0;
+  color: rgba(10,10,10,0.52);
+  font-size: 11px;
+  line-height: 1.42;
+}
+
+@media (max-width: 760px) {
+  .cp-kit {
+    border-radius: 20px;
+    padding: 14px;
+  }
+}
