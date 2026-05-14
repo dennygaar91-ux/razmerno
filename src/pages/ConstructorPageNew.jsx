@@ -65,6 +65,8 @@ export default function ConstructorPageNew() {
     setFacadeMaterial,
     setHardwareBrand,
     toggleLegs,
+    toggleBackPanel,
+    toggleWallMount,
     toggleHandles,
     setHandleVariant,
   } = useCabinetStore();
@@ -432,7 +434,7 @@ export default function ConstructorPageNew() {
             </div>
             <ProjectReadinessPanel config={config} validation={validation} />
             <ProjectKitPanel result={result} />
-            <AdvancedSettingsPanel />
+            <AdvancedSettingsPanel config={config} onBackPanel={toggleBackPanel} onWallMount={toggleWallMount} />
             {notice ? <p className="cp-notice">{notice}</p> : null}
             <button type="button" className="cp-primary" onClick={() => navigate("/account/order")}>В корзину</button>
             <button type="button" onClick={saveDraft}>Сохранить проект</button>
