@@ -4,6 +4,7 @@ import Header from "../components/Header/Header";
 import PremiumCabinetViewer from "../constructor/PremiumCabinetViewer";
 import ConstructorProgressPanel from "../constructor/components/ConstructorProgressPanel";
 import FillCounter from "../constructor/components/FillCounter";
+import FillStep from "../constructor/components/FillStep";
 import MaterialDrawer from "../constructor/components/MaterialDrawer";
 import MaterialStep from "../constructor/components/MaterialStep";
 import SummaryPanel from "../constructor/components/SummaryPanel";
@@ -317,57 +318,26 @@ export default function ConstructorPageNew() {
             )}
 
             {activeStep === "fill" && activeSection && (
-              <div className="cp-card">
-                <div className="cp-card-head">
-                  <span>02</span>
-                  <h2>Наполнение секции</h2>
-                </div>
-
-                <div className="cp-section-tabs">
-                  {config.sections.map((section, index) => (
-                    <button key={section.id} type="button" className={section.id === activeSection.id ? "active" : ""} onClick={() => setActiveSectionId(section.id)}>
-                      {index + 1}
-                    </button>
-                  ))}
-                </div>
-
-                {activeSectionIsEmpty ? (
-                  <div className="cp-empty-state">
-                    <strong>Секция пока пустая</strong>
-                    <small>Выберите готовый пресет или добавьте полку, ящик, штангу вручную.</small>
-                  </div>
-                ) : null}
-
-                <div className="cp-presets">
-                  {FILL_PRESETS.map((preset) => (
-                    <button type="button" key={preset.id} onClick={() => applyPreset(preset)}>
-                      <strong>{preset.label}</strong>
-                      <small>{preset.desc}</small>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="cp-fill-grid">
-                  <FillCounter label="Полки" value={getItemCount(activeSection, "shelf")} onMinus={() => setSectionShelves(activeSection.id, Math.max(0, getItemCount(activeSection, "shelf") - 1))} onPlus={addShelfToActiveSection} />
-                  <FillCounter label="Ящики" value={getItemCount(activeSection, "drawer")} onMinus={() => setSectionDrawers(activeSection.id, Math.max(0, getItemCount(activeSection, "drawer") - 1))} onPlus={addDrawerToActiveSection} />
-                  <FillCounter label="Штанга" value={getItemCount(activeSection, "hanger_rail")} onMinus={() => setSectionHangerRails(activeSection.id, 0)} onPlus={toggleRailInActiveSection} />
-                </div>
-
-                <div className="cp-toggles">
-                  <button type="button" className={config.options.hasLegs ? "active" : ""} onClick={() => toggleLegs(!config.options.hasLegs)}>Ножки</button>
-                  <button type="button" className={showHandles ? "active" : ""} onClick={() => toggleHandles(!showHandles)}>Ручки</button>
-                </div>
-
-                {showHandles ? (
-                  <div className="cp-handle-options">
-                    {handleOptions.map((option) => (
-                      <button key={option.id} type="button" className={config.facade.handleVariant === option.id ? "active" : ""} onClick={() => setHandleVariant(option.id)}>
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
+              <FillStep
+                config={config}
+                activeSection={activeSection}
+                activeSectionIsEmpty={activeSectionIsEmpty}
+                fillPresets={FILL_PRESETS}
+                showHandles={showHandles}
+                handleOptions={handleOptions}
+                getItemCount={getItemCount}
+                onSelectSection={setActiveSectionId}
+                onApplyPreset={applyPreset}
+                onSetSectionShelves={setSectionShelves}
+                onSetSectionDrawers={setSectionDrawers}
+                onSetSectionHangerRails={setSectionHangerRails}
+                onAddShelf={addShelfToActiveSection}
+                onAddDrawer={addDrawerToActiveSection}
+                onToggleRail={toggleRailInActiveSection}
+                onToggleLegs={toggleLegs}
+                onToggleHandles={toggleHandles}
+                onSetHandleVariant={setHandleVariant}
+              />
             )}
 
             {activeStep === "materials" && (
