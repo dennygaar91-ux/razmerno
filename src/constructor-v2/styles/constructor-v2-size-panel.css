@@ -1,0 +1,149 @@
+.rv2-size-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rv2-panel-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.rv2-panel-head h3 {
+  margin: 0 0 8px;
+  font-size: 34px;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.rv2-panel-head p {
+  margin: 0;
+  color: rgba(15,15,15,0.56);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.rv2-size-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(15,15,15,0.06);
+  border-radius: 24px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.rv2-size-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-bottom: 1px solid rgba(15,15,15,0.06);
+}
+
+.rv2-size-row:last-child {
+  border-bottom: 0;
+  background: rgba(239,91,42,0.04);
+}
+
+.rv2-size-row strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.rv2-size-row span {
+  color: rgba(15,15,15,0.48);
+  font-size: 13px;
+}
+
+.rv2-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(15,15,15,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.rv2-stepper button,
+.rv2-stepper b {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: #fff;
+  font-size: 15px;
+}
+
+.rv2-stepper b {
+  width: 78px;
+  border-inline: 1px solid rgba(15,15,15,0.06);
+}
+
+.rv2-section-widths {
+  padding-top: 20px;
+  border-top: 1px dashed rgba(15,15,15,0.1);
+}
+
+.rv2-section-widths strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.rv2-section-widths > span {
+  color: rgba(15,15,15,0.5);
+  font-size: 13px;
+}
+
+.rv2-section-widths div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.rv2-section-widths button {
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid rgba(15,15,15,0.08);
+  background: #fff;
+  font-weight: 700;
+}
+
+.rv2-panel-note {
+  margin-top: auto;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(239,91,42,0.06);
+  color: rgba(15,15,15,0.58);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .rv2-panel-head {
+    flex-direction: column;
+  }
+
+  .rv2-panel-head h3 {
+    font-size: 30px;
+  }
+
+  .rv2-size-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rv2-stepper {
+    width: 100%;
+  }
+
+  .rv2-stepper b {
+    flex: 1;
+  }
+}
