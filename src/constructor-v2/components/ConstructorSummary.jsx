@@ -1,17 +1,38 @@
 import "../styles/constructor-v2-summary.css";
 
-export default function ConstructorSummary() {
+function getItemCount(section, type) {
+  return section?.items?.find((item) => item.type === type)?.count || 0;
+}
+
+function getPartsCount(result) {
+  return result?.parts?.length || 0;
+}
+
+export default function ConstructorSummary({ config, result, validation }) {
+  const price = result?.price?.total || 0;
+  const hasIssues = validation.length > 0;
+  const readiness = hasIssues ? 76 : 96;
+  const shelves = config.sections.reduce((sum, section) => sum + getItemCount(section, "shelf"), 0);
+  const drawers = config.sections.reduce((sum, section) => sum + getItemCount(section, "drawer"), 0);
+  const rails = config.sections.reduce((sum, section) => sum + getItemCount(section, "hanger_rail"), 0);
+  const totalFill = shelves + drawers + rails;
+  const dimensionsText = `${config.dimensions.width} × ${config.dimensions.height} × ${config.dimensions.depth}`;
+
   return (
     <aside className="rv2-summary">
       <div className="rv2-summary-top">
         <span>Ваш проект</span>
-        <h3>Шкаф почти готов</h3>
-        <p>Осталось выбрать материалы и добавить проект в корзину.</p>
+        <h3>{hasIssues ? "Нужно проверить" : "Шкаф почти готов"}</h3>
+        <p>
+          {hasIssues
+            ? "Есть подсказки по конструкции. Проверьте параметры перед оформлением заказа."
+            : "Комплект рассчитан. Можно сохранить проект или перейти к оформлению."}
+        </p>
       </div>
 
       <div className="rv2-price-card">
         <span>Стоимость комплекта</span>
-        <strong>15 447 ₽</strong>
+        <strong>{price.toLocaleString("ru-RU")} ₽</strong>
       </div>
 
       <div className="rv2-facts">
@@ -19,17 +40,17 @@ export default function ConstructorSummary() {
 
         <div className="rv2-fact-row">
           <p>Размеры</p>
-          <b>2400 × 1800 × 600</b>
+          <b>{dimensionsText}</b>
         </div>
 
         <div className="rv2-fact-row">
           <p>Секции</p>
-          <b>3 шт.</b>
+          <b>{config.sections.length} шт.</b>
         </div>
 
         <div className="rv2-fact-row">
           <p>Наполнение</p>
-          <b>7 элементов</b>
+          <b>{totalFill} элементов</b>
         </div>
       </div>
 
@@ -37,12 +58,12 @@ export default function ConstructorSummary() {
         <span>Проверка</span>
 
         <div className="rv2-check-head">
-          <p>Конструкция надёжна и готова к сборке</p>
-          <strong>92%</strong>
+          <p>{hasIssues ? validation[0]?.message || "Проверьте проект" : "Конструкция надёжна и готова к сборке"}</p>
+          <strong>{readiness}%</strong>
         </div>
 
         <div className="rv2-progress-line">
-          <i />
+          <i style={{ width: `${readiness}%` }} />
         </div>
       </div>
 
@@ -51,18 +72,18 @@ export default function ConstructorSummary() {
 
         <div className="rv2-kit-grid">
           <div>
-            <b>Корпус</b>
-            <p>36 деталей</p>
+            <b>Детали</b>
+            <p>{getPartsCount(result)} шт.</p>
           </div>
 
           <div>
             <b>Полки</b>
-            <p>7 шт.</p>
+            <p>{shelves} шт.</p>
           </div>
 
           <div>
             <b>Ящики</b>
-            <p>2 шт.</p>
+            <p>{drawers} шт.</p>
           </div>
         </div>
       </div>
