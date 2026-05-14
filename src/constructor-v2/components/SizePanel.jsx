@@ -1,3 +1,5 @@
+import "../styles/constructor-v2-size-panel.css";
+
 const SIZE_ROWS = [
   { label: "Высота, мм", range: "200 — 2800", value: "2400" },
   { label: "Ширина, мм", range: "400 — 3000", value: "1800" },
@@ -37,6 +39,7 @@ export default function SizePanel() {
         <div className="rv2-section-widths">
           <strong>Ширина секции</strong>
           <span>Автоматическое распределение</span>
+
           <div>
             <button type="button">600 мм</button>
             <button type="button">600 мм</button>
