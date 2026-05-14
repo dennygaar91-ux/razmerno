@@ -3,6 +3,7 @@ import ConstructorActions from "../components/ConstructorActions";
 import ConstructorProgress from "../components/ConstructorProgress";
 import ConstructorSummary from "../components/ConstructorSummary";
 import ConstructorViewer from "../components/ConstructorViewer";
+import FillPanel from "../components/FillPanel";
 import MobileConstructorBar from "../components/MobileConstructorBar";
 import SizePanel from "../components/SizePanel";
 import { useCabinetStore } from "../../store/cabinetStore";
@@ -87,12 +88,27 @@ export default function ConstructorLayout() {
         />
 
         <div className="rv2-grid">
-          <SizePanel
-            dimensions={config.dimensions}
-            sections={config.sections}
-            onUpdateDimension={updateDimensions}
-            onSetSectionCount={setSectionCount}
-          />
+          {activeStep === "size" ? (
+            <SizePanel
+              dimensions={config.dimensions}
+              sections={config.sections}
+              onUpdateDimension={updateDimensions}
+              onSetSectionCount={setSectionCount}
+            />
+          ) : null}
+
+          {activeStep === "fill" ? (
+            <FillPanel
+              activeSection={activeSection}
+              sections={config.sections}
+              activeSectionId={activeSection?.id}
+              onSelectSection={setActiveSectionId}
+              onAddShelf={addShelf}
+              onAddDrawer={addDrawer}
+              onToggleRail={toggleRail}
+              onClearSection={clearActiveSection}
+            />
+          ) : null}
 
           <ConstructorViewer
             config={config}
