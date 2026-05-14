@@ -55,12 +55,12 @@ export default function ProjectKitPanel({ result }) {
   const groups = getPartGroups(parts);
   const hardwareCount = getHardwareCount(hardware);
   const visibleRows = [
-    { label: "Корпусные детали", value: groups.panels + groups.dividers },
+    { label: "Корпус", value: groups.panels + groups.dividers },
     { label: "Полки", value: groups.shelves },
     { label: "Ящики", value: groups.drawers },
     { label: "Фасады", value: groups.facades },
     { label: "Задние стенки", value: groups.backPanels },
-    { label: "Фурнитура и крепёж", value: hardwareCount },
+    { label: "Фурнитура", value: hardwareCount },
   ].filter((row) => row.value > 0);
 
   return (
@@ -68,7 +68,8 @@ export default function ProjectKitPanel({ result }) {
       <div className="cp-kit-head">
         <div>
           <span>Комплект</span>
-          <strong>Что будет в заказе</strong>
+          <strong>Что получите</strong>
+          <small>Детали, фурнитура и крепёж для самостоятельной сборки.</small>
         </div>
         <b>{parts.length}</b>
       </div>
@@ -83,7 +84,7 @@ export default function ProjectKitPanel({ result }) {
       </div>
 
       <p className="cp-kit-note">
-        Перед производством проект нужно будет проверить: размеры, фурнитуру, кромку и комплектность.
+        Перед запуском в производство мы проверим размеры, кромку, фурнитуру и комплектность.
       </p>
     </section>
   );
