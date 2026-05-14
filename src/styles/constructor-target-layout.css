@@ -1,0 +1,353 @@
+/* Selected design target alignment: layout, viewer, summary */
+
+.cp-page {
+  padding: 14px clamp(18px, 2.2vw, 32px) 44px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.92), transparent 30%),
+    radial-gradient(circle at 78% 12%, rgba(239, 91, 42, 0.055), transparent 26%),
+    #f4f2ed;
+}
+
+.cp-hero,
+.cp-progress-panel,
+.cp-workspace {
+  max-width: 1560px;
+}
+
+.cp-hero {
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  grid-template-columns: minmax(400px, 1fr) auto;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.cp-hero h1 {
+  max-width: 560px;
+  font-size: clamp(34px, 3.45vw, 54px);
+  line-height: 0.91;
+  letter-spacing: -0.082em;
+}
+
+.cp-hero p {
+  max-width: 520px;
+  font-size: 12px;
+  color: rgba(10, 10, 10, 0.54);
+}
+
+.cp-hero > div:first-child::after {
+  margin-top: 1px;
+  background: rgba(247, 246, 242, 0.86);
+}
+
+.cp-hero-actions {
+  align-self: center;
+  border-radius: 999px;
+}
+
+.cp-hero-actions button.primary {
+  min-width: 126px;
+  background: #0a0a0a;
+}
+
+.cp-progress-panel--wizard {
+  margin-bottom: 10px;
+  grid-template-columns: minmax(230px, 0.52fr) minmax(340px, 0.95fr) minmax(360px, 0.86fr);
+  padding: 8px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.cp-progress-panel--wizard .cp-progress-copy {
+  min-height: 68px;
+  padding: 11px 13px;
+}
+
+.cp-progress-panel--wizard .cp-progress-copy h2 {
+  font-size: clamp(20px, 1.7vw, 25px);
+}
+
+.cp-progress-panel--wizard .cp-progress-copy p {
+  max-width: 300px;
+  font-size: 10px;
+}
+
+.cp-progress-panel--wizard .cp-progress-steps button {
+  min-height: 58px;
+}
+
+.cp-progress-panel--wizard .cp-progress-facts div {
+  min-height: 54px;
+}
+
+.cp-workspace {
+  grid-template-columns: minmax(288px, 318px) minmax(660px, 1fr) minmax(300px, 326px);
+  gap: 12px;
+  align-items: start;
+}
+
+.cp-config,
+.cp-viewer-card,
+.cp-summary {
+  border-radius: 26px;
+  border-color: rgba(10, 10, 10, 0.055);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 18px 58px rgba(10, 10, 10, 0.052);
+}
+
+.cp-config {
+  padding: 9px;
+}
+
+.cp-card {
+  padding: 15px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.cp-card-head h2 {
+  font-size: 20px;
+  letter-spacing: -0.055em;
+}
+
+.cp-step-intro {
+  padding: 11px 12px;
+  margin-bottom: 10px;
+}
+
+.cp-dimensions,
+.cp-fill-grid {
+  gap: 8px;
+}
+
+.cp-dimension,
+.cp-section-count,
+.cp-section-widths,
+.cp-fill-counter,
+.cp-material-select {
+  border-radius: 17px;
+}
+
+.cp-viewer-card {
+  padding: 9px;
+  background:
+    radial-gradient(circle at 50% 6%, rgba(255, 255, 255, 0.98), transparent 34%),
+    rgba(255, 255, 255, 0.58);
+}
+
+.cp-viewer-card::before {
+  display: none;
+}
+
+.cp-viewer-toolbar-simple {
+  padding: 8px 9px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.cp-viewer-title strong {
+  max-width: 360px;
+  font-size: 10px;
+}
+
+.cp-viewer-actions {
+  background: rgba(247, 246, 242, 0.9);
+}
+
+.cp-viewer-stage {
+  height: min(66vh, 660px);
+  min-height: 540px;
+  margin: 8px 0;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 50% 54%, rgba(255, 255, 255, 0.78), transparent 38%),
+    linear-gradient(180deg, rgba(245, 241, 232, 0.52), rgba(255, 255, 255, 0.72));
+}
+
+.cp-viewer-stage::before {
+  inset: 18px;
+  opacity: 0.22;
+}
+
+.cp-viewer-stage::after {
+  top: 16px;
+  right: 16px;
+  height: 24px;
+  font-size: 8px;
+  opacity: 0.64;
+}
+
+.cp-viewer-tools {
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 0.72fr);
+  gap: 8px;
+  padding: 8px;
+  border-radius: 20px;
+}
+
+.cp-quick-actions {
+  gap: 5px;
+  padding-top: 22px;
+}
+
+.cp-quick-actions button {
+  min-height: 32px;
+  font-size: 9px;
+}
+
+.cp-mini-map {
+  border-radius: 15px;
+}
+
+.cp-mini-map button {
+  min-height: 42px;
+}
+
+.cp-viewer-footer {
+  padding-top: 7px;
+}
+
+.cp-summary {
+  top: 76px;
+  padding: 12px;
+  gap: 9px;
+  max-height: calc(100vh - 92px);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(239, 91, 42, 0.09), transparent 28%),
+    rgba(255, 255, 255, 0.68);
+}
+
+.cp-summary-hero,
+.cp-summary-price-block,
+.cp-readiness,
+.cp-kit,
+.cp-advanced {
+  border-radius: 18px;
+}
+
+.cp-summary-hero {
+  padding: 12px;
+}
+
+.cp-summary-hero h3 {
+  font-size: clamp(20px, 1.85vw, 25px);
+}
+
+.cp-summary-price-block {
+  padding: 12px;
+}
+
+.cp-summary-price-block strong {
+  font-size: clamp(33px, 2.65vw, 42px);
+}
+
+.cp-summary-list {
+  gap: 5px;
+  padding: 6px;
+  border-radius: 16px;
+}
+
+.cp-summary-list div {
+  min-height: 32px;
+  padding: 7px 8px;
+  border-radius: 11px;
+}
+
+.cp-readiness,
+.cp-kit,
+.cp-advanced {
+  padding: 10px;
+}
+
+.cp-summary .cp-kit {
+  max-height: 170px;
+}
+
+.cp-summary .cp-advanced {
+  max-height: 184px;
+}
+
+.cp-summary > .cp-primary {
+  min-height: 44px;
+  margin-top: 2px;
+  background: #ef5b2a;
+}
+
+.cp-summary > button:not(.cp-primary) {
+  min-height: 38px;
+}
+
+@media (max-width: 1360px) {
+  .cp-workspace {
+    grid-template-columns: minmax(280px, 305px) minmax(560px, 1fr) minmax(292px, 310px);
+  }
+
+  .cp-viewer-stage {
+    min-height: 500px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .cp-hero,
+  .cp-progress-panel--wizard,
+  .cp-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-hero-actions {
+    justify-self: start;
+  }
+
+  .cp-viewer-stage {
+    height: min(62vh, 640px);
+  }
+
+  .cp-summary {
+    max-height: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .cp-page {
+    padding: 10px 10px 126px;
+  }
+
+  .cp-hero {
+    padding: 10px;
+    border-radius: 22px;
+  }
+
+  .cp-hero h1 {
+    font-size: clamp(30px, 10vw, 40px);
+  }
+
+  .cp-hero-actions {
+    width: 100%;
+    border-radius: 18px;
+  }
+
+  .cp-config,
+  .cp-viewer-card,
+  .cp-summary {
+    padding: 8px;
+    border-radius: 22px;
+  }
+
+  .cp-viewer-stage {
+    min-height: 350px;
+    height: 46vh;
+    border-radius: 18px;
+  }
+
+  .cp-viewer-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-quick-actions {
+    padding-top: 0;
+  }
+
+  .cp-summary .cp-kit,
+  .cp-summary .cp-advanced {
+    max-height: none;
+  }
+}
