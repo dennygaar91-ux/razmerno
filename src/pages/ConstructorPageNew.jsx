@@ -9,11 +9,8 @@ import MaterialDrawer from "../constructor/components/MaterialDrawer";
 import MaterialStep from "../constructor/components/MaterialStep";
 import SizeStep from "../constructor/components/SizeStep";
 import SummaryPanel from "../constructor/components/SummaryPanel";
-import {
-  CONSTRUCTOR_DRAFT_STORAGE_KEY,
-  DIMENSION_LIMITS,
-  FILL_PRESETS,
-} from "../constructor/config/constructorUiConfig";
+import { DIMENSION_LIMITS, FILL_PRESETS } from "../constructor/config/constructorUiConfig";
+import { hasConstructorDraft, saveConstructorDraft } from "../constructor/utils/constructorDraftStorage";
 import { clamp, getItemCount } from "../constructor/utils/constructorUiUtils";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
@@ -39,6 +36,7 @@ export default function ConstructorPageNew() {
   const [drawerType, setDrawerType] = useState(null);
   const [notice, setNotice] = useState("");
   const [pricePulse, setPricePulse] = useState(false);
+  const [hasSavedDraft, setHasSavedDraft] = useState(false);
 
   const {
     config,
@@ -78,6 +76,10 @@ export default function ConstructorPageNew() {
   const bodyName = bodyMaterial?.name || "ЛДСП";
   const facadeName = facadeMaterial?.name || "МДФ";
   const showHandles = config.facade.enabled && config.facade.openingType === "with_handles";
+
+  useEffect(() => {
+    setHasSavedDraft(hasConstructorDraft());
+  }, []);
 
   useEffect(() => {
     if (!activeSectionId && config.sections[0]?.id) setActiveSectionId(config.sections[0].id);
@@ -195,11 +197,17 @@ export default function ConstructorPageNew() {
   }
 
   function saveDraft() {
-    window.localStorage.setItem(
-      CONSTRUCTOR_DRAFT_STORAGE_KEY,
-      JSON.stringify({ config, price, updatedAt: new Date().toISOString() })
+    const saved = saveConstructorDraft({ config, price });
+    if (saved) setHasSavedDraft(true);
+    setNotice(saved ? "Проект сохранён" : "Не удалось сохранить проект");
+  }
+
+  function loadSavedDraftNotice() {
+    setNotice(
+      hasSavedDraft
+        ? "Черновик найден. Восстановление проекта подключим после стабилизации store."
+        : "Сохранённых проектов пока нет"
     );
-    setNotice("Проект сохранён");
   }
 
   return (
@@ -213,6 +221,7 @@ export default function ConstructorPageNew() {
             <p>Задайте габариты, выберите секции, наполнение и материалы. Цена и визуализация обновляются сразу.</p>
           </div>
           <div className="cp-hero-actions">
+            <button type="button" onClick={loadSavedDraftNotice}>Загрузить</button>
             <button type="button" onClick={saveDraft}>Сохранить</button>
             <button type="button" className="primary" onClick={() => navigate("/account/order")}>В корзину</button>
           </div>
