@@ -16,6 +16,7 @@ import "../styles/premium-viewer-side-anatomy.css";
 import "../styles/premium-viewer-pseudo-cad.css";
 import "../styles/premium-viewer-orbit.css";
 import "../styles/premium-viewer-production.css";
+import "../styles/constructor-target-viewer-scene.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
