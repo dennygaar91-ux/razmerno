@@ -28,6 +28,32 @@ export default function FillStep({
   const drawersCount = getItemCount(activeSection, "drawer");
   const railCount = getItemCount(activeSection, "hanger_rail");
 
+  function getSectionMode(section) {
+    const shelves = getItemCount(section, "shelf");
+    const drawers = getItemCount(section, "drawer");
+    const rails = getItemCount(section, "hanger_rail");
+
+    if (rails && drawers) return "Комбо";
+    if (rails) return "Гардероб";
+    if (drawers) return "Ящики";
+    if (shelves) return "Полки";
+    return "Пусто";
+  }
+
+  function getSectionShortLabel(section) {
+    const shelves = getItemCount(section, "shelf");
+    const drawers = getItemCount(section, "drawer");
+    const rails = getItemCount(section, "hanger_rail");
+
+    if (shelves + drawers + rails === 0) return "Добавьте наполнение";
+
+    return [
+      shelves ? `${shelves} пол.` : "",
+      drawers ? `${drawers} ящ.` : "",
+      rails ? "штанга" : "",
+    ].filter(Boolean).join(" · ");
+  }
+
   let sectionMode = "Пустая";
 
   if (railCount && drawersCount) {
@@ -56,23 +82,40 @@ export default function FillStep({
         <span className="cp-section-mode-pill">{sectionMode}</span>
       </div>
 
-      <div className="cp-section-tabs">
-        {config.sections.map((section, index) => (
-          <button
-            key={section.id}
-            type="button"
-            className={section.id === activeSection.id ? "active" : ""}
-            onClick={() => onSelectSection(section.id)}
-          >
-            {index + 1}
-          </button>
-        ))}
+      <div className="cp-section-tabs cp-section-tabs-premium" aria-label="Выбор секции шкафа">
+        {config.sections.map((section, index) => {
+          const isActive = section.id === activeSection.id;
+          const shelves = getItemCount(section, "shelf");
+          const drawers = getItemCount(section, "drawer");
+          const rails = getItemCount(section, "hanger_rail");
+          const isEmpty = shelves + drawers + rails === 0;
+
+          return (
+            <button
+              key={section.id}
+              type="button"
+              className={`${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`}
+              onClick={() => onSelectSection(section.id)}
+              aria-label={`Секция ${index + 1}: ${getSectionShortLabel(section)}`}
+            >
+              <span className="cp-section-tab-number">{index + 1}</span>
+              <span className="cp-section-tab-copy">
+                <strong>Секция {index + 1}</strong>
+                <small>{getSectionShortLabel(section)}</small>
+              </span>
+              <em>{getSectionMode(section)}</em>
+            </button>
+          );
+        })}
       </div>
 
       {activeSectionIsEmpty ? (
-        <div className="cp-empty-state">
-          <strong>Секция пока пустая</strong>
-          <small>Выберите готовый пресет или добавьте полки, ящики и штангу вручную.</small>
+        <div className="cp-empty-state cp-empty-state-premium">
+          <span aria-hidden="true">＋</span>
+          <div>
+            <strong>Начните с готового сценария</strong>
+            <small>Ниже можно выбрать пресет или вручную добавить полки, ящики и штангу.</small>
+          </div>
         </div>
       ) : null}
 
