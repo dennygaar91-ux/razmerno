@@ -31,7 +31,15 @@ function getSectionSubtitle(section) {
   return "Добавьте наполнение";
 }
 
-export default function ConstructorViewer({ config }) {
+export default function ConstructorViewer({
+  config,
+  activeSectionId,
+  onSelectSection,
+  onAddShelf,
+  onAddDrawer,
+  onToggleRail,
+  onClearSection,
+}) {
   const sections = config.sections;
   const dimensions = config.dimensions;
 
@@ -55,21 +63,30 @@ export default function ConstructorViewer({ config }) {
         <div className="rv2-dimension-label rv2-dimension-width">{dimensions.width} мм</div>
 
         <div className="rv2-cabinet-placeholder" style={{ gridTemplateColumns: sections.map((section) => `${section.width}fr`).join(" ") }}>
-          {sections.map((section, index) => (
-            <div className="rv2-cabinet-section" key={section.id}>
-              <span>{index + 1}</span>
-              <strong>{getSectionTitle(section)}</strong>
-            </div>
-          ))}
+          {sections.map((section, index) => {
+            const isActive = section.id === activeSectionId;
+
+            return (
+              <button
+                type="button"
+                className={`rv2-cabinet-section ${isActive ? "active" : ""}`}
+                key={section.id}
+                onClick={() => onSelectSection(section.id)}
+              >
+                <span>{index + 1}</span>
+                <strong>{getSectionTitle(section)}</strong>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="rv2-viewer-tools">
         <div className="rv2-quick-actions">
-          <button type="button">+ Полка</button>
-          <button type="button">+ Ящик</button>
-          <button type="button">Штанга</button>
-          <button type="button">Очистить</button>
+          <button type="button" onClick={onAddShelf}>+ Полка</button>
+          <button type="button" onClick={onAddDrawer}>+ Ящик</button>
+          <button type="button" onClick={onToggleRail}>Штанга</button>
+          <button type="button" onClick={onClearSection}>Очистить</button>
         </div>
 
         <div className="rv2-section-map">
@@ -81,24 +98,29 @@ export default function ConstructorViewer({ config }) {
           </div>
 
           <div className="rv2-section-map-grid" style={{ gridTemplateColumns: `repeat(${sections.length}, minmax(0, 1fr))` }}>
-            {sections.map((section, index) => (
-              <button
-                key={section.id}
-                type="button"
-                className={`rv2-section-tile ${index === 0 ? "active" : ""}`}
-              >
-                <div>
-                  <b>{index + 1}</b>
-                </div>
+            {sections.map((section, index) => {
+              const isActive = section.id === activeSectionId;
 
-                <div>
-                  <strong>{getSectionTitle(section)}</strong>
-                  <span>{getSectionSubtitle(section)}</span>
-                </div>
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  className={`rv2-section-tile ${isActive ? "active" : ""}`}
+                  onClick={() => onSelectSection(section.id)}
+                >
+                  <div>
+                    <b>{index + 1}</b>
+                  </div>
 
-                <i />
-              </button>
-            ))}
+                  <div>
+                    <strong>{getSectionTitle(section)}</strong>
+                    <span>{getSectionSubtitle(section)}</span>
+                  </div>
+
+                  <i />
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
