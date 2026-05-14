@@ -33,6 +33,7 @@ import "../styles/constructor-priority-layout.css";
 import "../styles/constructor-left-panel-wizard.css";
 import "../styles/constructor-summary-compact.css";
 import "../styles/constructor-viewer-premium.css";
+import "../styles/constructor-actions-toast.css";
 
 export default function ConstructorPageNew() {
   const navigate = useNavigate();
@@ -127,6 +128,10 @@ export default function ConstructorPageNew() {
     getItemCount(activeSection, "drawer") === 0 &&
     getItemCount(activeSection, "hanger_rail") === 0;
 
+  function showNotice(message) {
+    setNotice(message);
+  }
+
   function commitDimension(key, value) {
     const limits = DIMENSION_LIMITS[key];
     const numeric = Number(value);
@@ -157,7 +162,7 @@ export default function ConstructorPageNew() {
     }
 
     autoDistributeSections();
-    setNotice(`Секции перераспределены: ${safeCount}`);
+    showNotice(`Готово: ${safeCount} секц.`);
   }
 
   function selectSection(sectionId) {
@@ -170,26 +175,26 @@ export default function ConstructorPageNew() {
     setSectionShelves(activeSection.id, preset.shelves);
     setSectionDrawers(activeSection.id, preset.drawers);
     setSectionHangerRails(activeSection.id, preset.rails);
-    setNotice(`Пресет «${preset.label}» применён`);
+    showNotice(`Применили: ${preset.label}`);
   }
 
   function addShelfToActiveSection() {
     if (!activeSection) return;
     setSectionShelves(activeSection.id, Math.min(12, getItemCount(activeSection, "shelf") + 1));
-    setNotice("Полка добавлена в активную секцию");
+    showNotice("Полка добавлена");
   }
 
   function addDrawerToActiveSection() {
     if (!activeSection) return;
     setSectionDrawers(activeSection.id, Math.min(6, getItemCount(activeSection, "drawer") + 1));
-    setNotice("Ящик добавлен в активную секцию");
+    showNotice("Ящик добавлен");
   }
 
   function toggleRailInActiveSection() {
     if (!activeSection) return;
     const next = getItemCount(activeSection, "hanger_rail") > 0 ? 0 : 1;
     setSectionHangerRails(activeSection.id, next);
-    setNotice(next ? "Штанга добавлена" : "Штанга убрана");
+    showNotice(next ? "Штанга добавлена" : "Штанга убрана");
   }
 
   function clearActiveSection() {
@@ -197,7 +202,7 @@ export default function ConstructorPageNew() {
     setSectionShelves(activeSection.id, 0);
     setSectionDrawers(activeSection.id, 0);
     setSectionHangerRails(activeSection.id, 0);
-    setNotice("Активная секция очищена");
+    showNotice("Секция очищена");
   }
 
   function resetViewerView() {
@@ -209,7 +214,7 @@ export default function ConstructorPageNew() {
   function saveDraft() {
     const saved = saveConstructorDraft({ config, price });
     if (saved) setHasSavedDraft(true);
-    setNotice(saved ? "Проект сохранён" : "Не удалось сохранить проект");
+    showNotice(saved ? "Проект сохранён" : "Не удалось сохранить");
   }
 
   function loadSavedDraft() {
@@ -217,7 +222,7 @@ export default function ConstructorPageNew() {
 
     if (!savedDraft?.config) {
       setHasSavedDraft(false);
-      setNotice("Сохранённых проектов пока нет");
+      showNotice("Сохранённых проектов нет");
       return;
     }
 
@@ -225,13 +230,13 @@ export default function ConstructorPageNew() {
     setActiveStep("size");
     setActiveSectionId(savedDraft.config.sections?.[0]?.id || null);
     setHasSavedDraft(true);
-    setNotice("Сохранённый проект загружен");
+    showNotice("Проект загружен");
   }
 
   function clearSavedDraft() {
     const cleared = clearConstructorDraft();
     setHasSavedDraft(false);
-    setNotice(cleared ? "Черновик удалён" : "Не удалось удалить черновик");
+    showNotice(cleared ? "Черновик удалён" : "Не удалось удалить");
   }
 
   return (
@@ -240,17 +245,24 @@ export default function ConstructorPageNew() {
       <main className="cp-page">
         <section className="cp-hero">
           <div>
-            <span className="cp-eyebrow">Новый конструктор</span>
+            <span className="cp-eyebrow">Онлайн-конструктор</span>
             <h1>Соберите шкаф под свой размер</h1>
-            <p>Задайте габариты, выберите секции, наполнение и материалы. Цена и визуализация обновляются сразу.</p>
+            <p>Задайте размеры, выберите наполнение и материалы — модель и стоимость обновятся сразу.</p>
           </div>
-          <div className="cp-hero-actions">
-            <button type="button" onClick={loadSavedDraft}>Загрузить</button>
-            <button type="button" onClick={clearSavedDraft}>Очистить</button>
+          <div className="cp-hero-actions" aria-label="Действия с проектом">
+            <button type="button" onClick={loadSavedDraft} disabled={!hasSavedDraft}>Загрузить</button>
+            <button type="button" className="danger" onClick={clearSavedDraft} disabled={!hasSavedDraft}>Очистить</button>
             <button type="button" onClick={saveDraft}>Сохранить</button>
             <button type="button" className="primary" onClick={() => navigate("/account/order")}>В корзину</button>
           </div>
         </section>
+
+        {notice ? (
+          <div className="cp-toast" role="status" aria-live="polite">
+            <span>Готово</span>
+            <strong>{notice}</strong>
+          </div>
+        ) : null}
 
         <ConstructorProgressPanel
           activeStep={activeStep}
@@ -318,8 +330,8 @@ export default function ConstructorPageNew() {
           <section className="cp-viewer-card">
             <div className="cp-viewer-toolbar cp-viewer-toolbar-simple">
               <div className="cp-viewer-title">
-                <span>Визуализация</span>
-                <strong>Смотрите модель сразу после каждого изменения</strong>
+                <span>Модель</span>
+                <strong>Кликайте по секциям и добавляйте наполнение снизу</strong>
               </div>
               <div className="cp-viewer-actions">
                 <button type="button" className={viewMode === "3D" ? "active" : ""} onClick={() => setViewMode("3D")}>3D</button>
@@ -383,7 +395,7 @@ export default function ConstructorPageNew() {
             onWallMount={toggleWallMount}
             onSaveDraft={saveDraft}
             onOrder={() => navigate("/account/order")}
-            onExport={() => setNotice("Экспорт чертежей подключим после стабилизации деталировки")}
+            onExport={() => showNotice("Чертежи появятся после финальной проверки проекта")}
           />
         </section>
 
