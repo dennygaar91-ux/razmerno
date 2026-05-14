@@ -13,6 +13,7 @@ function getItemCount(section, type) {
 }
 
 export default function ConstructorLayout() {
+  const [activeStep, setActiveStep] = useState("size");
   const [activeSectionId, setActiveSectionId] = useState(null);
 
   const {
@@ -80,7 +81,10 @@ export default function ConstructorLayout() {
       <section className="rv2-shell">
         <ConstructorActions />
 
-        <ConstructorProgress />
+        <ConstructorProgress
+          activeStep={activeStep}
+          onStepChange={setActiveStep}
+        />
 
         <div className="rv2-grid">
           <SizePanel
