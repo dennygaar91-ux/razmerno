@@ -31,6 +31,7 @@ import "../styles/constructor-material-step-polish.css";
 import "../styles/constructor-summary-polish.css";
 import "../styles/constructor-priority-layout.css";
 import "../styles/constructor-left-panel-wizard.css";
+import "../styles/constructor-summary-compact.css";
 
 export default function ConstructorPageNew() {
   const navigate = useNavigate();
