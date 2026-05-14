@@ -1,13 +1,24 @@
 import "../styles/constructor-v2-size-panel.css";
 
-const SIZE_ROWS = [
-  { label: "Высота, мм", range: "200 — 2800", value: "2400" },
-  { label: "Ширина, мм", range: "400 — 3000", value: "1800" },
-  { label: "Глубина, мм", range: "300 — 800", value: "600" },
-  { label: "Количество секций", range: "от 1 до 6", value: "3" },
-];
+const DIMENSION_LIMITS = {
+  height: { label: "Высота, мм", range: "200 — 2800", min: 200, max: 2800, step: 50 },
+  width: { label: "Ширина, мм", range: "400 — 3000", min: 400, max: 3000, step: 50 },
+  depth: { label: "Глубина, мм", range: "300 — 800", min: 300, max: 800, step: 25 },
+};
 
-export default function SizePanel() {
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+export default function SizePanel({ dimensions, sections, onUpdateDimension, onSetSectionCount }) {
+  const sectionCount = sections.length;
+
+  function stepDimension(key, delta) {
+    const limit = DIMENSION_LIMITS[key];
+    const next = clamp(Number(dimensions[key]) + delta, limit.min, limit.max);
+    onUpdateDimension(key, next);
+  }
+
   return (
     <aside className="rv2-sidebar">
       <div className="rv2-card rv2-size-panel">
@@ -20,20 +31,33 @@ export default function SizePanel() {
         </div>
 
         <div className="rv2-size-list">
-          {SIZE_ROWS.map((row) => (
-            <div className="rv2-size-row" key={row.label}>
+          {Object.entries(DIMENSION_LIMITS).map(([key, row]) => (
+            <div className="rv2-size-row" key={key}>
               <div>
                 <strong>{row.label}</strong>
                 <span>{row.range}</span>
               </div>
 
               <div className="rv2-stepper">
-                <button type="button">−</button>
-                <b>{row.value}</b>
-                <button type="button">+</button>
+                <button type="button" onClick={() => stepDimension(key, -row.step)}>−</button>
+                <b>{dimensions[key]}</b>
+                <button type="button" onClick={() => stepDimension(key, row.step)}>+</button>
               </div>
             </div>
           ))}
+
+          <div className="rv2-size-row">
+            <div>
+              <strong>Количество секций</strong>
+              <span>от 1 до 6</span>
+            </div>
+
+            <div className="rv2-stepper">
+              <button type="button" onClick={() => onSetSectionCount(sectionCount - 1)}>−</button>
+              <b>{sectionCount}</b>
+              <button type="button" onClick={() => onSetSectionCount(sectionCount + 1)}>+</button>
+            </div>
+          </div>
         </div>
 
         <div className="rv2-section-widths">
@@ -41,9 +65,11 @@ export default function SizePanel() {
           <span>Автоматическое распределение</span>
 
           <div>
-            <button type="button">600 мм</button>
-            <button type="button">600 мм</button>
-            <button type="button">600 мм</button>
+            {sections.map((section, index) => (
+              <button type="button" key={section.id}>
+                {Math.round(section.width)} мм
+              </button>
+            ))}
           </div>
         </div>
 
