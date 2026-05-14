@@ -46,6 +46,7 @@ import "../styles/constructor-client-panels.css";
 import "../styles/constructor-advanced-client.css";
 import "../styles/constructor-material-textures.css";
 import "../styles/constructor-target-layout.css";
+import "../styles/constructor-target-components.css";
 
 export default function ConstructorPageNew() {
   const navigate = useNavigate();
