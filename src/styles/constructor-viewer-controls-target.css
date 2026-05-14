@@ -1,0 +1,147 @@
+.cp-viewer-toolbar-simple {
+  gap: 18px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(15,15,15,0.06);
+}
+
+.cp-viewer-title span {
+  color: rgba(15,15,15,0.48);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cp-viewer-title strong {
+  color: rgba(15,15,15,0.78);
+  font-size: 0.92rem;
+}
+
+.cp-viewer-actions-target {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cp-viewer-mode-switch,
+.cp-viewer-zoom-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 18px;
+  background: rgba(15,15,15,0.04);
+  border: 1px solid rgba(15,15,15,0.04);
+}
+
+.cp-viewer-mode-switch button,
+.cp-viewer-zoom-control button,
+.cp-viewer-auto-button {
+  min-width: 42px;
+  height: 40px;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  color: rgba(15,15,15,0.64);
+  font-weight: 700;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.cp-viewer-mode-switch button:hover,
+.cp-viewer-zoom-control button:hover,
+.cp-viewer-auto-button:hover {
+  color: #111;
+  transform: translateY(-1px);
+}
+
+.cp-viewer-mode-switch button.active {
+  background: #111;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(15,15,15,0.14);
+}
+
+.cp-viewer-zoom-control strong {
+  min-width: 56px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.cp-viewer-auto-button {
+  padding: 0 16px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(15,15,15,0.06);
+}
+
+.cp-viewer-tools-target {
+  padding: 16px;
+  gap: 14px;
+}
+
+.cp-quick-actions-premium {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(15,15,15,0.06);
+  box-shadow: 0 12px 28px rgba(15,15,15,0.04);
+}
+
+.cp-quick-actions-premium button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(15,15,15,0.07);
+  background: #fff;
+  color: #111;
+  font-weight: 700;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.cp-quick-actions-premium button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(239,91,42,0.18);
+  box-shadow: 0 10px 20px rgba(15,15,15,0.06);
+}
+
+.cp-quick-actions-premium button span {
+  width: 24px;
+  height: 24px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15,15,15,0.05);
+  font-size: 0.9rem;
+}
+
+.cp-quick-actions-premium button.danger span {
+  background: rgba(239,91,42,0.08);
+  color: #cf542c;
+}
+
+@media (max-width: 900px) {
+  .cp-viewer-toolbar-simple {
+    align-items: flex-start;
+  }
+
+  .cp-viewer-actions-target {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .cp-quick-actions-premium {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cp-quick-actions-premium button {
+    justify-content: center;
+  }
+}
