@@ -1,3 +1,4 @@
+import SectionFillPreview from "./SectionFillPreview";
 import "../styles/constructor-v2-viewer.css";
 import "../styles/constructor-v2-viewer-tools.css";
 
@@ -74,6 +75,9 @@ export default function ConstructorViewer({
                 onClick={() => onSelectSection(section.id)}
               >
                 <span>{index + 1}</span>
+
+                <SectionFillPreview section={section} />
+
                 <strong>{getSectionTitle(section)}</strong>
               </button>
             );
