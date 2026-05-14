@@ -1,0 +1,214 @@
+.cp-progress-panel {
+  max-width: 1440px;
+  margin: 0 auto 18px;
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(360px, 0.9fr) minmax(320px, 0.85fr);
+  gap: 14px;
+  align-items: stretch;
+  padding: 14px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(10, 10, 10, 0.08);
+  box-shadow: 0 22px 66px rgba(10, 10, 10, 0.065);
+  backdrop-filter: blur(18px);
+}
+
+.cp-progress-copy,
+.cp-progress-steps,
+.cp-progress-facts {
+  border-radius: 24px;
+  background: #f7f6f2;
+  border: 1px solid rgba(10, 10, 10, 0.055);
+}
+
+.cp-progress-copy {
+  padding: 20px;
+}
+
+.cp-progress-copy span {
+  display: inline-flex;
+  margin-bottom: 9px;
+  color: rgba(10, 10, 10, 0.46);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cp-progress-copy h2 {
+  margin: 0;
+  color: #0a0a0a;
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 0.98;
+  font-weight: 950;
+  letter-spacing: -0.065em;
+}
+
+.cp-progress-copy p {
+  max-width: 520px;
+  margin: 12px 0 0;
+  color: rgba(10, 10, 10, 0.58);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.46;
+}
+
+.cp-progress-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 10px;
+}
+
+.cp-progress-steps button {
+  display: grid;
+  gap: 9px;
+  align-content: center;
+  justify-items: center;
+  min-height: 112px;
+  padding: 12px;
+  border: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  color: rgba(10, 10, 10, 0.58);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.cp-progress-steps button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(10, 10, 10, 0.08);
+}
+
+.cp-progress-steps button.active {
+  background: #0a0a0a;
+  color: #fff;
+  box-shadow: 0 18px 38px rgba(10, 10, 10, 0.15);
+}
+
+.cp-progress-steps button.done {
+  background: rgba(232, 97, 44, 0.1);
+  color: #d65422;
+}
+
+.cp-progress-steps button.active.done {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.cp-progress-steps i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.08);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 950;
+}
+
+.cp-progress-steps button.active i {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.cp-progress-steps button.done i {
+  background: rgba(232, 97, 44, 0.16);
+}
+
+.cp-progress-steps span {
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: -0.02em;
+}
+
+.cp-progress-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+}
+
+.cp-progress-facts div {
+  display: grid;
+  gap: 5px;
+  align-content: center;
+  min-height: 72px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.cp-progress-facts span {
+  color: rgba(10, 10, 10, 0.44);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cp-progress-facts strong {
+  overflow: hidden;
+  color: rgba(10, 10, 10, 0.82);
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: -0.035em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cp-progress-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 20px;
+  background: rgba(232, 97, 44, 0.08);
+  color: #d65422;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.42;
+}
+
+@media (max-width: 1180px) {
+  .cp-progress-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-progress-hint {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .cp-progress-panel {
+    margin-bottom: 14px;
+    padding: 10px;
+    border-radius: 24px;
+  }
+
+  .cp-progress-copy,
+  .cp-progress-steps,
+  .cp-progress-facts {
+    border-radius: 20px;
+  }
+
+  .cp-progress-copy {
+    padding: 16px;
+  }
+
+  .cp-progress-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-progress-steps button {
+    grid-template-columns: 38px 1fr;
+    justify-items: start;
+    min-height: 58px;
+  }
+
+  .cp-progress-facts {
+    grid-template-columns: 1fr;
+  }
+}
