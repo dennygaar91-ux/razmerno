@@ -41,6 +41,7 @@ import "../styles/constructor-final-ui-cleanup.css";
 import "../styles/constructor-step-intro-polish.css";
 import "../styles/constructor-fill-preset-visuals.css";
 import "../styles/constructor-section-minimap.css";
+import "../styles/constructor-summary-client.css";
 
 export default function ConstructorPageNew() {
   const navigate = useNavigate();
