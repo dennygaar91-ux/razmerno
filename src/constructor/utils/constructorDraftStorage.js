@@ -1,5 +1,16 @@
 import { CONSTRUCTOR_DRAFT_STORAGE_KEY } from "../config/constructorUiConfig";
 
+function isValidConstructorDraft(draft) {
+  return Boolean(
+    draft &&
+      draft.config &&
+      draft.config.dimensions &&
+      Array.isArray(draft.config.sections) &&
+      draft.config.materials &&
+      draft.config.options
+  );
+}
+
 export function saveConstructorDraft({ config, price }) {
   if (typeof window === "undefined") return false;
 
@@ -16,7 +27,8 @@ export function loadConstructorDraft() {
 
   try {
     const rawDraft = window.localStorage.getItem(CONSTRUCTOR_DRAFT_STORAGE_KEY);
-    return rawDraft ? JSON.parse(rawDraft) : null;
+    const parsedDraft = rawDraft ? JSON.parse(rawDraft) : null;
+    return isValidConstructorDraft(parsedDraft) ? parsedDraft : null;
   } catch {
     return null;
   }
@@ -25,4 +37,11 @@ export function loadConstructorDraft() {
 export function hasConstructorDraft() {
   if (typeof window === "undefined") return false;
   return Boolean(window.localStorage.getItem(CONSTRUCTOR_DRAFT_STORAGE_KEY));
+}
+
+export function clearConstructorDraft() {
+  if (typeof window === "undefined") return false;
+
+  window.localStorage.removeItem(CONSTRUCTOR_DRAFT_STORAGE_KEY);
+  return true;
 }
