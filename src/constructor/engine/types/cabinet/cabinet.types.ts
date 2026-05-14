@@ -50,6 +50,8 @@ export type CabinetConfig = {
   options: {
     hardwareBrand: "Hettich" | "Firmax";
     hasLegs: boolean;
+    hasBackPanel: boolean;
+    wallMount: boolean;
   };
 
   /**
