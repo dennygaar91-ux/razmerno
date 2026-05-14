@@ -9,6 +9,8 @@ function getProjectInsights(config, validation = []) {
   const width = Number(config.dimensions?.width) || 0;
   const height = Number(config.dimensions?.height) || 0;
   const depth = Number(config.dimensions?.depth) || 0;
+  const hasBackPanel = config.options?.hasBackPanel !== false;
+  const wallMount = Boolean(config.options?.wallMount);
   const emptySections = sections.filter((section) => section.items.length === 0).length;
   const totalDrawers = sections.reduce((sum, section) => sum + getItemCount(section, "drawer"), 0);
   const totalRails = sections.reduce((sum, section) => sum + getItemCount(section, "hanger_rail"), 0);
@@ -26,12 +28,22 @@ function getProjectInsights(config, validation = []) {
     insights.push({ type: "success", text: `Секции рассчитаны: ${sections.length}` });
   }
 
+  if (hasBackPanel) {
+    insights.push({ type: "success", text: "Задняя стенка добавлена для жёсткости корпуса" });
+  } else {
+    insights.push({ type: "warning", text: "Без задней стенки шкаф будет менее жёстким" });
+  }
+
   if (depth > 0 && depth < 520 && totalRails > 0) {
     insights.push({ type: "warning", text: "Для одежды на плечиках лучше глубина от 520 мм" });
   }
 
-  if (height >= 2200) {
+  if (height >= 2200 && !wallMount) {
     insights.push({ type: "warning", text: "Высокий шкаф лучше крепить к стене" });
+  }
+
+  if (height >= 2200 && wallMount) {
+    insights.push({ type: "success", text: "Крепление к стене добавлено для устойчивости" });
   }
 
   if (emptySections > 0) {
@@ -65,7 +77,7 @@ function getProjectInsights(config, validation = []) {
     0,
     Math.min(
       100,
-      baseScore - errors.length * 30 - warnings.length * 8 - emptySections * 10 - (depth < 300 ? 14 : 0)
+      baseScore - errors.length * 30 - warnings.length * 8 - emptySections * 10 - (depth < 300 ? 14 : 0) - (!hasBackPanel ? 10 : 0) - (height >= 2200 && !wallMount ? 8 : 0)
     )
   );
 
