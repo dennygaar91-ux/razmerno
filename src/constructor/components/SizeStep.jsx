@@ -18,6 +18,11 @@ export default function SizeStep({
         <h2>Размеры и секции</h2>
       </div>
 
+      <div className="cp-step-intro">
+        <strong>Начните с габаритов</strong>
+        <p>Укажите ширину, высоту и глубину в миллиметрах. Количество секций можно изменить ниже.</p>
+      </div>
+
       <div className="cp-dimensions">
         {Object.keys(dimensionLimits).map((key) => {
           const item = dimensionLimits[key];
@@ -60,7 +65,7 @@ export default function SizeStep({
       <div className="cp-section-widths">
         <div className="cp-section-widths-head">
           <strong>Секции шкафа</strong>
-          <small>сейчас ширина распределяется автоматически</small>
+          <small>нажмите на секцию, чтобы настроить наполнение</small>
         </div>
         <div className="cp-section-width-grid" style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(44px, 1fr))` }}>
           {sections.map((section, index) => {
