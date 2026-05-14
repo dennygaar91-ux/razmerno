@@ -39,6 +39,7 @@ import "../styles/constructor-material-drawer-premium.css";
 import "../styles/constructor-mobile-polish.css";
 import "../styles/constructor-final-ui-cleanup.css";
 import "../styles/constructor-step-intro-polish.css";
+import "../styles/constructor-fill-preset-visuals.css";
 
 export default function ConstructorPageNew() {
   const navigate = useNavigate();
