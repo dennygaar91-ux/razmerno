@@ -1,16 +1,41 @@
+.pv-2d .pv-canvas {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,0.9), transparent 38%),
+    linear-gradient(180deg, rgba(250,250,249,0.98), rgba(241,241,238,0.98));
+}
+
 .pv-2d .pv-cabinet {
   background:
     linear-gradient(180deg,
       rgba(255,255,255,0.98),
       rgba(244,244,244,0.98));
+  box-shadow:
+    0 18px 48px rgba(10,10,10,0.08),
+    0 0 0 1px rgba(10,10,10,0.1),
+    inset 0 0 0 1px rgba(255,255,255,0.78);
 }
 
 .pv-2d .pv-section {
-  box-shadow: inset 0 0 0 1px rgba(10,10,10,0.12);
+  box-shadow:
+    inset 0 0 0 1px rgba(10,10,10,0.12),
+    inset 0 0 0 999px rgba(255,255,255,0.18);
+}
+
+.pv-2d .pv-section.active {
+  box-shadow:
+    inset 0 0 0 1px rgba(232,97,44,0.42),
+    inset 0 0 0 999px rgba(232,97,44,0.035),
+    0 12px 24px rgba(10,10,10,0.08);
 }
 
 .pv-2d .pv-section::after {
   opacity: 0.22;
+}
+
+.pv-2d .pv-section-label,
+.pv-2d .pv-production-tag {
+  border: 1px solid rgba(10,10,10,0.1);
+  box-shadow: none;
 }
 
 .pv-2d .pv-shelves i,
@@ -22,11 +47,43 @@
 .pv-2d .pv-dimension {
   border-style: dashed;
   background: rgba(255,255,255,0.94);
+  box-shadow:
+    0 8px 22px rgba(10,10,10,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+.pv-2d .pv-dimension::before,
+.pv-2d .pv-dimension::after {
+  content: "";
+  position: absolute;
+  background: rgba(10,10,10,0.18);
+  pointer-events: none;
+}
+
+.pv-2d .pv-dimension-width::before,
+.pv-2d .pv-dimension-width::after {
+  top: 50%;
+  width: 22px;
+  height: 1px;
+}
+
+.pv-2d .pv-dimension-width::before {
+  right: calc(100% + 8px);
+}
+
+.pv-2d .pv-dimension-width::after {
+  left: calc(100% + 8px);
 }
 
 .pv-2d .pv-grid {
-  opacity: 0.46;
+  opacity: 0.52;
   background-size: 24px 24px;
+  background-image:
+    linear-gradient(rgba(10,10,10,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10,10,10,0.045) 1px, transparent 1px),
+    linear-gradient(rgba(232,97,44,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,97,44,0.045) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px, 120px 120px, 120px 120px;
 }
 
 .pv-2d .pv-cabinet::before {
@@ -35,4 +92,36 @@
   inset: 0;
   border: 1px dashed rgba(10,10,10,0.16);
   pointer-events: none;
+}
+
+.pv-2d .pv-cabinet::after {
+  content: "BLUEPRINT";
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(10,10,10,0.78);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+}
+
+.pv-2d .pv-exploded-hint {
+  opacity: 0.86;
+  box-shadow: none;
+}
+
+.pv-2d .pv-resize-handle::before {
+  background: linear-gradient(180deg, transparent, rgba(10,10,10,0.28), transparent);
+}
+
+@media (max-width: 760px) {
+  .pv-2d .pv-cabinet::after {
+    right: 10px;
+    bottom: 10px;
+    font-size: 8px;
+  }
 }
