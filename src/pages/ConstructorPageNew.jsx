@@ -16,6 +16,7 @@ import {
 import "../styles/constructor-premium.css";
 import "../styles/constructor-mobile-action-bar.css";
 import "../styles/constructor-desktop-polish.css";
+import "../styles/constructor-fill-step-polish.css";
 
 const DIMENSION_LIMITS = {
   height: { label: "Высота", min: 200, max: 2800 },
