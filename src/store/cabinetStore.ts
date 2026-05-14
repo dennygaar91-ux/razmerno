@@ -38,6 +38,8 @@ export type CabinetStoreState = {
   setFacadeMaterial: (materialId: string) => void;
   setHardwareBrand: (brand: "Hettich" | "Firmax") => void;
   toggleLegs: (enabled: boolean) => void;
+  toggleBackPanel: (enabled: boolean) => void;
+  toggleWallMount: (enabled: boolean) => void;
   toggleHandles: (enabled: boolean) => void;
   setHandleVariant: (variant: string) => void;
   addSection: () => void;
@@ -255,6 +257,34 @@ export const useCabinetStore = create<CabinetStoreState>((set) => ({
         options: {
           ...state.config.options,
           hasLegs: enabled
+        }
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  toggleBackPanel: (enabled) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        options: {
+          ...state.config.options,
+          hasBackPanel: enabled
+        }
+      };
+
+      return createState(nextConfig);
+    });
+  },
+
+  toggleWallMount: (enabled) => {
+    set((state) => {
+      const nextConfig: CabinetConfig = {
+        ...state.config,
+        options: {
+          ...state.config.options,
+          wallMount: enabled
         }
       };
 
