@@ -228,8 +228,8 @@ export default function PremiumCabinetViewer({
             <div className="pv-left-panel" />
             <div className="pv-right-panel" />
             <div className="pv-back-panel" />
-            <div className="pv-production-label pv-production-label-top">верхняя панель</div>
-            <div className="pv-production-label pv-production-label-side">боковина</div>
+            <div className="pv-production-label pv-production-label-top">верх</div>
+            <div className="pv-production-label pv-production-label-side">бок</div>
 
             <div className="pv-sections" style={{ gridTemplateColumns: sectionGridTemplate }}>
               {sections.map((section, index) => {
@@ -280,8 +280,8 @@ export default function PremiumCabinetViewer({
             </div>
 
             <div className="pv-exploded-hint">
-              <span>EXPLODED PREVIEW</span>
-              <b>панели · кромка · присадка</b>
+              <span>Комплект для сборки</span>
+              <b>детали · кромка · крепёж</b>
             </div>
 
             {sections.length > 1 ? (
@@ -322,7 +322,7 @@ export default function PremiumCabinetViewer({
       </div>
 
       <div className="pv-status">
-        <span>{viewMode === "2D" ? "Blueprint 2D" : "Premium 3D preview"}</span>
+        <span>{viewMode === "2D" ? "Плоский вид" : "Объёмный вид"}</span>
         <b>{sectionCount} секц. · средняя {averageSectionWidth} мм</b>
       </div>
     </div>
