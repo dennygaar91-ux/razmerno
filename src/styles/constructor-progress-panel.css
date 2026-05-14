@@ -322,6 +322,107 @@
   box-shadow: 0 16px 32px rgba(10, 10, 10, 0.15);
 }
 
+.cp-viewer-tools {
+  gap: 12px;
+  padding: 12px;
+  border-radius: 24px;
+  background: rgba(247, 246, 242, 0.78);
+  border: 1px solid rgba(10, 10, 10, 0.055);
+}
+
+.cp-quick-actions {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 30px;
+}
+
+.cp-quick-actions::before {
+  content: "Быстрое наполнение активной секции";
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: rgba(10, 10, 10, 0.44);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cp-quick-actions button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(10, 10, 10, 0.075);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: rgba(10, 10, 10, 0.72);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 950;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.cp-quick-actions button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(232, 97, 44, 0.22);
+  background: rgba(255, 247, 243, 0.92);
+  box-shadow: 0 12px 24px rgba(10, 10, 10, 0.07);
+}
+
+.cp-quick-actions button:first-child,
+.cp-quick-actions button:nth-child(2) {
+  background: #0a0a0a;
+  border-color: #0a0a0a;
+  color: #fff;
+}
+
+.cp-quick-actions button:first-child:hover,
+.cp-quick-actions button:nth-child(2):hover {
+  background: #d65422;
+  border-color: #d65422;
+  box-shadow: 0 14px 28px rgba(214, 84, 34, 0.16);
+}
+
+.cp-quick-actions button:last-child {
+  background: rgba(10, 10, 10, 0.055);
+  color: rgba(10, 10, 10, 0.48);
+}
+
+.cp-quick-actions button:last-child:hover {
+  border-color: rgba(214, 67, 67, 0.18);
+  background: rgba(214, 67, 67, 0.08);
+  color: #b93a3a;
+}
+
+.cp-mini-map {
+  padding: 8px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(10, 10, 10, 0.045);
+}
+
+.cp-mini-map button {
+  min-height: 48px;
+  border-radius: 14px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.cp-mini-map button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(10, 10, 10, 0.055);
+}
+
+.cp-mini-map button.active {
+  border-color: rgba(232, 97, 44, 0.28);
+  background: rgba(232, 97, 44, 0.1);
+}
+
+.cp-mini-map button.empty {
+  opacity: 0.58;
+}
+
 @media (max-width: 1180px) {
   .cp-progress-panel {
     grid-template-columns: 1fr;
@@ -389,5 +490,19 @@
 
   .cp-viewer-actions button {
     height: 40px;
+  }
+
+  .cp-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cp-quick-actions::before {
+    grid-column: 1 / -1;
+    position: static;
+  }
+
+  .cp-quick-actions button {
+    width: 100%;
   }
 }
