@@ -1,3 +1,16 @@
+.pv-cabinet,
+.pv-section,
+.pv-shelves i,
+.pv-drawers i,
+.pv-rail,
+.pv-facade {
+  will-change: transform, opacity, filter;
+}
+
+.pv-cabinet {
+  animation: pvCabinetIn 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 .pv-top-panel,
 .pv-bottom-panel {
   box-shadow: 0 1px 0 rgba(255,255,255,0.34), 0 8px 16px rgba(10,10,10,0.08);
@@ -13,6 +26,12 @@
   background:
     linear-gradient(90deg, rgba(255,255,255,0.24), rgba(255,255,255,0.08)),
     rgba(255,255,255,0.14);
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.2s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease,
+    opacity 0.18s ease;
 }
 
 .pv-section::before {
@@ -62,6 +81,14 @@
   box-shadow:
     0 5px 9px rgba(10,10,10,0.08),
     inset 0 1px 0 rgba(255,255,255,0.42);
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.pv-section:hover .pv-shelves i {
+  transform: translateY(-1px);
 }
 
 .pv-shelves i::after {
@@ -89,6 +116,18 @@
     0 8px 16px rgba(10,10,10,0.1),
     inset 0 1px 0 rgba(255,255,255,0.42),
     inset 0 -1px 0 rgba(10,10,10,0.1);
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.pv-section:hover .pv-drawers i {
+  transform: translateY(-1px) scale(1.006);
+  box-shadow:
+    0 10px 20px rgba(10,10,10,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.46),
+    inset 0 -1px 0 rgba(10,10,10,0.12);
 }
 
 .pv-drawers i::before {
@@ -107,4 +146,40 @@
 .pv-rail {
   box-shadow: 0 8px 14px rgba(10,10,10,0.12);
   z-index: 6;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pv-section:hover .pv-rail {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(10,10,10,0.14);
+}
+
+.pv-root.is-resizing .pv-section:hover .pv-shelves i,
+.pv-root.is-resizing .pv-section:hover .pv-drawers i,
+.pv-root.is-resizing .pv-section:hover .pv-rail {
+  transform: none;
+}
+
+@keyframes pvCabinetIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-cabinet,
+  .pv-section,
+  .pv-shelves i,
+  .pv-drawers i,
+  .pv-rail,
+  .pv-facade {
+    animation: none !important;
+    transition: none !important;
+  }
 }
