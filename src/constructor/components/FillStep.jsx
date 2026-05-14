@@ -58,7 +58,18 @@ export default function FillStep({
 
       <div className="cp-presets">
         {fillPresets.map((preset) => (
-          <button type="button" key={preset.id} onClick={() => onApplyPreset(preset)}>
+          <button
+            type="button"
+            key={preset.id}
+            className={`cp-preset-card cp-preset-${preset.id}`}
+            onClick={() => onApplyPreset(preset)}
+          >
+            <span className="cp-preset-visual" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
             <strong>{preset.label}</strong>
             <small>{preset.desc}</small>
           </button>
