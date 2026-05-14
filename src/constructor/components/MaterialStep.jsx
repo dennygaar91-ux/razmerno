@@ -17,6 +17,11 @@ export default function MaterialStep({
         <h2>Материалы</h2>
       </div>
 
+      <div className="cp-step-intro">
+        <strong>Выберите внешний вид</strong>
+        <p>Корпус влияет на внутренние детали, фасады — на главный визуальный образ шкафа.</p>
+      </div>
+
       <MaterialSelect
         title="Корпус"
         name={bodyName}
