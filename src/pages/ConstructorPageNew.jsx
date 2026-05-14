@@ -243,18 +243,6 @@ export default function ConstructorPageNew() {
 
         <section className="cp-workspace">
           <aside className="cp-config">
-            <div className="cp-steps">
-              {[
-                ["size", "Размеры"],
-                ["fill", "Наполнение"],
-                ["materials", "Материалы"],
-              ].map(([id, label]) => (
-                <button key={id} type="button" className={activeStep === id ? "active" : ""} onClick={() => setActiveStep(id)}>
-                  {label}
-                </button>
-              ))}
-            </div>
-
             {activeStep === "size" && (
               <SizeStep
                 dimensionLimits={DIMENSION_LIMITS}
