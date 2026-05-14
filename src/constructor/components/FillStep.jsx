@@ -22,11 +22,18 @@ export default function FillStep({
 }) {
   if (!activeSection) return null;
 
+  const activeSectionIndex = config.sections.findIndex((section) => section.id === activeSection.id) + 1;
+
   return (
     <div className="cp-card">
       <div className="cp-card-head">
         <span>02</span>
         <h2>Наполнение секции</h2>
+      </div>
+
+      <div className="cp-step-intro cp-step-intro-accent">
+        <strong>Секция {activeSectionIndex || 1}</strong>
+        <p>Выберите готовый сценарий или настройте полки, ящики и штангу вручную.</p>
       </div>
 
       <div className="cp-section-tabs">
