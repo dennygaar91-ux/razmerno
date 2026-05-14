@@ -2,15 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header";
 import PremiumCabinetViewer from "../constructor/PremiumCabinetViewer";
-import AdvancedSettingsPanel from "../constructor/components/AdvancedSettingsPanel";
 import ConstructorProgressPanel from "../constructor/components/ConstructorProgressPanel";
-import ProjectKitPanel from "../constructor/components/ProjectKitPanel";
-import ProjectReadinessPanel from "../constructor/components/ProjectReadinessPanel";
+import FillCounter from "../constructor/components/FillCounter";
+import MaterialDrawer from "../constructor/components/MaterialDrawer";
+import MaterialSelect from "../constructor/components/MaterialSelect";
+import SummaryPanel from "../constructor/components/SummaryPanel";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
   bodyMaterialOptions,
   facadeMaterialOptions,
-  hardwareBrandOptions,
   handleOptions,
 } from "../data/constructorOptions";
 import "../styles/constructor-premium.css";
@@ -439,25 +439,21 @@ export default function ConstructorPageNew() {
             </div>
           </section>
 
-          <aside className={`cp-summary ${pricePulse ? "is-price-updated" : ""}`}>
-            <span className="cp-eyebrow">Итого</span>
-            <strong>{price.toLocaleString("ru-RU")} ₽</strong>
-            <small>Ориентировочная стоимость комплекта</small>
-            <div className="cp-summary-list">
-              <div><span>Размеры</span><b>{config.dimensions.width}×{config.dimensions.height}×{config.dimensions.depth}</b></div>
-              <div><span>Секции</span><b>{sectionCount}</b></div>
-              <div><span>Полки</span><b>{totals.shelves}</b></div>
-              <div><span>Ящики</span><b>{totals.drawers}</b></div>
-              <div><span>Штанги</span><b>{totals.rails}</b></div>
-            </div>
-            <ProjectReadinessPanel config={config} validation={validation} />
-            <ProjectKitPanel result={result} />
-            <AdvancedSettingsPanel config={config} onBackPanel={toggleBackPanel} onWallMount={toggleWallMount} />
-            {notice ? <p className="cp-notice">{notice}</p> : null}
-            <button type="button" className="cp-primary" onClick={() => navigate("/account/order")}>В корзину</button>
-            <button type="button" onClick={saveDraft}>Сохранить проект</button>
-            <button type="button" onClick={() => setNotice("Экспорт чертежей подключим после стабилизации деталировки")}>Скачать чертежи</button>
-          </aside>
+          <SummaryPanel
+            config={config}
+            validation={validation}
+            result={result}
+            totals={totals}
+            price={price}
+            sectionCount={sectionCount}
+            pricePulse={pricePulse}
+            notice={notice}
+            onBackPanel={toggleBackPanel}
+            onWallMount={toggleWallMount}
+            onSaveDraft={saveDraft}
+            onOrder={() => navigate("/account/order")}
+            onExport={() => setNotice("Экспорт чертежей подключим после стабилизации деталировки")}
+          />
         </section>
 
         <div className={`cp-mobile-bar ${pricePulse ? "is-price-updated" : ""}`}>
@@ -484,71 +480,6 @@ export default function ConstructorPageNew() {
           onHardware={setHardwareBrand}
         />
       ) : null}
-    </>
-  );
-}
-
-function FillCounter({ label, value, onMinus, onPlus }) {
-  return (
-    <div className="cp-fill-counter">
-      <span>{label}</span>
-      <div>
-        <button type="button" onClick={onMinus}>−</button>
-        <b>{value}</b>
-        <button type="button" onClick={onPlus}>+</button>
-      </div>
-    </div>
-  );
-}
-
-function MaterialSelect({ title, name, color, onClick }) {
-  return (
-    <button type="button" className="cp-material-select" onClick={onClick}>
-      {color ? <span style={{ background: color }} /> : <i />}
-      <div>
-        <small>{title}</small>
-        <strong>{name}</strong>
-      </div>
-      <em>Изменить</em>
-    </button>
-  );
-}
-
-function MaterialDrawer({ type, config, onClose, onBody, onFacade, onHardware }) {
-  const title = type === "body" ? "Материал корпуса" : type === "facade" ? "Материал фасадов" : "Фурнитура";
-  const options = type === "body" ? bodyMaterialOptions : type === "facade" ? facadeMaterialOptions : hardwareBrandOptions;
-
-  function active(option) {
-    if (type === "body") return config.materials.bodyMaterialId === option.id;
-    if (type === "facade") return config.materials.facadeMaterialId === option.id;
-    return config.options.hardwareBrand === option.id;
-  }
-
-  function select(option) {
-    if (type === "body") onBody(option.id);
-    if (type === "facade") onFacade(option.id);
-    if (type === "hardware") onHardware(option.id);
-    onClose();
-  }
-
-  return (
-    <>
-      <div className="cp-drawer-overlay" onClick={onClose} />
-      <div className="cp-drawer">
-        <div className="cp-drawer-head">
-          <h3>{title}</h3>
-          <button type="button" onClick={onClose}>✕</button>
-        </div>
-        <div className="cp-drawer-grid">
-          {options.map((option) => (
-            <button key={option.id} type="button" className={active(option) ? "active" : ""} onClick={() => select(option)}>
-              {type !== "hardware" ? <span style={{ background: option.color }} /> : null}
-              <strong>{option.name || option.label}</strong>
-              <small>{option.subtitle || "петли и направляющие"}</small>
-            </button>
-          ))}
-        </div>
-      </div>
     </>
   );
 }
