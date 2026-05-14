@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header";
 import PremiumCabinetViewer from "../constructor/PremiumCabinetViewer";
+import ProjectReadinessPanel from "../constructor/components/ProjectReadinessPanel";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
   bodyMaterialOptions,
@@ -48,11 +49,13 @@ export default function ConstructorPageNew() {
 
   const {
     config,
+    validation,
     result,
     updateDimensions,
     addSection,
     removeSection,
     autoDistributeSections,
+    resizeSectionPair,
     setSectionShelves,
     setSectionDrawers,
     setSectionHangerRails,
@@ -383,6 +386,7 @@ export default function ConstructorPageNew() {
                 userHeight={humanHeight}
                 activeSectionId={activeSection?.id}
                 onSectionSelect={selectSection}
+                onResizeSectionPair={resizeSectionPair}
               />
             </div>
 
@@ -424,6 +428,7 @@ export default function ConstructorPageNew() {
               <div><span>Ящики</span><b>{totals.drawers}</b></div>
               <div><span>Штанги</span><b>{totals.rails}</b></div>
             </div>
+            <ProjectReadinessPanel config={config} validation={validation} />
             {notice ? <p className="cp-notice">{notice}</p> : null}
             <button type="button" className="cp-primary" onClick={() => navigate("/account/order")}>В корзину</button>
             <button type="button" onClick={saveDraft}>Сохранить проект</button>
