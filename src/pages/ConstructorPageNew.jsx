@@ -5,7 +5,7 @@ import PremiumCabinetViewer from "../constructor/PremiumCabinetViewer";
 import ConstructorProgressPanel from "../constructor/components/ConstructorProgressPanel";
 import FillCounter from "../constructor/components/FillCounter";
 import MaterialDrawer from "../constructor/components/MaterialDrawer";
-import MaterialSelect from "../constructor/components/MaterialSelect";
+import MaterialStep from "../constructor/components/MaterialStep";
 import SummaryPanel from "../constructor/components/SummaryPanel";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
@@ -371,16 +371,16 @@ export default function ConstructorPageNew() {
             )}
 
             {activeStep === "materials" && (
-              <div className="cp-card">
-                <div className="cp-card-head">
-                  <span>03</span>
-                  <h2>Материалы</h2>
-                </div>
-
-                <MaterialSelect title="Корпус" name={bodyName} color={bodyMaterial?.color} onClick={() => setDrawerType("body")} />
-                <MaterialSelect title="Фасады" name={facadeName} color={facadeMaterial?.color} onClick={() => setDrawerType("facade")} />
-                <MaterialSelect title="Фурнитура" name={config.options.hardwareBrand || "Hettich"} onClick={() => setDrawerType("hardware")} />
-              </div>
+              <MaterialStep
+                bodyName={bodyName}
+                bodyColor={bodyMaterial?.color}
+                facadeName={facadeName}
+                facadeColor={facadeMaterial?.color}
+                hardwareName={config.options.hardwareBrand || "Hettich"}
+                onSelectBody={() => setDrawerType("body")}
+                onSelectFacade={() => setDrawerType("facade")}
+                onSelectHardware={() => setDrawerType("hardware")}
+              />
             )}
           </aside>
 
