@@ -10,7 +10,12 @@ import MaterialStep from "../constructor/components/MaterialStep";
 import SizeStep from "../constructor/components/SizeStep";
 import SummaryPanel from "../constructor/components/SummaryPanel";
 import { DIMENSION_LIMITS, FILL_PRESETS } from "../constructor/config/constructorUiConfig";
-import { hasConstructorDraft, saveConstructorDraft } from "../constructor/utils/constructorDraftStorage";
+import {
+  clearConstructorDraft,
+  hasConstructorDraft,
+  loadConstructorDraft,
+  saveConstructorDraft,
+} from "../constructor/utils/constructorDraftStorage";
 import { clamp, getItemCount } from "../constructor/utils/constructorUiUtils";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
@@ -58,6 +63,7 @@ export default function ConstructorPageNew() {
     toggleWallMount,
     toggleHandles,
     setHandleVariant,
+    hydrateConfig,
   } = useCabinetStore();
 
   const [draft, setDraft] = useState(() => ({
@@ -202,12 +208,26 @@ export default function ConstructorPageNew() {
     setNotice(saved ? "Проект сохранён" : "Не удалось сохранить проект");
   }
 
-  function loadSavedDraftNotice() {
-    setNotice(
-      hasSavedDraft
-        ? "Черновик найден. Восстановление проекта подключим после стабилизации store."
-        : "Сохранённых проектов пока нет"
-    );
+  function loadSavedDraft() {
+    const savedDraft = loadConstructorDraft();
+
+    if (!savedDraft?.config) {
+      setHasSavedDraft(false);
+      setNotice("Сохранённых проектов пока нет");
+      return;
+    }
+
+    hydrateConfig(savedDraft.config);
+    setActiveStep("size");
+    setActiveSectionId(savedDraft.config.sections?.[0]?.id || null);
+    setHasSavedDraft(true);
+    setNotice("Сохранённый проект загружен");
+  }
+
+  function clearSavedDraft() {
+    const cleared = clearConstructorDraft();
+    setHasSavedDraft(false);
+    setNotice(cleared ? "Черновик удалён" : "Не удалось удалить черновик");
   }
 
   return (
@@ -221,7 +241,8 @@ export default function ConstructorPageNew() {
             <p>Задайте габариты, выберите секции, наполнение и материалы. Цена и визуализация обновляются сразу.</p>
           </div>
           <div className="cp-hero-actions">
-            <button type="button" onClick={loadSavedDraftNotice}>Загрузить</button>
+            <button type="button" onClick={loadSavedDraft}>Загрузить</button>
+            <button type="button" onClick={clearSavedDraft}>Очистить</button>
             <button type="button" onClick={saveDraft}>Сохранить</button>
             <button type="button" className="primary" onClick={() => navigate("/account/order")}>В корзину</button>
           </div>
