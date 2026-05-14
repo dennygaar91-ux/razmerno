@@ -45,6 +45,7 @@ export type CabinetStoreState = {
   addSection: () => void;
   removeSection: (sectionId: string) => void;
   autoDistributeSections: () => void;
+  hydrateConfig: (config: CabinetConfig) => void;
   resetConfig: () => void;
 };
 
@@ -391,6 +392,8 @@ export const useCabinetStore = create<CabinetStoreState>((set) => ({
       return createState(nextConfig);
     });
   },
+
+  hydrateConfig: (config) => set(() => createState(config)),
 
   resetConfig: () => createState(defaultCabinetConfig)
 }));
