@@ -1,0 +1,210 @@
+/* Final constructor UI cleanup: calmer minimalism, unified radius and shadows */
+
+:root {
+  --cp-radius-lg: 24px;
+  --cp-radius-md: 18px;
+  --cp-radius-sm: 12px;
+  --cp-border-soft: rgba(10, 10, 10, 0.065);
+  --cp-shadow-soft: 0 14px 42px rgba(10, 10, 10, 0.045);
+  --cp-shadow-hover: 0 18px 48px rgba(10, 10, 10, 0.07);
+}
+
+.cp-page {
+  color: #0a0a0a;
+}
+
+.cp-hero,
+.cp-progress-panel,
+.cp-workspace {
+  width: 100%;
+}
+
+.cp-config,
+.cp-viewer-card,
+.cp-summary,
+.cp-progress-panel,
+.cp-card {
+  border-color: var(--cp-border-soft);
+}
+
+.cp-config,
+.cp-viewer-card,
+.cp-summary,
+.cp-progress-panel {
+  box-shadow: var(--cp-shadow-soft);
+}
+
+.cp-card,
+.cp-progress-copy,
+.cp-progress-steps,
+.cp-progress-facts,
+.cp-viewer-toolbar-simple,
+.cp-viewer-tools,
+.cp-summary-list,
+.cp-summary .cp-readiness,
+.cp-summary .cp-kit,
+.cp-summary .cp-advanced {
+  box-shadow: none;
+}
+
+.cp-viewer-card::before,
+.cp-viewer-stage::before {
+  opacity: 0.38;
+}
+
+.cp-viewer-stage::before {
+  border-style: solid;
+}
+
+.cp-viewer-stage::after {
+  opacity: 0.72;
+}
+
+.cp-card,
+.cp-viewer-toolbar-simple,
+.cp-viewer-tools,
+.cp-summary-list,
+.cp-progress-copy,
+.cp-progress-steps,
+.cp-progress-facts,
+.cp-progress-hint {
+  border-color: rgba(10, 10, 10, 0.052);
+}
+
+.cp-hero-actions,
+.cp-viewer-actions,
+.cp-mobile-bar,
+.cp-toast {
+  box-shadow: 0 12px 34px rgba(10, 10, 10, 0.08);
+}
+
+.cp-hero-actions button,
+.cp-viewer-actions button,
+.cp-quick-actions button,
+.cp-summary button,
+.cp-mobile-bar-actions button,
+.cp-material-drawer .cp-drawer-grid > button > b {
+  letter-spacing: -0.01em;
+}
+
+.cp-hero-actions button:hover:not(:disabled),
+.cp-viewer-actions button:hover,
+.cp-quick-actions button:hover,
+.cp-summary > button:hover,
+.cp-material-drawer .cp-drawer-grid > button:hover {
+  transform: translateY(-1px);
+}
+
+.cp-viewer-actions button:hover,
+.cp-quick-actions button:hover {
+  box-shadow: none;
+}
+
+.cp-viewer-card,
+.cp-config,
+.cp-summary {
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.cp-viewer-card:hover,
+.cp-config:hover,
+.cp-summary:hover {
+  box-shadow: var(--cp-shadow-hover);
+}
+
+.cp-card-head h2,
+.cp-progress-copy h2,
+.cp-hero h1,
+.cp-material-drawer .cp-drawer-head h3 {
+  text-wrap: balance;
+}
+
+.cp-card-head span,
+.cp-progress-steps i,
+.cp-section-width-grid span {
+  flex: 0 0 auto;
+}
+
+.cp-dimension,
+.cp-section-count,
+.cp-section-widths,
+.cp-fill-counter,
+.cp-material-select,
+.cp-summary-list div,
+.cp-progress-facts div,
+.cp-mini-map button {
+  border-color: rgba(10, 10, 10, 0.052);
+}
+
+.cp-counter button,
+.cp-fill-counter button,
+.cp-viewer-actions button,
+.cp-hero-actions button,
+.cp-mobile-bar-actions button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cp-counter button:focus-visible,
+.cp-fill-counter button:focus-visible,
+.cp-viewer-actions button:focus-visible,
+.cp-hero-actions button:focus-visible,
+.cp-quick-actions button:focus-visible,
+.cp-progress-steps button:focus-visible,
+.cp-mobile-bar-actions button:focus-visible,
+.cp-material-drawer button:focus-visible {
+  outline: 2px solid rgba(239, 91, 42, 0.42);
+  outline-offset: 2px;
+}
+
+.cp-summary .cp-kit::after {
+  background: linear-gradient(180deg, transparent, rgba(247, 246, 242, 0.92));
+}
+
+.cp-material-drawer .cp-drawer-grid > button {
+  box-shadow: none;
+}
+
+.cp-material-drawer .cp-drawer-grid > button.active {
+  box-shadow: 0 12px 30px rgba(239, 91, 42, 0.1);
+}
+
+.cp-material-drawer .cp-drawer-head > button,
+.cp-mobile-bar,
+.cp-toast {
+  backdrop-filter: blur(18px) saturate(1.08);
+}
+
+@media (max-width: 1180px) {
+  .cp-viewer-card:hover,
+  .cp-config:hover,
+  .cp-summary:hover {
+    box-shadow: var(--cp-shadow-soft);
+  }
+}
+
+@media (max-width: 760px) {
+  .cp-config,
+  .cp-viewer-card,
+  .cp-summary,
+  .cp-progress-panel {
+    box-shadow: 0 10px 28px rgba(10, 10, 10, 0.04);
+  }
+
+  .cp-hero-actions,
+  .cp-mobile-bar,
+  .cp-toast {
+    box-shadow: 0 14px 36px rgba(10, 10, 10, 0.12);
+  }
+
+  .cp-card-head h2,
+  .cp-progress-copy h2,
+  .cp-hero h1 {
+    text-wrap: initial;
+  }
+
+  .cp-viewer-card:hover,
+  .cp-config:hover,
+  .cp-summary:hover {
+    box-shadow: 0 10px 28px rgba(10, 10, 10, 0.04);
+  }
+}
