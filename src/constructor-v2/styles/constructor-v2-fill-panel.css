@@ -1,0 +1,86 @@
+.rv2-fill-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.rv2-active-section-card {
+  padding: 20px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255,247,242,0.92) 0%, rgba(255,250,247,0.94) 100%);
+}
+
+.rv2-active-section-card span {
+  display: block;
+  margin-bottom: 8px;
+  color: #d85a2a;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.rv2-active-section-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 30px;
+  line-height: .94;
+  letter-spacing: -.06em;
+}
+
+.rv2-active-section-card p {
+  color: rgba(15,15,15,0.58);
+  line-height: 1.5;
+}
+
+.rv2-fill-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rv2-fill-actions-grid button {
+  height: 56px;
+  border-radius: 18px;
+  border: 1px solid rgba(15,15,15,0.08);
+  background: #fff;
+  font-weight: 800;
+}
+
+.rv2-fill-actions-grid .danger {
+  color: #d85a2a;
+  border-color: rgba(216,90,42,0.18);
+  background: rgba(216,90,42,0.05);
+}
+
+.rv2-section-picker strong {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.rv2-section-picker div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rv2-section-picker button {
+  height: 58px;
+  border-radius: 18px;
+  border: 1px solid rgba(15,15,15,0.08);
+  background: #fff;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.rv2-section-picker button.active {
+  background: #111;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .rv2-fill-actions-grid,
+  .rv2-section-picker div {
+    grid-template-columns: 1fr;
+  }
+}
