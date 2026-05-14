@@ -3,6 +3,7 @@ import ConstructorActions from "../components/ConstructorActions";
 import ConstructorProgress from "../components/ConstructorProgress";
 import ConstructorSummary from "../components/ConstructorSummary";
 import ConstructorViewer from "../components/ConstructorViewer";
+import MobileConstructorBar from "../components/MobileConstructorBar";
 import SizePanel from "../components/SizePanel";
 import { useCabinetStore } from "../../store/cabinetStore";
 import "../styles/constructor-v2.css";
@@ -28,6 +29,7 @@ export default function ConstructorLayout() {
   } = useCabinetStore();
 
   const activeSection = config.sections.find((section) => section.id === activeSectionId) || config.sections[0];
+  const price = result?.price?.total || 0;
 
   useEffect(() => {
     if (!activeSectionId && config.sections[0]?.id) {
@@ -74,35 +76,42 @@ export default function ConstructorLayout() {
   }
 
   return (
-    <section className="rv2-shell">
-      <ConstructorActions />
+    <>
+      <section className="rv2-shell">
+        <ConstructorActions />
 
-      <ConstructorProgress />
+        <ConstructorProgress />
 
-      <div className="rv2-grid">
-        <SizePanel
-          dimensions={config.dimensions}
-          sections={config.sections}
-          onUpdateDimension={updateDimensions}
-          onSetSectionCount={setSectionCount}
-        />
+        <div className="rv2-grid">
+          <SizePanel
+            dimensions={config.dimensions}
+            sections={config.sections}
+            onUpdateDimension={updateDimensions}
+            onSetSectionCount={setSectionCount}
+          />
 
-        <ConstructorViewer
-          config={config}
-          activeSectionId={activeSection?.id}
-          onSelectSection={setActiveSectionId}
-          onAddShelf={addShelf}
-          onAddDrawer={addDrawer}
-          onToggleRail={toggleRail}
-          onClearSection={clearActiveSection}
-        />
+          <ConstructorViewer
+            config={config}
+            activeSectionId={activeSection?.id}
+            onSelectSection={setActiveSectionId}
+            onAddShelf={addShelf}
+            onAddDrawer={addDrawer}
+            onToggleRail={toggleRail}
+            onClearSection={clearActiveSection}
+          />
 
-        <ConstructorSummary
-          config={config}
-          result={result}
-          validation={validation}
-        />
-      </div>
-    </section>
+          <ConstructorSummary
+            config={config}
+            result={result}
+            validation={validation}
+          />
+        </div>
+      </section>
+
+      <MobileConstructorBar
+        price={price}
+        dimensions={config.dimensions}
+      />
+    </>
   );
 }
