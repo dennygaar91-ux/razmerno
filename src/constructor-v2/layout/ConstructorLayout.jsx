@@ -3,28 +3,11 @@ import "../styles/constructor-v2.css";
 export default function ConstructorLayout() {
   return (
     <section className="rv2-shell">
-      <div className="rv2-hero">
-        <div>
-          <span className="rv2-eyebrow">Онлайн-конструктор</span>
-          <h1>Соберите шкаф под свой размер</h1>
-          <p>
-            Задайте габариты, выберите наполнение и материалы. Цена рассчитывается сразу,
-            а мы подготовим комплект для сборки.
-          </p>
-
-          <div className="rv2-meta">
-            <span>3 шага</span>
-            <span>цена сразу</span>
-            <span>комплект для сборки</span>
-          </div>
-        </div>
-
-        <div className="rv2-actions">
-          <button type="button">Загрузить</button>
-          <button type="button">Очистить</button>
-          <button type="button">Сохранить</button>
-          <button type="button" className="is-dark">В корзину</button>
-        </div>
+      <div className="rv2-actions rv2-actions-top">
+        <button type="button">Загрузить</button>
+        <button type="button">Очистить</button>
+        <button type="button">Сохранить</button>
+        <button type="button" className="is-dark">В корзину</button>
       </div>
 
       <div className="rv2-progress">
