@@ -5,41 +5,22 @@ const STEP_META = {
     number: "01",
     title: "Размеры",
     shortTitle: "Размеры",
-    description: "Введите ширину, высоту, глубину и количество секций. Конструктор сразу перестроит модель.",
-    hint: "Начните с внешних габаритов шкафа. Значения ограничены безопасным диапазоном.",
-    tips: [
-      "Ширина: 200–3600 мм",
-      "Высота: 200–2800 мм",
-      "Глубина: 200–900 мм",
-      "Секции: 1–6",
-      "После ввода значение автоматически приводится к допустимому диапазону",
-    ],
+    description: "Задайте габариты и количество секций.",
+    hint: "Начните с ширины, высоты и глубины. Модель перестроится автоматически.",
   },
   fill: {
     number: "02",
     title: "Наполнение",
     shortTitle: "Наполнение",
-    description: "Выберите секцию и добавьте полки, ящики или штангу. Можно использовать готовые пресеты.",
+    description: "Добавьте полки, ящики или штангу.",
     hint: "Кликните по секции на модели или выберите её в мини-карте.",
-    tips: [
-      "Полки — для хранения вещей и коробок",
-      "Ящики — для белья и мелких предметов",
-      "Штанга — для одежды на плечиках",
-      "Пустые секции подсвечиваются в проверке проекта",
-    ],
   },
   materials: {
     number: "03",
     title: "Материалы",
     shortTitle: "Материалы",
-    description: "Выберите корпус, фасады и фурнитуру. На следующем этапе подключим цены из прайс-листа.",
-    hint: "Обычному клиенту показываем только понятные варианты, экспертные параметры скрываем ниже.",
-    tips: [
-      "Корпус — основной цвет внутри шкафа",
-      "Фасады — внешний вид шкафа",
-      "Фурнитура влияет на комфорт открывания",
-      "Цены из прайс-листа подключим отдельным модулем",
-    ],
+    description: "Выберите корпус, фасады и фурнитуру.",
+    hint: "Показываем только понятные варианты. Производственные параметры остаются ниже.",
   },
 };
 
@@ -50,9 +31,10 @@ export default function ConstructorProgressPanel({ activeStep, onStepChange, con
   const current = STEP_META[activeStep] || STEP_META.size;
   const sectionCount = config?.sections?.length || 0;
   const formattedPrice = Number(price || 0).toLocaleString("ru-RU");
+  const fillCount = totals.shelves + totals.drawers + totals.rails;
 
   return (
-    <section className="cp-progress-panel" aria-label="Шаги конструктора">
+    <section className="cp-progress-panel cp-progress-panel--wizard" aria-label="Шаги конструктора">
       <div className="cp-progress-copy">
         <span>Шаг {activeIndex + 1} из {STEPS.length}</span>
         <h2>{current.title}</h2>
@@ -71,6 +53,7 @@ export default function ConstructorProgressPanel({ activeStep, onStepChange, con
               type="button"
               className={`${isActive ? "active" : ""} ${isDone ? "done" : ""}`}
               onClick={() => onStepChange(step)}
+              aria-current={isActive ? "step" : undefined}
             >
               <i>{isDone ? "✓" : meta.number}</i>
               <span>{meta.shortTitle}</span>
@@ -79,9 +62,9 @@ export default function ConstructorProgressPanel({ activeStep, onStepChange, con
         })}
       </div>
 
-      <div className="cp-progress-facts">
+      <div className="cp-progress-facts" aria-label="Краткая сводка проекта">
         <div>
-          <span>Габариты</span>
+          <span>Размер</span>
           <strong>{config.dimensions.width}×{config.dimensions.height}×{config.dimensions.depth}</strong>
         </div>
         <div>
@@ -89,19 +72,13 @@ export default function ConstructorProgressPanel({ activeStep, onStepChange, con
           <strong>{sectionCount}</strong>
         </div>
         <div>
-          <span>Наполнение</span>
-          <strong>{totals.shelves + totals.drawers + totals.rails}</strong>
+          <span>Элементы</span>
+          <strong>{fillCount}</strong>
         </div>
         <div>
-          <span>Итого</span>
+          <span>Цена</span>
           <strong>{formattedPrice} ₽</strong>
         </div>
-      </div>
-
-      <div className="cp-progress-tips" aria-label="Подсказки по текущему шагу">
-        {current.tips.map((tip) => (
-          <span key={tip}>{tip}</span>
-        ))}
       </div>
 
       <p className="cp-progress-hint">{current.hint}</p>
