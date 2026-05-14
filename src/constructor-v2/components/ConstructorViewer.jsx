@@ -1,3 +1,5 @@
+import "../styles/constructor-v2-viewer.css";
+
 export default function ConstructorViewer() {
   return (
     <div className="rv2-viewer">
