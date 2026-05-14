@@ -1,0 +1,258 @@
+/* Central viewer premium UX polish */
+
+.cp-viewer-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.96), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(247, 246, 242, 0.76));
+  border: 1px solid rgba(10, 10, 10, 0.055);
+  box-shadow: 0 24px 70px rgba(10, 10, 10, 0.07);
+}
+
+.cp-viewer-card::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  pointer-events: none;
+}
+
+.cp-viewer-toolbar-simple {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(10, 10, 10, 0.055);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+}
+
+.cp-viewer-title span {
+  font-size: 9px;
+  color: rgba(10, 10, 10, 0.38);
+}
+
+.cp-viewer-title strong {
+  max-width: 310px;
+  font-size: 11px;
+  color: rgba(10, 10, 10, 0.62);
+}
+
+.cp-viewer-actions {
+  gap: 5px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(247, 246, 242, 0.82);
+  border: 1px solid rgba(10, 10, 10, 0.045);
+}
+
+.cp-viewer-actions button {
+  min-width: 34px;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(10, 10, 10, 0.54);
+  font-size: 10px;
+  box-shadow: none;
+}
+
+.cp-viewer-actions button:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: none;
+}
+
+.cp-viewer-actions button.active {
+  background: #0a0a0a;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(10, 10, 10, 0.14);
+}
+
+.cp-viewer-stage {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(255, 255, 255, 0.58), transparent 39%),
+    linear-gradient(180deg, rgba(243, 240, 232, 0.48), rgba(255, 255, 255, 0.62));
+  border: 1px solid rgba(10, 10, 10, 0.045);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+.cp-viewer-stage::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 18px;
+  border: 1px dashed rgba(10, 10, 10, 0.055);
+  pointer-events: none;
+  opacity: 0.66;
+}
+
+.cp-viewer-stage::after {
+  content: "LIVE PREVIEW";
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.82);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.cp-viewer-tools {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(140px, 0.9fr);
+  align-items: stretch;
+  gap: 9px;
+  background: rgba(255, 255, 255, 0.62);
+  border-color: rgba(10, 10, 10, 0.045);
+  backdrop-filter: blur(14px);
+}
+
+.cp-quick-actions {
+  align-content: start;
+  gap: 6px;
+  padding-top: 24px;
+}
+
+.cp-quick-actions::before {
+  font-size: 8px;
+  color: rgba(10, 10, 10, 0.38);
+}
+
+.cp-quick-actions button {
+  min-height: 34px;
+  padding: 0 11px;
+  border-radius: 999px;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(10, 10, 10, 0.06);
+  color: rgba(10, 10, 10, 0.64);
+  box-shadow: none;
+}
+
+.cp-quick-actions button:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.cp-quick-actions button:first-child,
+.cp-quick-actions button:nth-child(2) {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.cp-quick-actions button:first-child:hover,
+.cp-quick-actions button:nth-child(2):hover {
+  background: #ef5b2a;
+  border-color: #ef5b2a;
+}
+
+.cp-quick-actions button:last-child {
+  background: transparent;
+  border-style: dashed;
+}
+
+.cp-mini-map {
+  align-self: stretch;
+  gap: 5px;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgba(247, 246, 242, 0.72);
+}
+
+.cp-mini-map button {
+  min-height: 36px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: none;
+}
+
+.cp-mini-map button:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.cp-mini-map button span {
+  font-size: 9px;
+}
+
+.cp-mini-map button i {
+  height: 5px;
+}
+
+.cp-viewer-footer {
+  position: relative;
+  z-index: 2;
+  gap: 8px;
+  padding-top: 9px;
+}
+
+.cp-viewer-footer .cp-fill-counter {
+  min-height: 42px;
+  padding: 6px 8px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(10, 10, 10, 0.045);
+}
+
+.cp-viewer-footer .cp-fill-counter > span {
+  font-size: 10px;
+  color: rgba(10, 10, 10, 0.46);
+}
+
+.cp-viewer-footer .cp-fill-counter div {
+  grid-template-columns: 30px minmax(44px, 1fr) 30px;
+}
+
+.cp-viewer-footer .cp-fill-counter button,
+.cp-viewer-footer .cp-fill-counter b {
+  height: 30px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+
+@media (max-width: 760px) {
+  .cp-viewer-toolbar-simple,
+  .cp-viewer-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-viewer-actions {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: 16px;
+  }
+
+  .cp-viewer-actions button {
+    min-width: 42px;
+  }
+
+  .cp-viewer-stage::after {
+    top: 14px;
+    right: 14px;
+    height: 24px;
+    font-size: 8px;
+  }
+
+  .cp-quick-actions {
+    padding-top: 0;
+  }
+}
