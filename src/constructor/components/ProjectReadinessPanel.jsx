@@ -1,3 +1,5 @@
+import "../../styles/constructor-readiness.css";
+
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
 }
