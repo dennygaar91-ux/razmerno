@@ -40,6 +40,7 @@ import "../styles/constructor-mobile-polish.css";
 import "../styles/constructor-final-ui-cleanup.css";
 import "../styles/constructor-step-intro-polish.css";
 import "../styles/constructor-fill-preset-visuals.css";
+import "../styles/constructor-section-minimap.css";
 
 export default function ConstructorPageNew() {
   const navigate = useNavigate();
@@ -371,10 +372,24 @@ export default function ConstructorPageNew() {
               <div className="cp-mini-map" style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(34px, 1fr))` }}>
                 {config.sections.map((section, index) => {
                   const isActive = section.id === activeSection?.id;
-                  const isEmpty = getItemCount(section, "shelf") + getItemCount(section, "drawer") + getItemCount(section, "hanger_rail") === 0;
+                  const shelves = getItemCount(section, "shelf");
+                  const drawers = getItemCount(section, "drawer");
+                  const rails = getItemCount(section, "hanger_rail");
+                  const isEmpty = shelves + drawers + rails === 0;
+                  const sectionLabel = isEmpty
+                    ? "Пусто"
+                    : [shelves ? `${shelves}П` : "", drawers ? `${drawers}Я` : "", rails ? "Ш" : ""].filter(Boolean).join(" · ");
+
                   return (
-                    <button key={section.id} type="button" className={`${isActive ? "active" : ""} ${isEmpty ? "empty" : ""}`} onClick={() => selectSection(section.id)}>
+                    <button
+                      key={section.id}
+                      type="button"
+                      className={`${isActive ? "active" : ""} ${isEmpty ? "empty" : ""} ${shelves ? "has-shelves" : ""} ${drawers ? "has-drawers" : ""} ${rails ? "has-rail" : ""}`}
+                      onClick={() => selectSection(section.id)}
+                      aria-label={`Секция ${index + 1}: ${sectionLabel}`}
+                    >
                       <span>{index + 1}</span>
+                      <em>{sectionLabel}</em>
                       <i />
                     </button>
                   );
