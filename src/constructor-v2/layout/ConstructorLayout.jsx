@@ -1,40 +1,15 @@
+import ConstructorActions from "../components/ConstructorActions";
+import ConstructorProgress from "../components/ConstructorProgress";
+import ConstructorSummary from "../components/ConstructorSummary";
+import ConstructorViewer from "../components/ConstructorViewer";
 import "../styles/constructor-v2.css";
 
 export default function ConstructorLayout() {
   return (
     <section className="rv2-shell">
-      <div className="rv2-actions rv2-actions-top">
-        <button type="button">Загрузить</button>
-        <button type="button">Очистить</button>
-        <button type="button">Сохранить</button>
-        <button type="button" className="is-dark">В корзину</button>
-      </div>
+      <ConstructorActions />
 
-      <div className="rv2-progress">
-        <button type="button" className="active">
-          <b>1</b>
-          <div>
-            <strong>Размеры</strong>
-            <span>Укажите габариты и секции</span>
-          </div>
-        </button>
-
-        <button type="button">
-          <b>2</b>
-          <div>
-            <strong>Наполнение</strong>
-            <span>Полки, ящики и штанги</span>
-          </div>
-        </button>
-
-        <button type="button">
-          <b>3</b>
-          <div>
-            <strong>Материалы</strong>
-            <span>Декоры и фурнитура</span>
-          </div>
-        </button>
-      </div>
+      <ConstructorProgress />
 
       <div className="rv2-grid">
         <aside className="rv2-sidebar">
@@ -44,37 +19,9 @@ export default function ConstructorLayout() {
           </div>
         </aside>
 
-        <div className="rv2-viewer">
-          <div className="rv2-viewer-toolbar">
-            <div className="rv2-tabs">
-              <button className="active">3D</button>
-              <button>2D</button>
-            </div>
+        <ConstructorViewer />
 
-            <div className="rv2-scale">
-              <button>-</button>
-              <strong>100%</strong>
-              <button>+</button>
-            </div>
-          </div>
-
-          <div className="rv2-stage">
-            <div className="rv2-cabinet-placeholder" />
-          </div>
-        </div>
-
-        <aside className="rv2-summary">
-          <div className="rv2-summary-top">
-            <span>Ваш проект</span>
-            <h3>Шкаф почти готов</h3>
-            <p>Осталось выбрать материалы и добавить проект в корзину.</p>
-          </div>
-
-          <div className="rv2-price-card">
-            <span>Стоимость комплекта</span>
-            <strong>15 447 ₽</strong>
-          </div>
-        </aside>
+        <ConstructorSummary />
       </div>
     </section>
   );
