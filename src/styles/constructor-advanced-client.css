@@ -1,0 +1,129 @@
+/* Client-friendly additional settings panel */
+
+.cp-advanced {
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(10, 10, 10, 0.06);
+}
+
+.cp-advanced-head {
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.cp-advanced-head div {
+  display: grid;
+  gap: 5px;
+}
+
+.cp-advanced-head span {
+  width: fit-content;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.055);
+  color: rgba(10, 10, 10, 0.46);
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.cp-advanced-head strong {
+  color: rgba(10, 10, 10, 0.88);
+  font-size: 14px;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: -0.035em;
+}
+
+.cp-advanced-head small {
+  max-width: 230px;
+  color: rgba(10, 10, 10, 0.52);
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.cp-advanced-list {
+  gap: 7px;
+}
+
+.cp-advanced-item {
+  min-height: 72px;
+  padding: 10px;
+  border-radius: 15px;
+  border: 1px solid rgba(10, 10, 10, 0.052);
+  background: rgba(247, 246, 242, 0.52);
+}
+
+.cp-advanced-item.is-control {
+  cursor: pointer;
+}
+
+.cp-advanced-item.is-control:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.cp-advanced-item.active {
+  border-color: rgba(239, 91, 42, 0.2);
+  background: rgba(255, 247, 243, 0.78);
+}
+
+.cp-advanced-item div {
+  gap: 4px;
+}
+
+.cp-advanced-item span {
+  color: rgba(10, 10, 10, 0.42);
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cp-advanced-item strong {
+  color: rgba(10, 10, 10, 0.84);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: -0.025em;
+}
+
+.cp-advanced-item p {
+  max-width: 210px;
+  color: rgba(10, 10, 10, 0.52);
+  font-size: 9px;
+  font-weight: 730;
+  line-height: 1.3;
+}
+
+.cp-advanced-item em {
+  min-width: 64px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: -0.01em;
+}
+
+.cp-advanced-item em.is-on {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.cp-advanced-item em.is-off {
+  background: rgba(10, 10, 10, 0.055);
+  color: rgba(10, 10, 10, 0.44);
+}
+
+.cp-advanced-item em.is-draft {
+  background: rgba(10, 10, 10, 0.055);
+  color: rgba(10, 10, 10, 0.36);
+}
+
+@media (max-width: 760px) {
+  .cp-advanced-head small,
+  .cp-advanced-item p {
+    max-width: none;
+  }
+}
