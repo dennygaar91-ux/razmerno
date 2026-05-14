@@ -35,6 +35,7 @@ import "../styles/constructor-summary-compact.css";
 import "../styles/constructor-viewer-premium.css";
 import "../styles/constructor-actions-toast.css";
 import "../styles/constructor-progress-wizard.css";
+import "../styles/constructor-material-drawer-premium.css";
 
 export default function ConstructorPageNew() {
   const navigate = useNavigate();
