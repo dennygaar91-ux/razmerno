@@ -25,7 +25,9 @@ export const defaultCabinetConfig: CabinetConfig = {
 
   options: {
     hardwareBrand: "Hettich",
-    hasLegs: true
+    hasLegs: true,
+    hasBackPanel: true,
+    wallMount: true
   },
 
   sections: [
