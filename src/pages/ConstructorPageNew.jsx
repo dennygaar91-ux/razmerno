@@ -9,6 +9,7 @@ import MaterialDrawer from "../constructor/components/MaterialDrawer";
 import MaterialStep from "../constructor/components/MaterialStep";
 import SizeStep from "../constructor/components/SizeStep";
 import SummaryPanel from "../constructor/components/SummaryPanel";
+import { clamp, getItemCount } from "../constructor/utils/constructorUiUtils";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
   bodyMaterialOptions,
@@ -34,14 +35,6 @@ const FILL_PRESETS = [
   { id: "drawers", label: "Ящики снизу", desc: "3 ящика + 2 полки", shelves: 2, drawers: 3, rails: 0 },
   { id: "mixed", label: "Комбо", desc: "полки, ящики, штанга", shelves: 2, drawers: 2, rails: 1 },
 ];
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function getItemCount(section, type) {
-  return section?.items?.find((item) => item.type === type)?.count || 0;
-}
 
 export default function ConstructorPageNew() {
   const navigate = useNavigate();
