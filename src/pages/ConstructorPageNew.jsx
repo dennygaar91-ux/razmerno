@@ -7,6 +7,7 @@ import FillCounter from "../constructor/components/FillCounter";
 import FillStep from "../constructor/components/FillStep";
 import MaterialDrawer from "../constructor/components/MaterialDrawer";
 import MaterialStep from "../constructor/components/MaterialStep";
+import SizeStep from "../constructor/components/SizeStep";
 import SummaryPanel from "../constructor/components/SummaryPanel";
 import { useCabinetStore } from "../store/cabinetStore";
 import {
@@ -144,6 +145,10 @@ export default function ConstructorPageNew() {
     setDraft((prev) => ({ ...prev, [key]: String(next) }));
   }
 
+  function updateDraftValue(key, value) {
+    setDraft((prev) => ({ ...prev, [key]: value }));
+  }
+
   function setSectionCount(nextCount) {
     const safeCount = clamp(nextCount, 1, 6);
     if (safeCount === sectionCount) return;
@@ -251,70 +256,19 @@ export default function ConstructorPageNew() {
             </div>
 
             {activeStep === "size" && (
-              <div className="cp-card">
-                <div className="cp-card-head">
-                  <span>01</span>
-                  <h2>Размеры и секции</h2>
-                </div>
-
-                <div className="cp-dimensions">
-                  {Object.keys(DIMENSION_LIMITS).map((key) => {
-                    const item = DIMENSION_LIMITS[key];
-                    return (
-                      <div className="cp-dimension" key={key}>
-                        <div>
-                          <strong>{item.label}, мм</strong>
-                          <small>{item.min}–{item.max}</small>
-                        </div>
-                        <div className="cp-counter">
-                          <button type="button" onClick={() => stepDimension(key, -1)}>−</button>
-                          <input
-                            type="number"
-                            value={draft[key]}
-                            onChange={(event) => setDraft((prev) => ({ ...prev, [key]: event.target.value }))}
-                            onBlur={(event) => commitDimension(key, event.target.value)}
-                            onKeyDown={(event) => {
-                              if (event.key === "Enter") event.currentTarget.blur();
-                            }}
-                          />
-                          <button type="button" onClick={() => stepDimension(key, 1)}>+</button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="cp-section-count">
-                  <div>
-                    <strong>Количество секций</strong>
-                    <small>от 1 до 6, ширина распределяется автоматически</small>
-                  </div>
-                  <div className="cp-counter compact">
-                    <button type="button" onClick={() => setSectionCount(sectionCount - 1)}>−</button>
-                    <span>{sectionCount}</span>
-                    <button type="button" onClick={() => setSectionCount(sectionCount + 1)}>+</button>
-                  </div>
-                </div>
-
-                <div className="cp-section-widths">
-                  <div className="cp-section-widths-head">
-                    <strong>Секции шкафа</strong>
-                    <small>сейчас ширина распределяется автоматически</small>
-                  </div>
-                  <div className="cp-section-width-grid" style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(44px, 1fr))` }}>
-                    {config.sections.map((section, index) => {
-                      const isActive = section.id === activeSection?.id;
-                      return (
-                        <button key={section.id} type="button" className={isActive ? "active" : ""} onClick={() => selectSection(section.id)}>
-                          <span>{index + 1}</span>
-                          <b>{autoSectionWidth} мм</b>
-                          <i />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+              <SizeStep
+                dimensionLimits={DIMENSION_LIMITS}
+                draft={draft}
+                sectionCount={sectionCount}
+                autoSectionWidth={autoSectionWidth}
+                sections={config.sections}
+                activeSectionId={activeSection?.id}
+                onDraftChange={updateDraftValue}
+                onCommitDimension={commitDimension}
+                onStepDimension={stepDimension}
+                onSetSectionCount={setSectionCount}
+                onSelectSection={selectSection}
+              />
             )}
 
             {activeStep === "fill" && activeSection && (
