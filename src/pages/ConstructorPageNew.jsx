@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header/Header";
 import PremiumCabinetViewer from "../constructor/PremiumCabinetViewer";
 import AdvancedSettingsPanel from "../constructor/components/AdvancedSettingsPanel";
+import ConstructorProgressPanel from "../constructor/components/ConstructorProgressPanel";
 import ProjectKitPanel from "../constructor/components/ProjectKitPanel";
 import ProjectReadinessPanel from "../constructor/components/ProjectReadinessPanel";
 import { useCabinetStore } from "../store/cabinetStore";
@@ -216,6 +217,14 @@ export default function ConstructorPageNew() {
             <button type="button" className="primary" onClick={() => navigate("/account/order")}>В корзину</button>
           </div>
         </section>
+
+        <ConstructorProgressPanel
+          activeStep={activeStep}
+          onStepChange={setActiveStep}
+          config={config}
+          totals={totals}
+          price={price}
+        />
 
         <section className="cp-workspace">
           <aside className="cp-config">
