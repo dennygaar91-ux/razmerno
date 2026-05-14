@@ -1,3 +1,27 @@
+.cp-workspace {
+  align-items: start;
+}
+
+.cp-config,
+.cp-summary {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.cp-config::-webkit-scrollbar,
+.cp-summary::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cp-config::-webkit-scrollbar-thumb,
+.cp-summary::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.16);
+}
+
 .cp-viewer-stage {
   position: relative;
   isolation: isolate;
@@ -50,8 +74,18 @@
 .cp-section-width-grid button,
 .cp-presets button,
 .cp-counter button,
-.cp-fill-counter button {
+.cp-fill-counter button,
+.cp-material-select,
+.cp-toggles button,
+.cp-handle-options button {
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.cp-card:focus-within,
+.cp-summary:focus-within,
+.cp-viewer-card:focus-within {
+  border-color: rgba(232, 97, 44, 0.22);
+  box-shadow: 0 24px 74px rgba(10, 10, 10, 0.08), 0 0 0 4px rgba(232, 97, 44, 0.08);
 }
 
 .cp-viewer-card:hover {
@@ -68,7 +102,10 @@
 .cp-viewer-toolbar button:hover,
 .cp-mini-map button:hover,
 .cp-section-width-grid button:hover,
-.cp-presets button:hover {
+.cp-presets button:hover,
+.cp-material-select:hover,
+.cp-toggles button:hover,
+.cp-handle-options button:hover {
   transform: translateY(-1px);
   border-color: rgba(10, 10, 10, 0.18);
   box-shadow: 0 12px 28px rgba(10, 10, 10, 0.07);
@@ -78,12 +115,16 @@
 .cp-viewer-toolbar button:active,
 .cp-mini-map button:active,
 .cp-section-width-grid button:active,
-.cp-presets button:active {
+.cp-presets button:active,
+.cp-material-select:active,
+.cp-toggles button:active,
+.cp-handle-options button:active {
   transform: translateY(0) scale(0.985);
 }
 
 .cp-section-width-grid button.active,
-.cp-mini-map button.active {
+.cp-mini-map button.active,
+.cp-section-tabs button.active {
   animation: cp-active-section-pulse 0.32s ease both;
 }
 
@@ -108,6 +149,28 @@
 .cp-hero-actions button.primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 32px rgba(232, 97, 44, 0.18);
+}
+
+.cp-summary-list div:hover {
+  background: rgba(10, 10, 10, 0.035);
+}
+
+.cp-notice {
+  animation: cp-notice-in 0.24s ease both;
+}
+
+@keyframes cp-notice-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1100px) {
+  .cp-config,
+  .cp-summary {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 @media (max-width: 760px) {
