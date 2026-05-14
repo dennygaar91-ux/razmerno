@@ -19,49 +19,38 @@ export default function SummaryPanel({
 }) {
   const hasIssues = validation.length > 0;
   const totalFill = totals.shelves + totals.drawers + totals.rails;
+  const dimensionsText = `${config.dimensions.width}×${config.dimensions.height}×${config.dimensions.depth}`;
 
   return (
-    <aside className={`cp-summary ${pricePulse ? "is-price-updated" : ""}`}>
+    <aside className={`cp-summary cp-summary-target ${pricePulse ? "is-price-updated" : ""}`}>
       <div className="cp-summary-hero">
         <span className="cp-eyebrow">Ваш проект</span>
         <h3>{hasIssues ? "Нужно проверить" : "Шкаф почти готов"}</h3>
         <p>
           {hasIssues
             ? "Проверьте подсказки ниже — после исправления проект можно будет отправить в заказ."
-            : "Мы уже посчитали комплект. Осталось сохранить проект или перейти к оформлению."}
+            : "Комплект рассчитан. Можно сохранить проект или перейти к оформлению."}
         </p>
       </div>
 
       <div className="cp-summary-price-block">
         <span>Стоимость комплекта</span>
         <strong>{price.toLocaleString("ru-RU")} ₽</strong>
-        <small>Предварительно, по текущим размерам и наполнению</small>
+        <small>Предварительная цена по текущей конфигурации</small>
       </div>
 
-      <div className="cp-summary-list">
+      <div className="cp-summary-strip" aria-label="Краткая сводка">
         <div>
-          <span>Габариты</span>
-          <b>{config.dimensions.width}×{config.dimensions.height}×{config.dimensions.depth}</b>
+          <span>Размер</span>
+          <b>{dimensionsText}</b>
         </div>
         <div>
           <span>Секции</span>
           <b>{sectionCount}</b>
         </div>
         <div>
-          <span>Наполнение</span>
+          <span>Элементы</span>
           <b>{totalFill}</b>
-        </div>
-        <div>
-          <span>Полки</span>
-          <b>{totals.shelves}</b>
-        </div>
-        <div>
-          <span>Ящики</span>
-          <b>{totals.drawers}</b>
-        </div>
-        <div>
-          <span>Штанги</span>
-          <b>{totals.rails}</b>
         </div>
       </div>
 
@@ -71,9 +60,11 @@ export default function SummaryPanel({
 
       {notice ? <p className="cp-notice">{notice}</p> : null}
 
-      <button type="button" className="cp-primary" onClick={onOrder}>Оформить заказ</button>
-      <button type="button" onClick={onSaveDraft}>Сохранить проект</button>
-      <button type="button" onClick={onExport}>Получить чертежи</button>
+      <div className="cp-summary-actions">
+        <button type="button" className="cp-primary" onClick={onOrder}>Оформить заказ</button>
+        <button type="button" onClick={onSaveDraft}>Сохранить</button>
+        <button type="button" onClick={onExport}>Чертежи</button>
+      </div>
     </aside>
   );
 }
