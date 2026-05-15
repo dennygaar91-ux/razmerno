@@ -9,6 +9,9 @@ import MobileConstructorBar from "../components/MobileConstructorBar";
 import SizePanel from "../components/SizePanel";
 import { useCabinetStore } from "../../store/cabinetStore";
 import "../styles/constructor-v2.css";
+import "../styles/constructor-v2-camera-parallax.css";
+import "../styles/constructor-v2-material-light.css";
+import "../styles/constructor-v2-idle-motion.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
