@@ -6,6 +6,7 @@ import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
 import { calculatePrice, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
+import { buildConstructorPayload } from '../utils/constructorPayload'
 import './ConstructorPage.css'
 import './ConstructorWizard.css'
 import './ConstructorReference.css'
@@ -36,6 +37,7 @@ export default function ConstructorPage() {
   const price = useMemo(() => calculatePrice(project, summary), [project, summary])
   const warnings = useMemo(() => getWarnings(project, summary), [project, summary])
   const projectWithPrice = useMemo(() => ({ ...project, price, priceBreakdown }), [project, price, priceBreakdown])
+  const orderPayload = useMemo(() => buildConstructorPayload(projectWithPrice, summary), [projectWithPrice, summary])
 
   function goNext() {
     if (!canGoNext) {
@@ -231,7 +233,7 @@ export default function ConstructorPage() {
         <ConstructorSummary project={projectWithPrice} summary={summary} warnings={warnings} onCheckout={() => setCheckoutOpen(true)} />
       </section>
 
-      <CheckoutDrawer open={checkoutOpen} project={projectWithPrice} summary={summary} onClose={() => setCheckoutOpen(false)} />
+      <CheckoutDrawer open={checkoutOpen} project={projectWithPrice} summary={summary} orderPayload={orderPayload} onClose={() => setCheckoutOpen(false)} />
     </main>
   )
 }
