@@ -1,0 +1,92 @@
+.rp-clear-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.rp-clear-confirm__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, .42);
+  backdrop-filter: blur(8px);
+}
+
+.rp-clear-confirm__card {
+  position: relative;
+  z-index: 2;
+  width: min(420px, calc(100vw - 48px));
+  padding: 24px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, .42);
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 24px 70px rgba(10, 10, 10, .22);
+}
+
+.rp-clear-confirm__card > span {
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(180, 35, 24, .08);
+  color: #b42318;
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.rp-clear-confirm__card h2 {
+  margin: 14px 0 0;
+  color: #111;
+  font-family: var(--fh, inherit);
+  font-size: 28px;
+  line-height: 1.04;
+  font-weight: 950;
+  letter-spacing: -.06em;
+}
+
+.rp-clear-confirm__card p {
+  margin: 12px 0 0;
+  color: #70706b;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 650;
+}
+
+.rp-clear-confirm__card div {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rp-clear-confirm__card button {
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 10, 10, .1);
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.rp-clear-confirm__card button.is-danger {
+  border-color: #b42318;
+  background: #b42318;
+  color: #fff;
+}
+
+@media (max-width: 1380px) {
+  .rp-clear-confirm__card {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .rp-clear-confirm__card h2 {
+    font-size: 24px;
+  }
+}
