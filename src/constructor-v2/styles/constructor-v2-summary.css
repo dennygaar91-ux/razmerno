@@ -1,17 +1,34 @@
 .rv2-summary {
-  gap: 16px;
+  gap: 18px;
   min-height: 720px;
-  box-shadow: 0 24px 70px rgba(15,15,15,0.05);
+  padding: 8px;
+  border-radius: 36px;
+  background: rgba(255,255,255,0.62);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0 30px 80px rgba(15,15,15,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.72);
 }
 
 .rv2-summary-top {
   position: relative;
   overflow: hidden;
-  padding: 24px;
-  border-radius: 28px;
+  padding: 28px;
+  border-radius: 30px;
   background:
     radial-gradient(circle at 92% 10%, rgba(239,91,42,0.16), transparent 30%),
     linear-gradient(180deg, rgba(255,247,242,0.96) 0%, rgba(255,250,247,0.94) 100%);
+}
+
+.rv2-summary-top::after {
+  content: "";
+  position: absolute;
+  inset: auto -40px -60px auto;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: rgba(239,91,42,0.08);
+  filter: blur(10px);
 }
 
 .rv2-summary-top span {
@@ -25,25 +42,43 @@
 }
 
 .rv2-summary-top h3 {
-  max-width: 220px;
-  margin: 0 0 12px;
-  font-size: 36px;
-  line-height: .92;
+  position: relative;
+  z-index: 2;
+  max-width: 240px;
+  margin: 0 0 14px;
+  font-size: 40px;
+  line-height: .9;
   letter-spacing: -.08em;
 }
 
 .rv2-summary-top p {
-  max-width: 250px;
+  position: relative;
+  z-index: 2;
+  max-width: 260px;
   margin: 0;
   color: rgba(15,15,15,.58);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .rv2-price-card {
-  padding: 24px;
-  border-radius: 28px;
-  border: 1px solid rgba(15,15,15,.06);
-  background: #fff;
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+  border-radius: 30px;
+  border: 1px solid rgba(15,15,15,.05);
+  background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(250,248,245,0.94) 100%);
+  box-shadow: 0 18px 40px rgba(15,15,15,.05);
+}
+
+.rv2-price-card::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -20px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(37,149,71,0.08);
 }
 
 .rv2-price-card span,
@@ -60,19 +95,21 @@
 }
 
 .rv2-price-card strong {
+  position: relative;
+  z-index: 2;
   display: block;
-  font-size: 52px;
-  line-height: .92;
-  letter-spacing: -.08em;
+  font-size: 60px;
+  line-height: .88;
+  letter-spacing: -.09em;
 }
 
 .rv2-facts {
   display: grid;
-  gap: 8px;
-  padding: 18px;
-  border-radius: 24px;
-  border: 1px solid rgba(15,15,15,.06);
-  background: #fff;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 26px;
+  border: 1px solid rgba(15,15,15,.05);
+  background: rgba(255,255,255,0.9);
 }
 
 .rv2-fact-row {
@@ -80,8 +117,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 48px;
+  padding: 0 4px;
   color: rgba(15,15,15,.62);
   font-size: 14px;
+  border-bottom: 1px solid rgba(15,15,15,.05);
+}
+
+.rv2-fact-row:last-child {
+  border-bottom: 0;
 }
 
 .rv2-fact-row b {
@@ -90,25 +134,26 @@
 
 .rv2-check-card,
 .rv2-kit-card {
-  padding: 20px;
-  border-radius: 24px;
-  border: 1px solid rgba(15,15,15,.06);
-  background: #fff;
+  padding: 22px;
+  border-radius: 26px;
+  border: 1px solid rgba(15,15,15,.05);
+  background: rgba(255,255,255,0.9);
 }
 
 .rv2-check-head {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .rv2-check-head strong {
   color: #259547;
+  font-size: 20px;
 }
 
 .rv2-progress-line {
-  height: 8px;
+  height: 10px;
   border-radius: 999px;
   background: rgba(15,15,15,.06);
   overflow: hidden;
@@ -119,25 +164,30 @@
   width: 92%;
   height: 100%;
   border-radius: inherit;
-  background: #259547;
+  background: linear-gradient(90deg, #259547 0%, #3ac264 100%);
 }
 
 .rv2-kit-grid {
   display: grid;
   grid-template-columns: repeat(3,minmax(0,1fr));
-  gap: 8px;
+  gap: 10px;
 }
 
 .rv2-kit-grid div {
-  min-height: 70px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(15,15,15,.03);
+  min-height: 84px;
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(15,15,15,.03) 0%, rgba(15,15,15,.015) 100%);
 }
 
 .rv2-kit-grid b {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+.rv2-kit-grid p {
+  font-size: 18px;
+  font-weight: 900;
 }
 
 .rv2-summary-actions {
@@ -148,35 +198,21 @@
 }
 
 .rv2-summary-actions button {
-  height: 52px;
-  border-radius: 18px;
+  height: 56px;
+  border-radius: 20px;
   border: 1px solid rgba(15,15,15,.08);
-  background: #fff;
-  font-weight: 800;
+  background: rgba(255,255,255,0.92);
+  font-weight: 900;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.rv2-summary-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(15,15,15,0.08);
 }
 
 .rv2-summary-actions .primary {
   background: #111;
   color: #fff;
-}
-
-@media (max-width: 1280px) {
-  .rv2-summary {
-    min-height: auto;
-  }
-
-  .rv2-summary-actions {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .rv2-price-card strong {
-    font-size: 40px;
-  }
-
-  .rv2-kit-grid,
-  .rv2-summary-actions {
-    grid-template-columns: 1fr;
-  }
+  box-shadow: 0 18px 30px rgba(15,15,15,0.16);
 }
