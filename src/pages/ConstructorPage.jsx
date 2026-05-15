@@ -5,7 +5,7 @@ import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
-import { calculatePrice, getProjectSummary, getWarnings } from '../utils/constructorPricing'
+import { calculatePrice, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import './ConstructorPage.css'
 import './ConstructorWizard.css'
 import './ConstructorReference.css'
@@ -32,9 +32,10 @@ export default function ConstructorPage() {
   const canGoNext = activeStepIndex < FLOW_STEPS.length - 1
 
   const summary = useMemo(() => getProjectSummary(project), [project])
+  const priceBreakdown = useMemo(() => getPriceBreakdown(project, summary), [project, summary])
   const price = useMemo(() => calculatePrice(project, summary), [project, summary])
   const warnings = useMemo(() => getWarnings(project, summary), [project, summary])
-  const projectWithPrice = useMemo(() => ({ ...project, price }), [project, price])
+  const projectWithPrice = useMemo(() => ({ ...project, price, priceBreakdown }), [project, price, priceBreakdown])
 
   function goNext() {
     if (!canGoNext) {
