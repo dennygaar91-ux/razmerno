@@ -4,6 +4,7 @@ import ConstructorProgress from "../components/ConstructorProgress";
 import ConstructorSummary from "../components/ConstructorSummary";
 import ConstructorViewer from "../components/ConstructorViewer";
 import FillPanel from "../components/FillPanel";
+import MaterialsPanel from "../components/MaterialsPanel";
 import MobileConstructorBar from "../components/MobileConstructorBar";
 import SizePanel from "../components/SizePanel";
 import { useCabinetStore } from "../../store/cabinetStore";
@@ -25,6 +26,11 @@ export default function ConstructorLayout() {
     addSection,
     removeSection,
     autoDistributeSections,
+    setBodyMaterial,
+    setFacadeMaterial,
+    setHardwareBrand,
+    toggleHandles,
+    toggleLegs,
     setSectionShelves,
     setSectionDrawers,
     setSectionHangerRails,
@@ -107,6 +113,17 @@ export default function ConstructorLayout() {
               onAddDrawer={addDrawer}
               onToggleRail={toggleRail}
               onClearSection={clearActiveSection}
+            />
+          ) : null}
+
+          {activeStep === "materials" ? (
+            <MaterialsPanel
+              config={config}
+              onSetBodyMaterial={setBodyMaterial}
+              onSetFacadeMaterial={setFacadeMaterial}
+              onSetHardwareBrand={setHardwareBrand}
+              onToggleHandles={toggleHandles}
+              onToggleLegs={toggleLegs}
             />
           ) : null}
 
