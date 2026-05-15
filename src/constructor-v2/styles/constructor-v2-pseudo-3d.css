@@ -1,10 +1,14 @@
 .rv2-stage {
   position: relative;
   overflow: hidden;
+  border-radius: 42px;
   background:
     radial-gradient(circle at top left, rgba(255,255,255,0.88) 0%, transparent 34%),
     radial-gradient(circle at top right, rgba(255,243,226,0.72) 0%, transparent 28%),
     linear-gradient(180deg, #f8f5f1 0%, #eee6dc 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.8),
+    inset 0 -80px 120px rgba(0,0,0,0.03);
 }
 
 .rv2-stage::before {
@@ -35,20 +39,32 @@
 
 .rv2-cabinet-shell {
   position: relative;
-  width: min(880px, 92%);
-  height: 560px;
-  margin: 42px auto 28px;
-  perspective: 1600px;
+  width: min(920px, 92%);
+  height: 580px;
+  margin: 34px auto 36px;
+  perspective: 1800px;
+  z-index: 3;
 }
 
 .rv2-cabinet-shell::before {
   content: "";
   position: absolute;
-  inset: -18px;
-  border-radius: 42px;
-  background: radial-gradient(circle at top, rgba(255,255,255,0.28), transparent 58%);
-  filter: blur(12px);
-  opacity: .8;
+  inset: -26px;
+  border-radius: 54px;
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,0.32), transparent 58%),
+    radial-gradient(circle at bottom, rgba(239,91,42,0.08), transparent 44%);
+  filter: blur(18px);
+  opacity: .9;
+  pointer-events: none;
+}
+
+.rv2-cabinet-shell::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 44px;
+  border: 1px solid rgba(255,255,255,0.28);
   pointer-events: none;
 }
 
@@ -99,7 +115,8 @@
   border: 10px solid rgba(120,94,67,0.18);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.18),
-    inset 0 -10px 18px rgba(0,0,0,0.04);
+    inset 0 -10px 18px rgba(0,0,0,0.04),
+    0 40px 80px rgba(15,15,15,0.08);
 }
 
 .rv2-cabinet-placeholder::before {
