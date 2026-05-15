@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Icon from '../../icons/Icon'
 
 function formatPrice(value) {
@@ -13,20 +14,20 @@ const breakdownLabels = {
 }
 
 export default function ConstructorSummary({ project, summary, warnings = [], estimateState = 'idle', onCheckout }) {
+  const [estimateOpen, setEstimateOpen] = useState(false)
+
   const projectRows = [
-    ['Размер (В × Ш × Г)', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
+    ['Размер', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
     ['Секции', `${project.sections} шт.`],
-    ['Наполнение', `${summary.elements} элементов`],
+    ['Наполнение', `${summary.shelves} полок · ${summary.drawers} ящиков · ${summary.rails} штанг`],
     ['Материал', project.material.body],
     ['Открывание', project.material.handles],
-    ['Кромка', project.material.edge],
   ]
 
   const kitItems = [
-    ['Корпус', '36 деталей'],
-    ['Полки', `${summary.shelves} шт.`],
-    ['Ящики', `${summary.drawers} шт.`],
-    ['Штанги', `${summary.rails} шт.`],
+    ['Корпус', 'детали'],
+    ['Распил', 'включён'],
+    ['Кромка', 'ПВХ 2 мм'],
     ['Фурнитура', project.material.handles],
   ]
 
@@ -34,35 +35,36 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
   const isCalculating = estimateState === 'loading'
   const hasEstimateError = estimateState === 'error'
   const breakdown = project.priceBreakdown ?? {}
+  const statusText = isCalculating ? 'Пересчитываем' : hasEstimateError ? 'Расчёт предварительный' : isReady ? 'Готов к оформлению' : 'Есть рекомендации'
+  const statusClass = isCalculating ? 'is-loading' : hasEstimateError ? 'has-error' : isReady ? 'is-ready' : 'has-warning'
 
   return (
-    <aside className="rp-ctor-summary rp-ref-summary rp-ref-summary--detailed">
-      <section className={`rp-ctor-card rp-ref-ready ${isCalculating ? 'is-loading' : ''} ${hasEstimateError ? 'has-error' : ''}`}>
-        <div>
-          <p>{isCalculating ? 'Пересчёт' : 'Ваш проект'}</p>
-          <h2>{isCalculating ? 'Обновляем смету' : isReady ? 'Шкаф почти готов' : 'Нужно проверить проект'}</h2>
-          <span>{isCalculating ? 'Стоимость и рекомендации обновляются после изменения параметров.' : hasEstimateError ? 'Показываем предварительный расчёт, backend недоступен.' : isReady ? 'Осталось выбрать материалы и добавить проект в корзину.' : warnings[0]}</span>
+    <aside className="rp-ctor-summary rp-ref-summary rp-ref-summary--product">
+      <section className={`rp-ctor-card rp-ref-price-card rp-ref-price-card--main ${statusClass}`}>
+        <div className="rp-ref-price-topline">
+          <span className="rp-ref-summary-status">{statusText}</span>
+          <Icon name={isReady ? 'check-circle' : 'clock'} size={18} />
         </div>
-        <Icon name={isCalculating ? 'clock' : isReady ? 'zap' : 'clock'} size={42} />
-      </section>
-
-      <section className={`rp-ctor-card rp-ref-price-card ${isCalculating ? 'is-loading' : ''}`}>
         <p>Стоимость комплекта</p>
         <strong>{formatPrice(project.price)} ₽</strong>
-        <span>{isCalculating ? 'Пересчитываем по текущим параметрам…' : 'Предварительно, по текущим размерам и наполнению'}</span>
+        <em>{isCalculating ? 'Обновляем смету после изменения параметров…' : 'Предварительно, финально подтвердит технолог'}</em>
+        <button className="rp-ref-summary-cta" type="button" onClick={onCheckout}>В корзину</button>
       </section>
 
-      <section className="rp-ctor-card rp-ref-breakdown-card">
-        <h3>Смета</h3>
-        {Object.entries(breakdown).map(([key, value]) => (
-          <div key={key}>
-            <span>{breakdownLabels[key] ?? key}</span>
-            <b>{formatPrice(value)} ₽</b>
-          </div>
-        ))}
+      <section className={`rp-ctor-card rp-ref-check-card ${statusClass}`}>
+        <div>
+          <h3>Проверка проекта</h3>
+          <span>{isCalculating ? 'Идёт пересчёт' : isReady ? 'Без критичных замечаний' : `${warnings.length} рекомендац.`}</span>
+        </div>
+        <div className="rp-ref-progress"><i style={{ width: isCalculating ? '52%' : isReady ? '92%' : '68%' }} /></div>
+        <p>{isCalculating ? 'Проверяем конструкцию' : isReady ? 'Можно переходить к оформлению' : warnings[0]} <b>{isCalculating ? '...' : isReady ? '92%' : '68%'}</b></p>
       </section>
 
-      <section className="rp-ctor-card rp-ref-project-card">
+      <section className="rp-ctor-card rp-ref-project-card rp-ref-project-card--compact">
+        <div className="rp-ref-card-head">
+          <h3>Параметры</h3>
+          <span>{summary.elements} элементов</span>
+        </div>
         {projectRows.map(([label, value]) => (
           <div key={label}>
             <span>{label}</span>
@@ -71,21 +73,12 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         ))}
       </section>
 
-      <section className={`rp-ctor-card rp-ref-check-card ${isReady ? 'is-ready' : 'has-warning'} ${isCalculating ? 'is-loading' : ''}`}>
-        <div>
-          <h3>Проверка</h3>
-          <span>{isCalculating ? 'Пересчитываем' : isReady ? 'Можно оформлять' : 'Есть рекомендации'}</span>
-        </div>
-        <div className="rp-ref-progress"><i style={{ width: isCalculating ? '52%' : isReady ? '92%' : '68%' }} /></div>
-        <p>{isCalculating ? 'Проверяем конструкцию и стоимость' : isReady ? 'Конструкция надёжна и готова к сборке' : 'Проверьте рекомендации перед оформлением'} <b>{isCalculating ? '...' : isReady ? '92%' : '68%'}</b></p>
-      </section>
-
-      <section className="rp-ctor-card rp-ref-kit-card">
+      <section className="rp-ctor-card rp-ref-kit-card rp-ref-kit-card--product">
         <div className="rp-ref-kit-head">
-          <h3>Комплект</h3>
-          <button type="button">Подробнее</button>
+          <h3>Что входит</h3>
+          <button type="button" onClick={() => setEstimateOpen(open => !open)}>{estimateOpen ? 'Скрыть смету' : 'Смета'}</button>
         </div>
-        <div className="rp-ref-kit-items">
+        <div className="rp-ref-kit-items rp-ref-kit-items--product">
           {kitItems.map(([title, text]) => (
             <div key={title}>
               <i />
@@ -96,14 +89,24 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         </div>
       </section>
 
-      <section className="rp-ctor-card rp-ref-additional-card">
+      {estimateOpen && (
+        <section className="rp-ctor-card rp-ref-breakdown-card rp-ref-breakdown-card--open">
+          <h3>Смета</h3>
+          {Object.entries(breakdown).map(([key, value]) => (
+            <div key={key}>
+              <span>{breakdownLabels[key] ?? key}</span>
+              <b>{formatPrice(value)} ₽</b>
+            </div>
+          ))}
+        </section>
+      )}
+
+      <section className="rp-ctor-card rp-ref-additional-card rp-ref-additional-card--product">
         <h3>Дополнительно</h3>
         <div><span>Задняя стенка</span><em>Рекомендуем</em><b /></div>
         <div><span>{project.material.edge}</span><em>Включена</em><b /></div>
         <div><span>Крепление к стене</span><em>Рекомендуем</em><b /></div>
       </section>
-
-      <button className="rp-ref-summary-cta" type="button" onClick={onCheckout}>В корзину</button>
     </aside>
   )
 }
