@@ -33,6 +33,10 @@
   color: #fff;
 }
 
+.rp-checkout__hero-total--structured {
+  background: linear-gradient(180deg, #0a0a0a, #1a1a17);
+}
+
 .rp-checkout__hero-total span {
   color: rgba(255, 255, 255, .62);
   font-size: 12px;
@@ -133,6 +137,16 @@
   min-height: 76px;
 }
 
+.rp-checkout__fields--delivery {
+  margin-top: 10px;
+  grid-template-columns: 1fr 96px 96px;
+}
+
+.rp-checkout__fields--delivery label:first-child,
+.rp-checkout__fields--delivery label:last-child {
+  grid-column: 1 / -1;
+}
+
 .rp-checkout__option-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -141,6 +155,10 @@
 
 .rp-checkout__option-grid + .rp-checkout__option-grid {
   margin-top: 8px;
+}
+
+.rp-checkout__option-grid--delivery {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .rp-checkout__option-grid button {
@@ -178,6 +196,33 @@
 
 .rp-checkout__option-grid--pay button.is-active span {
   color: rgba(255, 255, 255, .68);
+}
+
+.rp-checkout__agreement {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(10, 10, 10, .08);
+  background: #fff;
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  align-items: start;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+.rp-checkout__agreement input {
+  width: 18px;
+  height: 18px;
+  accent-color: #0a0a0a;
+}
+
+.rp-checkout__agreement.has-error {
+  border-color: rgba(180, 35, 24, .35);
+  background: rgba(180, 35, 24, .05);
 }
 
 .rp-checkout__success {
@@ -275,7 +320,38 @@
     padding: 14px;
   }
 
+  .rp-checkout__option-grid--delivery,
+  .rp-checkout__fields--delivery {
+    grid-template-columns: 1fr;
+  }
+
   .rp-checkout__success {
     min-height: 460px;
+  }
+}
+
+@media (max-height: 820px) and (min-width: 1181px) {
+  .rp-checkout__head--polished {
+    padding: 18px 22px 12px;
+  }
+
+  .rp-checkout__body--polished {
+    padding: 12px 22px;
+  }
+
+  .rp-checkout__hero-total {
+    padding: 16px;
+  }
+
+  .rp-checkout__step {
+    padding: 12px;
+  }
+
+  .rp-checkout__step-head {
+    margin-bottom: 10px;
+  }
+
+  .rp-checkout__option-grid button {
+    min-height: 50px;
   }
 }
