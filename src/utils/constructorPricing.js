@@ -65,6 +65,50 @@ export function getPriceBreakdown(project, summary) {
   }
 }
 
+export function getEstimateRows(project, summary, breakdown) {
+  const volumeFactor = (project.dimensions.height * project.dimensions.width * project.dimensions.depth) / (2400 * 1800 * 600)
+  const materialFactor = project.material.priceFactor ?? 1
+  const handleAdd = project.material.handlePriceAdd ?? 0
+
+  return [
+    {
+      key: 'material',
+      title: 'ЛДСП и детали корпуса',
+      value: breakdown.material ?? 0,
+      hint: `${project.material.body}, ${project.material.thickness} · ${project.sections} секц. · ${summary.shelves} полок`,
+      formula: `база × ${volumeFactor.toFixed(2)} × ${materialFactor.toFixed(2)}`,
+    },
+    {
+      key: 'cutting',
+      title: 'Распил',
+      value: breakdown.cutting ?? 0,
+      hint: 'Подготовка деталей под самостоятельную сборку',
+      formula: `фикс + ${project.sections} секц.`,
+    },
+    {
+      key: 'edging',
+      title: 'Кромление',
+      value: breakdown.edging ?? 0,
+      hint: project.material.edge,
+      formula: `${summary.shelves} полок · ${summary.drawers} ящиков`,
+    },
+    {
+      key: 'hardware',
+      title: 'Фурнитура',
+      value: breakdown.hardware ?? 0,
+      hint: `${summary.drawers} ящиков · ${summary.rails} штанг · ${project.material.handles}`,
+      formula: handleAdd ? `включая надбавку ${roundMoney(handleAdd).toLocaleString('ru-RU')} ₽` : 'базовый комплект',
+    },
+    {
+      key: 'packaging',
+      title: 'Упаковка',
+      value: breakdown.packaging ?? 0,
+      hint: 'Комплектуем детали, кромку и фурнитуру',
+      formula: 'фиксированная услуга MVP',
+    },
+  ]
+}
+
 export function calculatePrice(project, summary) {
   const breakdown = getPriceBreakdown(project, summary)
   const total = Object.values(breakdown).reduce((sum, value) => sum + value, 0)
