@@ -9,8 +9,9 @@ function formatSection(section) {
   return parts.length ? parts.join(' · ') : 'Пусто'
 }
 
-export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle }) {
+export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection }) {
   const activeSection = project.filling[project.activeSection - 1]
+  const railDisabled = project.dimensions.depth < 520
 
   return (
     <section className="rp-ctor-card rp-ctor-viewer rp-ref-viewer" aria-label="Предпросмотр шкафа">
@@ -40,8 +41,8 @@ export default function ConstructorViewer({ project, onSectionSelect, onSectionP
       <div className="rp-ref-quick-actions">
         <button type="button" onClick={() => onSectionPartChange('shelves', 1)}><Icon name="plus" size={16} />Полка</button>
         <button type="button" onClick={() => onSectionPartChange('drawers', 1)}><Icon name="plus" size={16} />Ящик</button>
-        <button className={activeSection.rail ? 'is-active' : ''} type="button" onClick={onRailToggle}><span className="rp-ref-rail-icon" />Штанга</button>
-        <button type="button" onClick={() => {}}><Icon name="x" size={15} />Очистить</button>
+        <button className={activeSection.rail ? 'is-active' : ''} type="button" disabled={railDisabled} onClick={onRailToggle}><span className="rp-ref-rail-icon" />Штанга</button>
+        <button type="button" onClick={onClearSection}><Icon name="x" size={15} />Очистить</button>
       </div>
 
       <div className="rp-ref-section-map">
