@@ -6,6 +6,7 @@ import ConstructorBenefits from '../components/constructor/ConstructorBenefits'
 import './ConstructorPage.css'
 import './ConstructorPageHeader.css'
 
+// Constructor page is intentionally assembled without the old left rail.
 export default function ConstructorPage() {
   return (
     <>
