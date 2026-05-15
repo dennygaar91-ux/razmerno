@@ -1,4 +1,8 @@
-export default function CheckoutDrawer({ open, onClose }) {
+function formatPrice(value) {
+  return new Intl.NumberFormat('ru-RU').format(value)
+}
+
+export default function CheckoutDrawer({ open, project, summary, onClose }) {
   if (!open) return null
 
   return (
@@ -17,7 +21,7 @@ export default function CheckoutDrawer({ open, onClose }) {
         <div className="rp-checkout__body">
           <section className="rp-checkout__card rp-checkout__total">
             <span>К оплате после подтверждения</span>
-            <strong>24 350 ₽</strong>
+            <strong>{formatPrice(project.price)} ₽</strong>
             <p>Финальная стоимость будет подтверждена после проверки проекта технологом.</p>
           </section>
 
@@ -25,8 +29,9 @@ export default function CheckoutDrawer({ open, onClose }) {
             <h3>Состав заказа</h3>
             <dl className="rp-checkout__summary">
               <div><dt>Изделие</dt><dd>Шкаф корпусный</dd></div>
-              <div><dt>Размеры</dt><dd>2400 × 1800 × 600 мм</dd></div>
-              <div><dt>Материал</dt><dd>ЛДСП 16 мм, Дуб Сонома</dd></div>
+              <div><dt>Размеры</dt><dd>{project.dimensions.height} × {project.dimensions.width} × {project.dimensions.depth} мм</dd></div>
+              <div><dt>Материал</dt><dd>{project.material.body}, {project.material.thickness}</dd></div>
+              <div><dt>Наполнение</dt><dd>{summary.shelves} полок, {summary.drawers} ящика, {summary.rails} штанга</dd></div>
               <div><dt>Срок</dt><dd>10–14 дней</dd></div>
               <div><dt>Доставка</dt><dd>от 6000 ₽ по Москве</dd></div>
             </dl>
