@@ -15,6 +15,7 @@ import "../styles/constructor-v2-idle-motion.css";
 import "../styles/constructor-v2-fill-presets.css";
 import "../styles/constructor-v2-section-editing.css";
 import "../styles/constructor-v2-smart-counters.css";
+import "../styles/constructor-v2-visual-fill-editor.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
