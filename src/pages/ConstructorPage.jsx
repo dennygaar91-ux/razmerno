@@ -7,6 +7,7 @@ import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
 import { calculatePrice, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
+import { clearConstructorProject, loadConstructorProject, saveConstructorProject } from '../utils/constructorStorage'
 import './ConstructorPage.css'
 import './ConstructorWizard.css'
 import './ConstructorReference.css'
@@ -26,6 +27,7 @@ export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [activeStep, setActiveStep] = useState('dimensions')
   const [project, setProject] = useState(DEFAULT_PROJECT)
+  const [notice, setNotice] = useState('')
 
   const activeStepIndex = FLOW_STEPS.findIndex(step => step.id === activeStep)
 
@@ -38,6 +40,11 @@ export default function ConstructorPage() {
   const warnings = useMemo(() => getWarnings(project, summary), [project, summary])
   const projectWithPrice = useMemo(() => ({ ...project, price, priceBreakdown }), [project, price, priceBreakdown])
   const orderPayload = useMemo(() => buildConstructorPayload(projectWithPrice, summary), [projectWithPrice, summary])
+
+  function showNotice(message) {
+    setNotice(message)
+    window.setTimeout(() => setNotice(''), 2200)
+  }
 
   function goNext() {
     if (!canGoNext) {
@@ -167,12 +174,32 @@ export default function ConstructorPage() {
   }
 
   function resetProject() {
+    clearConstructorProject()
     setProject(DEFAULT_PROJECT)
     setActiveStep('dimensions')
+    showNotice('Проект очищен')
+  }
+
+  function saveProject() {
+    const saved = saveConstructorProject(project)
+    showNotice(saved ? 'Проект сохранён на этом устройстве' : 'Не удалось сохранить проект')
+  }
+
+  function loadProject() {
+    const savedProject = loadConstructorProject()
+    if (!savedProject) {
+      showNotice('Сохранённый проект не найден')
+      return
+    }
+
+    setProject(savedProject)
+    setActiveStep('dimensions')
+    showNotice('Проект загружен')
   }
 
   return (
     <main className="rp-ctor-page rp-ctor-page--reference">
+      {notice && <div className="rp-ctor-notice" role="status">{notice}</div>}
       <section className="rp-ctor-hero">
         <div>
           <p className="rp-ctor-kicker">онлайн-конструктор</p>
@@ -186,9 +213,9 @@ export default function ConstructorPage() {
         </div>
 
         <div className="rp-ctor-actions">
-          <button type="button"><Icon name="download" size={16} />Загрузить</button>
+          <button type="button" onClick={loadProject}><Icon name="download" size={16} />Загрузить</button>
           <button type="button" onClick={resetProject}><Icon name="x" size={16} />Очистить</button>
-          <button type="button"><Icon name="file-check" size={16} />Сохранить</button>
+          <button type="button" onClick={saveProject}><Icon name="file-check" size={16} />Сохранить</button>
           <button className="is-primary" type="button" onClick={() => setCheckoutOpen(true)}><Icon name="orders" size={17} />В корзину</button>
         </div>
       </section>
