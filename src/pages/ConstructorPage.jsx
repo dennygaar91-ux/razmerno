@@ -7,8 +7,9 @@ import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
 import { getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
-import { clearConstructorProject, loadConstructorProject, saveConstructorProject } from '../utils/constructorStorage'
+import { clearConstructorProject, saveConstructorProject } from '../utils/constructorStorage'
 import { calculateConstructorEstimate } from '../services/constructorEstimate'
+import { loadConstructorProjectRemote, saveConstructorProjectRemote } from '../services/constructorProjects'
 import './ConstructorPage.css'
 import './ConstructorWizard.css'
 import './ConstructorReference.css'
@@ -39,6 +40,8 @@ export default function ConstructorPage() {
   const [notice, setNotice] = useState('')
   const [estimate, setEstimate] = useState(null)
   const [estimateState, setEstimateState] = useState('idle')
+  const [remoteProjectId, setRemoteProjectId] = useState('')
+  const [projectSyncState, setProjectSyncState] = useState('idle')
 
   const activeStepIndex = FLOW_STEPS.findIndex(step => step.id === activeStep)
 
@@ -227,24 +230,50 @@ export default function ConstructorPage() {
     setProject(DEFAULT_PROJECT)
     setActiveStep('dimensions')
     setEstimate(null)
+    setRemoteProjectId('')
+    setProjectSyncState('idle')
     showNotice('Проект очищен')
   }
 
-  function saveProject() {
-    const saved = saveConstructorProject(project)
-    showNotice(saved ? 'Проект сохранён на этом устройстве' : 'Не удалось сохранить проект')
+  async function saveProject() {
+    try {
+      setProjectSyncState('saving')
+      saveConstructorProject(project)
+      const result = await saveConstructorProjectRemote(project)
+
+      if (!result?.ok) {
+        throw new Error(result?.message ?? 'Project save failed')
+      }
+
+      setRemoteProjectId(result.projectId ?? '')
+      setProjectSyncState('saved')
+      showNotice(result.projectId ? `Проект сохранён: ${result.projectId}` : 'Проект сохранён')
+    } catch (error) {
+      console.warn('Project save failed:', error)
+      setProjectSyncState('error')
+      showNotice('Не удалось сохранить проект')
+    }
   }
 
-  function loadProject() {
-    const savedProject = loadConstructorProject()
-    if (!savedProject) {
-      showNotice('Сохранённый проект не найден')
-      return
-    }
+  async function loadProject() {
+    try {
+      setProjectSyncState('loading')
+      const result = await loadConstructorProjectRemote(remoteProjectId || 'local')
 
-    setProject(savedProject)
-    setActiveStep('dimensions')
-    showNotice('Проект загружен')
+      if (!result?.ok || !result.project) {
+        throw new Error(result?.message ?? 'Project not found')
+      }
+
+      setProject(result.project)
+      setRemoteProjectId(result.projectId ?? remoteProjectId)
+      setActiveStep('dimensions')
+      setProjectSyncState('loaded')
+      showNotice(result.projectId ? `Проект загружен: ${result.projectId}` : 'Проект загружен')
+    } catch (error) {
+      console.warn('Project load failed:', error)
+      setProjectSyncState('error')
+      showNotice('Сохранённый проект не найден')
+    }
   }
 
   return (
@@ -258,14 +287,14 @@ export default function ConstructorPage() {
           <div className="rp-ctor-badges">
             <span>3 шага</span>
             <span>цена сразу</span>
-            <span>{estimateState === 'loading' ? 'пересчитываем' : 'комплект для сборки'}</span>
+            <span>{estimateState === 'loading' ? 'пересчитываем' : projectSyncState === 'saving' ? 'сохраняем' : 'комплект для сборки'}</span>
           </div>
         </div>
 
         <div className="rp-ctor-actions">
-          <button type="button" onClick={loadProject}><Icon name="download" size={16} />Загрузить</button>
+          <button type="button" disabled={projectSyncState === 'loading'} onClick={loadProject}><Icon name="download" size={16} />{projectSyncState === 'loading' ? 'Загрузка' : 'Загрузить'}</button>
           <button type="button" onClick={resetProject}><Icon name="x" size={16} />Очистить</button>
-          <button type="button" onClick={saveProject}><Icon name="file-check" size={16} />Сохранить</button>
+          <button type="button" disabled={projectSyncState === 'saving'} onClick={saveProject}><Icon name="file-check" size={16} />{projectSyncState === 'saving' ? 'Сохранение' : 'Сохранить'}</button>
           <button className="is-primary" type="button" onClick={() => setCheckoutOpen(true)}><Icon name="orders" size={17} />В корзину</button>
         </div>
       </section>
