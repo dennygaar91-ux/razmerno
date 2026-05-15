@@ -2,6 +2,7 @@ import SectionFillPreview from "./SectionFillPreview";
 import "../styles/constructor-v2-viewer.css";
 import "../styles/constructor-v2-viewer-tools.css";
 import "../styles/constructor-v2-fill-preview.css";
+import "../styles/constructor-v2-material-live-preview.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
@@ -33,6 +34,18 @@ function getSectionSubtitle(section) {
   return "Добавьте наполнение";
 }
 
+function getMaterialClass(materialId) {
+  if (materialId?.includes("oak")) return "material-oak";
+  if (materialId?.includes("mdf")) return "material-mdf-white";
+  return "material-egger-white";
+}
+
+function getMaterialTitle(materialId) {
+  if (materialId?.includes("oak")) return "Kronospan Oak";
+  if (materialId?.includes("mdf")) return "МДФ белый";
+  return "Egger W980";
+}
+
 export default function ConstructorViewer({
   config,
   activeSectionId,
@@ -44,6 +57,8 @@ export default function ConstructorViewer({
 }) {
   const sections = config.sections;
   const dimensions = config.dimensions;
+  const bodyMaterial = config.materials.bodyMaterialId;
+  const materialClass = getMaterialClass(bodyMaterial);
 
   return (
     <div className="rv2-viewer">
@@ -61,10 +76,18 @@ export default function ConstructorViewer({
       </div>
 
       <div className="rv2-stage">
+        <div className={`rv2-material-preview-chip ${materialClass}`}>
+          <i />
+          {getMaterialTitle(bodyMaterial)}
+        </div>
+
         <div className="rv2-dimension-label rv2-dimension-height">{dimensions.height} мм</div>
         <div className="rv2-dimension-label rv2-dimension-width">{dimensions.width} мм</div>
 
-        <div className="rv2-cabinet-placeholder" style={{ gridTemplateColumns: sections.map((section) => `${section.width}fr`).join(" ") }}>
+        <div
+          className={`rv2-cabinet-placeholder ${materialClass}`}
+          style={{ gridTemplateColumns: sections.map((section) => `${section.width}fr`).join(" ") }}
+        >
           {sections.map((section, index) => {
             const isActive = section.id === activeSectionId;
 
