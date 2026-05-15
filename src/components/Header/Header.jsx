@@ -53,6 +53,12 @@ export default function Header() {
     setCityOpen(false)
   }
 
+  function isActiveLink(href) {
+    if (href === '/constructor') return location.pathname.startsWith('/constructor')
+    if (href === '/' || href.startsWith('/#')) return location.pathname === '/' && href === '/'
+    return location.pathname === href
+  }
+
   return (
     <>
       <header className={`hdr${scrolled ? ' scrolled' : ''}`}>
@@ -62,7 +68,7 @@ export default function Header() {
           {/* Desktop nav */}
           <nav className="dnav">
             {NAV_LINKS.map(l => (
-              <a key={l.href} href={l.href}>{l.label}</a>
+              <a key={l.href} href={l.href} className={isActiveLink(l.href) ? 'active' : undefined}>{l.label}</a>
             ))}
           </nav>
 
@@ -112,7 +118,7 @@ export default function Header() {
       {/* Mobile nav */}
       <div className={`mnav${menuOpen ? ' open' : ''}`}>
         {NAV_LINKS.map(l => (
-          <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}>{l.label}</a>
+          <a key={l.href} href={l.href} className={isActiveLink(l.href) ? 'active' : undefined} onClick={() => setMenuOpen(false)}>{l.label}</a>
         ))}
         <div className="mnav__foot">
           <Link to="/auth"        className="btn btn-pr" onClick={() => setMenuOpen(false)}>Личный кабинет</Link>
