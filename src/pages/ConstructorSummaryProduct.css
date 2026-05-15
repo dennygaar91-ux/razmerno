@@ -1,4 +1,5 @@
 @import './ConstructorConfigPolish.css';
+@import './ConstructorViewerPolish.css';
 
 .rp-ref-summary--product {
   grid-template-rows: 188px 92px 162px 112px auto 104px;
