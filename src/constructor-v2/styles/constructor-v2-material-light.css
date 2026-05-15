@@ -1,0 +1,59 @@
+.rv2-cabinet-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.16) 0%, transparent 26%),
+    linear-gradient(180deg, transparent 58%, rgba(0,0,0,0.05) 100%),
+    radial-gradient(circle at 22% 10%, rgba(255,255,255,0.12), transparent 28%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: .92;
+}
+
+.rv2-stage:hover .rv2-cabinet-placeholder::after {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.22) 0%, transparent 30%),
+    linear-gradient(180deg, transparent 54%, rgba(0,0,0,0.06) 100%),
+    radial-gradient(circle at 28% 12%, rgba(255,255,255,0.16), transparent 30%);
+}
+
+.rv2-facade-panel {
+  overflow: hidden;
+}
+
+.rv2-facade-panel::before {
+  backdrop-filter: blur(1px);
+}
+
+.rv2-facade-panel::marker {
+  display: none;
+}
+
+.rv2-facade-panel::selection {
+  background: transparent;
+}
+
+.rv2-facade-panel > * {
+  position: relative;
+  z-index: 2;
+}
+
+.rv2-facade-panel::after {
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.14),
+    0 0 12px rgba(255,255,255,0.08);
+}
+
+.rv2-facade-panel:hover {
+  filter: brightness(1.04) saturate(1.02);
+}
+
+.rv2-facade-panel.active {
+  filter: brightness(1.08) saturate(1.04);
+}
+
+.rv2-stage:hover .rv2-cabinet-back {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(0,0,0,0.05) 100%);
+}
