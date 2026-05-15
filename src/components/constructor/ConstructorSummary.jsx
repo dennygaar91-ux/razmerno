@@ -1,16 +1,25 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Icon from '../../icons/Icon'
+import { getEstimateRows } from '../../utils/constructorPricing'
 
 function formatPrice(value) {
   return new Intl.NumberFormat('ru-RU').format(value)
 }
 
-const breakdownLabels = {
-  material: 'Материалы и детали',
-  cutting: 'Распил',
-  edging: 'Кромление',
-  hardware: 'Фурнитура',
-  packaging: 'Упаковка',
+function EstimateRow({ row, total }) {
+  const percent = total > 0 ? Math.round((row.value / total) * 100) : 0
+
+  return (
+    <div className="rp-ref-estimate-row">
+      <div className="rp-ref-estimate-row__top">
+        <span>{row.title}</span>
+        <b>{formatPrice(row.value)} ₽</b>
+      </div>
+      <p>{row.hint}</p>
+      <div className="rp-ref-estimate-row__bar"><i style={{ width: `${Math.max(6, percent)}%` }} /></div>
+      <small>{row.formula}</small>
+    </div>
+  )
 }
 
 export default function ConstructorSummary({ project, summary, warnings = [], estimateState = 'idle', onCheckout }) {
@@ -27,7 +36,7 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
   const kitItems = [
     ['Корпус', 'детали'],
     ['Распил', 'включён'],
-    ['Кромка', 'ПВХ 2 мм'],
+    ['Кромка', project.material.edge],
     ['Фурнитура', project.material.handles],
   ]
 
@@ -35,6 +44,8 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
   const isCalculating = estimateState === 'loading'
   const hasEstimateError = estimateState === 'error'
   const breakdown = project.priceBreakdown ?? {}
+  const estimateRows = useMemo(() => getEstimateRows(project, summary, breakdown), [project, summary, breakdown])
+  const estimateTotal = estimateRows.reduce((sum, row) => sum + row.value, 0)
   const statusText = isCalculating ? 'Пересчитываем' : hasEstimateError ? 'Расчёт предварительный' : isReady ? 'Готов к оформлению' : 'Есть рекомендации'
   const statusClass = isCalculating ? 'is-loading' : hasEstimateError ? 'has-error' : isReady ? 'is-ready' : 'has-warning'
 
@@ -90,14 +101,13 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
       </section>
 
       {estimateOpen && (
-        <section className="rp-ctor-card rp-ref-breakdown-card rp-ref-breakdown-card--open">
-          <h3>Смета</h3>
-          {Object.entries(breakdown).map(([key, value]) => (
-            <div key={key}>
-              <span>{breakdownLabels[key] ?? key}</span>
-              <b>{formatPrice(value)} ₽</b>
-            </div>
-          ))}
+        <section className="rp-ctor-card rp-ref-breakdown-card rp-ref-breakdown-card--open rp-ref-breakdown-card--detailed">
+          <div className="rp-ref-breakdown-card__head">
+            <h3>Предварительная смета</h3>
+            <span>{formatPrice(estimateTotal)} ₽</span>
+          </div>
+          <p className="rp-ref-breakdown-note">Сейчас это frontend-оценка. Backend позже будет считать по актуальным ценам материалов, фурнитуры и работ.</p>
+          {estimateRows.map(row => <EstimateRow key={row.key} row={row} total={estimateTotal} />)}
         </section>
       )}
 
