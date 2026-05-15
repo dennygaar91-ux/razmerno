@@ -1,3 +1,7 @@
+function roundMoney(value) {
+  return Math.round(value / 10) * 10
+}
+
 export function getProjectSummary(project) {
   const shelves = project.filling.reduce((total, section) => total + section.shelves, 0)
   const drawers = project.filling.reduce((total, section) => total + section.drawers, 0)
@@ -11,19 +15,36 @@ export function getProjectSummary(project) {
   }
 }
 
-export function calculatePrice(project, summary) {
+export function getPriceBreakdown(project, summary) {
   const { height, width, depth } = project.dimensions
   const volumeFactor = (height * width * depth) / (2400 * 1800 * 600)
   const materialFactor = project.material.priceFactor ?? 1
   const handleAdd = project.material.handlePriceAdd ?? 0
 
-  const base = 11200 * volumeFactor * materialFactor
+  const materialBase = 11200 * volumeFactor * materialFactor
   const sections = project.sections * 620
   const shelves = summary.shelves * 420
   const drawers = summary.drawers * 1550
   const rails = summary.rails * 690
+  const cutting = 1800 + project.sections * 180
+  const edging = 1100 + summary.shelves * 90 + summary.drawers * 160
+  const hardware = drawers + rails + handleAdd
+  const packaging = 850
 
-  return Math.round((base + sections + shelves + drawers + rails + handleAdd) / 10) * 10
+  return {
+    material: roundMoney(materialBase + sections + shelves),
+    cutting: roundMoney(cutting),
+    edging: roundMoney(edging),
+    hardware: roundMoney(hardware),
+    packaging: roundMoney(packaging),
+  }
+}
+
+export function calculatePrice(project, summary) {
+  const breakdown = getPriceBreakdown(project, summary)
+  const total = Object.values(breakdown).reduce((sum, value) => sum + value, 0)
+
+  return roundMoney(total)
 }
 
 export function getWarnings(project, summary) {
