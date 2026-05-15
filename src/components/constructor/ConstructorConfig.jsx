@@ -28,7 +28,19 @@ function CounterField({ label, value, hint, onMinus, onPlus }) {
   )
 }
 
-function DimensionsStep({ project, onDimensionChange, onSectionsChange }) {
+function WarningList({ warnings }) {
+  if (!warnings?.length) return null
+
+  return (
+    <div className="rp-ref-warnings">
+      {warnings.map((warning) => (
+        <p key={warning}><Icon name="clock" size={14} />{warning}</p>
+      ))}
+    </div>
+  )
+}
+
+function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange }) {
   return (
     <>
       <div className="rp-ref-fields">
@@ -60,12 +72,15 @@ function DimensionsStep({ project, onDimensionChange, onSectionsChange }) {
           ))}
         </div>
       </div>
+
+      <WarningList warnings={warnings} />
     </>
   )
 }
 
-function FillingStep({ project, onSectionSelect, onSectionPartChange, onRailToggle }) {
+function FillingStep({ project, warnings, onSectionSelect, onSectionPartChange, onRailToggle }) {
   const activeSection = project.filling[project.activeSection - 1]
+  const railDisabled = project.dimensions.depth < 520
 
   return (
     <>
@@ -88,12 +103,14 @@ function FillingStep({ project, onSectionSelect, onSectionPartChange, onRailTogg
 
       <div className="rp-ref-block">
         <h3>Штанга</h3>
-        <p>Рекомендуемая глубина для одежды — от 520 мм</p>
-        <button className={`rp-ref-toggle-option ${activeSection.rail ? 'is-active' : ''}`} type="button" onClick={onRailToggle}>
+        <p>{railDisabled ? 'Недоступна: нужна глубина от 520 мм' : 'Рекомендуемая глубина для одежды — от 520 мм'}</p>
+        <button className={`rp-ref-toggle-option ${activeSection.rail ? 'is-active' : ''}`} type="button" disabled={railDisabled} onClick={onRailToggle}>
           <span>{activeSection.rail ? 'Штанга включена' : 'Добавить штангу'}</span>
           <b />
         </button>
       </div>
+
+      <WarningList warnings={warnings} />
     </>
   )
 }
@@ -133,6 +150,7 @@ function MaterialsStep({ project, onMaterialChange }) {
 export default function ConstructorConfig({
   activeStep,
   project,
+  warnings,
   canGoBack,
   canGoNext,
   onBack,
@@ -149,14 +167,14 @@ export default function ConstructorConfig({
       number: 1,
       title: 'Размеры и секции',
       text: 'Укажите габариты шкафа и количество секций. Конструктор сразу пересчитает проект.',
-      body: <DimensionsStep project={project} onDimensionChange={onDimensionChange} onSectionsChange={onSectionsChange} />,
+      body: <DimensionsStep project={project} warnings={warnings} onDimensionChange={onDimensionChange} onSectionsChange={onSectionsChange} />,
       next: 'Далее: наполнение',
     },
     filling: {
       number: 2,
       title: 'Наполнение',
       text: 'Настройте полки, ящики и штанги внутри выбранной секции.',
-      body: <FillingStep project={project} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} />,
+      body: <FillingStep project={project} warnings={warnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} />,
       next: 'Далее: материалы',
     },
     materials: {
