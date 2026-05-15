@@ -94,6 +94,12 @@
   font-weight: 900;
 }
 
+.rp-ref-toggle-option:disabled,
+.rp-ref-quick-actions button:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+}
+
 .rp-ref-toggle-option b {
   width: 34px;
   height: 18px;
@@ -215,4 +221,33 @@
   background: #0a0a0a;
   border-color: #0a0a0a;
   color: #fff;
+}
+
+.rp-ref-warnings {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.rp-ref-warnings p {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 97, 44, .22);
+  background: rgba(232, 97, 44, .07);
+  color: #8b3d1d;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+.rp-ref-check-card.has-warning span {
+  color: #d46b2c;
+}
+
+.rp-ref-check-card.has-warning .rp-ref-progress i {
+  background: #d46b2c;
 }
