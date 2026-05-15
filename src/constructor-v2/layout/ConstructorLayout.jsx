@@ -13,6 +13,7 @@ import "../styles/constructor-v2-camera-parallax.css";
 import "../styles/constructor-v2-material-light.css";
 import "../styles/constructor-v2-idle-motion.css";
 import "../styles/constructor-v2-fill-presets.css";
+import "../styles/constructor-v2-section-editing.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
