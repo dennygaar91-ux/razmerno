@@ -4,7 +4,7 @@ function formatPrice(value) {
   return new Intl.NumberFormat('ru-RU').format(value)
 }
 
-export default function ConstructorSummary({ project, summary, onCheckout }) {
+export default function ConstructorSummary({ project, summary, warnings = [], onCheckout }) {
   const projectRows = [
     ['Размер (В × Ш × Г)', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
     ['Секции', `${project.sections} шт.`],
@@ -22,15 +22,17 @@ export default function ConstructorSummary({ project, summary, onCheckout }) {
     ['Фурнитура', '1 компл.'],
   ]
 
+  const isReady = warnings.length === 0
+
   return (
     <aside className="rp-ctor-summary rp-ref-summary">
       <section className="rp-ctor-card rp-ref-ready">
         <div>
           <p>Ваш проект</p>
-          <h2>Шкаф почти готов</h2>
-          <span>Осталось выбрать материалы и добавить проект в корзину.</span>
+          <h2>{isReady ? 'Шкаф почти готов' : 'Нужно проверить проект'}</h2>
+          <span>{isReady ? 'Осталось выбрать материалы и добавить проект в корзину.' : warnings[0]}</span>
         </div>
-        <Icon name="zap" size={42} />
+        <Icon name={isReady ? 'zap' : 'clock'} size={42} />
       </section>
 
       <section className="rp-ctor-card rp-ref-price-card">
@@ -48,13 +50,13 @@ export default function ConstructorSummary({ project, summary, onCheckout }) {
         ))}
       </section>
 
-      <section className="rp-ctor-card rp-ref-check-card">
+      <section className={`rp-ctor-card rp-ref-check-card ${isReady ? 'is-ready' : 'has-warning'}`}>
         <div>
           <h3>Проверка</h3>
-          <span>Можно оформлять</span>
+          <span>{isReady ? 'Можно оформлять' : 'Есть рекомендации'}</span>
         </div>
-        <div className="rp-ref-progress"><i /></div>
-        <p>Конструкция надёжна и готова к сборке <b>92%</b></p>
+        <div className="rp-ref-progress"><i style={{ width: isReady ? '92%' : '68%' }} /></div>
+        <p>{isReady ? 'Конструкция надёжна и готова к сборке' : 'Проверьте рекомендации перед оформлением'} <b>{isReady ? '92%' : '68%'}</b></p>
       </section>
 
       <section className="rp-ctor-card rp-ref-kit-card">
