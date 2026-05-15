@@ -7,7 +7,8 @@ import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, EDGE_OPTIONS, HANDLE_OPTIONS, HARDWARE_OPTIONS } from '../data/constructorCatalog'
 import { getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
-import { clearConstructorProject, loadConstructorProjectId, loadConstructorProjectMeta, saveConstructorProject, saveConstructorProjectId } from '../utils/constructorStorage'
+import { normalizeConstructorProject } from '../utils/constructorProjectNormalize'
+import { clearConstructorProject, loadConstructorProject, loadConstructorProjectId, loadConstructorProjectMeta, saveConstructorProject, saveConstructorProjectId } from '../utils/constructorStorage'
 import { calculateConstructorEstimate } from '../services/constructorEstimate'
 import { loadConstructorProjectRemote, saveConstructorProjectRemote } from '../services/constructorProjects'
 import './ConstructorPage.css'
@@ -43,6 +44,10 @@ function formatProjectDate(value) {
   }
 }
 
+function getInitialProject() {
+  return normalizeConstructorProject(loadConstructorProject() ?? DEFAULT_PROJECT)
+}
+
 function getProjectStatus(syncState, meta) {
   if (syncState === 'saving') return { label: 'Сохраняем', tone: 'loading', text: 'Ручное сохранение проекта' }
   if (syncState === 'loading') return { label: 'Загружаем', tone: 'loading', text: 'Открываем последний проект' }
@@ -70,7 +75,7 @@ export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
   const [activeStep, setActiveStep] = useState('dimensions')
-  const [project, setProject] = useState(DEFAULT_PROJECT)
+  const [project, setProject] = useState(getInitialProject)
   const [notice, setNotice] = useState('')
   const [estimate, setEstimate] = useState(null)
   const [estimateState, setEstimateState] = useState('idle')
@@ -381,7 +386,7 @@ export default function ConstructorPage() {
   function resetProject() {
     suppressAutosaveRef.current = true
     clearConstructorProject()
-    setProject(DEFAULT_PROJECT)
+    setProject(normalizeConstructorProject(DEFAULT_PROJECT))
     setActiveStep('dimensions')
     setEstimate(null)
     setRemoteProjectId('')
@@ -425,7 +430,7 @@ export default function ConstructorPage() {
         throw new Error(result?.message ?? 'Project not found')
       }
 
-      setProject(result.project)
+      setProject(normalizeConstructorProject(result.project))
       const nextProjectId = result.projectId ?? savedProjectId
       setRemoteProjectId(nextProjectId)
       saveConstructorProjectId(nextProjectId)
