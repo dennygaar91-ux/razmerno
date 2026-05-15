@@ -7,7 +7,7 @@ import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
 import { getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
-import { clearConstructorProject, saveConstructorProject } from '../utils/constructorStorage'
+import { clearConstructorProject, loadConstructorProjectId, loadConstructorProjectMeta, saveConstructorProject, saveConstructorProjectId } from '../utils/constructorStorage'
 import { calculateConstructorEstimate } from '../services/constructorEstimate'
 import { loadConstructorProjectRemote, saveConstructorProjectRemote } from '../services/constructorProjects'
 import './ConstructorPage.css'
@@ -34,6 +34,15 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
 
+function formatProjectDate(value) {
+  if (!value) return ''
+  try {
+    return new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+  } catch {
+    return ''
+  }
+}
+
 export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [activeStep, setActiveStep] = useState('dimensions')
@@ -41,8 +50,9 @@ export default function ConstructorPage() {
   const [notice, setNotice] = useState('')
   const [estimate, setEstimate] = useState(null)
   const [estimateState, setEstimateState] = useState('idle')
-  const [remoteProjectId, setRemoteProjectId] = useState('')
+  const [remoteProjectId, setRemoteProjectId] = useState(() => loadConstructorProjectId())
   const [projectSyncState, setProjectSyncState] = useState('idle')
+  const [projectMeta, setProjectMeta] = useState(() => loadConstructorProjectMeta())
 
   const activeStepIndex = FLOW_STEPS.findIndex(step => step.id === activeStep)
 
@@ -60,6 +70,15 @@ export default function ConstructorPage() {
   const activeSectionWarnings = useMemo(() => getActiveSectionWarnings(project), [project])
   const projectWithPrice = useMemo(() => ({ ...project, price, priceBreakdown }), [project, price, priceBreakdown])
   const orderPayload = useMemo(() => buildConstructorPayload(projectWithPrice, summary), [projectWithPrice, summary])
+  const projectStatusText = projectSyncState === 'saving'
+    ? 'сохраняем'
+    : projectSyncState === 'loading'
+      ? 'загружаем'
+      : projectSyncState === 'saved'
+        ? 'сохранено'
+        : projectMeta?.updatedAt
+          ? `сохранено ${formatProjectDate(projectMeta.updatedAt)}`
+          : 'комплект для сборки'
 
   useEffect(() => {
     let isCancelled = false
@@ -194,7 +213,7 @@ export default function ConstructorPage() {
           ...current,
           material: {
             ...current.material,
-            body: material.title,
+            body: material.fullTitle ?? material.title,
             materialId: material.id,
             thickness: material.thickness,
             edge: material.edge,
@@ -232,6 +251,7 @@ export default function ConstructorPage() {
     setActiveStep('dimensions')
     setEstimate(null)
     setRemoteProjectId('')
+    setProjectMeta(null)
     setProjectSyncState('idle')
     showNotice('Проект очищен')
   }
@@ -240,15 +260,19 @@ export default function ConstructorPage() {
     try {
       setProjectSyncState('saving')
       saveConstructorProject(project)
+      setProjectMeta(loadConstructorProjectMeta())
       const result = await saveConstructorProjectRemote(project)
 
       if (!result?.ok) {
         throw new Error(result?.message ?? 'Project save failed')
       }
 
-      setRemoteProjectId(result.projectId ?? '')
+      const nextProjectId = result.projectId ?? ''
+      setRemoteProjectId(nextProjectId)
+      saveConstructorProjectId(nextProjectId)
+      setProjectMeta(loadConstructorProjectMeta())
       setProjectSyncState('saved')
-      showNotice(result.projectId ? `Проект сохранён: ${result.projectId}` : 'Проект сохранён')
+      showNotice(nextProjectId ? `Проект сохранён: ${nextProjectId}` : 'Проект сохранён')
     } catch (error) {
       console.warn('Project save failed:', error)
       setProjectSyncState('error')
@@ -259,17 +283,21 @@ export default function ConstructorPage() {
   async function loadProject() {
     try {
       setProjectSyncState('loading')
-      const result = await loadConstructorProjectRemote(remoteProjectId || 'local')
+      const savedProjectId = remoteProjectId || loadConstructorProjectId() || 'local'
+      const result = await loadConstructorProjectRemote(savedProjectId)
 
       if (!result?.ok || !result.project) {
         throw new Error(result?.message ?? 'Project not found')
       }
 
       setProject(result.project)
-      setRemoteProjectId(result.projectId ?? remoteProjectId)
+      const nextProjectId = result.projectId ?? savedProjectId
+      setRemoteProjectId(nextProjectId)
+      saveConstructorProjectId(nextProjectId)
+      setProjectMeta(loadConstructorProjectMeta())
       setActiveStep('dimensions')
       setProjectSyncState('loaded')
-      showNotice(result.projectId ? `Проект загружен: ${result.projectId}` : 'Проект загружен')
+      showNotice(nextProjectId ? `Проект загружен: ${nextProjectId}` : 'Проект загружен')
     } catch (error) {
       console.warn('Project load failed:', error)
       setProjectSyncState('error')
@@ -287,8 +315,8 @@ export default function ConstructorPage() {
           <p className="rp-ctor-lead">Задайте габариты, выберите наполнение и материалы. Цена рассчитывается сразу, а мы подготовим комплект для сборки и доставим к вам.</p>
           <div className="rp-ctor-badges">
             <span>3 шага</span>
-            <span>цена сразу</span>
-            <span>{estimateState === 'loading' ? 'пересчитываем' : projectSyncState === 'saving' ? 'сохраняем' : 'комплект для сборки'}</span>
+            <span>{estimateState === 'loading' ? 'пересчитываем' : 'цена сразу'}</span>
+            <span>{projectStatusText}</span>
           </div>
         </div>
 
