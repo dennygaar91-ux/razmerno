@@ -20,6 +20,13 @@ const FLOW_STEPS = [
   { id: 'materials', num: '3', title: 'Материалы', text: 'Подберите декоры и фурнитуру' },
 ]
 
+const FILLING_PRESETS = {
+  clothes: { shelves: 1, drawers: 0, rail: true },
+  shelves: { shelves: 5, drawers: 0, rail: false },
+  drawers: { shelves: 1, drawers: 3, rail: false },
+  empty: { shelves: 0, drawers: 0, rail: false },
+}
+
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
@@ -111,10 +118,17 @@ export default function ConstructorPage() {
   }
 
   function clearActiveSection() {
+    applyFillingPreset('empty')
+  }
+
+  function applyFillingPreset(presetId) {
+    const preset = FILLING_PRESETS[presetId]
+    if (!preset) return
+
     setProject(current => {
       const index = current.activeSection - 1
       const filling = current.filling.map((section, sectionIndex) => (
-        sectionIndex === index ? { shelves: 0, drawers: 0, rail: false } : section
+        sectionIndex === index ? { ...preset } : section
       ))
 
       return { ...current, filling }
@@ -249,6 +263,7 @@ export default function ConstructorPage() {
           onSectionPartChange={updateActiveSection}
           onRailToggle={toggleRail}
           onMaterialChange={updateMaterial}
+          onPresetApply={applyFillingPreset}
         />
         <ConstructorViewer
           activeStep={activeStep}
@@ -257,6 +272,7 @@ export default function ConstructorPage() {
           onSectionPartChange={updateActiveSection}
           onRailToggle={toggleRail}
           onClearSection={clearActiveSection}
+          onPresetApply={applyFillingPreset}
         />
         <ConstructorSummary project={projectWithPrice} summary={summary} warnings={warnings} onCheckout={() => setCheckoutOpen(true)} />
       </section>
