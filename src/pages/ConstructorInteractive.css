@@ -1,0 +1,218 @@
+.rp-ctor-flow button {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.rp-ctor-flow button:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -22px;
+  top: 0;
+  width: 44px;
+  height: 62px;
+  border-top: 1px solid rgba(10,10,10,.08);
+  border-right: 1px solid rgba(10,10,10,.08);
+  background: inherit;
+  transform: skewX(38deg);
+  z-index: 1;
+}
+
+.rp-ctor-flow button.is-active {
+  background: rgba(232, 97, 44, .04);
+}
+
+.rp-ctor-flow button.is-active span {
+  background: #e8612c;
+  color: #fff;
+}
+
+.rp-ctor-flow button:hover p {
+  color: #e8612c;
+}
+
+.rp-ref-step-body {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.rp-ref-block--topless {
+  margin-top: 0;
+}
+
+.rp-ref-section-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.rp-ref-section-tabs--two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.rp-ref-section-tabs button {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(10,10,10,.09);
+  background: #fff;
+  color: #676767;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.rp-ref-section-tabs button.is-active,
+.rp-ref-section-tabs button:hover {
+  background: #0a0a0a;
+  border-color: #0a0a0a;
+  color: #fff;
+}
+
+.rp-ref-fields--compact .rp-ref-field {
+  min-height: 64px;
+}
+
+.rp-ref-toggle-option {
+  width: 100%;
+  height: 46px;
+  padding: 0 12px 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(10,10,10,.09);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #151515;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.rp-ref-toggle-option b {
+  width: 34px;
+  height: 18px;
+  border-radius: 99px;
+  background: #d8d8d4;
+  position: relative;
+}
+
+.rp-ref-toggle-option b::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform .18s;
+}
+
+.rp-ref-toggle-option.is-active b {
+  background: #0a0a0a;
+}
+
+.rp-ref-toggle-option.is-active b::after {
+  transform: translateX(16px);
+}
+
+.rp-ref-material-list {
+  display: grid;
+  gap: 9px;
+}
+
+.rp-ref-material-list button {
+  min-height: 60px;
+  padding: 9px;
+  border-radius: 14px;
+  border: 1px solid rgba(10,10,10,.09);
+  background: #fff;
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.rp-ref-material-list button.is-active,
+.rp-ref-material-list button:hover {
+  border-color: #0a0a0a;
+  box-shadow: inset 0 0 0 1px #0a0a0a;
+}
+
+.rp-ref-material-list i {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: repeating-linear-gradient(88deg,rgba(112,83,50,.14) 0,rgba(112,83,50,.14) 1px,transparent 1px,transparent 8px),linear-gradient(90deg,#cbb797,#e1d3bc);
+}
+
+.rp-ref-material-list span {
+  color: #151515;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.rp-ref-material-list small {
+  display: block;
+  margin-top: 4px;
+  color: #777;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.rp-ref-config-nav {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 10px;
+}
+
+.rp-ref-config-nav button {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(10,10,10,.1);
+  background: #fff;
+  color: #151515;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.rp-ref-config-nav button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.rp-ref-config-nav button.is-primary {
+  background: #0a0a0a;
+  border-color: #0a0a0a;
+  color: #fff;
+}
+
+.rp-ctor-col.is-active {
+  outline: 3px solid rgba(232, 97, 44, .65);
+  outline-offset: -3px;
+  z-index: 2;
+}
+
+.rp-ref-section-map button.is-active {
+  border-color: #e8612c;
+  background: rgba(232, 97, 44, .06);
+  box-shadow: inset 0 0 0 1px rgba(232, 97, 44, .35);
+}
+
+.rp-ref-quick-actions button.is-active {
+  background: #0a0a0a;
+  border-color: #0a0a0a;
+  color: #fff;
+}
