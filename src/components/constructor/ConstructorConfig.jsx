@@ -79,7 +79,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
   )
 }
 
-function FillingStep({ project, warnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply }) {
+function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply }) {
   const activeSection = project.filling[project.activeSection - 1]
   const railDisabled = project.dimensions.depth < 520
 
@@ -129,7 +129,7 @@ function FillingStep({ project, warnings, onSectionSelect, onSectionPartChange, 
         </button>
       </div>
 
-      <WarningList warnings={warnings} />
+      <WarningList warnings={activeSectionWarnings?.length ? activeSectionWarnings : warnings} />
     </>
   )
 }
@@ -175,6 +175,7 @@ export default function ConstructorConfig({
   activeStep,
   project,
   warnings,
+  activeSectionWarnings,
   materials,
   handleOptions,
   canGoBack,
@@ -201,7 +202,7 @@ export default function ConstructorConfig({
       number: 2,
       title: 'Наполнение',
       text: 'Настройте полки, ящики и штанги внутри выбранной секции.',
-      body: <FillingStep project={project} warnings={warnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} />,
+      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={activeSectionWarnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} />,
       next: 'Далее: материалы',
     },
     materials: {
