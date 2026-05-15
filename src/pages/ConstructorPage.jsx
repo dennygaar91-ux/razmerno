@@ -5,7 +5,6 @@ import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import ConstructorBenefits from '../components/constructor/ConstructorBenefits'
 import './ConstructorPage.css'
 import './ConstructorPageHeader.css'
-import './ConstructorPageNoRail.css'
 
 export default function ConstructorPage() {
   return (
