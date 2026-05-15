@@ -12,7 +12,7 @@ const breakdownLabels = {
   packaging: 'Упаковка',
 }
 
-export default function ConstructorSummary({ project, summary, warnings = [], onCheckout }) {
+export default function ConstructorSummary({ project, summary, warnings = [], estimateState = 'idle', onCheckout }) {
   const projectRows = [
     ['Размер (В × Ш × Г)', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
     ['Секции', `${project.sections} шт.`],
@@ -31,23 +31,25 @@ export default function ConstructorSummary({ project, summary, warnings = [], on
   ]
 
   const isReady = warnings.length === 0
+  const isCalculating = estimateState === 'loading'
+  const hasEstimateError = estimateState === 'error'
   const breakdown = project.priceBreakdown ?? {}
 
   return (
     <aside className="rp-ctor-summary rp-ref-summary rp-ref-summary--detailed">
-      <section className="rp-ctor-card rp-ref-ready">
+      <section className={`rp-ctor-card rp-ref-ready ${isCalculating ? 'is-loading' : ''} ${hasEstimateError ? 'has-error' : ''}`}>
         <div>
-          <p>Ваш проект</p>
-          <h2>{isReady ? 'Шкаф почти готов' : 'Нужно проверить проект'}</h2>
-          <span>{isReady ? 'Осталось выбрать материалы и добавить проект в корзину.' : warnings[0]}</span>
+          <p>{isCalculating ? 'Пересчёт' : 'Ваш проект'}</p>
+          <h2>{isCalculating ? 'Обновляем смету' : isReady ? 'Шкаф почти готов' : 'Нужно проверить проект'}</h2>
+          <span>{isCalculating ? 'Стоимость и рекомендации обновляются после изменения параметров.' : hasEstimateError ? 'Показываем предварительный расчёт, backend недоступен.' : isReady ? 'Осталось выбрать материалы и добавить проект в корзину.' : warnings[0]}</span>
         </div>
-        <Icon name={isReady ? 'zap' : 'clock'} size={42} />
+        <Icon name={isCalculating ? 'clock' : isReady ? 'zap' : 'clock'} size={42} />
       </section>
 
-      <section className="rp-ctor-card rp-ref-price-card">
+      <section className={`rp-ctor-card rp-ref-price-card ${isCalculating ? 'is-loading' : ''}`}>
         <p>Стоимость комплекта</p>
         <strong>{formatPrice(project.price)} ₽</strong>
-        <span>Предварительно, по текущим размерам и наполнению</span>
+        <span>{isCalculating ? 'Пересчитываем по текущим параметрам…' : 'Предварительно, по текущим размерам и наполнению'}</span>
       </section>
 
       <section className="rp-ctor-card rp-ref-breakdown-card">
@@ -69,13 +71,13 @@ export default function ConstructorSummary({ project, summary, warnings = [], on
         ))}
       </section>
 
-      <section className={`rp-ctor-card rp-ref-check-card ${isReady ? 'is-ready' : 'has-warning'}`}>
+      <section className={`rp-ctor-card rp-ref-check-card ${isReady ? 'is-ready' : 'has-warning'} ${isCalculating ? 'is-loading' : ''}`}>
         <div>
           <h3>Проверка</h3>
-          <span>{isReady ? 'Можно оформлять' : 'Есть рекомендации'}</span>
+          <span>{isCalculating ? 'Пересчитываем' : isReady ? 'Можно оформлять' : 'Есть рекомендации'}</span>
         </div>
-        <div className="rp-ref-progress"><i style={{ width: isReady ? '92%' : '68%' }} /></div>
-        <p>{isReady ? 'Конструкция надёжна и готова к сборке' : 'Проверьте рекомендации перед оформлением'} <b>{isReady ? '92%' : '68%'}</b></p>
+        <div className="rp-ref-progress"><i style={{ width: isCalculating ? '52%' : isReady ? '92%' : '68%' }} /></div>
+        <p>{isCalculating ? 'Проверяем конструкцию и стоимость' : isReady ? 'Конструкция надёжна и готова к сборке' : 'Проверьте рекомендации перед оформлением'} <b>{isCalculating ? '...' : isReady ? '92%' : '68%'}</b></p>
       </section>
 
       <section className="rp-ctor-card rp-ref-kit-card">
