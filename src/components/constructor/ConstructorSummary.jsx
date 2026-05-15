@@ -1,40 +1,82 @@
+import Icon from '../../icons/Icon'
+
+const projectRows = [
+  ['Размер (В × Ш × Г)', '2400 × 1800 × 600 мм'],
+  ['Секции', '3 шт.'],
+  ['Наполнение', '7 элементов'],
+  ['Полки', '7 шт.'],
+  ['Ящики', '2 шт.'],
+  ['Штанги', '1 шт.'],
+]
+
+const kitItems = [
+  ['Корпус', '36 деталей'],
+  ['Полки', '7 шт.'],
+  ['Ящики', '2 шт.'],
+  ['Фасады', '0 шт.'],
+  ['Фурнитура', '1 компл.'],
+]
+
 export default function ConstructorSummary({ onCheckout }) {
   return (
-    <aside className="rp-ctor-summary">
-      <section className="rp-ctor-card rp-ctor-price">
-        <p>Предварительная стоимость</p>
-        <strong>24 350 ₽</strong>
-        <em>Экономия: 3 650 ₽ относительно заказа в салоне</em>
-        <div><span>Срок изготовления</span><b>10–14 дней</b></div>
-        <button type="button" onClick={onCheckout}>Оформить проект</button>
-        <button type="button">♡ Сохранить проект</button>
+    <aside className="rp-ctor-summary rp-ref-summary">
+      <section className="rp-ctor-card rp-ref-ready">
+        <div>
+          <p>Ваш проект</p>
+          <h2>Шкаф почти готов</h2>
+          <span>Осталось выбрать материалы и добавить проект в корзину.</span>
+        </div>
+        <Icon name="zap" size={42} />
       </section>
 
-      <section className="rp-ctor-card rp-ctor-estimate">
-        <h3>Что входит</h3>
-        <ul>
-          <li><span>ЛДСП 16 мм</span><b>включено</b></li>
-          <li><span>Кромка ПВХ 2 мм</span><b>включено</b></li>
-          <li><span>Распил и кромление</span><b>включено</b></li>
-          <li><span>Фурнитура и крепёж</span><b>включено</b></li>
-          <li><span>Доставка по Москве</span><b>от 6000 ₽</b></li>
-        </ul>
+      <section className="rp-ctor-card rp-ref-price-card">
+        <p>Стоимость комплекта</p>
+        <strong>15 447 ₽</strong>
+        <span>Предварительно, по текущим размерам и наполнению</span>
       </section>
 
-      <section className="rp-ctor-card rp-ctor-materials">
-        <h3>Материалы</h3>
-        <div><i className="rp-ctor-texture" /><p>ЛДСП Дуб Сонома<span>16 мм</span></p><b>›</b></div>
-        <div><i className="rp-ctor-texture rp-ctor-texture--edge" /><p>Кромка<span>ПВХ 2 мм</span></p></div>
+      <section className="rp-ctor-card rp-ref-project-card">
+        {projectRows.map(([label, value]) => (
+          <div key={label}>
+            <span>{label}</span>
+            <b>{value}</b>
+          </div>
+        ))}
       </section>
 
-      <section className="rp-ctor-card rp-ctor-sizes">
-        <h3>Сводка проекта</h3>
-        <dl>
-          <div><dt>Размеры</dt><dd>2400 × 1800 × 600 мм</dd></div>
-          <div><dt>Секции</dt><dd>3 секции</dd></div>
-          <div><dt>Тип</dt><dd>Корпусный</dd></div>
-        </dl>
+      <section className="rp-ctor-card rp-ref-check-card">
+        <div>
+          <h3>Проверка</h3>
+          <span>Можно оформлять</span>
+        </div>
+        <div className="rp-ref-progress"><i /></div>
+        <p>Конструкция надёжна и готова к сборке <b>92%</b></p>
       </section>
+
+      <section className="rp-ctor-card rp-ref-kit-card">
+        <div className="rp-ref-kit-head">
+          <h3>Комплект</h3>
+          <button type="button">Подробнее</button>
+        </div>
+        <div className="rp-ref-kit-items">
+          {kitItems.map(([title, text]) => (
+            <div key={title}>
+              <i />
+              <span>{title}</span>
+              <small>{text}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rp-ctor-card rp-ref-additional-card">
+        <h3>Дополнительно</h3>
+        <div><span>Задняя стенка</span><em>Рекомендуем</em><b /></div>
+        <div><span>Кромка</span><em>Включена</em><b /></div>
+        <div><span>Крепление к стене</span><em>Рекомендуем</em><b /></div>
+      </section>
+
+      <button className="rp-ref-summary-cta" type="button" onClick={onCheckout}>В корзину</button>
     </aside>
   )
 }
