@@ -16,7 +16,7 @@ const steps = [
 ]
 
 const benefits = [
-  ['box', 'Комплект для сборки', 'детали, кромка, фурнитура'],
+  ['package', 'Комплект для сборки', 'детали, кромка, фурнитура'],
   ['truck', 'Доставка по Москве', 'внутри МКАД от 6000 ₽'],
   ['shield', 'Гарантия 18 месяцев', 'на комплект мебели'],
   ['tool', 'Сборка по желанию', '+10% к стоимости заказа'],
@@ -55,12 +55,12 @@ export default function ConstructorPage() {
           <aside className="rp-ctor-rail">
             <button className="rp-ctor-rail-step" type="button">①</button>
             <nav className="rp-ctor-rail-nav" aria-label="Разделы конструктора">
-              <button className="is-active" type="button"><Icon name="layout" size={22} /><span>Конструктор</span></button>
+              <button className="is-active" type="button"><Icon name="cube" size={22} /><span>Конструктор</span></button>
               <button type="button"><Icon name="layers" size={22} /><span>Материалы</span></button>
-              <button type="button"><Icon name="file" size={22} /><span>Проекты</span></button>
-              <button type="button"><Icon name="heart" size={22} /><span>Избранное</span></button>
+              <button type="button"><Icon name="projects" size={22} /><span>Проекты</span></button>
+              <button type="button"><Icon name="star" size={22} /><span>Избранное</span></button>
             </nav>
-            <button className="rp-ctor-help" type="button"><Icon name="help" size={22} /><span>Помощь</span></button>
+            <button className="rp-ctor-help" type="button"><Icon name="message" size={22} /><span>Помощь</span></button>
           </aside>
 
           <aside className="rp-ctor-card rp-ctor-config">
