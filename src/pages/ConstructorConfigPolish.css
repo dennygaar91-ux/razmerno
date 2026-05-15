@@ -1,0 +1,230 @@
+.rp-ref-config--polished {
+  padding: 20px 22px;
+}
+
+.rp-ref-panel-head--polished {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(10, 10, 10, .07);
+}
+
+.rp-ref-panel-head--polished > span {
+  background: rgba(232, 97, 44, .08);
+}
+
+.rp-ref-panel-head--polished em {
+  display: inline-flex;
+  margin-bottom: 6px;
+  color: #e8612c;
+  font-size: 10px;
+  line-height: 1;
+  font-style: normal;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.rp-ref-panel-head--polished h2 {
+  font-size: 20px;
+}
+
+.rp-ref-step-hint {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(232, 97, 44, .16);
+  background: rgba(232, 97, 44, .055);
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  color: #8b3d1d;
+}
+
+.rp-ref-step-hint b {
+  display: block;
+  color: #171717;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.rp-ref-step-hint span {
+  display: block;
+  margin-top: 4px;
+  color: #745647;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.rp-ref-fields--polished {
+  margin-top: 14px;
+  border-radius: 14px;
+}
+
+.rp-ref-field--polished {
+  min-height: 64px;
+  grid-template-columns: minmax(0, 1fr) 140px;
+  padding: 11px 12px;
+}
+
+.rp-ref-counter-wrap {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.rp-ref-counter-wrap small {
+  color: #8b8b86;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.rp-ref-counter button:disabled {
+  color: #c9c9c5;
+  background: #f3f2ef;
+  cursor: not-allowed;
+}
+
+.rp-ref-counter button:not(:disabled):hover {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.rp-ref-block--polished {
+  margin-top: 18px;
+}
+
+.rp-ref-section-widths button {
+  min-width: 0;
+  height: 46px;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+}
+
+.rp-ref-section-widths button span {
+  color: #858585;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.rp-ref-section-widths button b {
+  color: #151515;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.rp-ref-section-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rp-ref-section-tabs button {
+  min-height: 46px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+}
+
+.rp-ref-section-tabs button span {
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.rp-ref-section-tabs button small {
+  color: inherit;
+  opacity: .72;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.rp-ref-active-section--polished {
+  align-items: flex-start;
+}
+
+.rp-ref-active-section--polished div {
+  display: grid;
+  gap: 5px;
+}
+
+.rp-ref-active-section--polished b {
+  text-align: left;
+}
+
+.rp-ref-active-section--polished strong {
+  color: #151515;
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 850;
+  text-align: right;
+}
+
+.rp-ref-preset-grid--polished button {
+  min-height: 74px;
+  align-content: start;
+  gap: 4px;
+}
+
+.rp-ref-preset-grid--polished em {
+  color: #8a8a85;
+  font-size: 9px;
+  line-height: 1.25;
+  font-style: normal;
+  font-weight: 650;
+}
+
+.rp-ref-preset-grid--polished button:hover span {
+  color: #e8612c;
+}
+
+.rp-ref-toggle-option:disabled {
+  background: #f3f2ef;
+}
+
+.rp-ref-config-nav--polished {
+  padding-top: 14px;
+  border-top: 1px solid rgba(10, 10, 10, .07);
+}
+
+.rp-ref-config-nav--polished button {
+  height: 48px;
+  border-radius: 999px;
+}
+
+.rp-ref-config-nav--polished button.is-primary {
+  box-shadow: 0 12px 22px rgba(10, 10, 10, .12);
+}
+
+@media (max-width: 1480px) {
+  .rp-ref-config--polished {
+    padding: 18px;
+  }
+
+  .rp-ref-field--polished {
+    grid-template-columns: minmax(0, 1fr) 128px;
+  }
+}
+
+@media (max-width: 1380px) {
+  .rp-ref-step-hint {
+    margin-top: 14px;
+    padding: 10px 12px;
+  }
+
+  .rp-ref-step-hint span {
+    display: none;
+  }
+
+  .rp-ref-field--polished {
+    min-height: 56px;
+    grid-template-columns: minmax(0, 1fr) 116px;
+  }
+
+  .rp-ref-preset-grid--polished button {
+    min-height: 60px;
+  }
+
+  .rp-ref-preset-grid--polished em {
+    display: none;
+  }
+}
