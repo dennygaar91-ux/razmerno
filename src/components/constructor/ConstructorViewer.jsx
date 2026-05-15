@@ -1,13 +1,17 @@
 import Icon from '../../icons/Icon'
 import WardrobeMockup from './WardrobeMockup'
 
-const sectionMap = [
-  ['1', '4П · 2Я'],
-  ['2', 'Ш'],
-  ['3', '3П'],
-]
+function formatSection(section) {
+  const parts = []
+  if (section.shelves) parts.push(`${section.shelves}П`)
+  if (section.drawers) parts.push(`${section.drawers}Я`)
+  if (section.rail) parts.push('Ш')
+  return parts.length ? parts.join(' · ') : 'Пусто'
+}
 
-export default function ConstructorViewer() {
+export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle }) {
+  const activeSection = project.filling[project.activeSection - 1]
+
   return (
     <section className="rp-ctor-card rp-ctor-viewer rp-ref-viewer" aria-label="Предпросмотр шкафа">
       <div className="rp-ref-viewer-toolbar">
@@ -27,27 +31,27 @@ export default function ConstructorViewer() {
       </div>
 
       <div className="rp-ref-scene">
-        <span className="rp-ctor-size rp-ctor-size--h">2400 мм</span>
-        <WardrobeMockup />
-        <span className="rp-ctor-size rp-ctor-size--w">1800 мм</span>
-        <span className="rp-ctor-size rp-ctor-size--d">600 мм</span>
+        <span className="rp-ctor-size rp-ctor-size--h">{project.dimensions.height} мм</span>
+        <WardrobeMockup project={project} />
+        <span className="rp-ctor-size rp-ctor-size--w">{project.dimensions.width} мм</span>
+        <span className="rp-ctor-size rp-ctor-size--d">{project.dimensions.depth} мм</span>
       </div>
 
       <div className="rp-ref-quick-actions">
-        <button type="button"><Icon name="plus" size={16} />Полка</button>
-        <button type="button"><Icon name="plus" size={16} />Ящик</button>
-        <button type="button"><span className="rp-ref-rail-icon" />Штанга</button>
-        <button type="button"><Icon name="x" size={15} />Очистить</button>
+        <button type="button" onClick={() => onSectionPartChange('shelves', 1)}><Icon name="plus" size={16} />Полка</button>
+        <button type="button" onClick={() => onSectionPartChange('drawers', 1)}><Icon name="plus" size={16} />Ящик</button>
+        <button className={activeSection.rail ? 'is-active' : ''} type="button" onClick={onRailToggle}><span className="rp-ref-rail-icon" />Штанга</button>
+        <button type="button" onClick={() => {}}><Icon name="x" size={15} />Очистить</button>
       </div>
 
       <div className="rp-ref-section-map">
         <h3>Карта секций</h3>
         <p>Наглядная схема наполнения по секциям</p>
-        <div>
-          {sectionMap.map(([num, label]) => (
-            <button type="button" key={num}>
-              <span>{num}</span>
-              <b>{label}</b>
+        <div style={{ gridTemplateColumns: `repeat(${project.sections}, 1fr)` }}>
+          {project.filling.map((section, index) => (
+            <button className={project.activeSection === index + 1 ? 'is-active' : ''} type="button" key={index} onClick={() => onSectionSelect(index + 1)}>
+              <span>{index + 1}</span>
+              <b>{formatSection(section)}</b>
             </button>
           ))}
         </div>
