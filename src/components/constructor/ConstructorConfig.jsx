@@ -59,6 +59,23 @@ function StepHint({ title, text }) {
   )
 }
 
+function OptionList({ items, activeId, field, onChange, compact = false }) {
+  return (
+    <div className={`rp-ref-option-list ${compact ? 'rp-ref-option-list--compact' : ''}`}>
+      {items.map((item) => (
+        <button className={activeId === item.id ? 'is-active' : ''} type="button" key={item.id} onClick={() => onChange(field, item.id)}>
+          <span>
+            <strong>{item.title}</strong>
+            <small>{item.text}</small>
+            <em>{item.helper}</em>
+          </span>
+          <b>{item.priceAdd ? `+${item.priceAdd.toLocaleString('ru-RU')} ₽` : item.badge}</b>
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange }) {
   const sectionWidth = Math.round(project.dimensions.width / project.sections)
 
@@ -191,26 +208,34 @@ function getPriceLabel(item) {
   return 'база'
 }
 
-function MaterialsStep({ project, materials, handleOptions, onMaterialChange }) {
+function MaterialsStep({ project, materials, edgeOptions, handleOptions, hardwareOptions, onMaterialChange }) {
   const selectedMaterial = materials.find(material => material.id === project.material.materialId) ?? materials[0]
+  const selectedEdge = edgeOptions.find(option => option.id === project.material.edgeId) ?? edgeOptions[0]
   const selectedHandle = handleOptions.find(option => option.id === project.material.handleId) ?? handleOptions[0]
+  const selectedHardware = hardwareOptions.find(option => option.id === project.material.hardwareId) ?? hardwareOptions[0]
 
   return (
     <>
-      <StepHint title="Выберите внешний вид" text="Материал влияет на визуал, комплект деталей и предварительную стоимость." />
+      <StepHint title="Соберите спецификацию" text="Корпус, кромка, открывание и фурнитура уже разнесены так, чтобы позже подключить каталог и админку." />
 
-      <div className="rp-ref-selected-material">
+      <div className="rp-ref-selected-material rp-ref-selected-material--spec">
         <i className={`rp-ref-material-swatch rp-ref-material-swatch--${selectedMaterial.tone}`} />
         <div>
-          <span>Выбрано сейчас</span>
+          <span>Текущая спецификация</span>
           <b>{selectedMaterial.fullTitle ?? selectedMaterial.title}</b>
-          <small>{selectedMaterial.edge} · {selectedHandle.title}</small>
+          <small>{selectedEdge.title} · {selectedHandle.title} · {selectedHardware.title}</small>
         </div>
       </div>
 
+      <div className="rp-ref-material-spec-grid">
+        <div><span>Производитель</span><b>{selectedMaterial.manufacturer}</b></div>
+        <div><span>Артикул MVP</span><b>{selectedMaterial.article}</b></div>
+        <div><span>Толщина</span><b>{selectedMaterial.thickness}</b></div>
+      </div>
+
       <div className="rp-ref-block rp-ref-block--topless rp-ref-block--polished">
-        <h3>Материал корпуса</h3>
-        <p>Базовый материал MVP — ЛДСП 16 мм. Кромка подбирается автоматически.</p>
+        <h3>1. Корпус</h3>
+        <p>Базовый материал MVP — ЛДСП 16 мм. Позже эти карточки будут приходить из админки материалов.</p>
         <div className="rp-ref-material-list rp-ref-material-list--product">
           {materials.map((material) => (
             <button className={project.material.materialId === material.id ? 'is-active' : ''} type="button" key={material.id} onClick={() => onMaterialChange('materialId', material.id)}>
@@ -228,25 +253,26 @@ function MaterialsStep({ project, materials, handleOptions, onMaterialChange }) 
       </div>
 
       <div className="rp-ref-block rp-ref-block--polished">
-        <h3>Открывание</h3>
+        <h3>2. Кромка</h3>
+        <p>В MVP кромка подобрана автоматически, но её можно переопределить для теста спецификации.</p>
+        <OptionList items={edgeOptions} activeId={project.material.edgeId} field="edgeId" onChange={onMaterialChange} compact />
+      </div>
+
+      <div className="rp-ref-block rp-ref-block--polished">
+        <h3>3. Открывание</h3>
         <p>Для MVP безопаснее вариант с ручками, без ручек потребует более точной регулировки.</p>
-        <div className="rp-ref-handle-list rp-ref-handle-list--product">
-          {handleOptions.map((option) => (
-            <button className={project.material.handleId === option.id ? 'is-active' : ''} type="button" key={option.id} onClick={() => onMaterialChange('handleId', option.id)}>
-              <span>
-                <strong>{option.title}</strong>
-                <small>{option.text}</small>
-                <em>{option.helper}</em>
-              </span>
-              <b>{option.priceAdd ? `+${option.priceAdd.toLocaleString('ru-RU')} ₽` : 'включено'}</b>
-            </button>
-          ))}
-        </div>
+        <OptionList items={handleOptions} activeId={project.material.handleId} field="handleId" onChange={onMaterialChange} compact />
+      </div>
+
+      <div className="rp-ref-block rp-ref-block--polished">
+        <h3>4. Фурнитура</h3>
+        <p>Сейчас это UX-заготовка. Реальные бренды и правила подбора подключим через backend.</p>
+        <OptionList items={hardwareOptions} activeId={project.material.hardwareId} field="hardwareId" onChange={onMaterialChange} compact />
       </div>
 
       <div className="rp-ref-block rp-ref-info rp-ref-info--materials">
         <Icon name="check-circle" size={16} />
-        <span>{project.material.edge} подобрана автоматически. Фурнитура будет проверена технологом перед оплатой.</span>
+        <span>Спецификация готовится как структура для будущей базы: материал → кромка → фурнитура → правила расчёта.</span>
       </div>
     </>
   )
@@ -258,7 +284,9 @@ export default function ConstructorConfig({
   warnings,
   activeSectionWarnings,
   materials,
+  edgeOptions,
   handleOptions,
+  hardwareOptions,
   canGoBack,
   canGoNext,
   onBack,
@@ -294,8 +322,8 @@ export default function ConstructorConfig({
       number: 3,
       eyebrow: 'Шаг 3 из 3',
       title: 'Материалы и фурнитура',
-      text: 'Выберите декор корпуса и способ открывания. Кромка и базовая фурнитура учтены автоматически.',
-      body: <MaterialsStep project={project} materials={materials} handleOptions={handleOptions} onMaterialChange={onMaterialChange} />,
+      text: 'Выберите декор корпуса, кромку, открывание и фурнитуру. Это будущая структура спецификации.',
+      body: <MaterialsStep project={project} materials={materials} edgeOptions={edgeOptions} handleOptions={handleOptions} hardwareOptions={hardwareOptions} onMaterialChange={onMaterialChange} />,
       next: 'В корзину',
     },
   }
