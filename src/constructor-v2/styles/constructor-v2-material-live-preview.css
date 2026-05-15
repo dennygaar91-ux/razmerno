@@ -1,11 +1,51 @@
 .rv2-cabinet-placeholder.material-egger-white {
-  background: linear-gradient(90deg, #ece8df 0 1.2%, #f6f4ef 1.2% 32%, #d8d2c6 32% 33.2%, #f2f0eb 33.2% 66%, #d8d2c6 66% 67.2%, #f7f5f0 67.2% 98.8%, #d8d2c6 98.8%);
+  background:
+    linear-gradient(90deg,
+      rgba(120,110,96,0.12) 0 1%,
+      transparent 1% 14%,
+      rgba(120,110,96,0.08) 14% 15%,
+      transparent 15% 28%,
+      rgba(120,110,96,0.1) 28% 29%,
+      transparent 29% 42%,
+      rgba(120,110,96,0.08) 42% 43%,
+      transparent 43% 58%,
+      rgba(120,110,96,0.12) 58% 59%,
+      transparent 59% 72%,
+      rgba(120,110,96,0.08) 72% 73%,
+      transparent 73% 100%
+    ),
+    linear-gradient(180deg, #f7f4ee 0%, #ece5da 100%);
   box-shadow: 0 34px 70px rgba(90, 82, 70, 0.14);
 }
 
 .rv2-cabinet-placeholder.material-oak {
-  background: linear-gradient(90deg, #b98d5f 0 1.2%, #d8b180 1.2% 32%, #a97848 32% 33.2%, #d1a875 33.2% 66%, #a97848 66% 67.2%, #dcb989 67.2% 98.8%, #a97848 98.8%);
+  background:
+    linear-gradient(90deg,
+      rgba(102,62,28,0.24) 0 1%,
+      transparent 1% 12%,
+      rgba(133,88,49,0.18) 12% 13%,
+      transparent 13% 24%,
+      rgba(102,62,28,0.24) 24% 25%,
+      transparent 25% 38%,
+      rgba(133,88,49,0.16) 38% 39%,
+      transparent 39% 52%,
+      rgba(102,62,28,0.24) 52% 53%,
+      transparent 53% 66%,
+      rgba(133,88,49,0.18) 66% 67%,
+      transparent 67% 82%,
+      rgba(102,62,28,0.22) 82% 83%,
+      transparent 83% 100%
+    ),
+    linear-gradient(180deg, #ddb688 0%, #b88556 100%);
   box-shadow: 0 34px 70px rgba(91, 57, 28, 0.2);
+}
+
+.rv2-cabinet-placeholder.material-oak .rv2-cabinet-section:nth-child(odd) {
+  background: rgba(255,255,255,0.04);
+}
+
+.rv2-cabinet-placeholder.material-oak .rv2-cabinet-section:nth-child(even) {
+  background: rgba(0,0,0,0.03);
 }
 
 .rv2-cabinet-placeholder.material-mdf-white {
@@ -46,13 +86,4 @@
 .rv2-material-preview-chip.material-egger-white i,
 .rv2-material-preview-chip.material-mdf-white i {
   background: #f1eee8;
-}
-
-@media (max-width: 640px) {
-  .rv2-material-preview-chip {
-    top: 14px;
-    left: 14px;
-    min-height: 34px;
-    font-size: 11px;
-  }
 }
