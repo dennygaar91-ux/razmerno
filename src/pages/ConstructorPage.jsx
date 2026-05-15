@@ -7,6 +7,7 @@ import ConstructorBenefits from '../components/constructor/ConstructorBenefits'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import './ConstructorPage.css'
 import './ConstructorPageHeader.css'
+import './ConstructorWizard.css'
 
 export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
