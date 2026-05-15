@@ -2,8 +2,18 @@ function formatPrice(value) {
   return new Intl.NumberFormat('ru-RU').format(value)
 }
 
+const breakdownLabels = {
+  material: 'Материалы и детали',
+  cutting: 'Распил',
+  edging: 'Кромление',
+  hardware: 'Фурнитура',
+  packaging: 'Упаковка',
+}
+
 export default function CheckoutDrawer({ open, project, summary, onClose }) {
   if (!open) return null
+
+  const breakdown = project.priceBreakdown ?? {}
 
   return (
     <div className="rp-checkout" role="dialog" aria-modal="true" aria-label="Оформление заказа">
@@ -31,9 +41,20 @@ export default function CheckoutDrawer({ open, project, summary, onClose }) {
               <div><dt>Изделие</dt><dd>Шкаф корпусный</dd></div>
               <div><dt>Размеры</dt><dd>{project.dimensions.height} × {project.dimensions.width} × {project.dimensions.depth} мм</dd></div>
               <div><dt>Материал</dt><dd>{project.material.body}, {project.material.thickness}</dd></div>
+              <div><dt>Кромка</dt><dd>{project.material.edge}</dd></div>
+              <div><dt>Открывание</dt><dd>{project.material.handles}</dd></div>
               <div><dt>Наполнение</dt><dd>{summary.shelves} полок, {summary.drawers} ящика, {summary.rails} штанга</dd></div>
               <div><dt>Срок</dt><dd>10–14 дней</dd></div>
               <div><dt>Доставка</dt><dd>от 6000 ₽ по Москве</dd></div>
+            </dl>
+          </section>
+
+          <section className="rp-checkout__card">
+            <h3>Смета</h3>
+            <dl className="rp-checkout__summary">
+              {Object.entries(breakdown).map(([key, value]) => (
+                <div key={key}><dt>{breakdownLabels[key] ?? key}</dt><dd>{formatPrice(value)} ₽</dd></div>
+              ))}
             </dl>
           </section>
 
