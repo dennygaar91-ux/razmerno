@@ -5,6 +5,8 @@
   width: min(1520px, calc(100vw - 56px));
   margin: 0 auto;
   padding: 34px 0 72px;
+  color: #111;
+  font-feature-settings: "ss01" on, "cv01" on;
 }
 
 .rv2-actions {
@@ -24,7 +26,8 @@
   border: 1px solid rgba(15,15,15,0.06);
   background: #fff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -.02em;
 }
 
 .rv2-actions .is-dark {
@@ -56,6 +59,7 @@
   border-radius: 28px;
   border: 1px solid rgba(15,15,15,0.05);
   background: rgba(255,255,255,0.72);
+  text-align: left;
   transition:
     transform 180ms ease,
     background 180ms ease,
@@ -85,7 +89,7 @@
   justify-content: center;
   background: rgba(15,15,15,0.06);
   color: rgba(15,15,15,0.72);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 900;
   transition:
     background 180ms ease,
@@ -102,17 +106,19 @@
 
 .rv2-progress strong {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
   color: #111;
-  font-size: 20px;
-  line-height: .96;
-  letter-spacing: -.05em;
+  font-size: 21px;
+  font-weight: 900;
+  line-height: .94;
+  letter-spacing: -.06em;
 }
 
 .rv2-progress span {
   color: rgba(15,15,15,0.52);
-  font-size: 14px;
-  line-height: 1.45;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .rv2-grid {
@@ -161,10 +167,22 @@
   margin-bottom: 20px;
   background: rgba(255,255,255,0.9);
   box-shadow: 0 10px 20px rgba(15,15,15,0.05);
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .rv2-card h3 {
-  font-size: 36px;
-  line-height: .94;
-  letter-spacing: -0.07em;
+  margin: 0 0 10px;
+  font-size: 38px;
+  font-weight: 900;
+  line-height: .92;
+  letter-spacing: -0.08em;
+}
+
+.rv2-card p,
+.rv2-summary p {
+  color: rgba(15,15,15,0.56);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.65;
 }
