@@ -43,6 +43,29 @@ function formatProjectDate(value) {
   }
 }
 
+function getProjectStatus(syncState, meta) {
+  if (syncState === 'saving') return { label: 'Сохраняем', tone: 'loading', text: 'Ручное сохранение проекта' }
+  if (syncState === 'loading') return { label: 'Загружаем', tone: 'loading', text: 'Открываем последний проект' }
+  if (syncState === 'autosaving') return { label: 'Автосохранение', tone: 'loading', text: 'Сохраняем изменения локально' }
+  if (syncState === 'error') return { label: 'Ошибка сохранения', tone: 'error', text: 'Можно попробовать сохранить вручную' }
+  if (syncState === 'saved') return { label: 'Сохранено', tone: 'success', text: 'Проект сохранён вручную' }
+  if (syncState === 'autosaved') return { label: 'Автосохранено', tone: 'success', text: 'Последние изменения сохранены' }
+  if (syncState === 'loaded') return { label: 'Загружено', tone: 'success', text: 'Проект восстановлен' }
+
+  if (meta?.updatedAt) {
+    return { label: `Сохранено ${formatProjectDate(meta.updatedAt)}`, tone: 'neutral', text: 'Есть локальная копия проекта' }
+  }
+
+  return { label: 'Новый проект', tone: 'neutral', text: 'Автосохранение включено' }
+}
+
+function getEstimateStatus(estimateState) {
+  if (estimateState === 'loading') return { label: 'Пересчитываем', tone: 'loading' }
+  if (estimateState === 'error') return { label: 'Предварительная цена', tone: 'error' }
+  if (estimateState === 'success') return { label: 'Цена обновлена', tone: 'success' }
+  return { label: 'Цена сразу', tone: 'neutral' }
+}
+
 export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
@@ -73,17 +96,8 @@ export default function ConstructorPage() {
   const activeSectionWarnings = useMemo(() => getActiveSectionWarnings(project), [project])
   const projectWithPrice = useMemo(() => ({ ...project, price, priceBreakdown }), [project, price, priceBreakdown])
   const orderPayload = useMemo(() => buildConstructorPayload(projectWithPrice, summary), [projectWithPrice, summary])
-  const projectStatusText = projectSyncState === 'saving'
-    ? 'сохраняем'
-    : projectSyncState === 'loading'
-      ? 'загружаем'
-      : projectSyncState === 'autosaving'
-        ? 'автосохранение'
-        : projectSyncState === 'saved' || projectSyncState === 'autosaved'
-          ? 'сохранено'
-          : projectMeta?.updatedAt
-            ? `сохранено ${formatProjectDate(projectMeta.updatedAt)}`
-            : 'комплект для сборки'
+  const projectStatus = getProjectStatus(projectSyncState, projectMeta)
+  const estimateStatus = getEstimateStatus(estimateState)
 
   useEffect(() => {
     let isCancelled = false
@@ -351,10 +365,10 @@ export default function ConstructorPage() {
           <p className="rp-ctor-kicker">онлайн-конструктор</p>
           <h1>Соберите шкаф под свой размер</h1>
           <p className="rp-ctor-lead">Задайте габариты, выберите наполнение и материалы. Цена рассчитывается сразу, а мы подготовим комплект для сборки и доставим к вам.</p>
-          <div className="rp-ctor-badges">
+          <div className="rp-ctor-badges rp-ctor-badges--stateful">
             <span>3 шага</span>
-            <span>{estimateState === 'loading' ? 'пересчитываем' : 'цена сразу'}</span>
-            <span>{projectStatusText}</span>
+            <span className={`is-${estimateStatus.tone}`}>{estimateStatus.label}</span>
+            <span className={`is-${projectStatus.tone}`} title={projectStatus.text}>{projectStatus.label}</span>
           </div>
         </div>
 
@@ -365,6 +379,13 @@ export default function ConstructorPage() {
           <button className="is-primary" type="button" onClick={() => setCheckoutOpen(true)}><Icon name="orders" size={17} />В корзину</button>
         </div>
       </section>
+
+      {(projectSyncState === 'error' || estimateState === 'error') && (
+        <section className="rp-ctor-inline-status" role="status">
+          {projectSyncState === 'error' && <p><Icon name="clock" size={15} />Не удалось сохранить проект. Проверьте localStorage или попробуйте сохранить вручную.</p>}
+          {estimateState === 'error' && <p><Icon name="clock" size={15} />Смета временно считается локально. Финальная цена всё равно будет проверена технологом.</p>}
+        </section>
+      )}
 
       <section className="rp-ctor-flow" aria-label="Этапы конструктора">
         {FLOW_STEPS.map(step => (
