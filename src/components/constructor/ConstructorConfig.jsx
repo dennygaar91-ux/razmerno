@@ -109,7 +109,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
   )
 }
 
-function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply }) {
+function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply, onCopySection, onApplySectionToAll }) {
   const activeSection = project.filling[project.activeSection - 1]
   const railDisabled = project.dimensions.depth < 520
   const activePreset = activeSection.rail && activeSection.shelves <= 2 && activeSection.drawers === 0
@@ -145,6 +145,11 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
           <b>{activePreset}</b>
         </div>
         <strong>{activeSection.shelves} полок · {activeSection.drawers} ящиков · {activeSection.rail ? 'штанга' : 'без штанги'}</strong>
+      </div>
+
+      <div className="rp-ref-section-tools">
+        <button type="button" disabled={project.sections < 2} onClick={onCopySection}>Копировать в соседнюю</button>
+        <button type="button" disabled={project.sections < 2} onClick={onApplySectionToAll}>Применить ко всем</button>
       </div>
 
       <div className="rp-ref-block rp-ref-block--polished">
@@ -265,6 +270,8 @@ export default function ConstructorConfig({
   onRailToggle,
   onMaterialChange,
   onPresetApply,
+  onCopySection,
+  onApplySectionToAll,
 }) {
   const stepContent = {
     dimensions: {
@@ -280,7 +287,7 @@ export default function ConstructorConfig({
       eyebrow: 'Шаг 2 из 3',
       title: 'Наполнение секций',
       text: 'Соберите внутреннюю логику шкафа: полки, ящики и штанги в каждой секции.',
-      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={activeSectionWarnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} />,
+      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={activeSectionWarnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} onCopySection={onCopySection} onApplySectionToAll={onApplySectionToAll} />,
       next: 'Далее: материалы',
     },
     materials: {
