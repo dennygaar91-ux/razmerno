@@ -303,6 +303,37 @@
   color: var(--text-muted);
 }
 
+.rp-checkout__auth-options {
+  display: grid;
+  gap: 8px;
+}
+
+.rp-checkout__auth-options button {
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.rp-checkout__auth-options button span {
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 650;
+}
+
+.rp-checkout__auth-options button.is-active {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
 .rp-checkout__summary {
   margin: 0;
   display: grid;
@@ -412,6 +443,11 @@
   color: #16823c;
 }
 
+.rp-checkout__status.is-loading {
+  background: rgba(10, 10, 10, .06);
+  color: var(--ink);
+}
+
 .rp-checkout__foot {
   padding: 16px 24px 24px;
   display: grid;
@@ -437,4 +473,9 @@
 .rp-checkout__primary {
   background: var(--orange);
   color: #fff;
+}
+
+.rp-checkout__primary:disabled {
+  opacity: .58;
+  cursor: progress;
 }
