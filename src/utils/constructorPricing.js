@@ -2,6 +2,31 @@ function roundMoney(value) {
   return Math.round(value / 10) * 10
 }
 
+function getSectionWarnings(section, sectionIndex, project) {
+  const warnings = []
+  const sectionHeight = project.dimensions.height
+  const usefulHeight = sectionHeight - section.drawers * 220 - (section.rail ? 950 : 0)
+  const shelfGap = section.shelves > 1 ? usefulHeight / (section.shelves + 1) : usefulHeight
+
+  if (section.rail && project.dimensions.depth < 520) {
+    warnings.push(`Секция ${sectionIndex + 1}: для штанги нужна глубина от 520 мм.`)
+  }
+
+  if (section.drawers > 0 && project.dimensions.width / project.sections < 420) {
+    warnings.push(`Секция ${sectionIndex + 1}: для ящиков лучше ширина секции от 420 мм.`)
+  }
+
+  if (section.shelves > 1 && shelfGap < 200) {
+    warnings.push(`Секция ${sectionIndex + 1}: между полками получается меньше 200 мм.`)
+  }
+
+  if (section.drawers > 3 && project.dimensions.height < 1600) {
+    warnings.push(`Секция ${sectionIndex + 1}: для четырёх ящиков лучше высота шкафа от 1600 мм.`)
+  }
+
+  return warnings
+}
+
 export function getProjectSummary(project) {
   const shelves = project.filling.reduce((total, section) => total + section.shelves, 0)
   const drawers = project.filling.reduce((total, section) => total + section.drawers, 0)
@@ -67,5 +92,18 @@ export function getWarnings(project, summary) {
     warnings.push('Для варианта без ручек ящики потребуют push-to-open фурнитуру. Стоимость уже учитывает базовую надбавку.')
   }
 
-  return warnings
+  project.filling.forEach((section, index) => {
+    warnings.push(...getSectionWarnings(section, index, project))
+  })
+
+  return [...new Set(warnings)]
+}
+
+export function getActiveSectionWarnings(project) {
+  const index = project.activeSection - 1
+  const section = project.filling[index]
+
+  if (!section) return []
+
+  return getSectionWarnings(section, index, project)
 }
