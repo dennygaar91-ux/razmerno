@@ -1,6 +1,14 @@
 import Icon from '../../icons/Icon'
 import WardrobeMockup from './WardrobeMockup'
 
+function getSectionLabel(section) {
+  if (section.rail && section.shelves <= 2 && section.drawers === 0) return 'Одежда'
+  if (section.shelves >= 4 && section.drawers === 0 && !section.rail) return 'Полки'
+  if (section.drawers >= 2) return 'Ящики'
+  if (!section.shelves && !section.drawers && !section.rail) return 'Пусто'
+  return 'Смешанная'
+}
+
 function formatSection(section) {
   const parts = []
   if (section.shelves) parts.push(`${section.shelves}П`)
@@ -9,7 +17,7 @@ function formatSection(section) {
   return parts.length ? parts.join(' · ') : 'Пусто'
 }
 
-export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection }) {
+export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection, onPresetApply }) {
   const activeSection = project.filling[project.activeSection - 1]
   const railDisabled = project.dimensions.depth < 520
 
@@ -46,12 +54,18 @@ export default function ConstructorViewer({ project, onSectionSelect, onSectionP
       </div>
 
       <div className="rp-ref-section-map">
-        <h3>Карта секций</h3>
-        <p>Наглядная схема наполнения по секциям</p>
+        <div className="rp-ref-section-map__head">
+          <div>
+            <h3>Карта секций</h3>
+            <p>Активна секция {project.activeSection}: {getSectionLabel(activeSection)}</p>
+          </div>
+          <button type="button" onClick={() => onPresetApply('clothes')}>Сценарий одежды</button>
+        </div>
         <div style={{ gridTemplateColumns: `repeat(${project.sections}, 1fr)` }}>
           {project.filling.map((section, index) => (
             <button className={project.activeSection === index + 1 ? 'is-active' : ''} type="button" key={index} onClick={() => onSectionSelect(index + 1)}>
               <span>{index + 1}</span>
+              <strong>{getSectionLabel(section)}</strong>
               <b>{formatSection(section)}</b>
             </button>
           ))}
