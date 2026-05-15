@@ -238,6 +238,38 @@ export default function ConstructorPage() {
     })
   }
 
+  function copyActiveSectionToNext() {
+    setProject(current => {
+      if (current.sections < 2) return current
+
+      const sourceIndex = current.activeSection - 1
+      const targetIndex = sourceIndex + 1 < current.sections ? sourceIndex + 1 : sourceIndex - 1
+      if (targetIndex < 0) return current
+
+      const source = current.filling[sourceIndex]
+      const filling = current.filling.map((section, index) => (
+        index === targetIndex ? { ...source } : section
+      ))
+
+      return { ...current, activeSection: targetIndex + 1, filling }
+    })
+
+    showNotice('Наполнение скопировано в соседнюю секцию')
+  }
+
+  function applyActiveSectionToAll() {
+    setProject(current => {
+      const source = current.filling[current.activeSection - 1]
+
+      return {
+        ...current,
+        filling: current.filling.map(() => ({ ...source })),
+      }
+    })
+
+    showNotice('Наполнение применено ко всем секциям')
+  }
+
   function toggleRail() {
     setProject(current => {
       const index = current.activeSection - 1
@@ -417,6 +449,8 @@ export default function ConstructorPage() {
           onRailToggle={toggleRail}
           onMaterialChange={updateMaterial}
           onPresetApply={applyFillingPreset}
+          onCopySection={copyActiveSectionToNext}
+          onApplySectionToAll={applyActiveSectionToAll}
         />
         <ConstructorViewer
           activeStep={activeStep}
