@@ -86,11 +86,31 @@ export default function FillPanel({
           </div>
         </div>
 
-        <div className="rv2-fill-actions-grid">
-          <button type="button" onClick={onAddShelf}>+ Полка</button>
-          <button type="button" onClick={onAddDrawer}>+ Ящик</button>
-          <button type="button" onClick={onToggleRail}>Штанга</button>
-          <button type="button" className="danger" onClick={onClearSection}>Очистить</button>
+        <div className="rv2-fill-counter-panel">
+          <strong>Точная настройка</strong>
+
+          <div className="rv2-fill-actions-grid rv2-fill-smart-actions">
+            <button type="button" className={shelves ? "active" : ""} onClick={onAddShelf}>
+              <span>Полки</span>
+              <b>{shelves}</b>
+              <small>Добавить</small>
+            </button>
+            <button type="button" className={drawers ? "active" : ""} onClick={onAddDrawer}>
+              <span>Ящики</span>
+              <b>{drawers}</b>
+              <small>Добавить</small>
+            </button>
+            <button type="button" className={rails ? "active" : ""} onClick={onToggleRail}>
+              <span>Штанга</span>
+              <b>{rails ? "Да" : "Нет"}</b>
+              <small>Переключить</small>
+            </button>
+            <button type="button" className="danger" onClick={onClearSection}>
+              <span>Очистить</span>
+              <b>×</b>
+              <small>Сброс секции</small>
+            </button>
+          </div>
         </div>
 
         <div className="rv2-section-picker">
