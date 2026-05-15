@@ -4,7 +4,7 @@ import ViewerScene from './viewer/ViewerScene'
 import ViewerToolbar from './viewer/ViewerToolbar'
 import { buildViewerSceneProps } from './viewer/viewerUtils'
 
-export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection, onPresetApply, renderCanvas }) {
+export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection, onPresetApply, onPresetApplyToSection, renderCanvas }) {
   const activeSection = project.filling[project.activeSection - 1]
   const railDisabled = project.dimensions.depth < 520
   const sceneProps = buildViewerSceneProps(project)
@@ -14,7 +14,7 @@ export default function ConstructorViewer({ project, onSectionSelect, onSectionP
       <ViewerToolbar />
       <ViewerScene sceneProps={sceneProps} renderCanvas={renderCanvas} />
       <ViewerQuickActions activeSection={activeSection} railDisabled={railDisabled} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onClearSection={onClearSection} />
-      <SectionMap project={project} activeSection={activeSection} onSectionSelect={onSectionSelect} onPresetApply={onPresetApply} />
+      <SectionMap project={project} activeSection={activeSection} onSectionSelect={onSectionSelect} onPresetApply={onPresetApply} onPresetApplyToSection={onPresetApplyToSection} />
     </section>
   )
 }
