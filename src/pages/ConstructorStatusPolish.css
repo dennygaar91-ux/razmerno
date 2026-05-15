@@ -1,0 +1,73 @@
+.rp-ctor-badges--stateful span {
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
+}
+
+.rp-ctor-badges--stateful span.is-success {
+  border-color: rgba(48, 112, 72, .16);
+  background: rgba(48, 112, 72, .08);
+  color: #307048;
+}
+
+.rp-ctor-badges--stateful span.is-loading {
+  border-color: rgba(232, 97, 44, .16);
+  background: rgba(232, 97, 44, .08);
+  color: #8b3d1d;
+}
+
+.rp-ctor-badges--stateful span.is-error {
+  border-color: rgba(180, 35, 24, .16);
+  background: rgba(180, 35, 24, .08);
+  color: #b42318;
+}
+
+.rp-ctor-badges--stateful span.is-neutral {
+  border-color: rgba(10, 10, 10, .08);
+  background: rgba(255, 255, 255, .72);
+  color: #5f5f5a;
+}
+
+.rp-ctor-inline-status {
+  max-width: 1280px;
+  margin: -8px auto 10px;
+  padding: 0 var(--container-pad, 20px);
+  display: grid;
+  gap: 8px;
+}
+
+.rp-ctor-inline-status p {
+  margin: 0;
+  min-height: 38px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(232, 97, 44, .15);
+  background: rgba(232, 97, 44, .055);
+  color: #7a3a20;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+.rp-ctor-inline-status svg {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 1380px) {
+  .rp-ctor-inline-status {
+    margin: -6px auto 8px;
+  }
+
+  .rp-ctor-inline-status p {
+    min-height: 32px;
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+}
+
+@media (max-height: 820px) and (min-width: 1181px) {
+  .rp-ctor-inline-status {
+    display: none;
+  }
+}
