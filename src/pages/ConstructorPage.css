@@ -11,72 +11,28 @@
   width: min(1464px, calc(100vw - 72px));
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 88px 326px minmax(560px, 1fr) 336px;
+  grid-template-columns: 326px minmax(640px, 1fr) 336px;
   gap: 12px;
   align-items: stretch;
 }
 
-.rp-ctor-card,
-.rp-ctor-rail {
+.rp-ctor-shell--no-rail {
+  grid-template-columns: 326px minmax(640px, 1fr) 336px;
+}
+
+.rp-ctor-card {
   background: rgba(255,255,255,.9);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   box-shadow: var(--sh-2);
 }
 
-.rp-ctor-rail,
 .rp-ctor-config,
 .rp-ctor-viewer,
 .rp-ctor-summary {
   height: calc(100vh - 180px);
   min-height: 700px;
   max-height: 830px;
-}
-
-.rp-ctor-rail {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.rp-ctor-rail-step {
-  height: 84px;
-  display: grid;
-  place-items: center;
-  color: var(--ink);
-  font-size: 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.rp-ctor-rail-nav {
-  margin-top: 72px;
-  display: grid;
-}
-
-.rp-ctor-rail-nav button,
-.rp-ctor-help {
-  min-height: 88px;
-  color: var(--text-soft);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  transition: color .16s, background .16s;
-}
-
-.rp-ctor-rail-nav button.is-active,
-.rp-ctor-rail-nav button:hover {
-  color: var(--ink);
-  background: var(--bg-soft);
-}
-
-.rp-ctor-help {
-  margin-top: auto;
-  min-height: 78px;
 }
 
 .rp-ctor-config {
@@ -626,11 +582,14 @@
   .rp-ctor-page { padding-inline: 20px; }
   .rp-ctor-shell,
   .rp-ctor-benefits { width: calc(100vw - 40px); }
-  .rp-ctor-shell { grid-template-columns: 76px 300px minmax(420px, 1fr) 300px; }
+  .rp-ctor-shell,
+  .rp-ctor-shell--no-rail { grid-template-columns: 300px minmax(500px, 1fr) 300px; }
 }
 
 @media (max-width: 1080px) {
   .rp-ctor-page { padding-top: 86px; overflow-x: auto; }
   .rp-ctor-shell,
-  .rp-ctor-benefits { min-width: 1120px; }
+  .rp-ctor-benefits { min-width: 1040px; }
+  .rp-ctor-shell,
+  .rp-ctor-shell--no-rail { grid-template-columns: 300px 520px 300px; }
 }
