@@ -1,0 +1,402 @@
+/* Desktop/laptop stabilization for constructor reference layout */
+.rp-ctor-page--reference {
+  overflow-x: hidden;
+}
+
+.rp-ctor-page--reference .rp-ctor-shell {
+  min-width: 0;
+}
+
+.rp-ctor-page--reference .rp-ctor-config,
+.rp-ctor-page--reference .rp-ctor-viewer,
+.rp-ctor-page--reference .rp-ctor-summary {
+  min-width: 0;
+}
+
+.rp-ref-step-body,
+.rp-ref-summary,
+.rp-ref-scene,
+.rp-ref-section-map,
+.rp-ref-kit-card,
+.rp-ref-project-card,
+.rp-ref-breakdown-card {
+  min-width: 0;
+}
+
+.rp-ref-section-map button,
+.rp-ref-quick-actions button,
+.rp-ref-field,
+.rp-ref-material-list button,
+.rp-ref-handle-list button {
+  min-width: 0;
+}
+
+.rp-ref-section-map b,
+.rp-ref-section-map span,
+.rp-ref-quick-actions button,
+.rp-ref-project-card b,
+.rp-ref-breakdown-card b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1480px) {
+  .rp-ctor-page--reference {
+    padding: 20px 22px 24px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-hero {
+    min-height: 104px;
+    margin-bottom: 12px;
+  }
+
+  .rp-ctor-hero h1 {
+    font-size: 31px;
+  }
+
+  .rp-ctor-lead {
+    max-width: 650px;
+    font-size: 12px;
+  }
+
+  .rp-ctor-actions {
+    gap: 8px;
+  }
+
+  .rp-ctor-actions button {
+    height: 40px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+
+  .rp-ctor-flow {
+    height: 58px;
+  }
+
+  .rp-ctor-flow button {
+    grid-template-columns: 32px 1fr;
+    gap: 10px;
+    padding: 0 18px;
+  }
+
+  .rp-ctor-flow button:not(:last-child)::after {
+    height: 58px;
+  }
+
+  .rp-ctor-flow span {
+    width: 28px;
+    height: 28px;
+  }
+
+  .rp-ctor-flow p {
+    font-size: 14px;
+  }
+
+  .rp-ctor-flow small {
+    font-size: 10px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-config,
+  .rp-ctor-page--reference .rp-ctor-viewer,
+  .rp-ctor-page--reference .rp-ctor-summary {
+    height: calc(100vh - 204px);
+    min-height: 620px;
+    max-height: 700px;
+  }
+
+  .rp-ref-config {
+    padding: 18px 18px;
+  }
+
+  .rp-ref-field {
+    grid-template-columns: minmax(0, 1fr) 134px;
+    min-height: 64px;
+    padding: 11px 10px;
+  }
+
+  .rp-ref-counter {
+    grid-template-columns: 32px 1fr 32px;
+  }
+
+  .rp-ref-viewer {
+    grid-template-rows: 40px minmax(0, 1fr) 50px 118px;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .rp-ref-scene .rp-ctor-wardrobe {
+    width: min(520px, 74%);
+  }
+
+  .rp-ref-quick-actions {
+    min-height: 50px;
+    padding: 7px;
+    gap: 7px;
+  }
+
+  .rp-ref-quick-actions button {
+    gap: 7px;
+    font-size: 12px;
+  }
+
+  .rp-ref-section-map {
+    padding: 12px;
+  }
+
+  .rp-ref-section-map button {
+    height: 42px;
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .rp-ref-summary {
+    grid-template-rows: 70px 82px 102px 124px 68px 80px 88px 38px;
+    gap: 6px;
+  }
+
+  .rp-ref-summary .rp-ctor-card {
+    padding: 10px 12px;
+  }
+
+  .rp-ref-price-card strong {
+    font-size: 27px;
+  }
+}
+
+@media (max-width: 1380px) {
+  .rp-ctor-page--reference {
+    padding: 16px 16px 20px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-shell {
+    grid-template-columns: calc(26% - 8px) calc(48% - 8px) calc(26% - 8px);
+    gap: 10px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-hero {
+    min-height: 92px;
+    gap: 18px;
+  }
+
+  .rp-ctor-hero h1 {
+    font-size: 28px;
+  }
+
+  .rp-ctor-kicker {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  .rp-ctor-lead {
+    margin-top: 9px;
+    max-width: 590px;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .rp-ctor-badges {
+    margin-top: 9px;
+  }
+
+  .rp-ctor-badges span {
+    min-height: 26px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  .rp-ctor-actions button {
+    height: 38px;
+    padding: 0 12px;
+    gap: 7px;
+    font-size: 11px;
+  }
+
+  .rp-ctor-flow {
+    height: 54px;
+    margin-bottom: 10px;
+  }
+
+  .rp-ctor-flow button {
+    grid-template-columns: 28px 1fr;
+    padding: 0 14px;
+  }
+
+  .rp-ctor-flow button:not(:last-child)::after {
+    height: 54px;
+  }
+
+  .rp-ctor-flow span {
+    width: 25px;
+    height: 25px;
+    font-size: 11px;
+  }
+
+  .rp-ctor-flow p {
+    font-size: 13px;
+  }
+
+  .rp-ctor-flow small {
+    display: none;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-config,
+  .rp-ctor-page--reference .rp-ctor-viewer,
+  .rp-ctor-page--reference .rp-ctor-summary {
+    height: calc(100vh - 176px);
+    min-height: 600px;
+    max-height: 680px;
+  }
+
+  .rp-ref-panel-head {
+    grid-template-columns: 27px 1fr;
+    gap: 11px;
+  }
+
+  .rp-ref-panel-head > span {
+    width: 25px;
+    height: 25px;
+    font-size: 11px;
+  }
+
+  .rp-ref-panel-head h2 {
+    font-size: 17px;
+  }
+
+  .rp-ref-panel-head p {
+    font-size: 11px;
+  }
+
+  .rp-ref-fields {
+    margin-top: 16px;
+  }
+
+  .rp-ref-field {
+    grid-template-columns: minmax(0, 1fr) 118px;
+    min-height: 58px;
+    gap: 9px;
+    padding: 9px;
+  }
+
+  .rp-ref-field strong {
+    font-size: 12px;
+  }
+
+  .rp-ref-field span {
+    font-size: 10px;
+  }
+
+  .rp-ref-counter {
+    height: 32px;
+    grid-template-columns: 29px 1fr 29px;
+  }
+
+  .rp-ref-block {
+    margin-top: 18px;
+  }
+
+  .rp-ref-viewer {
+    grid-template-rows: 36px minmax(0, 1fr) 46px 104px;
+    gap: 7px;
+    padding: 10px;
+  }
+
+  .rp-ref-view-mode span,
+  .rp-ref-scale span {
+    display: none;
+  }
+
+  .rp-ref-view-mode button,
+  .rp-ref-scale button,
+  .rp-ref-scale b {
+    height: 31px;
+    min-width: 36px;
+    padding: 0 9px;
+    font-size: 11px;
+  }
+
+  .rp-ref-scene .rp-ctor-wardrobe {
+    width: min(460px, 72%);
+  }
+
+  .rp-ref-quick-actions {
+    min-height: 46px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rp-ref-quick-actions button {
+    font-size: 11px;
+  }
+
+  .rp-ref-section-map {
+    padding: 10px;
+  }
+
+  .rp-ref-section-map h3 {
+    font-size: 13px;
+  }
+
+  .rp-ref-section-map p {
+    display: none;
+  }
+
+  .rp-ref-section-map > div {
+    margin-top: 8px;
+    gap: 7px;
+  }
+
+  .rp-ref-section-map button {
+    height: 38px;
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  .rp-ref-section-map b {
+    font-size: 11px;
+  }
+
+  .rp-ref-summary {
+    grid-template-rows: 66px 76px 96px 116px 64px 74px 80px 38px;
+    gap: 5px;
+  }
+
+  .rp-ref-summary .rp-ctor-card {
+    padding: 9px 10px;
+  }
+
+  .rp-ref-ready h2 {
+    font-size: 16px;
+  }
+
+  .rp-ref-ready span {
+    display: none;
+  }
+
+  .rp-ref-price-card strong {
+    font-size: 25px;
+  }
+
+  .rp-ref-price-card span {
+    display: none;
+  }
+
+  .rp-ref-kit-items {
+    gap: 3px;
+  }
+
+  .rp-ref-kit-items small {
+    display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .rp-ctor-page--reference {
+    overflow-x: auto;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-hero,
+  .rp-ctor-page--reference .rp-ctor-flow,
+  .rp-ctor-page--reference .rp-ctor-shell {
+    min-width: 1120px;
+  }
+}
