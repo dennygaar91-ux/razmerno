@@ -1,0 +1,304 @@
+/* Fixes after visual check on real screenshots */
+.rp-ctor-page--reference {
+  padding-top: 16px;
+}
+
+.rp-ctor-page--reference .rp-ctor-hero {
+  min-height: 94px;
+  margin-bottom: 10px;
+}
+
+.rp-ctor-hero h1 {
+  font-size: 31px;
+  line-height: 1.02;
+}
+
+.rp-ctor-lead {
+  margin-top: 8px;
+  max-width: 640px;
+  font-size: 12px;
+  line-height: 1.42;
+}
+
+.rp-ctor-badges {
+  margin-top: 9px;
+}
+
+.rp-ctor-badges span {
+  min-height: 26px;
+  padding-inline: 10px;
+  font-size: 11px;
+}
+
+.rp-ctor-actions {
+  padding-top: 0;
+}
+
+.rp-ctor-actions button {
+  height: 38px;
+  padding-inline: 14px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+
+.rp-ctor-actions button.is-primary {
+  padding-inline: 20px;
+}
+
+.rp-ctor-flow {
+  height: 58px;
+  margin-bottom: 10px;
+}
+
+.rp-ctor-flow div:not(:last-child)::after,
+.rp-ctor-flow button:not(:last-child)::after {
+  height: 58px;
+}
+
+.rp-ctor-flow p {
+  font-size: 14px;
+}
+
+.rp-ctor-flow small {
+  font-size: 10px;
+}
+
+.rp-ctor-page--reference .rp-ctor-config,
+.rp-ctor-page--reference .rp-ctor-viewer,
+.rp-ctor-page--reference .rp-ctor-summary {
+  height: calc(100vh - 190px);
+  min-height: 620px;
+  max-height: 720px;
+}
+
+.rp-ref-viewer {
+  padding: 12px;
+  grid-template-rows: 38px minmax(0, 1fr) 50px 144px;
+  gap: 8px;
+}
+
+.rp-ref-scene .rp-ctor-wardrobe {
+  width: min(510px, 72%);
+  max-height: 82%;
+}
+
+.rp-ref-scene__hint {
+  bottom: 10px;
+}
+
+.rp-ref-quick-actions--polished {
+  min-height: 50px;
+  padding: 6px;
+}
+
+.rp-ref-quick-actions--polished button {
+  min-height: 40px;
+}
+
+.rp-ref-section-map--polished {
+  padding: 12px;
+}
+
+.rp-ref-section-map__head {
+  margin-bottom: 8px;
+}
+
+.rp-ref-section-map__head h3 {
+  font-size: 14px;
+}
+
+.rp-ref-section-map__head p {
+  margin-top: 4px;
+  margin-bottom: 0;
+  font-size: 11px;
+}
+
+.rp-ref-section-map__head > button {
+  min-height: 30px;
+  white-space: nowrap;
+}
+
+.rp-ref-section-map__grid {
+  gap: 7px;
+}
+
+.rp-ref-section-map__item {
+  min-height: 60px;
+  padding: 8px;
+}
+
+.rp-ref-section-map__item em {
+  display: none;
+}
+
+.rp-ref-config--polished {
+  padding: 18px 20px;
+}
+
+.rp-ref-step-hint {
+  margin-top: 14px;
+  padding: 10px 12px;
+}
+
+.rp-ref-fields--polished {
+  margin-top: 12px;
+}
+
+.rp-ref-field--polished {
+  min-height: 58px;
+  padding-block: 9px;
+}
+
+.rp-ref-block--polished {
+  margin-top: 14px;
+}
+
+.rp-ref-preset-grid--polished button {
+  min-height: 64px;
+}
+
+.rp-ref-summary--product {
+  grid-template-rows: 176px 86px 150px 104px auto 96px;
+}
+
+.rp-ref-price-card--main strong {
+  font-size: 34px;
+}
+
+.rp-checkout--polished .rp-checkout__panel {
+  width: min(530px, calc(100vw - 28px));
+}
+
+.rp-checkout__head--polished {
+  padding-top: 22px;
+}
+
+.rp-checkout__hero-total strong {
+  font-size: 34px;
+}
+
+.rp-clear-confirm__card {
+  width: min(390px, calc(100vw - 48px));
+}
+
+.rp-clear-confirm__card h2 {
+  font-size: 26px;
+}
+
+@media (max-width: 1480px) {
+  .rp-ctor-hero h1 {
+    font-size: 29px;
+  }
+
+  .rp-ctor-lead {
+    max-width: 580px;
+  }
+
+  .rp-ref-viewer {
+    grid-template-rows: 36px minmax(0, 1fr) 48px 136px;
+  }
+
+  .rp-ref-section-map__item {
+    min-height: 56px;
+  }
+}
+
+@media (max-width: 1380px) {
+  .rp-ctor-page--reference {
+    padding: 12px 18px 18px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-hero {
+    min-height: 76px;
+  }
+
+  .rp-ctor-hero h1 {
+    font-size: 25px;
+  }
+
+  .rp-ctor-lead {
+    display: none;
+  }
+
+  .rp-ctor-actions button {
+    height: 36px;
+    padding-inline: 11px;
+  }
+
+  .rp-ctor-flow {
+    height: 52px;
+  }
+
+  .rp-ctor-flow div:not(:last-child)::after,
+  .rp-ctor-flow button:not(:last-child)::after {
+    height: 52px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-config,
+  .rp-ctor-page--reference .rp-ctor-viewer,
+  .rp-ctor-page--reference .rp-ctor-summary {
+    height: calc(100vh - 152px);
+    min-height: 560px;
+  }
+
+  .rp-ref-viewer {
+    grid-template-rows: 34px minmax(0, 1fr) 44px 118px;
+  }
+
+  .rp-ref-section-map__head p,
+  .rp-ref-section-map__item b {
+    display: none;
+  }
+
+  .rp-ref-section-map__item {
+    min-height: 42px;
+  }
+}
+
+@media (max-height: 820px) and (min-width: 1181px) {
+  .rp-ctor-page--reference {
+    padding-top: 10px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-hero {
+    min-height: 70px;
+  }
+
+  .rp-ctor-badges {
+    display: flex;
+  }
+
+  .rp-ctor-badges span {
+    min-height: 24px;
+    font-size: 10px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-config,
+  .rp-ctor-page--reference .rp-ctor-viewer,
+  .rp-ctor-page--reference .rp-ctor-summary {
+    height: calc(100vh - 142px);
+    min-height: 540px;
+  }
+
+  .rp-ref-viewer {
+    grid-template-rows: 32px minmax(0, 1fr) 42px 108px;
+  }
+
+  .rp-ref-section-map--polished {
+    padding: 10px;
+  }
+
+  .rp-ref-section-map__item {
+    min-height: 40px;
+  }
+
+  .rp-ref-section-map__item b,
+  .rp-ref-section-map__item em,
+  .rp-ref-section-map__head p {
+    display: none;
+  }
+
+  .rp-ref-quick-actions--polished small {
+    display: none;
+  }
+}
