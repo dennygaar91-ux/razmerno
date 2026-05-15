@@ -6,12 +6,6 @@ const dimensionFields = [
   ['depth', 'Глубина, мм', '300–800', 50],
 ]
 
-const materials = [
-  ['ЛДСП Дуб Сонома', 'Тёплый древесный декор'],
-  ['ЛДСП Белый матовый', 'Светлый минимализм'],
-  ['ЛДСП Серый камень', 'Нейтральный современный тон'],
-]
-
 function CounterField({ label, value, hint, onMinus, onPlus }) {
   return (
     <div className="rp-ref-field">
@@ -115,17 +109,18 @@ function FillingStep({ project, warnings, onSectionSelect, onSectionPartChange, 
   )
 }
 
-function MaterialsStep({ project, onMaterialChange }) {
+function MaterialsStep({ project, materials, handleOptions, onMaterialChange }) {
   return (
     <>
       <div className="rp-ref-block rp-ref-block--topless">
         <h3>Материал корпуса</h3>
         <p>Выберите декор ЛДСП для корпуса и полок</p>
         <div className="rp-ref-material-list">
-          {materials.map(([title, text]) => (
-            <button className={project.material.body === title ? 'is-active' : ''} type="button" key={title} onClick={() => onMaterialChange('body', title)}>
-              <i />
-              <span>{title}<small>{text}</small></span>
+          {materials.map((material) => (
+            <button className={project.material.materialId === material.id ? 'is-active' : ''} type="button" key={material.id} onClick={() => onMaterialChange('materialId', material.id)}>
+              <i className={`rp-ref-material-swatch rp-ref-material-swatch--${material.tone}`} />
+              <span>{material.title}<small>{material.text} · {material.thickness}</small></span>
+              <b>{material.priceFactor > 1 ? `+${Math.round((material.priceFactor - 1) * 100)}%` : material.priceFactor < 1 ? `−${Math.round((1 - material.priceFactor) * 100)}%` : 'база'}</b>
             </button>
           ))}
         </div>
@@ -133,15 +128,19 @@ function MaterialsStep({ project, onMaterialChange }) {
 
       <div className="rp-ref-block">
         <h3>Открывание</h3>
-        <div className="rp-ref-section-tabs rp-ref-section-tabs--two">
-          <button className={project.material.handles === 'С ручками' ? 'is-active' : ''} type="button" onClick={() => onMaterialChange('handles', 'С ручками')}>С ручками</button>
-          <button className={project.material.handles === 'Без ручек' ? 'is-active' : ''} type="button" onClick={() => onMaterialChange('handles', 'Без ручек')}>Без ручек</button>
+        <div className="rp-ref-handle-list">
+          {handleOptions.map((option) => (
+            <button className={project.material.handleId === option.id ? 'is-active' : ''} type="button" key={option.id} onClick={() => onMaterialChange('handleId', option.id)}>
+              <span>{option.title}<small>{option.text}</small></span>
+              <b>{option.priceAdd ? `+${option.priceAdd.toLocaleString('ru-RU')} ₽` : 'включено'}</b>
+            </button>
+          ))}
         </div>
       </div>
 
       <div className="rp-ref-block rp-ref-info">
         <Icon name="check-circle" size={16} />
-        <span>Кромка ПВХ 2 мм подобрана автоматически в цвет корпуса</span>
+        <span>{project.material.edge} подобрана автоматически</span>
       </div>
     </>
   )
@@ -151,6 +150,8 @@ export default function ConstructorConfig({
   activeStep,
   project,
   warnings,
+  materials,
+  handleOptions,
   canGoBack,
   canGoNext,
   onBack,
@@ -181,7 +182,7 @@ export default function ConstructorConfig({
       number: 3,
       title: 'Материалы',
       text: 'Подберите декор, кромку и базовую фурнитуру для комплекта.',
-      body: <MaterialsStep project={project} onMaterialChange={onMaterialChange} />,
+      body: <MaterialsStep project={project} materials={materials} handleOptions={handleOptions} onMaterialChange={onMaterialChange} />,
       next: 'В корзину',
     },
   }
