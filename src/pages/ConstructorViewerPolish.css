@@ -33,6 +33,34 @@
   font-weight: 950;
 }
 
+.rp-ref-scene__meta {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rp-ref-scene__meta span {
+  min-height: 28px;
+  max-width: 150px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 10, 10, .07);
+  background: rgba(255, 255, 255, .76);
+  color: #60605a;
+  backdrop-filter: blur(10px);
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 850;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .rp-ref-scene--polished .rp-ctor-size {
   z-index: 4;
   min-height: 34px;
@@ -57,6 +85,63 @@
   font-weight: 850;
   text-transform: uppercase;
   letter-spacing: .08em;
+}
+
+.rp-canvas-slot {
+  position: absolute;
+  inset: 58px 34px 46px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.rp-canvas-slot__stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.rp-canvas-slot.is-canvas .rp-canvas-slot__stage > * {
+  width: 100%;
+  height: 100%;
+}
+
+.rp-canvas-slot.is-fallback .rp-ctor-wardrobe {
+  position: relative;
+}
+
+.rp-canvas-slot__fallback-note {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  z-index: 3;
+  min-height: 30px;
+  padding: 5px 9px;
+  border-radius: 12px;
+  border: 1px solid rgba(10, 10, 10, .07);
+  background: rgba(255, 255, 255, .78);
+  backdrop-filter: blur(10px);
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.rp-canvas-slot__fallback-note span {
+  color: #8a8a85;
+  font-size: 7px;
+  line-height: 1;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.rp-canvas-slot__fallback-note b {
+  color: #151515;
+  font-size: 8px;
+  line-height: 1.1;
+  font-weight: 850;
 }
 
 .rp-ref-scene__hint {
@@ -239,12 +324,34 @@
   .rp-ref-section-map__item {
     min-height: 50px;
   }
+
+  .rp-ref-scene__meta span:nth-child(2) {
+    display: none;
+  }
 }
 
 @media (max-width: 1380px) {
   .rp-ref-scene__badge {
     top: 12px;
     left: 12px;
+  }
+
+  .rp-ref-scene__meta {
+    top: 12px;
+    right: 12px;
+  }
+
+  .rp-ref-scene__meta span {
+    min-height: 24px;
+    font-size: 8px;
+  }
+
+  .rp-canvas-slot {
+    inset: 48px 24px 34px;
+  }
+
+  .rp-canvas-slot__fallback-note {
+    display: none;
   }
 
   .rp-ref-scene__hint {
