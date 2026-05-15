@@ -4,28 +4,37 @@ function formatPrice(value) {
   return new Intl.NumberFormat('ru-RU').format(value)
 }
 
+const breakdownLabels = {
+  material: 'Материалы и детали',
+  cutting: 'Распил',
+  edging: 'Кромление',
+  hardware: 'Фурнитура',
+  packaging: 'Упаковка',
+}
+
 export default function ConstructorSummary({ project, summary, warnings = [], onCheckout }) {
   const projectRows = [
     ['Размер (В × Ш × Г)', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
     ['Секции', `${project.sections} шт.`],
     ['Наполнение', `${summary.elements} элементов`],
-    ['Полки', `${summary.shelves} шт.`],
-    ['Ящики', `${summary.drawers} шт.`],
-    ['Штанги', `${summary.rails} шт.`],
+    ['Материал', project.material.body],
+    ['Открывание', project.material.handles],
+    ['Кромка', project.material.edge],
   ]
 
   const kitItems = [
     ['Корпус', '36 деталей'],
     ['Полки', `${summary.shelves} шт.`],
     ['Ящики', `${summary.drawers} шт.`],
-    ['Фасады', '0 шт.'],
-    ['Фурнитура', '1 компл.'],
+    ['Штанги', `${summary.rails} шт.`],
+    ['Фурнитура', project.material.handles],
   ]
 
   const isReady = warnings.length === 0
+  const breakdown = project.priceBreakdown ?? {}
 
   return (
-    <aside className="rp-ctor-summary rp-ref-summary">
+    <aside className="rp-ctor-summary rp-ref-summary rp-ref-summary--detailed">
       <section className="rp-ctor-card rp-ref-ready">
         <div>
           <p>Ваш проект</p>
@@ -39,6 +48,16 @@ export default function ConstructorSummary({ project, summary, warnings = [], on
         <p>Стоимость комплекта</p>
         <strong>{formatPrice(project.price)} ₽</strong>
         <span>Предварительно, по текущим размерам и наполнению</span>
+      </section>
+
+      <section className="rp-ctor-card rp-ref-breakdown-card">
+        <h3>Смета</h3>
+        {Object.entries(breakdown).map(([key, value]) => (
+          <div key={key}>
+            <span>{breakdownLabels[key] ?? key}</span>
+            <b>{formatPrice(value)} ₽</b>
+          </div>
+        ))}
       </section>
 
       <section className="rp-ctor-card rp-ref-project-card">
