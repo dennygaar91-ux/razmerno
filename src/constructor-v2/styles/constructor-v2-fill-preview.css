@@ -20,7 +20,11 @@
   color: #4b3420;
   text-align: center;
   overflow: hidden;
-  transition: background 160ms ease, box-shadow 160ms ease;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
 }
 
 .rv2-cabinet-section::before {
@@ -38,15 +42,27 @@
 }
 
 .rv2-cabinet-section.active {
-  background: rgba(255,255,255,0.28);
+  z-index: 4;
+  transform: translateY(-4px) scale(1.015);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,0.42), transparent 44%),
+    linear-gradient(180deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.18) 100%);
   box-shadow:
-    inset 0 0 0 3px rgba(239,91,42,0.34),
-    inset 0 -18px 24px rgba(0,0,0,0.05);
+    inset 0 0 0 3px rgba(239,91,42,0.46),
+    inset 0 -18px 24px rgba(0,0,0,0.05),
+    0 18px 32px rgba(80,54,31,0.16),
+    0 0 0 8px rgba(239,91,42,0.08);
+}
+
+.rv2-cabinet-section.active::before {
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 46%, rgba(239,91,42,0.12) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.16) 0%, transparent 22%);
 }
 
 .rv2-cabinet-section > span {
   position: relative;
-  z-index: 3;
+  z-index: 5;
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -57,17 +73,30 @@
   background: rgba(255,255,255,0.75);
   font-size: 12px;
   font-weight: 900;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.rv2-cabinet-section.active > span {
+  background: linear-gradient(180deg, #ff7a45 0%, #ef5b2a 100%);
+  color: #fff;
+  box-shadow: 0 8px 16px rgba(239,91,42,0.28);
 }
 
 .rv2-cabinet-section > strong {
   position: relative;
-  z-index: 3;
+  z-index: 5;
   min-height: 30px;
   padding: 7px 10px;
   border-radius: 999px;
   background: rgba(255,255,255,0.72);
   font-size: 12px;
   font-weight: 900;
+  transition: background 160ms ease, box-shadow 160ms ease;
+}
+
+.rv2-cabinet-section.active > strong {
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 8px 18px rgba(15,15,15,0.08);
 }
 
 .rv2-section-fill-preview {
@@ -95,6 +124,14 @@
   box-shadow:
     0 2px 0 rgba(255,255,255,0.18),
     0 6px 10px rgba(0,0,0,0.08);
+}
+
+.rv2-cabinet-section.active .rv2-shelf-line,
+.rv2-cabinet-section.active .rv2-rail-line {
+  background: rgba(66, 43, 24, 0.68);
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.22),
+    0 8px 14px rgba(0,0,0,0.12);
 }
 
 .rv2-rail-line {
@@ -134,6 +171,15 @@
   box-shadow:
     inset 0 -2px 0 rgba(76,50,27,0.12),
     0 8px 14px rgba(0,0,0,0.08);
+}
+
+.rv2-cabinet-section.active .rv2-drawer-stack i {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.3) 100%),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 0%, transparent 14%, transparent 86%, rgba(0,0,0,0.06) 100%);
+  box-shadow:
+    inset 0 -2px 0 rgba(76,50,27,0.16),
+    0 10px 18px rgba(0,0,0,0.12);
 }
 
 .rv2-drawer-stack i span {
