@@ -132,7 +132,20 @@
   color: #111;
 }
 
-.rv2-check-card,
+.rv2-check-card {
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border-radius: 30px;
+  border: 1px solid rgba(37,149,71,.12);
+  background:
+    radial-gradient(circle at top right, rgba(58,194,100,0.1), transparent 32%),
+    linear-gradient(180deg, rgba(247,255,250,0.96) 0%, rgba(241,252,245,0.92) 100%);
+  box-shadow:
+    0 18px 34px rgba(37,149,71,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
 .rv2-kit-card {
   padding: 22px;
   border-radius: 26px;
@@ -140,31 +153,70 @@
   background: rgba(255,255,255,0.9);
 }
 
+.rv2-check-card::after {
+  content: "production ready";
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #3ac264 0%, #259547 100%);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 18px rgba(37,149,71,0.22);
+}
+
 .rv2-check-head {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .rv2-check-head strong {
   color: #259547;
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -.05em;
+}
+
+.rv2-check-head p {
+  margin: 4px 0 0;
+  color: rgba(15,15,15,.52);
+  font-size: 13px;
 }
 
 .rv2-progress-line {
-  height: 10px;
+  position: relative;
+  height: 12px;
   border-radius: 999px;
   background: rgba(15,15,15,.06);
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
 }
 
 .rv2-progress-line i {
+  position: relative;
   display: block;
   width: 92%;
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #259547 0%, #3ac264 100%);
+  box-shadow: 0 4px 12px rgba(37,149,71,0.28);
+}
+
+.rv2-progress-line i::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.22) 0%, transparent 100%);
 }
 
 .rv2-kit-grid {
