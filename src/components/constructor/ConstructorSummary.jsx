@@ -1,23 +1,27 @@
 import Icon from '../../icons/Icon'
 
-const projectRows = [
-  ['Размер (В × Ш × Г)', '2400 × 1800 × 600 мм'],
-  ['Секции', '3 шт.'],
-  ['Наполнение', '7 элементов'],
-  ['Полки', '7 шт.'],
-  ['Ящики', '2 шт.'],
-  ['Штанги', '1 шт.'],
-]
+function formatPrice(value) {
+  return new Intl.NumberFormat('ru-RU').format(value)
+}
 
-const kitItems = [
-  ['Корпус', '36 деталей'],
-  ['Полки', '7 шт.'],
-  ['Ящики', '2 шт.'],
-  ['Фасады', '0 шт.'],
-  ['Фурнитура', '1 компл.'],
-]
+export default function ConstructorSummary({ project, summary, onCheckout }) {
+  const projectRows = [
+    ['Размер (В × Ш × Г)', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
+    ['Секции', `${project.sections} шт.`],
+    ['Наполнение', `${summary.elements} элементов`],
+    ['Полки', `${summary.shelves} шт.`],
+    ['Ящики', `${summary.drawers} шт.`],
+    ['Штанги', `${summary.rails} шт.`],
+  ]
 
-export default function ConstructorSummary({ onCheckout }) {
+  const kitItems = [
+    ['Корпус', '36 деталей'],
+    ['Полки', `${summary.shelves} шт.`],
+    ['Ящики', `${summary.drawers} шт.`],
+    ['Фасады', '0 шт.'],
+    ['Фурнитура', '1 компл.'],
+  ]
+
   return (
     <aside className="rp-ctor-summary rp-ref-summary">
       <section className="rp-ctor-card rp-ref-ready">
@@ -31,7 +35,7 @@ export default function ConstructorSummary({ onCheckout }) {
 
       <section className="rp-ctor-card rp-ref-price-card">
         <p>Стоимость комплекта</p>
-        <strong>15 447 ₽</strong>
+        <strong>{formatPrice(project.price)} ₽</strong>
         <span>Предварительно, по текущим размерам и наполнению</span>
       </section>
 
@@ -72,7 +76,7 @@ export default function ConstructorSummary({ onCheckout }) {
       <section className="rp-ctor-card rp-ref-additional-card">
         <h3>Дополнительно</h3>
         <div><span>Задняя стенка</span><em>Рекомендуем</em><b /></div>
-        <div><span>Кромка</span><em>Включена</em><b /></div>
+        <div><span>{project.material.edge}</span><em>Включена</em><b /></div>
         <div><span>Крепление к стене</span><em>Рекомендуем</em><b /></div>
       </section>
 
