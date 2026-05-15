@@ -1,13 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ConstructorConfig from '../components/constructor/ConstructorConfig'
 import ConstructorViewer from '../components/constructor/ConstructorViewer'
 import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
-import { calculatePrice, getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
+import { getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
 import { clearConstructorProject, loadConstructorProject, saveConstructorProject } from '../utils/constructorStorage'
+import { calculateConstructorEstimate } from '../services/constructorEstimate'
 import './ConstructorPage.css'
 import './ConstructorWizard.css'
 import './ConstructorReference.css'
@@ -36,19 +37,51 @@ export default function ConstructorPage() {
   const [activeStep, setActiveStep] = useState('dimensions')
   const [project, setProject] = useState(DEFAULT_PROJECT)
   const [notice, setNotice] = useState('')
+  const [estimate, setEstimate] = useState(null)
+  const [estimateState, setEstimateState] = useState('idle')
 
   const activeStepIndex = FLOW_STEPS.findIndex(step => step.id === activeStep)
 
   const canGoBack = activeStepIndex > 0
   const canGoNext = activeStepIndex < FLOW_STEPS.length - 1
 
-  const summary = useMemo(() => getProjectSummary(project), [project])
-  const priceBreakdown = useMemo(() => getPriceBreakdown(project, summary), [project, summary])
-  const price = useMemo(() => calculatePrice(project, summary), [project, summary])
-  const warnings = useMemo(() => getWarnings(project, summary), [project, summary])
+  const fallbackSummary = useMemo(() => getProjectSummary(project), [project])
+  const fallbackPriceBreakdown = useMemo(() => getPriceBreakdown(project, fallbackSummary), [project, fallbackSummary])
+  const fallbackWarnings = useMemo(() => getWarnings(project, fallbackSummary), [project, fallbackSummary])
+
+  const summary = estimate?.summary ?? fallbackSummary
+  const priceBreakdown = estimate?.estimate?.breakdown ?? fallbackPriceBreakdown
+  const price = estimate?.estimate?.total ?? Object.values(priceBreakdown).reduce((sum, value) => sum + value, 0)
+  const warnings = estimate?.warnings ?? fallbackWarnings
   const activeSectionWarnings = useMemo(() => getActiveSectionWarnings(project), [project])
   const projectWithPrice = useMemo(() => ({ ...project, price, priceBreakdown }), [project, price, priceBreakdown])
   const orderPayload = useMemo(() => buildConstructorPayload(projectWithPrice, summary), [projectWithPrice, summary])
+
+  useEffect(() => {
+    let isCancelled = false
+    setEstimateState('loading')
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const nextEstimate = await calculateConstructorEstimate(project)
+        if (isCancelled) return
+
+        setEstimate(nextEstimate)
+        setEstimateState('success')
+      } catch (error) {
+        if (isCancelled) return
+
+        console.warn('Constructor estimate failed:', error)
+        setEstimate(null)
+        setEstimateState('error')
+      }
+    }, 320)
+
+    return () => {
+      isCancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [project])
 
   function showNotice(message) {
     setNotice(message)
@@ -193,6 +226,7 @@ export default function ConstructorPage() {
     clearConstructorProject()
     setProject(DEFAULT_PROJECT)
     setActiveStep('dimensions')
+    setEstimate(null)
     showNotice('Проект очищен')
   }
 
@@ -224,7 +258,7 @@ export default function ConstructorPage() {
           <div className="rp-ctor-badges">
             <span>3 шага</span>
             <span>цена сразу</span>
-            <span>комплект для сборки</span>
+            <span>{estimateState === 'loading' ? 'пересчитываем' : 'комплект для сборки'}</span>
           </div>
         </div>
 
@@ -276,7 +310,7 @@ export default function ConstructorPage() {
           onClearSection={clearActiveSection}
           onPresetApply={applyFillingPreset}
         />
-        <ConstructorSummary project={projectWithPrice} summary={summary} warnings={warnings} onCheckout={() => setCheckoutOpen(true)} />
+        <ConstructorSummary project={projectWithPrice} summary={summary} warnings={warnings} estimateState={estimateState} onCheckout={() => setCheckoutOpen(true)} />
       </section>
 
       <CheckoutDrawer open={checkoutOpen} project={projectWithPrice} summary={summary} orderPayload={orderPayload} onClose={() => setCheckoutOpen(false)} />
