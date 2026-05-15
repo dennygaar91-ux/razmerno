@@ -45,6 +45,8 @@ export function getPriceBreakdown(project, summary) {
   const volumeFactor = (height * width * depth) / (2400 * 1800 * 600)
   const materialFactor = project.material.priceFactor ?? 1
   const handleAdd = project.material.handlePriceAdd ?? 0
+  const edgeAdd = project.material.edgePriceAdd ?? 0
+  const hardwareAdd = project.material.hardwarePriceAdd ?? 0
 
   const materialBase = 11200 * volumeFactor * materialFactor
   const sections = project.sections * 620
@@ -52,8 +54,8 @@ export function getPriceBreakdown(project, summary) {
   const drawers = summary.drawers * 1550
   const rails = summary.rails * 690
   const cutting = 1800 + project.sections * 180
-  const edging = 1100 + summary.shelves * 90 + summary.drawers * 160
-  const hardware = drawers + rails + handleAdd
+  const edging = 1100 + summary.shelves * 90 + summary.drawers * 160 + edgeAdd
+  const hardware = drawers + rails + handleAdd + hardwareAdd
   const packaging = 850
 
   return {
@@ -69,6 +71,8 @@ export function getEstimateRows(project, summary, breakdown) {
   const volumeFactor = (project.dimensions.height * project.dimensions.width * project.dimensions.depth) / (2400 * 1800 * 600)
   const materialFactor = project.material.priceFactor ?? 1
   const handleAdd = project.material.handlePriceAdd ?? 0
+  const hardwareAdd = project.material.hardwarePriceAdd ?? 0
+  const edgeAdd = project.material.edgePriceAdd ?? 0
 
   return [
     {
@@ -90,14 +94,14 @@ export function getEstimateRows(project, summary, breakdown) {
       title: 'Кромление',
       value: breakdown.edging ?? 0,
       hint: project.material.edge,
-      formula: `${summary.shelves} полок · ${summary.drawers} ящиков`,
+      formula: edgeAdd ? `включая опцию ${roundMoney(edgeAdd).toLocaleString('ru-RU')} ₽` : `${summary.shelves} полок · ${summary.drawers} ящиков`,
     },
     {
       key: 'hardware',
       title: 'Фурнитура',
       value: breakdown.hardware ?? 0,
-      hint: `${summary.drawers} ящиков · ${summary.rails} штанг · ${project.material.handles}`,
-      formula: handleAdd ? `включая надбавку ${roundMoney(handleAdd).toLocaleString('ru-RU')} ₽` : 'базовый комплект',
+      hint: `${summary.drawers} ящиков · ${summary.rails} штанг · ${project.material.handles} · ${project.material.hardware ?? 'Стандарт'}`,
+      formula: handleAdd || hardwareAdd ? `надбавки ${roundMoney(handleAdd + hardwareAdd).toLocaleString('ru-RU')} ₽` : 'базовый комплект',
     },
     {
       key: 'packaging',
