@@ -4,6 +4,8 @@ import ConstructorViewer from '../components/constructor/ConstructorViewer'
 import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import Icon from '../icons/Icon'
+import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
+import { calculatePrice, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import './ConstructorPage.css'
 import './ConstructorWizard.css'
 import './ConstructorReference.css'
@@ -15,88 +17,21 @@ const FLOW_STEPS = [
   { id: 'materials', num: '3', title: 'Материалы', text: 'Подберите декоры и фурнитуру' },
 ]
 
-const DIMENSION_LIMITS = {
-  height: { min: 200, max: 2800, step: 100 },
-  width: { min: 400, max: 3000, step: 100 },
-  depth: { min: 300, max: 800, step: 50 },
-}
-
-const initialProject = {
-  dimensions: { height: 2400, width: 1800, depth: 600 },
-  sections: 3,
-  activeSection: 1,
-  filling: [
-    { shelves: 4, drawers: 2, rail: false },
-    { shelves: 1, drawers: 0, rail: true },
-    { shelves: 3, drawers: 0, rail: false },
-  ],
-  material: {
-    body: 'ЛДСП Дуб Сонома',
-    thickness: '16 мм',
-    edge: 'ПВХ 2 мм',
-    handles: 'С ручками',
-  },
-}
-
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
-}
-
-function calculatePrice(project, summary) {
-  const { height, width, depth } = project.dimensions
-  const volumeFactor = (height * width * depth) / (2400 * 1800 * 600)
-  const base = 11200 * volumeFactor
-  const sections = project.sections * 620
-  const shelves = summary.shelves * 420
-  const drawers = summary.drawers * 1550
-  const rails = summary.rails * 690
-  const handleFactor = project.material.handles === 'Без ручек' ? 1450 : 0
-
-  return Math.round((base + sections + shelves + drawers + rails + handleFactor) / 10) * 10
-}
-
-function getWarnings(project, summary) {
-  const warnings = []
-  const { height, width, depth } = project.dimensions
-
-  if (depth < 520 && summary.rails > 0) {
-    warnings.push('Для штанги рекомендуем глубину от 520 мм. Сейчас одежда может не помещаться по плечикам.')
-  }
-
-  if (height < 1200 && summary.shelves > 4) {
-    warnings.push('При такой высоте слишком много полок: минимальный комфортный шаг между полками — около 200 мм.')
-  }
-
-  if (width / project.sections < 350) {
-    warnings.push('Ширина секции меньше 350 мм. Лучше уменьшить количество секций или увеличить ширину шкафа.')
-  }
-
-  return warnings
 }
 
 export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [activeStep, setActiveStep] = useState('dimensions')
-  const [project, setProject] = useState(initialProject)
+  const [project, setProject] = useState(DEFAULT_PROJECT)
 
   const activeStepIndex = FLOW_STEPS.findIndex(step => step.id === activeStep)
 
   const canGoBack = activeStepIndex > 0
   const canGoNext = activeStepIndex < FLOW_STEPS.length - 1
 
-  const summary = useMemo(() => {
-    const shelves = project.filling.reduce((total, section) => total + section.shelves, 0)
-    const drawers = project.filling.reduce((total, section) => total + section.drawers, 0)
-    const rails = project.filling.reduce((total, section) => total + (section.rail ? 1 : 0), 0)
-
-    return {
-      shelves,
-      drawers,
-      rails,
-      elements: shelves + drawers + rails,
-    }
-  }, [project])
-
+  const summary = useMemo(() => getProjectSummary(project), [project])
   const price = useMemo(() => calculatePrice(project, summary), [project, summary])
   const warnings = useMemo(() => getWarnings(project, summary), [project, summary])
   const projectWithPrice = useMemo(() => ({ ...project, price }), [project, price])
@@ -187,14 +122,49 @@ export default function ConstructorPage() {
   }
 
   function updateMaterial(field, value) {
-    setProject(current => ({
-      ...current,
-      material: { ...current.material, [field]: value },
-    }))
+    setProject(current => {
+      if (field === 'materialId') {
+        const material = MATERIALS.find(item => item.id === value)
+        if (!material) return current
+
+        return {
+          ...current,
+          material: {
+            ...current.material,
+            body: material.title,
+            materialId: material.id,
+            thickness: material.thickness,
+            edge: material.edge,
+            tone: material.tone,
+            priceFactor: material.priceFactor,
+          },
+        }
+      }
+
+      if (field === 'handleId') {
+        const handle = HANDLE_OPTIONS.find(item => item.id === value)
+        if (!handle) return current
+
+        return {
+          ...current,
+          material: {
+            ...current.material,
+            handles: handle.title,
+            handleId: handle.id,
+            handlePriceAdd: handle.priceAdd,
+          },
+        }
+      }
+
+      return {
+        ...current,
+        material: { ...current.material, [field]: value },
+      }
+    })
   }
 
   function resetProject() {
-    setProject(initialProject)
+    setProject(DEFAULT_PROJECT)
     setActiveStep('dimensions')
   }
 
@@ -235,6 +205,8 @@ export default function ConstructorPage() {
           project={projectWithPrice}
           summary={summary}
           warnings={warnings}
+          materials={MATERIALS}
+          handleOptions={HANDLE_OPTIONS}
           canGoBack={canGoBack}
           canGoNext={canGoNext}
           onBack={goBack}
