@@ -86,6 +86,14 @@ export default function ConstructorLayout() {
     setSectionHangerRails(activeSection.id, 0);
   }
 
+  function applyFillPreset(preset) {
+    if (!activeSection) return;
+
+    setSectionShelves(activeSection.id, preset.shelves);
+    setSectionDrawers(activeSection.id, preset.drawers);
+    setSectionHangerRails(activeSection.id, preset.rails);
+  }
+
   return (
     <>
       <section className="rv2-shell">
@@ -116,6 +124,7 @@ export default function ConstructorLayout() {
               onAddDrawer={addDrawer}
               onToggleRail={toggleRail}
               onClearSection={clearActiveSection}
+              onApplyPreset={applyFillPreset}
             />
           ) : null}
 
