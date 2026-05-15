@@ -1,0 +1,89 @@
+.rv2-cabinet-section {
+  isolation: isolate;
+}
+
+.rv2-cabinet-section::before {
+  transition: opacity 180ms ease, background 180ms ease;
+}
+
+.rv2-cabinet-section:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.26);
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.38),
+    0 12px 24px rgba(80,54,31,0.1);
+}
+
+.rv2-cabinet-section:hover > span {
+  background: rgba(17,17,17,0.92);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(15,15,15,0.16);
+}
+
+.rv2-cabinet-section:hover > strong {
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 8px 18px rgba(15,15,15,0.08);
+}
+
+.rv2-cabinet-section.active {
+  outline: 1px solid rgba(239,91,42,0.28);
+  outline-offset: -6px;
+}
+
+.rv2-cabinet-section.active::after {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,0.24), transparent 36%),
+    linear-gradient(180deg, rgba(239,91,42,0.12) 0%, transparent 40%, rgba(0,0,0,0.04) 100%);
+}
+
+.rv2-cabinet-section.active::before {
+  opacity: .96;
+}
+
+.rv2-cabinet-section.active > span::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 1px solid rgba(239,91,42,0.24);
+}
+
+.rv2-section-fill-preview {
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.rv2-cabinet-section:hover .rv2-section-fill-preview,
+.rv2-cabinet-section.active .rv2-section-fill-preview {
+  transform: translateY(-2px);
+  opacity: 1;
+}
+
+.rv2-cabinet-section:not(.active):hover .rv2-section-fill-preview {
+  opacity: .82;
+}
+
+.rv2-cabinet-section.active .rv2-section-fill-preview::after {
+  content: "Редактируется";
+  position: absolute;
+  left: 50%;
+  bottom: -42px;
+  transform: translateX(-50%);
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17,17,17,0.9);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 12px 22px rgba(15,15,15,0.18);
+}
+
+.rv2-cabinet-placeholder:hover .rv2-cabinet-section:not(:hover):not(.active) {
+  filter: saturate(.92) brightness(.96);
+}
