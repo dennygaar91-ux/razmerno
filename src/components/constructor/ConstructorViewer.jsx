@@ -1,76 +1,20 @@
-import Icon from '../../icons/Icon'
-import WardrobeMockup from './WardrobeMockup'
+import SectionMap from './viewer/SectionMap'
+import ViewerQuickActions from './viewer/ViewerQuickActions'
+import ViewerScene from './viewer/ViewerScene'
+import ViewerToolbar from './viewer/ViewerToolbar'
+import { buildViewerSceneProps } from './viewer/viewerUtils'
 
-function getSectionLabel(section) {
-  if (section.rail && section.shelves <= 2 && section.drawers === 0) return 'Одежда'
-  if (section.shelves >= 4 && section.drawers === 0 && !section.rail) return 'Полки'
-  if (section.drawers >= 2) return 'Ящики'
-  if (!section.shelves && !section.drawers && !section.rail) return 'Пусто'
-  return 'Смешанная'
-}
-
-function formatSection(section) {
-  const parts = []
-  if (section.shelves) parts.push(`${section.shelves}П`)
-  if (section.drawers) parts.push(`${section.drawers}Я`)
-  if (section.rail) parts.push('Ш')
-  return parts.length ? parts.join(' · ') : 'Пусто'
-}
-
-export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection, onPresetApply }) {
+export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection, onPresetApply, renderCanvas }) {
   const activeSection = project.filling[project.activeSection - 1]
   const railDisabled = project.dimensions.depth < 520
+  const sceneProps = buildViewerSceneProps(project)
 
   return (
     <section className="rp-ctor-card rp-ctor-viewer rp-ref-viewer" aria-label="Предпросмотр шкафа">
-      <div className="rp-ref-viewer-toolbar">
-        <div className="rp-ref-view-mode">
-          <span>Вид</span>
-          <button className="is-active" type="button">3D</button>
-          <button type="button">2D</button>
-        </div>
-
-        <div className="rp-ref-scale">
-          <span>Масштаб</span>
-          <button type="button">−</button>
-          <b>100%</b>
-          <button type="button">+</button>
-          <button type="button" aria-label="Развернуть"><Icon name="expand" size={15} /></button>
-        </div>
-      </div>
-
-      <div className="rp-ref-scene">
-        <span className="rp-ctor-size rp-ctor-size--h">{project.dimensions.height} мм</span>
-        <WardrobeMockup project={project} />
-        <span className="rp-ctor-size rp-ctor-size--w">{project.dimensions.width} мм</span>
-        <span className="rp-ctor-size rp-ctor-size--d">{project.dimensions.depth} мм</span>
-      </div>
-
-      <div className="rp-ref-quick-actions">
-        <button type="button" onClick={() => onSectionPartChange('shelves', 1)}><Icon name="plus" size={16} />Полка</button>
-        <button type="button" onClick={() => onSectionPartChange('drawers', 1)}><Icon name="plus" size={16} />Ящик</button>
-        <button className={activeSection.rail ? 'is-active' : ''} type="button" disabled={railDisabled} onClick={onRailToggle}><span className="rp-ref-rail-icon" />Штанга</button>
-        <button type="button" onClick={onClearSection}><Icon name="x" size={15} />Очистить</button>
-      </div>
-
-      <div className="rp-ref-section-map">
-        <div className="rp-ref-section-map__head">
-          <div>
-            <h3>Карта секций</h3>
-            <p>Активна секция {project.activeSection}: {getSectionLabel(activeSection)}</p>
-          </div>
-          <button type="button" onClick={() => onPresetApply('clothes')}>Сценарий одежды</button>
-        </div>
-        <div style={{ gridTemplateColumns: `repeat(${project.sections}, 1fr)` }}>
-          {project.filling.map((section, index) => (
-            <button className={project.activeSection === index + 1 ? 'is-active' : ''} type="button" key={index} onClick={() => onSectionSelect(index + 1)}>
-              <span>{index + 1}</span>
-              <strong>{getSectionLabel(section)}</strong>
-              <b>{formatSection(section)}</b>
-            </button>
-          ))}
-        </div>
-      </div>
+      <ViewerToolbar />
+      <ViewerScene sceneProps={sceneProps} renderCanvas={renderCanvas} />
+      <ViewerQuickActions activeSection={activeSection} railDisabled={railDisabled} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onClearSection={onClearSection} />
+      <SectionMap project={project} activeSection={activeSection} onSectionSelect={onSectionSelect} onPresetApply={onPresetApply} />
     </section>
   )
 }
