@@ -295,18 +295,10 @@
   font-weight: 900;
 }
 
-.rp-ref-counter button {
-  border-right: 1px solid rgba(10,10,10,.08);
-}
+.rp-ref-counter button { border-right: 1px solid rgba(10,10,10,.08); }
+.rp-ref-counter button:last-child { border-left: 1px solid rgba(10,10,10,.08); border-right: 0; }
 
-.rp-ref-counter button:last-child {
-  border-left: 1px solid rgba(10,10,10,.08);
-  border-right: 0;
-}
-
-.rp-ref-block {
-  margin-top: 24px;
-}
+.rp-ref-block { margin-top: 24px; }
 
 .rp-ref-block h3 {
   margin: 0;
@@ -374,11 +366,7 @@
 }
 
 .rp-ref-view-mode,
-.rp-ref-scale {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.rp-ref-scale { display: flex; align-items: center; gap: 6px; }
 
 .rp-ref-view-mode span,
 .rp-ref-scale span {
@@ -404,11 +392,7 @@
   font-weight: 850;
 }
 
-.rp-ref-view-mode button.is-active {
-  background: #0a0a0a;
-  color: #fff;
-  border-color: #0a0a0a;
-}
+.rp-ref-view-mode button.is-active { background: #0a0a0a; color: #fff; border-color: #0a0a0a; }
 
 .rp-ref-scene {
   position: relative;
@@ -431,12 +415,7 @@
   background: repeating-linear-gradient(174deg, rgba(180,170,150,.16) 0, rgba(180,170,150,.16) 1px, transparent 1px, transparent 36px);
 }
 
-.rp-ref-scene .rp-ctor-wardrobe {
-  z-index: 1;
-  width: min(560px, 76%);
-  transform: none;
-}
-
+.rp-ref-scene .rp-ctor-wardrobe { z-index: 1; width: min(560px, 76%); transform: none; }
 .rp-ref-scene .rp-ctor-size--h { left: 17%; }
 .rp-ref-scene .rp-ctor-size--w { bottom: 9%; }
 .rp-ref-scene .rp-ctor-size--d { right: 6%; bottom: 18%; }
@@ -465,12 +444,7 @@
   font-weight: 900;
 }
 
-.rp-ref-rail-icon {
-  width: 17px;
-  height: 2px;
-  border-radius: 99px;
-  background: #141414;
-}
+.rp-ref-rail-icon { width: 17px; height: 2px; border-radius: 99px; background: #141414; }
 
 .rp-ref-section-map {
   border-radius: 12px;
@@ -479,24 +453,9 @@
   padding: 14px;
 }
 
-.rp-ref-section-map h3 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 900;
-}
-
-.rp-ref-section-map p {
-  margin: 7px 0 12px;
-  color: #777;
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.rp-ref-section-map > div {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
+.rp-ref-section-map h3 { margin: 0; font-size: 15px; font-weight: 900; }
+.rp-ref-section-map p { margin: 7px 0 12px; color: #777; font-size: 12px; font-weight: 650; }
+.rp-ref-section-map > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
 .rp-ref-section-map button {
   height: 46px;
@@ -509,28 +468,17 @@
   padding: 0 14px;
 }
 
-.rp-ref-section-map span {
-  color: #141414;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.rp-ref-section-map b {
-  color: #141414;
-  font-size: 13px;
-  font-weight: 900;
-}
+.rp-ref-section-map span { color: #141414; font-size: 12px; font-weight: 900; }
+.rp-ref-section-map b { color: #141414; font-size: 13px; font-weight: 900; }
 
 .rp-ref-summary {
   display: grid;
-  grid-template-rows: 96px 112px 146px 88px 100px 122px 44px;
-  gap: 8px;
+  grid-template-rows: 76px 88px 106px 132px 72px 84px 94px 40px;
+  gap: 7px;
   overflow: hidden;
 }
 
-.rp-ref-summary .rp-ctor-card {
-  padding: 16px 18px;
-}
+.rp-ref-summary .rp-ctor-card { padding: 12px 14px; }
 
 .rp-ref-ready {
   display: flex;
@@ -540,17 +488,17 @@
 }
 
 .rp-ref-ready p {
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   color: #e8612c;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 900;
-  letter-spacing: .16em;
+  letter-spacing: .15em;
   text-transform: uppercase;
 }
 
 .rp-ref-ready h2 {
   margin: 0;
-  font-size: 21px;
+  font-size: 18px;
   line-height: 1.05;
   font-weight: 900;
   letter-spacing: -.045em;
@@ -558,29 +506,30 @@
 
 .rp-ref-ready span {
   display: block;
-  margin-top: 7px;
+  margin-top: 5px;
   color: #555;
-  font-size: 11px;
-  line-height: 1.35;
+  font-size: 10px;
+  line-height: 1.25;
   font-weight: 650;
 }
 
-.rp-ref-ready svg { color: #e8612c; }
+.rp-ref-ready svg { color: #e8612c; width: 34px; height: 34px; }
 
 .rp-ref-price-card p,
+.rp-ref-breakdown-card h3,
 .rp-ref-kit-head h3,
 .rp-ref-check-card h3,
 .rp-ref-additional-card h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
 }
 
 .rp-ref-price-card strong {
   display: block;
-  margin-top: 9px;
+  margin-top: 7px;
   font-family: var(--fh);
-  font-size: 34px;
+  font-size: 29px;
   line-height: 1;
   font-weight: 900;
   letter-spacing: -.055em;
@@ -588,39 +537,45 @@
 
 .rp-ref-price-card span {
   display: block;
-  margin-top: 8px;
+  margin-top: 6px;
   color: #777;
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 1.25;
   font-weight: 650;
 }
 
-.rp-ref-project-card {
+.rp-ref-breakdown-card {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
+.rp-ref-breakdown-card div,
 .rp-ref-project-card div,
 .rp-ref-check-card > div:first-child,
 .rp-ref-additional-card div {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
+.rp-ref-breakdown-card span,
 .rp-ref-project-card span,
 .rp-ref-additional-card span {
   color: #777;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 750;
 }
 
+.rp-ref-breakdown-card b,
 .rp-ref-project-card b {
   color: #151515;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
   text-align: right;
 }
+
+.rp-ref-project-card { display: grid; gap: 6px; }
 
 .rp-ref-check-card span,
 .rp-ref-additional-card em,
@@ -633,79 +588,47 @@
 
 .rp-ref-progress {
   height: 4px;
-  margin: 14px 0 11px;
+  margin: 10px 0 8px;
   border-radius: 99px;
   background: #e9e9e5;
   overflow: hidden;
 }
 
-.rp-ref-progress i {
-  display: block;
-  width: 92%;
-  height: 100%;
-  background: #4b9a42;
-}
+.rp-ref-progress i { display: block; width: 92%; height: 100%; background: #4b9a42; }
 
 .rp-ref-check-card p {
   margin: 0;
   display: flex;
   justify-content: space-between;
   color: #555;
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 1.25;
   font-weight: 650;
 }
 
-.rp-ref-kit-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+.rp-ref-kit-head { display: flex; align-items: center; justify-content: space-between; }
 
 .rp-ref-kit-items {
-  margin-top: 14px;
+  margin-top: 10px;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 5px;
 }
 
-.rp-ref-kit-items div {
-  min-width: 0;
-  display: grid;
-  justify-items: center;
-  gap: 3px;
-}
+.rp-ref-kit-items div { min-width: 0; display: grid; justify-items: center; gap: 2px; }
+.rp-ref-kit-items i { width: 20px; height: 16px; border-radius: 3px; border: 1px solid #9b8d78; background: #d8c6a6; }
+.rp-ref-kit-items span { color: #151515; font-size: 9px; font-weight: 900; }
+.rp-ref-kit-items small { color: #777; font-size: 8px; font-weight: 650; max-width: 46px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.rp-ref-kit-items i {
-  width: 22px;
-  height: 18px;
-  border-radius: 3px;
-  border: 1px solid #9b8d78;
-  background: #d8c6a6;
-}
-
-.rp-ref-kit-items span {
-  color: #151515;
-  font-size: 10px;
-  font-weight: 900;
-}
-
-.rp-ref-kit-items small {
-  color: #777;
-  font-size: 9px;
-  font-weight: 650;
-}
-
-.rp-ref-additional-card {
-  display: grid;
-  gap: 10px;
-}
+.rp-ref-additional-card { display: grid; gap: 8px; }
 
 .rp-ref-additional-card b {
-  width: 34px;
-  height: 18px;
+  width: 32px;
+  height: 17px;
   border-radius: 99px;
   background: #0a0a0a;
   position: relative;
+  flex-shrink: 0;
 }
 
 .rp-ref-additional-card b::after {
@@ -713,8 +636,8 @@
   position: absolute;
   right: 3px;
   top: 3px;
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: #fff;
 }
