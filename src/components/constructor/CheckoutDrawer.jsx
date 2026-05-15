@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createConstructorOrder } from '../../services/constructorOrders'
 
 function formatPrice(value) {
   return new Intl.NumberFormat('ru-RU').format(value)
@@ -42,18 +43,22 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
   const [customer, setCustomer] = useState(initialCustomer)
   const [errors, setErrors] = useState({})
   const [submitState, setSubmitState] = useState('idle')
+  const [authMode, setAuthMode] = useState('guest')
+  const [orderId, setOrderId] = useState('')
 
   if (!open) return null
 
   const breakdown = project.priceBreakdown ?? {}
+  const isSubmitting = submitState === 'loading'
 
   function updateCustomer(field, value) {
     setCustomer(current => ({ ...current, [field]: value }))
     setErrors(current => ({ ...current, [field]: undefined }))
     setSubmitState('idle')
+    setOrderId('')
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     const nextErrors = validateCustomer(customer)
     setErrors(nextErrors)
 
@@ -65,14 +70,30 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
     const payload = {
       ...orderPayload,
       customer,
+      auth: {
+        mode: authMode,
+        status: authMode === 'guest' ? 'guest_checkout' : 'auth_required_later',
+      },
       payment: {
         method: 'online',
         status: 'pending',
       },
     }
 
-    console.info('Constructor order payload:', payload)
-    setSubmitState('success')
+    try {
+      setSubmitState('loading')
+      const result = await createConstructorOrder(payload)
+
+      if (!result?.ok) {
+        throw new Error('Order service returned an error')
+      }
+
+      setOrderId(result.orderId)
+      setSubmitState('success')
+    } catch (error) {
+      console.warn('Constructor order submit failed:', error)
+      setSubmitState('error')
+    }
   }
 
   return (
@@ -93,6 +114,14 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
             <span>К оплате после подтверждения</span>
             <strong>{formatPrice(project.price)} ₽</strong>
             <p>Финальная стоимость будет подтверждена после проверки проекта технологом.</p>
+          </section>
+
+          <section className="rp-checkout__card rp-checkout__auth">
+            <h3>Как оформить</h3>
+            <div className="rp-checkout__auth-options">
+              <button className={authMode === 'guest' ? 'is-active' : ''} type="button" onClick={() => setAuthMode('guest')}>Продолжить без входа<span>Быстрое оформление по телефону</span></button>
+              <button className={authMode === 'login' ? 'is-active' : ''} type="button" onClick={() => setAuthMode('login')}>Войти позже<span>Личный кабинет добавим отдельным этапом</span></button>
+            </div>
           </section>
 
           <section className="rp-checkout__card">
@@ -149,15 +178,16 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
               <button className="is-active" type="button">Оплатить онлайн</button>
               <button type="button">Согласовать с менеджером</button>
             </div>
-            <p className="rp-checkout__note">Авторизацию и личный кабинет добавим отдельным этапом. Сейчас заявка может уходить без входа в аккаунт.</p>
-            {submitState === 'error' && <p className="rp-checkout__status is-error">Заполните обязательные поля перед оплатой.</p>}
-            {submitState === 'success' && <p className="rp-checkout__status is-success">Данные готовы к отправке. Следующий этап — подключение оплаты и backend.</p>}
+            <p className="rp-checkout__note">Сейчас создаём заявку и резервируем параметры проекта. Платёжный шлюз подключим следующим техническим этапом.</p>
+            {submitState === 'error' && <p className="rp-checkout__status is-error">Заполните обязательные поля или попробуйте ещё раз.</p>}
+            {submitState === 'loading' && <p className="rp-checkout__status is-loading">Создаём заявку и готовим переход к оплате…</p>}
+            {submitState === 'success' && <p className="rp-checkout__status is-success">Заявка создана{orderId ? `: ${orderId}` : ''}. Следующий этап — реальная оплата и backend.</p>}
           </section>
         </div>
 
         <div className="rp-checkout__foot">
           <button type="button" className="rp-checkout__secondary" onClick={onClose}>Вернуться к проекту</button>
-          <button type="button" className="rp-checkout__primary" onClick={handleSubmit}>Перейти к оплате</button>
+          <button type="button" className="rp-checkout__primary" disabled={isSubmitting} onClick={handleSubmit}>{isSubmitting ? 'Создаём заявку…' : 'Перейти к оплате'}</button>
         </div>
       </aside>
     </div>
