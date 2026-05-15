@@ -238,6 +238,22 @@ export default function ConstructorPage() {
     })
   }
 
+  function applyPresetToSection(sectionNumber, presetId) {
+    const preset = FILLING_PRESETS[presetId]
+    if (!preset) return
+
+    setProject(current => {
+      const targetIndex = clamp(sectionNumber, 1, current.sections) - 1
+      const filling = current.filling.map((section, index) => (
+        index === targetIndex ? { ...preset } : section
+      ))
+
+      return { ...current, activeSection: targetIndex + 1, filling }
+    })
+
+    showNotice(`Секция ${sectionNumber} обновлена`)
+  }
+
   function copyActiveSectionToNext() {
     setProject(current => {
       if (current.sections < 2) return current
@@ -460,6 +476,7 @@ export default function ConstructorPage() {
           onRailToggle={toggleRail}
           onClearSection={clearActiveSection}
           onPresetApply={applyFillingPreset}
+          onPresetApplyToSection={applyPresetToSection}
         />
         <ConstructorSummary project={projectWithPrice} summary={summary} warnings={warnings} estimateState={estimateState} onCheckout={() => setCheckoutOpen(true)} />
       </section>
