@@ -3,6 +3,7 @@ import "../styles/constructor-v2-viewer.css";
 import "../styles/constructor-v2-viewer-tools.css";
 import "../styles/constructor-v2-fill-preview.css";
 import "../styles/constructor-v2-material-live-preview.css";
+import "../styles/constructor-v2-pseudo-3d.css";
 
 function getItemCount(section, type) {
   return section?.items?.find((item) => item.type === type)?.count || 0;
@@ -84,28 +85,43 @@ export default function ConstructorViewer({
         <div className="rv2-dimension-label rv2-dimension-height">{dimensions.height} мм</div>
         <div className="rv2-dimension-label rv2-dimension-width">{dimensions.width} мм</div>
 
-        <div
-          className={`rv2-cabinet-placeholder ${materialClass}`}
-          style={{ gridTemplateColumns: sections.map((section) => `${section.width}fr`).join(" ") }}
-        >
-          {sections.map((section, index) => {
-            const isActive = section.id === activeSectionId;
+        <div className="rv2-cabinet-shell">
+          <div className="rv2-cabinet-depth">
+            <div className="rv2-cabinet-back" />
 
-            return (
-              <button
-                type="button"
-                className={`rv2-cabinet-section ${isActive ? "active" : ""}`}
-                key={section.id}
-                onClick={() => onSelectSection(section.id)}
-              >
-                <span>{index + 1}</span>
+            <div
+              className={`rv2-cabinet-placeholder ${materialClass}`}
+              style={{ gridTemplateColumns: sections.map((section) => `${section.width}fr`).join(" ") }}
+            >
+              {sections.map((section, index) => {
+                const isActive = section.id === activeSectionId;
 
-                <SectionFillPreview section={section} />
+                return (
+                  <button
+                    type="button"
+                    className={`rv2-cabinet-section ${isActive ? "active" : ""}`}
+                    key={section.id}
+                    onClick={() => onSelectSection(section.id)}
+                  >
+                    <span>{index + 1}</span>
 
-                <strong>{getSectionTitle(section)}</strong>
-              </button>
-            );
-          })}
+                    <SectionFillPreview section={section} />
+
+                    <strong>{getSectionTitle(section)}</strong>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div
+              className="rv2-facade-overlay"
+              style={{ gridTemplateColumns: sections.map((section) => `${section.width}fr`).join(" ") }}
+            >
+              {sections.map((section) => (
+                <div className="rv2-facade-panel" key={`facade-${section.id}`} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
