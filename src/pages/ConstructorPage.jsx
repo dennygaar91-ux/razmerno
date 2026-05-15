@@ -4,7 +4,7 @@ import ConstructorViewer from '../components/constructor/ConstructorViewer'
 import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import Icon from '../icons/Icon'
-import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
+import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, EDGE_OPTIONS, HANDLE_OPTIONS, HARDWARE_OPTIONS } from '../data/constructorCatalog'
 import { getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
 import { clearConstructorProject, loadConstructorProjectId, loadConstructorProjectMeta, saveConstructorProject, saveConstructorProjectId } from '../utils/constructorStorage'
@@ -302,6 +302,7 @@ export default function ConstructorPage() {
       if (field === 'materialId') {
         const material = MATERIALS.find(item => item.id === value)
         if (!material) return current
+        const edge = EDGE_OPTIONS.find(item => item.id === material.edgeId) ?? EDGE_OPTIONS[0]
 
         return {
           ...current,
@@ -309,10 +310,44 @@ export default function ConstructorPage() {
             ...current.material,
             body: material.fullTitle ?? material.title,
             materialId: material.id,
+            manufacturer: material.manufacturer,
+            article: material.article,
             thickness: material.thickness,
-            edge: material.edge,
+            edge: edge.text,
+            edgeId: edge.id,
+            edgePriceAdd: edge.priceAdd,
             tone: material.tone,
             priceFactor: material.priceFactor,
+          },
+        }
+      }
+
+      if (field === 'edgeId') {
+        const edge = EDGE_OPTIONS.find(item => item.id === value)
+        if (!edge) return current
+
+        return {
+          ...current,
+          material: {
+            ...current.material,
+            edge: edge.text,
+            edgeId: edge.id,
+            edgePriceAdd: edge.priceAdd,
+          },
+        }
+      }
+
+      if (field === 'hardwareId') {
+        const hardware = HARDWARE_OPTIONS.find(item => item.id === value)
+        if (!hardware) return current
+
+        return {
+          ...current,
+          material: {
+            ...current.material,
+            hardware: hardware.title,
+            hardwareId: hardware.id,
+            hardwarePriceAdd: hardware.priceAdd,
           },
         }
       }
@@ -452,7 +487,9 @@ export default function ConstructorPage() {
           warnings={warnings}
           activeSectionWarnings={activeSectionWarnings}
           materials={MATERIALS}
+          edgeOptions={EDGE_OPTIONS}
           handleOptions={HANDLE_OPTIONS}
+          hardwareOptions={HARDWARE_OPTIONS}
           canGoBack={canGoBack}
           canGoNext={canGoNext}
           onBack={goBack}
