@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ConstructorConfig from '../components/constructor/ConstructorConfig'
 import ConstructorViewer from '../components/constructor/ConstructorViewer'
 import ConstructorSummary from '../components/constructor/ConstructorSummary'
@@ -45,6 +45,7 @@ function formatProjectDate(value) {
 
 export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
   const [activeStep, setActiveStep] = useState('dimensions')
   const [project, setProject] = useState(DEFAULT_PROJECT)
   const [notice, setNotice] = useState('')
@@ -53,6 +54,8 @@ export default function ConstructorPage() {
   const [remoteProjectId, setRemoteProjectId] = useState(() => loadConstructorProjectId())
   const [projectSyncState, setProjectSyncState] = useState('idle')
   const [projectMeta, setProjectMeta] = useState(() => loadConstructorProjectMeta())
+  const autosaveMountedRef = useRef(false)
+  const suppressAutosaveRef = useRef(false)
 
   const activeStepIndex = FLOW_STEPS.findIndex(step => step.id === activeStep)
 
@@ -74,11 +77,13 @@ export default function ConstructorPage() {
     ? 'сохраняем'
     : projectSyncState === 'loading'
       ? 'загружаем'
-      : projectSyncState === 'saved'
-        ? 'сохранено'
-        : projectMeta?.updatedAt
-          ? `сохранено ${formatProjectDate(projectMeta.updatedAt)}`
-          : 'комплект для сборки'
+      : projectSyncState === 'autosaving'
+        ? 'автосохранение'
+        : projectSyncState === 'saved' || projectSyncState === 'autosaved'
+          ? 'сохранено'
+          : projectMeta?.updatedAt
+            ? `сохранено ${formatProjectDate(projectMeta.updatedAt)}`
+            : 'комплект для сборки'
 
   useEffect(() => {
     let isCancelled = false
@@ -104,6 +109,33 @@ export default function ConstructorPage() {
       isCancelled = true
       window.clearTimeout(timer)
     }
+  }, [project])
+
+  useEffect(() => {
+    if (!autosaveMountedRef.current) {
+      autosaveMountedRef.current = true
+      return undefined
+    }
+
+    if (suppressAutosaveRef.current) {
+      suppressAutosaveRef.current = false
+      return undefined
+    }
+
+    setProjectSyncState(current => current === 'saving' || current === 'loading' ? current : 'autosaving')
+
+    const timer = window.setTimeout(() => {
+      const saved = saveConstructorProject(project)
+      if (!saved) {
+        setProjectSyncState('error')
+        return
+      }
+
+      setProjectMeta(loadConstructorProjectMeta())
+      setProjectSyncState(current => current === 'saving' || current === 'loading' ? current : 'autosaved')
+    }, 900)
+
+    return () => window.clearTimeout(timer)
   }, [project])
 
   function showNotice(message) {
@@ -245,7 +277,12 @@ export default function ConstructorPage() {
     })
   }
 
+  function requestProjectReset() {
+    setClearConfirmOpen(true)
+  }
+
   function resetProject() {
+    suppressAutosaveRef.current = true
     clearConstructorProject()
     setProject(DEFAULT_PROJECT)
     setActiveStep('dimensions')
@@ -253,6 +290,7 @@ export default function ConstructorPage() {
     setRemoteProjectId('')
     setProjectMeta(null)
     setProjectSyncState('idle')
+    setClearConfirmOpen(false)
     showNotice('Проект очищен')
   }
 
@@ -322,7 +360,7 @@ export default function ConstructorPage() {
 
         <div className="rp-ctor-actions">
           <button type="button" disabled={projectSyncState === 'loading'} onClick={loadProject}><Icon name="download" size={16} />{projectSyncState === 'loading' ? 'Загрузка' : 'Загрузить'}</button>
-          <button type="button" onClick={resetProject}><Icon name="x" size={16} />Очистить</button>
+          <button type="button" onClick={requestProjectReset}><Icon name="x" size={16} />Очистить</button>
           <button type="button" disabled={projectSyncState === 'saving'} onClick={saveProject}><Icon name="file-check" size={16} />{projectSyncState === 'saving' ? 'Сохранение' : 'Сохранить'}</button>
           <button className="is-primary" type="button" onClick={() => setCheckoutOpen(true)}><Icon name="orders" size={17} />В корзину</button>
         </div>
@@ -372,6 +410,21 @@ export default function ConstructorPage() {
       </section>
 
       <CheckoutDrawer open={checkoutOpen} project={projectWithPrice} summary={summary} orderPayload={orderPayload} onClose={() => setCheckoutOpen(false)} />
+
+      {clearConfirmOpen && (
+        <div className="rp-clear-confirm" role="dialog" aria-modal="true" aria-label="Очистить проект">
+          <button className="rp-clear-confirm__overlay" type="button" aria-label="Отменить очистку" onClick={() => setClearConfirmOpen(false)} />
+          <section className="rp-clear-confirm__card">
+            <span>Очистить проект?</span>
+            <h2>Текущая конфигурация будет сброшена</h2>
+            <p>Автосохранённая версия, project ID и параметры шкафа будут удалены с этого устройства. Это действие нельзя отменить.</p>
+            <div>
+              <button type="button" onClick={() => setClearConfirmOpen(false)}>Отмена</button>
+              <button type="button" className="is-danger" onClick={resetProject}>Очистить</button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   )
 }
