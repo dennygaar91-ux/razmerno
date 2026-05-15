@@ -1,0 +1,20 @@
+.rp-ctor-shell--no-rail {
+  grid-template-columns: 326px minmax(640px, 1fr) 336px;
+}
+
+.rp-ctor-shell--no-rail + .rp-ctor-benefits {
+  padding-left: 0;
+}
+
+@media (max-width: 1280px) {
+  .rp-ctor-shell--no-rail {
+    grid-template-columns: 300px minmax(500px, 1fr) 300px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .rp-ctor-shell--no-rail {
+    min-width: 1040px;
+    grid-template-columns: 300px 520px 300px;
+  }
+}
