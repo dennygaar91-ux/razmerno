@@ -6,6 +6,7 @@ import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import Icon from '../icons/Icon'
 import './ConstructorPage.css'
 import './ConstructorWizard.css'
+import './ConstructorReference.css'
 
 const flowSteps = [
   ['1', 'Размеры', 'Укажите габариты и секции', true],
