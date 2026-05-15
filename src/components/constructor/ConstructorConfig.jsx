@@ -6,6 +6,13 @@ const dimensionFields = [
   ['depth', 'Глубина, мм', '300–800', 50],
 ]
 
+const fillingPresets = [
+  ['clothes', 'Одежда', 'штанга + полка'],
+  ['shelves', 'Полки', '5 полок'],
+  ['drawers', 'Ящики', '3 ящика'],
+  ['empty', 'Пусто', 'очистить секцию'],
+]
+
 function CounterField({ label, value, hint, onMinus, onPlus }) {
   return (
     <div className="rp-ref-field">
@@ -72,7 +79,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
   )
 }
 
-function FillingStep({ project, warnings, onSectionSelect, onSectionPartChange, onRailToggle }) {
+function FillingStep({ project, warnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply }) {
   const activeSection = project.filling[project.activeSection - 1]
   const railDisabled = project.dimensions.depth < 520
 
@@ -85,6 +92,24 @@ function FillingStep({ project, warnings, onSectionSelect, onSectionPartChange, 
           {project.filling.map((_, index) => (
             <button className={project.activeSection === index + 1 ? 'is-active' : ''} type="button" key={index} onClick={() => onSectionSelect(index + 1)}>
               Секция {index + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rp-ref-active-section">
+        <span>Секция {project.activeSection}</span>
+        <b>{activeSection.shelves}П · {activeSection.drawers}Я · {activeSection.rail ? 'Штанга' : 'без штанги'}</b>
+      </div>
+
+      <div className="rp-ref-block">
+        <h3>Быстрые сценарии</h3>
+        <p>Применяются только к выбранной секции</p>
+        <div className="rp-ref-preset-grid">
+          {fillingPresets.map(([id, title, text]) => (
+            <button type="button" key={id} onClick={() => onPresetApply(id)}>
+              <span>{title}</span>
+              <small>{text}</small>
             </button>
           ))}
         </div>
@@ -162,6 +187,7 @@ export default function ConstructorConfig({
   onSectionPartChange,
   onRailToggle,
   onMaterialChange,
+  onPresetApply,
 }) {
   const stepContent = {
     dimensions: {
@@ -175,7 +201,7 @@ export default function ConstructorConfig({
       number: 2,
       title: 'Наполнение',
       text: 'Настройте полки, ящики и штанги внутри выбранной секции.',
-      body: <FillingStep project={project} warnings={warnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} />,
+      body: <FillingStep project={project} warnings={warnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} />,
       next: 'Далее: материалы',
     },
     materials: {
