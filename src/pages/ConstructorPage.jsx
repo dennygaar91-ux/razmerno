@@ -12,6 +12,7 @@ import './ConstructorPage.css'
 import './ConstructorWizard.css'
 import './ConstructorReference.css'
 import './ConstructorInteractive.css'
+import './ConstructorAdaptive.css'
 
 const FLOW_STEPS = [
   { id: 'dimensions', num: '1', title: 'Размеры', text: 'Укажите габариты и секции' },
