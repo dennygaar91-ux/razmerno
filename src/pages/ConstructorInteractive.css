@@ -37,6 +37,25 @@
   color: #e8612c;
 }
 
+.rp-ctor-notice {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  z-index: 600;
+  transform: translateX(-50%);
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #0a0a0a;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 28px rgba(10,10,10,.18);
+  font-size: 13px;
+  font-weight: 850;
+}
+
 .rp-ref-step-body {
   min-height: 0;
   flex: 1;
