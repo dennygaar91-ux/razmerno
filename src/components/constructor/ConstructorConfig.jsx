@@ -1,29 +1,35 @@
 import Icon from '../../icons/Icon'
 
 const dimensionFields = [
-  ['height', 'Высота, мм', '200–2800', 100],
-  ['width', 'Ширина, мм', '400–3000', 100],
-  ['depth', 'Глубина, мм', '300–800', 50],
+  ['height', 'Высота', 'от 200 до 2800 мм', 100, 'мм'],
+  ['width', 'Ширина', 'от 400 до 3000 мм', 100, 'мм'],
+  ['depth', 'Глубина', 'от 300 до 800 мм', 50, 'мм'],
 ]
 
 const fillingPresets = [
-  ['clothes', 'Одежда', 'штанга + полка'],
-  ['shelves', 'Полки', '5 полок'],
-  ['drawers', 'Ящики', '3 ящика'],
-  ['empty', 'Пусто', 'очистить секцию'],
+  ['clothes', 'Гардероб', 'штанга + полка', 'Для одежды на плечиках'],
+  ['shelves', 'Полки', '5 полок', 'Для белья, коробок и хранения'],
+  ['drawers', 'Ящики', '3 ящика', 'Для мелких вещей и аксессуаров'],
+  ['empty', 'Пусто', 'очистить секцию', 'Начать секцию заново'],
 ]
 
-function CounterField({ label, value, hint, onMinus, onPlus }) {
+function CounterField({ label, value, hint, unit = '', min, max, onMinus, onPlus }) {
+  const minusDisabled = typeof min === 'number' && value <= min
+  const plusDisabled = typeof max === 'number' && value >= max
+
   return (
-    <div className="rp-ref-field">
+    <div className="rp-ref-field rp-ref-field--polished">
       <div>
         <strong>{label}</strong>
         <span>{hint}</span>
       </div>
-      <div className="rp-ref-counter">
-        <button type="button" onClick={onMinus}>−</button>
-        <input value={value} readOnly inputMode="numeric" />
-        <button type="button" onClick={onPlus}>+</button>
+      <div className="rp-ref-counter-wrap">
+        <div className="rp-ref-counter">
+          <button type="button" disabled={minusDisabled} onClick={onMinus} aria-label={`Уменьшить ${label}`}>−</button>
+          <input value={unit ? `${value}` : value} readOnly inputMode="numeric" />
+          <button type="button" disabled={plusDisabled} onClick={onPlus} aria-label={`Увеличить ${label}`}>+</button>
+        </div>
+        {unit && <small>{unit}</small>}
       </div>
     </div>
   )
@@ -41,35 +47,59 @@ function WarningList({ warnings }) {
   )
 }
 
+function StepHint({ title, text }) {
+  return (
+    <div className="rp-ref-step-hint">
+      <Icon name="check-circle" size={16} />
+      <div>
+        <b>{title}</b>
+        <span>{text}</span>
+      </div>
+    </div>
+  )
+}
+
 function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange }) {
+  const sectionWidth = Math.round(project.dimensions.width / project.sections)
+
   return (
     <>
-      <div className="rp-ref-fields">
-        {dimensionFields.map(([key, label, hint, step]) => (
+      <StepHint title="Начните с габаритов" text="Укажите реальные размеры ниши или места, где будет стоять шкаф. Секции распределятся автоматически." />
+
+      <div className="rp-ref-fields rp-ref-fields--polished">
+        {dimensionFields.map(([key, label, hint, step, unit]) => (
           <CounterField
             key={key}
             label={label}
             value={project.dimensions[key]}
             hint={hint}
+            unit={unit}
+            min={key === 'height' ? 200 : key === 'width' ? 400 : 300}
+            max={key === 'height' ? 2800 : key === 'width' ? 3000 : 800}
             onMinus={() => onDimensionChange(key, -step)}
             onPlus={() => onDimensionChange(key, step)}
           />
         ))}
         <CounterField
-          label="Количество секций"
+          label="Секции"
           value={project.sections}
-          hint="от 1 до 6"
+          hint="от 1 до 6 вертикальных зон"
+          min={1}
+          max={6}
           onMinus={() => onSectionsChange(-1)}
           onPlus={() => onSectionsChange(1)}
         />
       </div>
 
-      <div className="rp-ref-block">
+      <div className="rp-ref-block rp-ref-block--polished">
         <h3>Ширина секции</h3>
-        <p>Автоматическое распределение</p>
+        <p>Сейчас каждая секция примерно по {sectionWidth} мм</p>
         <div className="rp-ref-section-widths" style={{ gridTemplateColumns: `repeat(${project.sections}, 1fr)` }}>
           {Array.from({ length: project.sections }, (_, index) => (
-            <button type="button" key={index}>{Math.round(project.dimensions.width / project.sections)} мм</button>
+            <button type="button" key={index}>
+              <span>{index + 1}</span>
+              <b>{sectionWidth} мм</b>
+            </button>
           ))}
         </div>
       </div>
@@ -82,47 +112,63 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
 function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply }) {
   const activeSection = project.filling[project.activeSection - 1]
   const railDisabled = project.dimensions.depth < 520
+  const activePreset = activeSection.rail && activeSection.shelves <= 2 && activeSection.drawers === 0
+    ? 'Гардероб'
+    : activeSection.shelves >= 4 && !activeSection.drawers && !activeSection.rail
+      ? 'Полки'
+      : activeSection.drawers >= 2
+        ? 'Ящики'
+        : !activeSection.shelves && !activeSection.drawers && !activeSection.rail
+          ? 'Пусто'
+          : 'Смешанная'
 
   return (
     <>
-      <div className="rp-ref-block rp-ref-block--topless">
-        <h3>Выберите секцию</h3>
+      <StepHint title="Настройте одну секцию" text="Выберите секцию ниже, затем добавьте полки, ящики или штангу. Изменения сразу видны в центре." />
+
+      <div className="rp-ref-block rp-ref-block--topless rp-ref-block--polished">
+        <h3>Секция для редактирования</h3>
         <p>Активная секция подсвечивается в визуализации</p>
         <div className="rp-ref-section-tabs">
-          {project.filling.map((_, index) => (
+          {project.filling.map((section, index) => (
             <button className={project.activeSection === index + 1 ? 'is-active' : ''} type="button" key={index} onClick={() => onSectionSelect(index + 1)}>
-              Секция {index + 1}
+              <span>{index + 1}</span>
+              <small>{section.shelves}П · {section.drawers}Я · {section.rail ? 'Ш' : '—'}</small>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="rp-ref-active-section">
-        <span>Секция {project.activeSection}</span>
-        <b>{activeSection.shelves}П · {activeSection.drawers}Я · {activeSection.rail ? 'Штанга' : 'без штанги'}</b>
+      <div className="rp-ref-active-section rp-ref-active-section--polished">
+        <div>
+          <span>Секция {project.activeSection}</span>
+          <b>{activePreset}</b>
+        </div>
+        <strong>{activeSection.shelves} полок · {activeSection.drawers} ящиков · {activeSection.rail ? 'штанга' : 'без штанги'}</strong>
       </div>
 
-      <div className="rp-ref-block">
-        <h3>Быстрые сценарии</h3>
-        <p>Применяются только к выбранной секции</p>
-        <div className="rp-ref-preset-grid">
-          {fillingPresets.map(([id, title, text]) => (
+      <div className="rp-ref-block rp-ref-block--polished">
+        <h3>Готовые сценарии</h3>
+        <p>Быстро заполните выбранную секцию</p>
+        <div className="rp-ref-preset-grid rp-ref-preset-grid--polished">
+          {fillingPresets.map(([id, title, text, description]) => (
             <button type="button" key={id} onClick={() => onPresetApply(id)}>
               <span>{title}</span>
               <small>{text}</small>
+              <em>{description}</em>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="rp-ref-fields rp-ref-fields--compact">
-        <CounterField label="Полки" value={activeSection.shelves} hint="минимальный шаг 200 мм" onMinus={() => onSectionPartChange('shelves', -1)} onPlus={() => onSectionPartChange('shelves', 1)} />
-        <CounterField label="Ящики" value={activeSection.drawers} hint="фасад от 200 мм" onMinus={() => onSectionPartChange('drawers', -1)} onPlus={() => onSectionPartChange('drawers', 1)} />
+      <div className="rp-ref-fields rp-ref-fields--compact rp-ref-fields--polished">
+        <CounterField label="Полки" value={activeSection.shelves} hint="минимальный комфортный шаг — 200 мм" min={0} max={8} onMinus={() => onSectionPartChange('shelves', -1)} onPlus={() => onSectionPartChange('shelves', 1)} />
+        <CounterField label="Ящики" value={activeSection.drawers} hint="ориентир фасада — от 200 мм" min={0} max={4} onMinus={() => onSectionPartChange('drawers', -1)} onPlus={() => onSectionPartChange('drawers', 1)} />
       </div>
 
-      <div className="rp-ref-block">
+      <div className="rp-ref-block rp-ref-block--polished">
         <h3>Штанга</h3>
-        <p>{railDisabled ? 'Недоступна: нужна глубина от 520 мм' : 'Рекомендуемая глубина для одежды — от 520 мм'}</p>
+        <p>{railDisabled ? 'Недоступна при глубине меньше 520 мм' : 'Подходит для одежды на плечиках'}</p>
         <button className={`rp-ref-toggle-option ${activeSection.rail ? 'is-active' : ''}`} type="button" disabled={railDisabled} onClick={onRailToggle}>
           <span>{activeSection.rail ? 'Штанга включена' : 'Добавить штангу'}</span>
           <b />
@@ -137,9 +183,11 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
 function MaterialsStep({ project, materials, handleOptions, onMaterialChange }) {
   return (
     <>
-      <div className="rp-ref-block rp-ref-block--topless">
+      <StepHint title="Выберите внешний вид" text="Материал влияет на визуал, комплект деталей и предварительную стоимость." />
+
+      <div className="rp-ref-block rp-ref-block--topless rp-ref-block--polished">
         <h3>Материал корпуса</h3>
-        <p>Выберите декор ЛДСП для корпуса и полок</p>
+        <p>Базовый материал MVP — ЛДСП 16 мм</p>
         <div className="rp-ref-material-list">
           {materials.map((material) => (
             <button className={project.material.materialId === material.id ? 'is-active' : ''} type="button" key={material.id} onClick={() => onMaterialChange('materialId', material.id)}>
@@ -151,7 +199,7 @@ function MaterialsStep({ project, materials, handleOptions, onMaterialChange }) 
         </div>
       </div>
 
-      <div className="rp-ref-block">
+      <div className="rp-ref-block rp-ref-block--polished">
         <h3>Открывание</h3>
         <div className="rp-ref-handle-list">
           {handleOptions.map((option) => (
@@ -193,22 +241,25 @@ export default function ConstructorConfig({
   const stepContent = {
     dimensions: {
       number: 1,
-      title: 'Размеры и секции',
-      text: 'Укажите габариты шкафа и количество секций. Конструктор сразу пересчитает проект.',
+      eyebrow: 'Шаг 1 из 3',
+      title: 'Размеры шкафа',
+      text: 'Сначала задаём габариты. Это основа для деталировки, стоимости и ограничений по наполнению.',
       body: <DimensionsStep project={project} warnings={warnings} onDimensionChange={onDimensionChange} onSectionsChange={onSectionsChange} />,
       next: 'Далее: наполнение',
     },
     filling: {
       number: 2,
-      title: 'Наполнение',
-      text: 'Настройте полки, ящики и штанги внутри выбранной секции.',
+      eyebrow: 'Шаг 2 из 3',
+      title: 'Наполнение секций',
+      text: 'Соберите внутреннюю логику шкафа: полки, ящики и штанги в каждой секции.',
       body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={activeSectionWarnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} />,
       next: 'Далее: материалы',
     },
     materials: {
       number: 3,
-      title: 'Материалы',
-      text: 'Подберите декор, кромку и базовую фурнитуру для комплекта.',
+      eyebrow: 'Шаг 3 из 3',
+      title: 'Материалы и фурнитура',
+      text: 'Выберите декор корпуса и способ открывания. Кромка и базовая фурнитура учтены автоматически.',
       body: <MaterialsStep project={project} materials={materials} handleOptions={handleOptions} onMaterialChange={onMaterialChange} />,
       next: 'В корзину',
     },
@@ -217,10 +268,11 @@ export default function ConstructorConfig({
   const current = stepContent[activeStep] ?? stepContent.dimensions
 
   return (
-    <aside className="rp-ctor-card rp-ctor-config rp-ref-config">
-      <div className="rp-ref-panel-head">
+    <aside className="rp-ctor-card rp-ctor-config rp-ref-config rp-ref-config--polished">
+      <div className="rp-ref-panel-head rp-ref-panel-head--polished">
         <span>{current.number}</span>
         <div>
+          <em>{current.eyebrow}</em>
           <h2>{current.title}</h2>
           <p>{current.text}</p>
         </div>
@@ -230,7 +282,7 @@ export default function ConstructorConfig({
         {current.body}
       </div>
 
-      <div className="rp-ref-config-nav">
+      <div className="rp-ref-config-nav rp-ref-config-nav--polished">
         <button type="button" disabled={!canGoBack} onClick={onBack}>Назад</button>
         <button className="is-primary" type="button" onClick={onNext}>{canGoNext ? current.next : 'В корзину'}<Icon name="arrow-right" size={15} /></button>
       </div>
