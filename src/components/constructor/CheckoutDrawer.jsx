@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 function formatPrice(value) {
   return new Intl.NumberFormat('ru-RU').format(value)
 }
@@ -10,10 +12,68 @@ const breakdownLabels = {
   packaging: 'Упаковка',
 }
 
-export default function CheckoutDrawer({ open, project, summary, onClose }) {
+const initialCustomer = {
+  name: '',
+  phone: '',
+  address: '',
+  comment: '',
+}
+
+function validateCustomer(customer) {
+  const errors = {}
+
+  if (customer.name.trim().length < 2) {
+    errors.name = 'Укажите имя'
+  }
+
+  const phoneDigits = customer.phone.replace(/\D/g, '')
+  if (phoneDigits.length < 10) {
+    errors.phone = 'Укажите телефон для связи'
+  }
+
+  if (customer.address.trim().length < 3) {
+    errors.address = 'Укажите город или адрес доставки'
+  }
+
+  return errors
+}
+
+export default function CheckoutDrawer({ open, project, summary, orderPayload, onClose }) {
+  const [customer, setCustomer] = useState(initialCustomer)
+  const [errors, setErrors] = useState({})
+  const [submitState, setSubmitState] = useState('idle')
+
   if (!open) return null
 
   const breakdown = project.priceBreakdown ?? {}
+
+  function updateCustomer(field, value) {
+    setCustomer(current => ({ ...current, [field]: value }))
+    setErrors(current => ({ ...current, [field]: undefined }))
+    setSubmitState('idle')
+  }
+
+  function handleSubmit() {
+    const nextErrors = validateCustomer(customer)
+    setErrors(nextErrors)
+
+    if (Object.keys(nextErrors).length > 0) {
+      setSubmitState('error')
+      return
+    }
+
+    const payload = {
+      ...orderPayload,
+      customer,
+      payment: {
+        method: 'online',
+        status: 'pending',
+      },
+    }
+
+    console.info('Constructor order payload:', payload)
+    setSubmitState('success')
+  }
 
   return (
     <div className="rp-checkout" role="dialog" aria-modal="true" aria-label="Оформление заказа">
@@ -61,10 +121,25 @@ export default function CheckoutDrawer({ open, project, summary, onClose }) {
           <section className="rp-checkout__card">
             <h3>Ваши данные</h3>
             <div className="rp-checkout__fields">
-              <label><span>Имя</span><input placeholder="Например, Денис" /></label>
-              <label><span>Телефон</span><input placeholder="+7 999 000-00-00" inputMode="tel" /></label>
-              <label><span>Город / адрес доставки</span><input placeholder="Москва, район или адрес" /></label>
-              <label><span>Комментарий</span><textarea placeholder="Например: нужен подъём, сборка или консультация" rows="3" /></label>
+              <label className={errors.name ? 'has-error' : ''}>
+                <span>Имя</span>
+                <input placeholder="Например, Денис" value={customer.name} onChange={(event) => updateCustomer('name', event.target.value)} />
+                {errors.name && <small>{errors.name}</small>}
+              </label>
+              <label className={errors.phone ? 'has-error' : ''}>
+                <span>Телефон</span>
+                <input placeholder="+7 999 000-00-00" inputMode="tel" value={customer.phone} onChange={(event) => updateCustomer('phone', event.target.value)} />
+                {errors.phone && <small>{errors.phone}</small>}
+              </label>
+              <label className={errors.address ? 'has-error' : ''}>
+                <span>Город / адрес доставки</span>
+                <input placeholder="Москва, район или адрес" value={customer.address} onChange={(event) => updateCustomer('address', event.target.value)} />
+                {errors.address && <small>{errors.address}</small>}
+              </label>
+              <label>
+                <span>Комментарий</span>
+                <textarea placeholder="Например: нужен подъём, сборка или консультация" rows="3" value={customer.comment} onChange={(event) => updateCustomer('comment', event.target.value)} />
+              </label>
             </div>
           </section>
 
@@ -75,12 +150,14 @@ export default function CheckoutDrawer({ open, project, summary, onClose }) {
               <button type="button">Согласовать с менеджером</button>
             </div>
             <p className="rp-checkout__note">Авторизацию и личный кабинет добавим отдельным этапом. Сейчас заявка может уходить без входа в аккаунт.</p>
+            {submitState === 'error' && <p className="rp-checkout__status is-error">Заполните обязательные поля перед оплатой.</p>}
+            {submitState === 'success' && <p className="rp-checkout__status is-success">Данные готовы к отправке. Следующий этап — подключение оплаты и backend.</p>}
           </section>
         </div>
 
         <div className="rp-checkout__foot">
           <button type="button" className="rp-checkout__secondary" onClick={onClose}>Вернуться к проекту</button>
-          <button type="button" className="rp-checkout__primary">Перейти к оплате</button>
+          <button type="button" className="rp-checkout__primary" onClick={handleSubmit}>Перейти к оплате</button>
         </div>
       </aside>
     </div>
