@@ -134,13 +134,13 @@
 }
 
 .rp-ref-material-list button {
-  min-height: 60px;
+  min-height: 64px;
   padding: 9px;
   border-radius: 14px;
   border: 1px solid rgba(10,10,10,.09);
   background: #fff;
   display: grid;
-  grid-template-columns: 42px 1fr;
+  grid-template-columns: 42px 1fr auto;
   align-items: center;
   gap: 12px;
   text-align: left;
@@ -152,11 +152,25 @@
   box-shadow: inset 0 0 0 1px #0a0a0a;
 }
 
-.rp-ref-material-list i {
+.rp-ref-material-list i,
+.rp-ref-material-swatch {
   width: 42px;
   height: 42px;
   border-radius: 10px;
   background: repeating-linear-gradient(88deg,rgba(112,83,50,.14) 0,rgba(112,83,50,.14) 1px,transparent 1px,transparent 8px),linear-gradient(90deg,#cbb797,#e1d3bc);
+}
+
+.rp-ref-material-swatch--white {
+  background: linear-gradient(135deg,#fff,#f1f1ee);
+  border: 1px solid rgba(10,10,10,.08);
+}
+
+.rp-ref-material-swatch--gray {
+  background: linear-gradient(135deg,#a9aaa7,#deded9);
+}
+
+.rp-ref-material-swatch--oak {
+  background: repeating-linear-gradient(86deg,rgba(90,63,33,.18) 0,rgba(90,63,33,.18) 1px,transparent 1px,transparent 7px),linear-gradient(90deg,#b98e58,#e4c28c);
 }
 
 .rp-ref-material-list span {
@@ -171,6 +185,66 @@
   color: #777;
   font-size: 10px;
   font-weight: 650;
+}
+
+.rp-ref-material-list b {
+  min-width: 42px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #f0efeb;
+  color: #151515;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.rp-ref-handle-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rp-ref-handle-list button {
+  min-height: 54px;
+  padding: 9px 12px;
+  border-radius: 13px;
+  border: 1px solid rgba(10,10,10,.09);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  text-align: left;
+}
+
+.rp-ref-handle-list button.is-active,
+.rp-ref-handle-list button:hover {
+  border-color: #0a0a0a;
+  box-shadow: inset 0 0 0 1px #0a0a0a;
+}
+
+.rp-ref-handle-list span {
+  color: #151515;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.rp-ref-handle-list small {
+  display: block;
+  margin-top: 4px;
+  color: #777;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.rp-ref-handle-list b {
+  color: #151515;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .rp-ref-config-nav {
