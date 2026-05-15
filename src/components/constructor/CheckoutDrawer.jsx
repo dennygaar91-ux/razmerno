@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createConstructorOrder } from '../../services/constructorOrders'
 
 function formatPrice(value) {
@@ -9,10 +9,12 @@ const initialCustomer = {
   name: '',
   phone: '',
   address: '',
+  entrance: '',
+  floor: '',
   comment: '',
 }
 
-function validateCustomer(customer) {
+function validateCustomer(customer, agreementAccepted) {
   const errors = {}
 
   if (customer.name.trim().length < 2) {
@@ -26,6 +28,10 @@ function validateCustomer(customer) {
 
   if (customer.address.trim().length < 3) {
     errors.address = 'Укажите город или адрес доставки'
+  }
+
+  if (!agreementAccepted) {
+    errors.agreement = 'Нужно согласие на обработку заявки'
   }
 
   return errors
@@ -51,20 +57,27 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
   const [errors, setErrors] = useState({})
   const [submitState, setSubmitState] = useState('idle')
   const [authMode, setAuthMode] = useState('guest')
-  const [paymentMode, setPaymentMode] = useState('online')
+  const [deliveryMode, setDeliveryMode] = useState('mkad')
+  const [paymentMode, setPaymentMode] = useState('after-check')
+  const [agreementAccepted, setAgreementAccepted] = useState(true)
   const [orderId, setOrderId] = useState('')
+
+  const deliveryPrice = deliveryMode === 'pickup' ? 0 : deliveryMode === 'mo' ? 6000 : 6000
+  const finalTotal = project.price + deliveryPrice
+
+  const orderRows = useMemo(() => [
+    ['Размер', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
+    ['Материал', `${project.material.body}, ${project.material.thickness}`],
+    ['Кромка', project.material.edge],
+    ['Фурнитура', `${project.material.handles} · ${project.material.hardware ?? 'Стандарт'}`],
+    ['Наполнение', `${summary.shelves} полок · ${summary.drawers} ящиков · ${summary.rails} штанг`],
+    ['Срок', '10–14 дней'],
+  ], [project, summary])
 
   if (!open) return null
 
   const isSubmitting = submitState === 'loading'
   const isSuccess = submitState === 'success'
-
-  const orderRows = [
-    ['Размер', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
-    ['Материал', `${project.material.body}, ${project.material.thickness}`],
-    ['Наполнение', `${summary.shelves} полок · ${summary.drawers} ящиков · ${summary.rails} штанг`],
-    ['Срок', '10–14 дней'],
-  ]
 
   function updateCustomer(field, value) {
     setCustomer(current => ({ ...current, [field]: value }))
@@ -73,8 +86,14 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
     setOrderId('')
   }
 
+  function updateAgreement(value) {
+    setAgreementAccepted(value)
+    setErrors(current => ({ ...current, agreement: undefined }))
+    setSubmitState('idle')
+  }
+
   async function handleSubmit() {
-    const nextErrors = validateCustomer(customer)
+    const nextErrors = validateCustomer(customer, agreementAccepted)
     setErrors(nextErrors)
 
     if (Object.keys(nextErrors).length > 0) {
@@ -85,13 +104,25 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
     const payload = {
       ...orderPayload,
       customer,
+      delivery: {
+        mode: deliveryMode,
+        price: deliveryPrice,
+        address: customer.address,
+        entrance: customer.entrance,
+        floor: customer.floor,
+      },
       auth: {
         mode: authMode,
         status: authMode === 'guest' ? 'guest_checkout' : 'auth_required_later',
       },
       payment: {
         method: paymentMode,
-        status: 'pending',
+        status: 'pending_after_tech_check',
+        amount: finalTotal,
+      },
+      agreements: {
+        personalData: agreementAccepted,
+        offerStatus: 'draft_for_later',
       },
     }
 
@@ -112,7 +143,7 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
   }
 
   return (
-    <div className="rp-checkout rp-checkout--polished" role="dialog" aria-modal="true" aria-label="Оформление заказа">
+    <div className="rp-checkout rp-checkout--polished rp-checkout--structured" role="dialog" aria-modal="true" aria-label="Оформление заказа">
       <button className="rp-checkout__overlay" type="button" aria-label="Закрыть оформление" onClick={onClose} />
 
       <aside className="rp-checkout__panel">
@@ -120,7 +151,7 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
           <div>
             <p>Оформление заказа</p>
             <h2>{isSuccess ? 'Заявка создана' : 'Проверьте комплект и оставьте контакты'}</h2>
-            <span>{isSuccess ? 'Мы зафиксировали параметры проекта и передадим их на проверку.' : 'Оплата появится после проверки проекта технологом.'}</span>
+            <span>{isSuccess ? 'Мы зафиксировали параметры проекта и передадим их на проверку.' : 'Оплата будет доступна после проверки проекта технологом.'}</span>
           </div>
           <button type="button" onClick={onClose} aria-label="Закрыть">×</button>
         </div>
@@ -132,20 +163,21 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
               <h3>Заявка {orderId} создана</h3>
               <p>Следующий шаг — менеджер проверит деталировку, подтвердит стоимость и отправит ссылку на оплату.</p>
               <dl>
-                <div><dt>Стоимость</dt><dd>{formatPrice(project.price)} ₽</dd></div>
-                <div><dt>Срок</dt><dd>10–14 дней после подтверждения</dd></div>
+                <div><dt>Комплект</dt><dd>{formatPrice(project.price)} ₽</dd></div>
+                <div><dt>Доставка</dt><dd>{deliveryPrice ? `${formatPrice(deliveryPrice)} ₽` : 'самовывоз'}</dd></div>
+                <div><dt>Итого ориентир</dt><dd>{formatPrice(finalTotal)} ₽</dd></div>
                 <div><dt>Контакт</dt><dd>{customer.phone}</dd></div>
               </dl>
             </section>
           ) : (
             <>
-              <section className="rp-checkout__hero-total">
-                <span>Предварительная стоимость</span>
-                <strong>{formatPrice(project.price)} ₽</strong>
-                <p>Финальная стоимость будет подтверждена после проверки проекта технологом.</p>
+              <section className="rp-checkout__hero-total rp-checkout__hero-total--structured">
+                <span>Ориентировочно к оплате после проверки</span>
+                <strong>{formatPrice(finalTotal)} ₽</strong>
+                <p>Комплект {formatPrice(project.price)} ₽ + доставка {deliveryPrice ? `${formatPrice(deliveryPrice)} ₽` : '0 ₽'}. Финальная стоимость будет подтверждена технологом.</p>
               </section>
 
-              <CheckoutStep number="1" title="Комплект" text="Проверьте основные параметры перед оформлением.">
+              <CheckoutStep number="1" title="Заказ" text="Проверьте основные параметры комплекта перед оформлением.">
                 <dl className="rp-checkout__summary rp-checkout__summary--compact">
                   {orderRows.map(([label, value]) => (
                     <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
@@ -153,7 +185,7 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
                 </dl>
               </CheckoutStep>
 
-              <CheckoutStep number="2" title="Контакты и доставка" text="Нужны только данные для связи и предварительной доставки.">
+              <CheckoutStep number="2" title="Контакты" text="Нужны только данные для связи. Авторизацию подключим отдельным этапом.">
                 <div className="rp-checkout__fields rp-checkout__fields--polished">
                   <label className={errors.name ? 'has-error' : ''}>
                     <span>Имя</span>
@@ -165,10 +197,28 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
                     <input placeholder="+7 999 000-00-00" inputMode="tel" value={customer.phone} onChange={(event) => updateCustomer('phone', event.target.value)} />
                     {errors.phone && <small>{errors.phone}</small>}
                   </label>
+                </div>
+              </CheckoutStep>
+
+              <CheckoutStep number="3" title="Доставка" text="Для MVP считаем доставку по Москве внутри МКАД как базовый сценарий.">
+                <div className="rp-checkout__option-grid rp-checkout__option-grid--delivery">
+                  <button className={deliveryMode === 'mkad' ? 'is-active' : ''} type="button" onClick={() => setDeliveryMode('mkad')}>Москва МКАД<span>6 000 ₽</span></button>
+                  <button className={deliveryMode === 'mo' ? 'is-active' : ''} type="button" onClick={() => setDeliveryMode('mo')}>МО / за МКАД<span>от 6 000 ₽ + км</span></button>
+                  <button className={deliveryMode === 'pickup' ? 'is-active' : ''} type="button" onClick={() => setDeliveryMode('pickup')}>Самовывоз<span>0 ₽</span></button>
+                </div>
+                <div className="rp-checkout__fields rp-checkout__fields--polished rp-checkout__fields--delivery">
                   <label className={errors.address ? 'has-error' : ''}>
                     <span>Город / адрес доставки</span>
                     <input placeholder="Москва, район или адрес" value={customer.address} onChange={(event) => updateCustomer('address', event.target.value)} />
                     {errors.address && <small>{errors.address}</small>}
+                  </label>
+                  <label>
+                    <span>Подъезд</span>
+                    <input placeholder="1" value={customer.entrance} onChange={(event) => updateCustomer('entrance', event.target.value)} />
+                  </label>
+                  <label>
+                    <span>Этаж</span>
+                    <input placeholder="5" value={customer.floor} onChange={(event) => updateCustomer('floor', event.target.value)} />
                   </label>
                   <label>
                     <span>Комментарий</span>
@@ -177,16 +227,21 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
                 </div>
               </CheckoutStep>
 
-              <CheckoutStep number="3" title="Оформление" text="Можно продолжить без входа. Личный кабинет добавим позже.">
+              <CheckoutStep number="4" title="Оплата и согласие" text="Оплата не списывается сейчас: сначала проверка проекта и подтверждение цены.">
                 <div className="rp-checkout__option-grid">
                   <button className={authMode === 'guest' ? 'is-active' : ''} type="button" onClick={() => setAuthMode('guest')}>Без входа<span>Оформить по телефону</span></button>
-                  <button className={authMode === 'login' ? 'is-active' : ''} type="button" onClick={() => setAuthMode('login')}>Войти позже<span>Сохраним UX под кабинет</span></button>
+                  <button className={authMode === 'login' ? 'is-active' : ''} type="button" onClick={() => setAuthMode('login')}>Войти позже<span>Под кабинет</span></button>
                 </div>
                 <div className="rp-checkout__option-grid rp-checkout__option-grid--pay">
-                  <button className={paymentMode === 'online' ? 'is-active' : ''} type="button" onClick={() => setPaymentMode('online')}>Онлайн-оплата<span>После проверки</span></button>
+                  <button className={paymentMode === 'after-check' ? 'is-active' : ''} type="button" onClick={() => setPaymentMode('after-check')}>После проверки<span>Ссылка на оплату</span></button>
                   <button className={paymentMode === 'manager' ? 'is-active' : ''} type="button" onClick={() => setPaymentMode('manager')}>Через менеджера<span>Согласовать вручную</span></button>
                 </div>
-                <p className="rp-checkout__note">Сейчас создаём заявку и резервируем параметры проекта. Платёжный шлюз подключим следующим техническим этапом.</p>
+                <label className={`rp-checkout__agreement ${errors.agreement ? 'has-error' : ''}`}>
+                  <input type="checkbox" checked={agreementAccepted} onChange={(event) => updateAgreement(event.target.checked)} />
+                  <span>Согласен на обработку заявки и понимаю, что цена предварительная до проверки технологом.</span>
+                </label>
+                {errors.agreement && <p className="rp-checkout__status is-error">{errors.agreement}</p>}
+                <p className="rp-checkout__note">Публичную оферту, оплату и авторизацию подключим позже. Сейчас создаётся заявка с параметрами проекта.</p>
                 {submitState === 'error' && <p className="rp-checkout__status is-error">Заполните обязательные поля или попробуйте ещё раз.</p>}
                 {submitState === 'loading' && <p className="rp-checkout__status is-loading">Создаём заявку и готовим переход к оплате…</p>}
               </CheckoutStep>
