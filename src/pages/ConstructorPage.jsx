@@ -5,7 +5,7 @@ import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, HANDLE_OPTIONS } from '../data/constructorCatalog'
-import { calculatePrice, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
+import { calculatePrice, getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
 import { clearConstructorProject, loadConstructorProject, saveConstructorProject } from '../utils/constructorStorage'
 import './ConstructorPage.css'
@@ -46,6 +46,7 @@ export default function ConstructorPage() {
   const priceBreakdown = useMemo(() => getPriceBreakdown(project, summary), [project, summary])
   const price = useMemo(() => calculatePrice(project, summary), [project, summary])
   const warnings = useMemo(() => getWarnings(project, summary), [project, summary])
+  const activeSectionWarnings = useMemo(() => getActiveSectionWarnings(project), [project])
   const projectWithPrice = useMemo(() => ({ ...project, price, priceBreakdown }), [project, price, priceBreakdown])
   const orderPayload = useMemo(() => buildConstructorPayload(projectWithPrice, summary), [projectWithPrice, summary])
 
@@ -250,6 +251,7 @@ export default function ConstructorPage() {
           project={projectWithPrice}
           summary={summary}
           warnings={warnings}
+          activeSectionWarnings={activeSectionWarnings}
           materials={MATERIALS}
           handleOptions={HANDLE_OPTIONS}
           canGoBack={canGoBack}
