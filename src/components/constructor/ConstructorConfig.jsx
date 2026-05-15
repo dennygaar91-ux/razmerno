@@ -180,20 +180,43 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
   )
 }
 
+function getPriceLabel(item) {
+  if (item.priceFactor > 1) return `+${Math.round((item.priceFactor - 1) * 100)}%`
+  if (item.priceFactor < 1) return `−${Math.round((1 - item.priceFactor) * 100)}%`
+  return 'база'
+}
+
 function MaterialsStep({ project, materials, handleOptions, onMaterialChange }) {
+  const selectedMaterial = materials.find(material => material.id === project.material.materialId) ?? materials[0]
+  const selectedHandle = handleOptions.find(option => option.id === project.material.handleId) ?? handleOptions[0]
+
   return (
     <>
       <StepHint title="Выберите внешний вид" text="Материал влияет на визуал, комплект деталей и предварительную стоимость." />
 
+      <div className="rp-ref-selected-material">
+        <i className={`rp-ref-material-swatch rp-ref-material-swatch--${selectedMaterial.tone}`} />
+        <div>
+          <span>Выбрано сейчас</span>
+          <b>{selectedMaterial.fullTitle ?? selectedMaterial.title}</b>
+          <small>{selectedMaterial.edge} · {selectedHandle.title}</small>
+        </div>
+      </div>
+
       <div className="rp-ref-block rp-ref-block--topless rp-ref-block--polished">
         <h3>Материал корпуса</h3>
-        <p>Базовый материал MVP — ЛДСП 16 мм</p>
-        <div className="rp-ref-material-list">
+        <p>Базовый материал MVP — ЛДСП 16 мм. Кромка подбирается автоматически.</p>
+        <div className="rp-ref-material-list rp-ref-material-list--product">
           {materials.map((material) => (
             <button className={project.material.materialId === material.id ? 'is-active' : ''} type="button" key={material.id} onClick={() => onMaterialChange('materialId', material.id)}>
               <i className={`rp-ref-material-swatch rp-ref-material-swatch--${material.tone}`} />
-              <span>{material.title}<small>{material.text} · {material.thickness}</small></span>
-              <b>{material.priceFactor > 1 ? `+${Math.round((material.priceFactor - 1) * 100)}%` : material.priceFactor < 1 ? `−${Math.round((1 - material.priceFactor) * 100)}%` : 'база'}</b>
+              <span>
+                <strong>{material.title}</strong>
+                <small>{material.text}</small>
+                <em>{material.collection} · {material.thickness}</em>
+              </span>
+              <b>{material.badge}</b>
+              <u>{getPriceLabel(material)}</u>
             </button>
           ))}
         </div>
@@ -201,19 +224,24 @@ function MaterialsStep({ project, materials, handleOptions, onMaterialChange }) 
 
       <div className="rp-ref-block rp-ref-block--polished">
         <h3>Открывание</h3>
-        <div className="rp-ref-handle-list">
+        <p>Для MVP безопаснее вариант с ручками, без ручек потребует более точной регулировки.</p>
+        <div className="rp-ref-handle-list rp-ref-handle-list--product">
           {handleOptions.map((option) => (
             <button className={project.material.handleId === option.id ? 'is-active' : ''} type="button" key={option.id} onClick={() => onMaterialChange('handleId', option.id)}>
-              <span>{option.title}<small>{option.text}</small></span>
+              <span>
+                <strong>{option.title}</strong>
+                <small>{option.text}</small>
+                <em>{option.helper}</em>
+              </span>
               <b>{option.priceAdd ? `+${option.priceAdd.toLocaleString('ru-RU')} ₽` : 'включено'}</b>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="rp-ref-block rp-ref-info">
+      <div className="rp-ref-block rp-ref-info rp-ref-info--materials">
         <Icon name="check-circle" size={16} />
-        <span>{project.material.edge} подобрана автоматически</span>
+        <span>{project.material.edge} подобрана автоматически. Фурнитура будет проверена технологом перед оплатой.</span>
       </div>
     </>
   )
