@@ -157,6 +157,36 @@
   min-height: 64px;
 }
 
+.rp-ref-section-tools {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.rp-ref-section-tools button {
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(10, 10, 10, .08);
+  background: #fff;
+  color: #151515;
+  font-size: 10px;
+  line-height: 1.15;
+  font-weight: 900;
+}
+
+.rp-ref-section-tools button:hover:not(:disabled) {
+  border-color: rgba(232, 97, 44, .32);
+  color: #8b3d1d;
+  background: rgba(232, 97, 44, .055);
+}
+
+.rp-ref-section-tools button:disabled {
+  opacity: .46;
+  cursor: not-allowed;
+}
+
 .rp-ref-summary--product {
   grid-template-rows: 176px 86px 150px 104px auto 96px;
 }
@@ -253,6 +283,16 @@
   .rp-ref-section-map__item {
     min-height: 42px;
   }
+
+  .rp-ref-section-tools {
+    gap: 6px;
+  }
+
+  .rp-ref-section-tools button {
+    min-height: 32px;
+    padding-inline: 7px;
+    font-size: 9px;
+  }
 }
 
 @media (max-height: 820px) and (min-width: 1181px) {
@@ -300,5 +340,9 @@
 
   .rp-ref-quick-actions--polished small {
     display: none;
+  }
+
+  .rp-ref-section-tools button {
+    min-height: 30px;
   }
 }
