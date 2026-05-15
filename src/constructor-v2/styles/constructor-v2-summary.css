@@ -147,10 +147,17 @@
 }
 
 .rv2-kit-card {
-  padding: 22px;
-  border-radius: 26px;
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border-radius: 30px;
   border: 1px solid rgba(15,15,15,.05);
-  background: rgba(255,255,255,0.9);
+  background:
+    radial-gradient(circle at 96% 0%, rgba(239,91,42,0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(248,246,242,0.92) 100%);
+  box-shadow:
+    0 18px 34px rgba(15,15,15,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.86);
 }
 
 .rv2-check-card::after {
@@ -222,24 +229,54 @@
 .rv2-kit-grid {
   display: grid;
   grid-template-columns: repeat(3,minmax(0,1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .rv2-kit-grid div {
-  min-height: 84px;
-  padding: 14px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(15,15,15,.03) 0%, rgba(15,15,15,.015) 100%);
+  position: relative;
+  min-height: 96px;
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(15,15,15,0.05);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.88) 0%, rgba(247,245,241,0.82) 100%);
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.78),
+    0 10px 20px rgba(15,15,15,0.04);
+}
+
+.rv2-kit-grid div::after {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: -18px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(15,15,15,0.035);
 }
 
 .rv2-kit-grid b {
+  position: relative;
+  z-index: 2;
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
+  color: rgba(15,15,15,0.54);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
 }
 
 .rv2-kit-grid p {
-  font-size: 18px;
+  position: relative;
+  z-index: 2;
+  color: #111;
+  font-size: 22px;
   font-weight: 900;
+  line-height: .98;
+  letter-spacing: -.06em;
 }
 
 .rv2-summary-actions {
