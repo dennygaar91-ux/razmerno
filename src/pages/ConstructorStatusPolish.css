@@ -1,25 +1,30 @@
+.rp-status-badge,
 .rp-ctor-badges--stateful span {
   transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
 
+.rp-status-badge.is-loading,
 .rp-ctor-badges--stateful span.is-loading {
   border-color: rgba(232, 97, 44, .22);
   background: rgba(232, 97, 44, .08);
   color: #8b3d1d;
 }
 
+.rp-status-badge.is-success,
 .rp-ctor-badges--stateful span.is-success {
   border-color: rgba(36, 148, 71, .2);
   background: rgba(36, 148, 71, .08);
   color: #206f39;
 }
 
+.rp-status-badge.is-error,
 .rp-ctor-badges--stateful span.is-error {
   border-color: rgba(180, 35, 24, .2);
   background: rgba(180, 35, 24, .08);
   color: #b42318;
 }
 
+.rp-status-badge.is-neutral,
 .rp-ctor-badges--stateful span.is-neutral {
   border-color: rgba(10, 10, 10, .08);
   background: #fff;
