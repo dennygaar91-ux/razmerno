@@ -6,6 +6,7 @@
 @import './ConstructorProjectSafety.css';
 @import './ConstructorStatusPolish.css';
 @import './ConstructorScreenshotFixes.css';
+@import './ConstructorSectionMapFix.css';
 
 .rp-ref-summary--product {
   grid-template-rows: 188px 92px 162px 112px auto 104px;
@@ -234,97 +235,6 @@
   font-size: 10px;
 }
 
-.rp-ref-breakdown-card--detailed {
-  max-height: 320px;
-  overflow-y: auto;
-}
-
-.rp-ref-breakdown-card__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.rp-ref-breakdown-card__head span {
-  min-height: 24px;
-  padding: 0 9px;
-  border-radius: 999px;
-  background: #111;
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  font-size: 10px;
-  font-weight: 950;
-}
-
-.rp-ref-breakdown-note {
-  margin: 0;
-  padding: 9px 10px;
-  border-radius: 12px;
-  background: rgba(232, 97, 44, .07);
-  color: #7c4328;
-  font-size: 10px;
-  line-height: 1.35;
-  font-weight: 750;
-}
-
-.rp-ref-estimate-row {
-  padding: 9px 0;
-  border-top: 1px solid rgba(10, 10, 10, .07);
-  display: grid;
-  gap: 5px;
-}
-
-.rp-ref-estimate-row__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.rp-ref-estimate-row__top span {
-  color: #151515;
-  font-size: 11px;
-  font-weight: 950;
-}
-
-.rp-ref-estimate-row__top b {
-  color: #151515;
-  font-size: 11px;
-  font-weight: 950;
-  white-space: nowrap;
-}
-
-.rp-ref-estimate-row p {
-  margin: 0;
-  color: #777;
-  font-size: 9px;
-  line-height: 1.25;
-  font-weight: 700;
-}
-
-.rp-ref-estimate-row__bar {
-  height: 4px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #efeee9;
-}
-
-.rp-ref-estimate-row__bar i {
-  height: 100%;
-  border-radius: inherit;
-  background: #111;
-  display: block;
-}
-
-.rp-ref-estimate-row small {
-  color: #9a9a94;
-  font-size: 8px;
-  line-height: 1.2;
-  font-weight: 750;
-}
-
 .rp-ref-additional-card--product {
   display: grid;
   align-content: start;
@@ -346,10 +256,6 @@
 
   .rp-ref-price-card--main strong {
     font-size: 32px;
-  }
-
-  .rp-ref-breakdown-card--detailed {
-    max-height: 280px;
   }
 }
 
@@ -380,15 +286,6 @@
   }
 
   .rp-ref-kit-items--product small {
-    display: none;
-  }
-
-  .rp-ref-breakdown-card--detailed {
-    max-height: 230px;
-  }
-
-  .rp-ref-breakdown-note,
-  .rp-ref-estimate-row small {
     display: none;
   }
 }
