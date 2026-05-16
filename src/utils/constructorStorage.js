@@ -1,80 +1,144 @@
 const STORAGE_KEY = 'razmerno.constructor.project.v1'
 const PROJECT_ID_KEY = 'razmerno.constructor.projectId.v1'
 const PROJECT_META_KEY = 'razmerno.constructor.projectMeta.v1'
+const LEGACY_KEYS = [
+  'razhmerno.constructor.project.v1',
+  'razhmerno.constructor.projectId.v1',
+  'razhmerno.constructor.projectMeta.v1',
+  'razhmerno_project',
+  'razhmerno_project_id',
+]
 
-export function saveConstructorProject(project) {
-  if (typeof window === 'undefined') return false
+let memoryProject = null
+let memoryProjectId = ''
+let memoryMeta = null
+
+function getLocalStorage() {
+  if (typeof window === 'undefined') return null
 
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(project))
-    window.localStorage.setItem(PROJECT_META_KEY, JSON.stringify({ updatedAt: new Date().toISOString() }))
+    const storage = window.localStorage
+    const testKey = 'razmerno.constructor.storage.test'
+    storage.setItem(testKey, '1')
+    storage.removeItem(testKey)
+    return storage
+  } catch (error) {
+    console.warn('Constructor localStorage is unavailable:', error)
+    return null
+  }
+}
+
+function createMeta() {
+  const now = new Date().toISOString()
+
+  return {
+    version: 1,
+    updatedAt: now,
+  }
+}
+
+export function saveConstructorProject(project) {
+  const meta = createMeta()
+  memoryProject = project
+  memoryMeta = meta
+
+  const storage = getLocalStorage()
+  if (!storage) return true
+
+  try {
+    storage.setItem(STORAGE_KEY, JSON.stringify(project))
+    storage.setItem(PROJECT_META_KEY, JSON.stringify(meta))
     return true
   } catch (error) {
     console.warn('Failed to save constructor project:', error)
-    return false
+    return true
   }
 }
 
 export function loadConstructorProject() {
-  if (typeof window === 'undefined') return null
+  const storage = getLocalStorage()
+  if (!storage) return memoryProject
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
+    const raw = storage.getItem(STORAGE_KEY)
+    if (!raw) return memoryProject
 
-    return JSON.parse(raw)
+    const parsed = JSON.parse(raw)
+    memoryProject = parsed
+    return parsed
   } catch (error) {
     console.warn('Failed to load constructor project:', error)
-    return null
+    return memoryProject
   }
 }
 
 export function saveConstructorProjectId(projectId) {
-  if (typeof window === 'undefined' || !projectId) return false
+  if (!projectId) return false
+
+  memoryProjectId = projectId
+  const storage = getLocalStorage()
+  if (!storage) return true
 
   try {
-    window.localStorage.setItem(PROJECT_ID_KEY, projectId)
+    storage.setItem(PROJECT_ID_KEY, projectId)
     return true
   } catch (error) {
     console.warn('Failed to save constructor project id:', error)
-    return false
+    return true
   }
 }
 
 export function loadConstructorProjectId() {
-  if (typeof window === 'undefined') return ''
+  const storage = getLocalStorage()
+  if (!storage) return memoryProjectId
 
   try {
-    return window.localStorage.getItem(PROJECT_ID_KEY) ?? ''
+    const projectId = storage.getItem(PROJECT_ID_KEY) ?? memoryProjectId
+    memoryProjectId = projectId
+    return projectId
   } catch (error) {
     console.warn('Failed to load constructor project id:', error)
-    return ''
+    return memoryProjectId
   }
 }
 
 export function loadConstructorProjectMeta() {
-  if (typeof window === 'undefined') return null
+  const storage = getLocalStorage()
+  if (!storage) return memoryMeta
 
   try {
-    const raw = window.localStorage.getItem(PROJECT_META_KEY)
-    if (!raw) return null
-    return JSON.parse(raw)
+    const raw = storage.getItem(PROJECT_META_KEY)
+    if (!raw) return memoryMeta
+
+    const parsed = JSON.parse(raw)
+    memoryMeta = parsed
+    return parsed
   } catch (error) {
     console.warn('Failed to load constructor project meta:', error)
-    return null
+    return memoryMeta
   }
 }
 
 export function clearConstructorProject() {
-  if (typeof window === 'undefined') return false
+  memoryProject = null
+  memoryProjectId = ''
+  memoryMeta = null
+
+  const storage = getLocalStorage()
+  if (!storage) return true
 
   try {
-    window.localStorage.removeItem(STORAGE_KEY)
-    window.localStorage.removeItem(PROJECT_ID_KEY)
-    window.localStorage.removeItem(PROJECT_META_KEY)
+    storage.removeItem(STORAGE_KEY)
+    storage.removeItem(PROJECT_ID_KEY)
+    storage.removeItem(PROJECT_META_KEY)
+    LEGACY_KEYS.forEach(key => storage.removeItem(key))
     return true
   } catch (error) {
     console.warn('Failed to clear constructor project:', error)
     return false
   }
+}
+
+export function isConstructorStoragePersistent() {
+  return Boolean(getLocalStorage())
 }
