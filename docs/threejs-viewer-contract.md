@@ -22,11 +22,13 @@
 
 Если `renderCanvas` не передан, используется CSS fallback через `WardrobeMockup`.
 
-Если `renderCanvas` передан, он вызывается так:
+Если `renderCanvas` передан, `CanvasSlot` пробует вызвать:
 
 ```jsx
 renderCanvas(sceneProps)
 ```
+
+Если будущий Canvas упадёт во время render-функции, `CanvasSlot` безопасно вернётся к CSS fallback. Это не заменяет полноценный React Error Boundary внутри будущего Canvas, но защищает текущий pre-MVP интерфейс от простых ошибок подключения.
 
 ## sceneProps
 
@@ -50,6 +52,8 @@ renderCanvas(sceneProps)
   material: {
     materialId: string,
     body: string,
+    manufacturer?: string,
+    article?: string,
     tone: string,
     thickness: string,
     edge: string,
@@ -60,10 +64,17 @@ renderCanvas(sceneProps)
     fillingElements: number,
     materialTone: string,
     rendererReady: boolean,
+    activeSectionLabel: string,
   },
   three: {
+    version: 1,
     unit: 'mm',
     coordinateSystem: 'width-x_height-y_depth-z',
+    interaction: {
+      selectable: 'section',
+      activeSection: number,
+      emits: ['section:select'],
+    },
     cabinet: {
       width: number,
       height: number,
@@ -75,7 +86,10 @@ renderCanvas(sceneProps)
       id: string,
       tone: string,
       title: string,
+      manufacturer?: string,
+      article?: string,
       thickness: string,
+      edge: string,
     },
     sections: Array<{
       id: string,
@@ -84,11 +98,25 @@ renderCanvas(sceneProps)
       width: number,
       height: number,
       depth: number,
+      bounds: {
+        xMin: number,
+        xMax: number,
+        yMin: number,
+        yMax: number,
+        zMin: number,
+        zMax: number,
+      },
       active: boolean,
       shelves: number,
       drawers: number,
       rail: boolean,
       label: string,
+      shortLabel: string,
+      slots: Array<{
+        type: 'shelf' | 'drawer' | 'rail',
+        index: number,
+        label: string,
+      }>,
     }>,
   },
 }
@@ -120,6 +148,22 @@ function CabinetCanvas3D({ sceneProps, onReady, onError, onSectionClick }) {
 />
 ```
 
+## Координатная система
+
+```txt
+width  -> X
+height -> Y
+depth  -> Z
+unit   -> mm
+```
+
+`bounds` каждой секции уже рассчитаны в миллиметрах. На стороне Three.js можно масштабировать миллиметры в scene units, например:
+
+```js
+const SCENE_SCALE = 0.001
+const widthInScene = width * SCENE_SCALE
+```
+
 ## Подсветка activeSection
 
 В массиве `three.sections` каждая секция содержит:
@@ -137,9 +181,37 @@ Three.js должен подсвечивать активную секцию п�
 - не менять геометрию секции;
 - не перекрывать полки, ящики и штангу.
 
+## Наполнение секций
+
+Для каждой секции есть агрегированные поля:
+
+```js
+shelves: number
+drawers: number
+rail: boolean
+```
+
+И детальный список `slots`:
+
+```js
+[
+  { type: 'shelf', index: 0, label: 'Полка 1' },
+  { type: 'drawer', index: 0, label: 'Ящик 1' },
+  { type: 'rail', index: 0, label: 'Штанга' },
+]
+```
+
+На первом этапе Three.js может строить элементы по агрегированным полям. Позже `slots` можно расширить координатами и размерами деталей.
+
 ## Материалы
 
-На первом этапе достаточно использовать `material.tone` и `material.title`.
+На первом этапе достаточно использовать:
+
+```js
+three.material.tone
+three.material.title
+three.material.edge
+```
 
 Позже можно расширить контракт:
 
@@ -149,6 +221,7 @@ material: {
   tone: string,
   title: string,
   thickness: string,
+  edge: string,
   textureUrl?: string,
   edgeColor?: string,
 }
