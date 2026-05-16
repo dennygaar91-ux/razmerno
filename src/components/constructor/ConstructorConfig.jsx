@@ -59,7 +59,11 @@ function StepHint({ title, text }) {
   )
 }
 
-function OptionList({ items, activeId, field, onChange, compact = false }) {
+function OptionList({ items = [], activeId, field, onChange, compact = false }) {
+  if (!items.length) {
+    return <div className="rp-ref-empty-option">Варианты пока не добавлены</div>
+  }
+
   return (
     <div className={`rp-ref-option-list ${compact ? 'rp-ref-option-list--compact' : ''}`}>
       {items.map((item) => (
@@ -127,7 +131,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
 }
 
 function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply, onCopySection, onApplySectionToAll }) {
-  const activeSection = project.filling[project.activeSection - 1]
+  const activeSection = project.filling[project.activeSection - 1] ?? { shelves: 0, drawers: 0, rail: false }
   const railDisabled = project.dimensions.depth < 520
   const activePreset = activeSection.rail && activeSection.shelves <= 2 && activeSection.drawers === 0
     ? 'Гардероб'
@@ -208,11 +212,23 @@ function getPriceLabel(item) {
   return 'база'
 }
 
-function MaterialsStep({ project, materials, edgeOptions, handleOptions, hardwareOptions, onMaterialChange }) {
+function MaterialsStep({ project, materials = [], edgeOptions = [], handleOptions = [], hardwareOptions = [], onMaterialChange }) {
   const selectedMaterial = materials.find(material => material.id === project.material.materialId) ?? materials[0]
   const selectedEdge = edgeOptions.find(option => option.id === project.material.edgeId) ?? edgeOptions[0]
   const selectedHandle = handleOptions.find(option => option.id === project.material.handleId) ?? handleOptions[0]
   const selectedHardware = hardwareOptions.find(option => option.id === project.material.hardwareId) ?? hardwareOptions[0]
+
+  if (!selectedMaterial || !selectedEdge || !selectedHandle || !selectedHardware) {
+    return (
+      <>
+        <StepHint title="Материалы пока недоступны" text="Каталог материалов не загрузился. Проверьте constructorCatalog.js." />
+        <div className="rp-ref-block rp-ref-info rp-ref-info--materials">
+          <Icon name="clock" size={16} />
+          <span>Конструктор продолжит работать с текущими размерами и наполнением, но выбор спецификации временно недоступен.</span>
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
@@ -283,10 +299,10 @@ export default function ConstructorConfig({
   project,
   warnings,
   activeSectionWarnings,
-  materials,
-  edgeOptions,
-  handleOptions,
-  hardwareOptions,
+  materials = [],
+  edgeOptions = [],
+  handleOptions = [],
+  hardwareOptions = [],
   canGoBack,
   canGoNext,
   onBack,
