@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createConstructorOrder } from '../../services/constructorOrders'
 
 function formatPrice(value) {
@@ -73,6 +73,19 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
     ['Наполнение', `${summary.shelves} полок · ${summary.drawers} ящиков · ${summary.rails} штанг`],
     ['Срок', '10–14 дней'],
   ], [project, summary])
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [open, onClose])
 
   if (!open) return null
 
