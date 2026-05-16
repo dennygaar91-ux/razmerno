@@ -24,20 +24,23 @@ function EstimateRow({ row, total }) {
 
 export default function ConstructorSummary({ project, summary, warnings = [], estimateState = 'idle', onCheckout }) {
   const [estimateOpen, setEstimateOpen] = useState(false)
+  const hardwareTitle = project.material.hardware ?? 'Стандарт'
 
   const projectRows = [
     ['Размер', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
     ['Секции', `${project.sections} шт.`],
     ['Наполнение', `${summary.shelves} полок · ${summary.drawers} ящиков · ${summary.rails} штанг`],
     ['Материал', project.material.body],
+    ['Кромка', project.material.edge],
+    ['Фурнитура', hardwareTitle],
     ['Открывание', project.material.handles],
   ]
 
   const kitItems = [
-    ['Корпус', 'детали'],
+    ['Корпус', project.material.thickness],
     ['Распил', 'включён'],
     ['Кромка', project.material.edge],
-    ['Фурнитура', project.material.handles],
+    ['Фурнитура', hardwareTitle],
   ]
 
   const isReady = warnings.length === 0
@@ -115,7 +118,7 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         <h3>Дополнительно</h3>
         <div><span>Задняя стенка</span><em>Рекомендуем</em><b /></div>
         <div><span>{project.material.edge}</span><em>Включена</em><b /></div>
-        <div><span>Крепление к стене</span><em>Рекомендуем</em><b /></div>
+        <div><span>{hardwareTitle}</span><em>Учтена</em><b /></div>
       </section>
     </aside>
   )
