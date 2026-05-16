@@ -3,6 +3,7 @@ import ConstructorConfig from '../components/constructor/ConstructorConfig'
 import ConstructorViewer from '../components/constructor/ConstructorViewer'
 import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
+import StatusBadge from '../components/constructor/StatusBadge'
 import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, EDGE_OPTIONS, HANDLE_OPTIONS, HARDWARE_OPTIONS } from '../data/constructorCatalog'
 import { getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
@@ -454,9 +455,9 @@ export default function ConstructorPage() {
           <h1>Соберите шкаф под свой размер</h1>
           <p className="rp-ctor-lead">Задайте габариты, выберите наполнение и материалы. Цена рассчитывается сразу, а мы подготовим комплект для сборки и доставим к вам.</p>
           <div className="rp-ctor-badges rp-ctor-badges--stateful">
-            <span>3 шага</span>
-            <span className={`is-${estimateStatus.tone}`}>{estimateStatus.label}</span>
-            <span className={`is-${projectStatus.tone}`} title={projectStatus.text}>{projectStatus.label}</span>
+            <StatusBadge>3 шага</StatusBadge>
+            <StatusBadge tone={estimateStatus.tone}>{estimateStatus.label}</StatusBadge>
+            <StatusBadge tone={projectStatus.tone} title={projectStatus.text}>{projectStatus.label}</StatusBadge>
           </div>
         </div>
 
