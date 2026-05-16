@@ -37,6 +37,17 @@ function validateCustomer(customer, agreementAccepted) {
   return errors
 }
 
+function getErrorProps(field, errors) {
+  return errors[field]
+    ? {
+        'aria-invalid': 'true',
+        'aria-describedby': `checkout-${field}-error`,
+      }
+    : {
+        'aria-invalid': 'false',
+      }
+}
+
 function CheckoutStep({ number, title, text, children }) {
   return (
     <section className="rp-checkout__step">
@@ -171,7 +182,7 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
 
         <div className="rp-checkout__body rp-checkout__body--polished">
           {isSuccess ? (
-            <section className="rp-checkout__success">
+            <section className="rp-checkout__success" role="status">
               <div className="rp-checkout__success-icon">✓</div>
               <h3>Заявка {orderId} создана</h3>
               <p>Следующий шаг — менеджер проверит деталировку, подтвердит стоимость и отправит ссылку на оплату.</p>
@@ -200,63 +211,63 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
 
               <CheckoutStep number="2" title="Контакты" text="Нужны только данные для связи. Авторизацию подключим отдельным этапом.">
                 <div className="rp-checkout__fields rp-checkout__fields--polished">
-                  <label className={errors.name ? 'has-error' : ''}>
+                  <label className={errors.name ? 'has-error' : ''} htmlFor="checkout-name">
                     <span>Имя</span>
-                    <input placeholder="Например, Денис" value={customer.name} onChange={(event) => updateCustomer('name', event.target.value)} />
-                    {errors.name && <small>{errors.name}</small>}
+                    <input id="checkout-name" placeholder="Например, Денис" value={customer.name} onChange={(event) => updateCustomer('name', event.target.value)} {...getErrorProps('name', errors)} />
+                    {errors.name && <small id="checkout-name-error">{errors.name}</small>}
                   </label>
-                  <label className={errors.phone ? 'has-error' : ''}>
+                  <label className={errors.phone ? 'has-error' : ''} htmlFor="checkout-phone">
                     <span>Телефон</span>
-                    <input placeholder="+7 999 000-00-00" inputMode="tel" value={customer.phone} onChange={(event) => updateCustomer('phone', event.target.value)} />
-                    {errors.phone && <small>{errors.phone}</small>}
+                    <input id="checkout-phone" placeholder="+7 999 000-00-00" inputMode="tel" value={customer.phone} onChange={(event) => updateCustomer('phone', event.target.value)} {...getErrorProps('phone', errors)} />
+                    {errors.phone && <small id="checkout-phone-error">{errors.phone}</small>}
                   </label>
                 </div>
               </CheckoutStep>
 
               <CheckoutStep number="3" title="Доставка" text="Для MVP считаем доставку по Москве внутри МКАД как базовый сценарий.">
-                <div className="rp-checkout__option-grid rp-checkout__option-grid--delivery">
-                  <button className={deliveryMode === 'mkad' ? 'is-active' : ''} type="button" onClick={() => setDeliveryMode('mkad')}>Москва МКАД<span>6 000 ₽</span></button>
-                  <button className={deliveryMode === 'mo' ? 'is-active' : ''} type="button" onClick={() => setDeliveryMode('mo')}>МО / за МКАД<span>от 6 000 ₽ + км</span></button>
-                  <button className={deliveryMode === 'pickup' ? 'is-active' : ''} type="button" onClick={() => setDeliveryMode('pickup')}>Самовывоз<span>0 ₽</span></button>
+                <div className="rp-checkout__option-grid rp-checkout__option-grid--delivery" role="group" aria-label="Способ доставки">
+                  <button className={deliveryMode === 'mkad' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'mkad'} onClick={() => setDeliveryMode('mkad')}>Москва МКАД<span>6 000 ₽</span></button>
+                  <button className={deliveryMode === 'mo' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'mo'} onClick={() => setDeliveryMode('mo')}>МО / за МКАД<span>от 6 000 ₽ + км</span></button>
+                  <button className={deliveryMode === 'pickup' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'pickup'} onClick={() => setDeliveryMode('pickup')}>Самовывоз<span>0 ₽</span></button>
                 </div>
                 <div className="rp-checkout__fields rp-checkout__fields--polished rp-checkout__fields--delivery">
-                  <label className={errors.address ? 'has-error' : ''}>
+                  <label className={errors.address ? 'has-error' : ''} htmlFor="checkout-address">
                     <span>Город / адрес доставки</span>
-                    <input placeholder="Москва, район или адрес" value={customer.address} onChange={(event) => updateCustomer('address', event.target.value)} />
-                    {errors.address && <small>{errors.address}</small>}
+                    <input id="checkout-address" placeholder="Москва, район или адрес" value={customer.address} onChange={(event) => updateCustomer('address', event.target.value)} {...getErrorProps('address', errors)} />
+                    {errors.address && <small id="checkout-address-error">{errors.address}</small>}
                   </label>
-                  <label>
+                  <label htmlFor="checkout-entrance">
                     <span>Подъезд</span>
-                    <input placeholder="1" value={customer.entrance} onChange={(event) => updateCustomer('entrance', event.target.value)} />
+                    <input id="checkout-entrance" placeholder="1" value={customer.entrance} onChange={(event) => updateCustomer('entrance', event.target.value)} />
                   </label>
-                  <label>
+                  <label htmlFor="checkout-floor">
                     <span>Этаж</span>
-                    <input placeholder="5" value={customer.floor} onChange={(event) => updateCustomer('floor', event.target.value)} />
+                    <input id="checkout-floor" placeholder="5" value={customer.floor} onChange={(event) => updateCustomer('floor', event.target.value)} />
                   </label>
-                  <label>
+                  <label htmlFor="checkout-comment">
                     <span>Комментарий</span>
-                    <textarea placeholder="Например: нужен подъём, сборка или консультация" rows="3" value={customer.comment} onChange={(event) => updateCustomer('comment', event.target.value)} />
+                    <textarea id="checkout-comment" placeholder="Например: нужен подъём, сборка или консультация" rows="3" value={customer.comment} onChange={(event) => updateCustomer('comment', event.target.value)} />
                   </label>
                 </div>
               </CheckoutStep>
 
               <CheckoutStep number="4" title="Оплата и согласие" text="Оплата не списывается сейчас: сначала проверка проекта и подтверждение цены.">
-                <div className="rp-checkout__option-grid">
-                  <button className={authMode === 'guest' ? 'is-active' : ''} type="button" onClick={() => setAuthMode('guest')}>Без входа<span>Оформить по телефону</span></button>
-                  <button className={authMode === 'login' ? 'is-active' : ''} type="button" onClick={() => setAuthMode('login')}>Войти позже<span>Под кабинет</span></button>
+                <div className="rp-checkout__option-grid" role="group" aria-label="Способ оформления">
+                  <button className={authMode === 'guest' ? 'is-active' : ''} type="button" aria-pressed={authMode === 'guest'} onClick={() => setAuthMode('guest')}>Без входа<span>Оформить по телефону</span></button>
+                  <button className={authMode === 'login' ? 'is-active' : ''} type="button" aria-pressed={authMode === 'login'} onClick={() => setAuthMode('login')}>Войти позже<span>Под кабинет</span></button>
                 </div>
-                <div className="rp-checkout__option-grid rp-checkout__option-grid--pay">
-                  <button className={paymentMode === 'after-check' ? 'is-active' : ''} type="button" onClick={() => setPaymentMode('after-check')}>После проверки<span>Ссылка на оплату</span></button>
-                  <button className={paymentMode === 'manager' ? 'is-active' : ''} type="button" onClick={() => setPaymentMode('manager')}>Через менеджера<span>Согласовать вручную</span></button>
+                <div className="rp-checkout__option-grid rp-checkout__option-grid--pay" role="group" aria-label="Способ оплаты">
+                  <button className={paymentMode === 'after-check' ? 'is-active' : ''} type="button" aria-pressed={paymentMode === 'after-check'} onClick={() => setPaymentMode('after-check')}>После проверки<span>Ссылка на оплату</span></button>
+                  <button className={paymentMode === 'manager' ? 'is-active' : ''} type="button" aria-pressed={paymentMode === 'manager'} onClick={() => setPaymentMode('manager')}>Через менеджера<span>Согласовать вручную</span></button>
                 </div>
-                <label className={`rp-checkout__agreement ${errors.agreement ? 'has-error' : ''}`}>
-                  <input type="checkbox" checked={agreementAccepted} onChange={(event) => updateAgreement(event.target.checked)} />
+                <label className={`rp-checkout__agreement ${errors.agreement ? 'has-error' : ''}`} htmlFor="checkout-agreement">
+                  <input id="checkout-agreement" type="checkbox" checked={agreementAccepted} onChange={(event) => updateAgreement(event.target.checked)} aria-invalid={errors.agreement ? 'true' : 'false'} aria-describedby={errors.agreement ? 'checkout-agreement-error' : undefined} />
                   <span>Согласен на обработку заявки и понимаю, что цена предварительная до проверки технологом.</span>
                 </label>
-                {errors.agreement && <p className="rp-checkout__status is-error">{errors.agreement}</p>}
+                {errors.agreement && <p id="checkout-agreement-error" className="rp-checkout__status is-error">{errors.agreement}</p>}
                 <p className="rp-checkout__note">Публичную оферту, оплату и авторизацию подключим позже. Сейчас создаётся заявка с параметрами проекта.</p>
-                {submitState === 'error' && <p className="rp-checkout__status is-error">Заполните обязательные поля или попробуйте ещё раз.</p>}
-                {submitState === 'loading' && <p className="rp-checkout__status is-loading">Создаём заявку и готовим переход к оплате…</p>}
+                {submitState === 'error' && <p className="rp-checkout__status is-error" role="status">Заполните обязательные поля или попробуйте ещё раз.</p>}
+                {submitState === 'loading' && <p className="rp-checkout__status is-loading" role="status">Создаём заявку и готовим переход к оплате…</p>}
               </CheckoutStep>
             </>
           )}
