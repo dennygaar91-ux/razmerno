@@ -123,3 +123,220 @@
     padding: 9px;
   }
 }
+
+/* Screenshot-based polish */
+.rp-ctor-page--reference {
+  padding-top: 72px;
+}
+
+.rp-ctor-hero {
+  min-height: 94px;
+  padding-bottom: 12px;
+}
+
+.rp-ctor-kicker {
+  margin-bottom: 3px;
+  letter-spacing: .18em;
+}
+
+.rp-ctor-hero h1 {
+  max-width: 780px;
+  font-size: clamp(28px, 2.25vw, 40px);
+  line-height: .96;
+  letter-spacing: -.07em;
+}
+
+.rp-ctor-lead {
+  max-width: 620px;
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.rp-ctor-actions {
+  top: 18px;
+}
+
+.rp-ref-panel-head--polished h2 {
+  font-size: 22px;
+  line-height: 1.04;
+}
+
+.rp-ref-step-body {
+  padding-right: 8px;
+}
+
+.rp-ref-config-nav--polished {
+  padding-top: 14px;
+  border-top: 1px solid rgba(10, 10, 10, .06);
+}
+
+.rp-ref-config-nav--polished button {
+  min-height: 52px;
+}
+
+.rp-ref-material-spec-grid {
+  gap: 8px;
+}
+
+.rp-ref-material-spec-grid div {
+  min-width: 0;
+}
+
+.rp-ref-material-spec-grid b,
+.rp-ref-material-spec-grid span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rp-ref-option-list button {
+  min-height: 74px;
+}
+
+.rp-ref-option-list button b {
+  min-width: 58px;
+  height: 58px;
+  font-size: 12px;
+}
+
+.rp-ref-option-list button small,
+.rp-ref-option-list button em {
+  line-height: 1.28;
+}
+
+.rp-ref-scene .rp-ctor-wardrobe {
+  transform: scale(.92);
+}
+
+.rp-ref-summary--product {
+  scrollbar-width: thin;
+}
+
+.rp-ref-project-card--compact > div:not(.rp-ref-card-head):nth-of-type(n + 7) {
+  display: grid;
+}
+
+.rp-ref-additional-card--product {
+  min-height: 0;
+}
+
+.rp-checkout--structured .rp-checkout__panel {
+  max-height: calc(100vh - 20px);
+}
+
+.rp-checkout__head--polished {
+  padding-top: 20px;
+}
+
+.rp-checkout__body--polished {
+  gap: 10px;
+}
+
+.rp-checkout__step {
+  padding: 14px;
+}
+
+.rp-checkout__hero-total {
+  padding: 16px;
+}
+
+.rp-checkout__hero-total strong {
+  font-size: 32px;
+}
+
+.rp-checkout__summary--compact div {
+  padding-bottom: 7px;
+}
+
+@media (max-width: 1480px) {
+  .rp-ctor-page--reference {
+    padding-top: 64px;
+  }
+
+  .rp-ctor-hero {
+    min-height: 82px;
+  }
+
+  .rp-ctor-hero h1 {
+    font-size: 32px;
+  }
+
+  .rp-ctor-lead {
+    max-width: 560px;
+    font-size: 12px;
+  }
+
+  .rp-ref-option-list button {
+    min-height: 66px;
+  }
+
+  .rp-ref-option-list button b {
+    min-width: 50px;
+    height: 50px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1380px) {
+  .rp-ctor-hero h1 {
+    font-size: 29px;
+  }
+
+  .rp-ctor-actions button {
+    min-width: 104px;
+  }
+
+  .rp-ref-project-card--compact > div:not(.rp-ref-card-head):nth-of-type(n + 6) {
+    display: none;
+  }
+
+  .rp-ref-option-list button {
+    min-height: 58px;
+  }
+
+  .rp-ref-option-list button b {
+    min-width: 44px;
+    height: 44px;
+    font-size: 10px;
+  }
+
+  .rp-ref-option-list button em {
+    display: none;
+  }
+
+  .rp-checkout--polished .rp-checkout__panel {
+    width: min(500px, calc(100vw - 22px));
+  }
+}
+
+@media (max-height: 820px) and (min-width: 1181px) {
+  .rp-ctor-page--reference {
+    padding-top: 58px;
+  }
+
+  .rp-ctor-hero {
+    min-height: 68px;
+  }
+
+  .rp-ctor-hero h1 {
+    font-size: 27px;
+    line-height: .95;
+  }
+
+  .rp-ctor-actions {
+    top: 10px;
+  }
+
+  .rp-ref-option-list button {
+    min-height: 52px;
+  }
+
+  .rp-ref-material-spec-grid {
+    display: none;
+  }
+
+  .rp-checkout__step {
+    padding: 12px;
+  }
+}
