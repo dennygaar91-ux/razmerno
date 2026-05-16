@@ -28,9 +28,7 @@ function getSectionMeta(section) {
 export default function SectionMap({ project, activeSection, onSectionSelect, onPresetApply, onPresetApplyToSection }) {
   const activeMeta = getSectionMeta(activeSection)
 
-  function handleScenarioClick(event, sectionNumber, presetId) {
-    event.stopPropagation()
-
+  function handleScenarioClick(sectionNumber, presetId) {
     if (onPresetApplyToSection) {
       onPresetApplyToSection(sectionNumber, presetId)
       return
@@ -57,19 +55,19 @@ export default function SectionMap({ project, activeSection, onSectionSelect, on
           const active = project.activeSection === sectionNumber
 
           return (
-            <button className={`rp-ref-section-map__item rp-ref-section-map__item--smart is-${meta.tone} ${active ? 'is-active' : ''}`} type="button" key={index} onClick={() => onSectionSelect(sectionNumber)}>
-              <span>{sectionNumber}</span>
-              <strong>{meta.label}</strong>
-              <b>{meta.details}</b>
-              <em>{active ? 'Редактируется' : 'Выбрать'}</em>
+            <article className={`rp-ref-section-map__item rp-ref-section-map__item--smart is-${meta.tone} ${active ? 'is-active' : ''}`} key={sectionNumber} aria-label={`Секция ${sectionNumber}: ${meta.details}`}>
+              <button className="rp-ref-section-map__select" type="button" onClick={() => onSectionSelect(sectionNumber)} aria-pressed={active}>
+                <span>{sectionNumber}</span>
+                <strong>{meta.label}</strong>
+                <b>{meta.details}</b>
+                <em>{active ? 'Редактируется' : 'Выбрать'}</em>
+              </button>
               <div className="rp-ref-section-map__actions" aria-label={`Быстрые сценарии для секции ${sectionNumber}`}>
                 {scenarioActions.map(([presetId, label]) => (
-                  <i role="button" tabIndex="0" key={presetId} onClick={(event) => handleScenarioClick(event, sectionNumber, presetId)} onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') handleScenarioClick(event, sectionNumber, presetId)
-                  }}>{label}</i>
+                  <button type="button" key={presetId} onClick={() => handleScenarioClick(sectionNumber, presetId)}>{label}</button>
                 ))}
               </div>
-            </button>
+            </article>
           )
         })}
       </div>
