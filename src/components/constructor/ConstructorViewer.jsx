@@ -4,8 +4,10 @@ import ViewerScene from './viewer/ViewerScene'
 import ViewerToolbar from './viewer/ViewerToolbar'
 import { buildViewerSceneProps } from './viewer/viewerUtils'
 
+const EMPTY_SECTION = { shelves: 0, drawers: 0, rail: false }
+
 export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection, onPresetApply, onPresetApplyToSection, renderCanvas }) {
-  const activeSection = project.filling[project.activeSection - 1]
+  const activeSection = project.filling[project.activeSection - 1] ?? EMPTY_SECTION
   const railDisabled = project.dimensions.depth < 520
   const sceneProps = buildViewerSceneProps(project)
 
