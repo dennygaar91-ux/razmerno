@@ -2,34 +2,33 @@
   transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
 
-.rp-ctor-badges--stateful span.is-success {
-  border-color: rgba(48, 112, 72, .16);
-  background: rgba(48, 112, 72, .08);
-  color: #307048;
-}
-
 .rp-ctor-badges--stateful span.is-loading {
-  border-color: rgba(232, 97, 44, .16);
+  border-color: rgba(232, 97, 44, .22);
   background: rgba(232, 97, 44, .08);
   color: #8b3d1d;
 }
 
+.rp-ctor-badges--stateful span.is-success {
+  border-color: rgba(36, 148, 71, .2);
+  background: rgba(36, 148, 71, .08);
+  color: #206f39;
+}
+
 .rp-ctor-badges--stateful span.is-error {
-  border-color: rgba(180, 35, 24, .16);
+  border-color: rgba(180, 35, 24, .2);
   background: rgba(180, 35, 24, .08);
   color: #b42318;
 }
 
 .rp-ctor-badges--stateful span.is-neutral {
   border-color: rgba(10, 10, 10, .08);
-  background: rgba(255, 255, 255, .72);
-  color: #5f5f5a;
+  background: #fff;
+  color: #6f6f6b;
 }
 
 .rp-ctor-inline-status {
-  max-width: 1280px;
-  margin: -8px auto 10px;
-  padding: 0 var(--container-pad, 20px);
+  width: min(1280px, calc(100% - 40px));
+  margin: -8px auto 12px;
   display: grid;
   gap: 8px;
 }
@@ -37,11 +36,11 @@
 .rp-ctor-inline-status p {
   margin: 0;
   min-height: 38px;
-  padding: 9px 12px;
+  padding: 9px 13px;
   border-radius: 14px;
-  border: 1px solid rgba(232, 97, 44, .15);
-  background: rgba(232, 97, 44, .055);
-  color: #7a3a20;
+  border: 1px solid rgba(180, 35, 24, .14);
+  background: rgba(180, 35, 24, .055);
+  color: #7a2d24;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -56,7 +55,9 @@
 
 @media (max-width: 1380px) {
   .rp-ctor-inline-status {
-    margin: -6px auto 8px;
+    width: min(1180px, calc(100% - 28px));
+    margin-top: -6px;
+    margin-bottom: 8px;
   }
 
   .rp-ctor-inline-status p {
@@ -68,6 +69,11 @@
 
 @media (max-height: 820px) and (min-width: 1181px) {
   .rp-ctor-inline-status {
-    display: none;
+    margin-top: -4px;
+    margin-bottom: 6px;
+  }
+
+  .rp-ctor-inline-status p {
+    min-height: 28px;
   }
 }
