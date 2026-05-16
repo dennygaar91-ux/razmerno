@@ -205,6 +205,32 @@
   line-height: 1.28;
 }
 
+.rp-ref-preset-grid--polished button {
+  min-height: 74px;
+}
+
+.rp-ref-section-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.rp-ref-section-tools button {
+  min-height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 10, 10, .08);
+  background: #fff;
+  color: #151515;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.rp-ref-section-tools button:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+
 .rp-ref-scene .rp-ctor-wardrobe {
   transform: scale(.92);
 }
@@ -249,6 +275,12 @@
   padding-bottom: 7px;
 }
 
+.rp-canvas-slot__fallback-note.has-error {
+  border-color: rgba(180, 35, 24, .18);
+  background: rgba(180, 35, 24, .06);
+  color: #8b2d23;
+}
+
 @media (max-width: 1480px) {
   .rp-ctor-page--reference {
     padding-top: 64px;
@@ -275,6 +307,10 @@
     min-width: 50px;
     height: 50px;
     font-size: 11px;
+  }
+
+  .rp-ref-preset-grid--polished button {
+    min-height: 66px;
   }
 }
 
@@ -303,6 +339,19 @@
 
   .rp-ref-option-list button em {
     display: none;
+  }
+
+  .rp-ref-preset-grid--polished button {
+    min-height: 58px;
+  }
+
+  .rp-ref-preset-grid--polished button em {
+    display: none;
+  }
+
+  .rp-ref-section-tools button {
+    min-height: 34px;
+    font-size: 10px;
   }
 
   .rp-checkout--polished .rp-checkout__panel {
@@ -334,6 +383,14 @@
 
   .rp-ref-material-spec-grid {
     display: none;
+  }
+
+  .rp-ref-section-tools {
+    gap: 6px;
+  }
+
+  .rp-ref-section-tools button {
+    min-height: 32px;
   }
 
   .rp-checkout__step {
