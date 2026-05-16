@@ -1,0 +1,125 @@
+.rp-checkout--structured .rp-checkout__panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.rp-checkout--structured .rp-checkout__body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.rp-checkout--structured .rp-checkout__foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(12px);
+}
+
+.rp-ref-project-card--compact {
+  min-height: 0;
+}
+
+.rp-ref-project-card--compact > div:not(.rp-ref-card-head) {
+  min-width: 0;
+}
+
+.rp-ref-project-card--compact > div:not(.rp-ref-card-head):nth-of-type(n + 7) {
+  display: none;
+}
+
+.rp-ref-additional-card--product div:nth-of-type(n + 3) {
+  display: none;
+}
+
+@media (min-width: 1381px) {
+  .rp-ref-summary--product {
+    grid-template-rows: 188px 92px 174px 112px auto 88px;
+  }
+}
+
+@media (max-width: 1480px) {
+  .rp-checkout__body--polished {
+    gap: 10px;
+  }
+
+  .rp-checkout__step-head p {
+    display: none;
+  }
+
+  .rp-checkout__summary--compact {
+    gap: 7px;
+  }
+
+  .rp-checkout__option-grid button {
+    min-height: 52px;
+  }
+}
+
+@media (max-width: 1380px) {
+  .rp-ref-summary--product {
+    grid-template-rows: 156px 74px 132px 88px auto 64px;
+  }
+
+  .rp-ref-project-card--compact > div:not(.rp-ref-card-head) {
+    min-height: 16px;
+  }
+
+  .rp-ref-project-card--compact > div:not(.rp-ref-card-head):nth-of-type(n + 6) {
+    display: none;
+  }
+
+  .rp-ref-additional-card--product h3 {
+    display: none;
+  }
+
+  .rp-checkout__head--polished > div > span,
+  .rp-checkout__hero-total p,
+  .rp-checkout__note {
+    display: none;
+  }
+
+  .rp-checkout__hero-total {
+    padding: 14px;
+  }
+
+  .rp-checkout__hero-total strong {
+    margin-top: 6px;
+    font-size: 28px;
+  }
+
+  .rp-checkout__step {
+    border-radius: 18px;
+  }
+}
+
+@media (max-height: 820px) and (min-width: 1181px) {
+  .rp-checkout__head--polished h2 {
+    font-size: 22px;
+  }
+
+  .rp-checkout__hero-total span,
+  .rp-checkout__step-head p,
+  .rp-checkout__summary--compact dt,
+  .rp-checkout__option-grid button span {
+    display: none;
+  }
+
+  .rp-checkout__hero-total strong {
+    font-size: 26px;
+  }
+
+  .rp-checkout__fields--polished input,
+  .rp-checkout__fields--polished textarea {
+    min-height: 40px;
+  }
+
+  .rp-checkout__fields--polished textarea {
+    min-height: 58px;
+  }
+
+  .rp-checkout__agreement {
+    padding: 9px;
+  }
+}
