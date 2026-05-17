@@ -64,22 +64,25 @@ function ZoneContent({ zone }) {
   )
 }
 
-function ZoneLayer({ zone, section, active }) {
+function ZoneLayer({ zone, section, active, onZoneSelect }) {
   const sectionHeight = Math.max(section.height || 1, 1)
   const bottom = (zone.fromY / sectionHeight) * 100
   const height = Math.max(4, (zone.height / sectionHeight) * 100)
   const contentType = zone?.content?.type || 'empty'
 
   return (
-    <div
+    <button
+      type="button"
       className={`rp-wardrobe-zone ${active ? 'is-active' : ''} has-${contentType}`}
       style={{ bottom: `${bottom}%`, height: `${height}%` }}
       title={`${zone.label} · ${zone.height} мм`}
+      aria-label={`Выбрать ${zone.label}, ${zone.height} мм`}
+      onClick={() => onZoneSelect?.(section.id, zone.id)}
     >
       <span className="rp-wardrobe-zone__label">{zone.label}</span>
       <small>{zone.height} мм</small>
       <ZoneContent zone={zone} />
-    </div>
+    </button>
   )
 }
 
@@ -90,11 +93,11 @@ function DividerLayer({ divider, section }) {
   return <span className="rp-wardrobe-zone-divider" style={{ bottom: `${bottom}%` }} />
 }
 
-function ZoneSectionMockup({ section, activeSection, activeZoneId }) {
+function ZoneSectionMockup({ section, activeSection, activeZoneId, onZoneSelect }) {
   return (
     <div className={`rp-ctor-col rp-ctor-col--zones ${activeSection ? 'is-active' : ''}`}>
       {section.zones.map((zone) => (
-        <ZoneLayer zone={zone} section={section} active={zone.id === activeZoneId} key={zone.id} />
+        <ZoneLayer zone={zone} section={section} active={zone.id === activeZoneId} onZoneSelect={onZoneSelect} key={zone.id} />
       ))}
       {section.dividers.map((divider) => (
         <DividerLayer divider={divider} section={section} key={divider.id} />
@@ -120,7 +123,7 @@ function getMockupStyle(project, sectionCount) {
   }
 }
 
-export default function WardrobeMockup({ project }) {
+export default function WardrobeMockup({ project, onZoneSelect }) {
   const zoneSections = project?.zoneLayout?.sections
   const legacySections = project?.filling ?? [
     { shelves: 4, drawers: 2, rail: false },
@@ -134,11 +137,11 @@ export default function WardrobeMockup({ project }) {
   const style = getMockupStyle(project, sections.length)
 
   return (
-    <div className={`rp-ctor-wardrobe rp-ctor-wardrobe--renderlike ${isZoneMode ? 'rp-ctor-wardrobe--zones' : ''}`} style={style} aria-hidden="true">
-      <div className="rp-ctor-top" />
+    <div className={`rp-ctor-wardrobe rp-ctor-wardrobe--renderlike ${isZoneMode ? 'rp-ctor-wardrobe--zones' : ''}`} style={style}>
+      <div className="rp-ctor-top" aria-hidden="true" />
       {sections.map((section, index) => (
         isZoneMode
-          ? <ZoneSectionMockup section={section} activeSection={activeSectionId === section.id || project?.activeSection === index + 1} activeZoneId={activeZoneId} key={section.id} />
+          ? <ZoneSectionMockup section={section} activeSection={activeSectionId === section.id || project?.activeSection === index + 1} activeZoneId={activeZoneId} onZoneSelect={onZoneSelect} key={section.id} />
           : <LegacySectionMockup section={section} active={project?.activeSection === index + 1} key={index} />
       ))}
     </div>
