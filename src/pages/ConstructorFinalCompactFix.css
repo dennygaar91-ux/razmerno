@@ -623,6 +623,181 @@
   background: #fff;
 }
 
+/* Target UI alignment pass: make CSS fallback look closer to the accepted image-based render. */
+.rp-ref-scene--polished {
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 48% 20%, rgba(255, 255, 255, .96), rgba(248, 246, 241, .92) 42%, rgba(238, 233, 223, .72) 100%),
+    linear-gradient(180deg, #fff 0%, #f7f4ed 100%);
+}
+
+.rp-ref-scene__meta,
+.rp-canvas-slot__fallback-note {
+  display: none;
+}
+
+.rp-ref-scene__badge {
+  min-height: 34px;
+  padding: 7px 13px;
+  background: rgba(255, 255, 255, .88);
+}
+
+.rp-ref-scene__badge span {
+  letter-spacing: .14em;
+}
+
+.rp-canvas-slot {
+  inset: 50px 38px 42px;
+}
+
+.rp-canvas-slot__stage {
+  overflow: visible;
+}
+
+.rp-ctor-wardrobe--renderlike {
+  border-width: 0;
+  background: #c8b590;
+  box-shadow:
+    0 22px 60px rgba(58, 42, 24, .18),
+    0 2px 0 rgba(255, 255, 255, .45) inset;
+  transform: none !important;
+  perspective: none;
+}
+
+.rp-ctor-wardrobe--renderlike::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(43, 27, 11, .13), transparent 18%, transparent 82%, rgba(43, 27, 11, .12)),
+    linear-gradient(180deg, rgba(255, 255, 255, .2), transparent 18%, rgba(43, 27, 11, .08));
+  mix-blend-mode: multiply;
+}
+
+.rp-ctor-wardrobe--renderlike::after {
+  left: -14px;
+  right: -18px;
+  bottom: -20px;
+  height: 20px;
+  background: linear-gradient(90deg, #c2aa84, #e2d2b3);
+  transform: skewX(-24deg);
+  box-shadow: 0 20px 32px rgba(45, 30, 16, .14);
+}
+
+.rp-ctor-wardrobe--renderlike .rp-ctor-top {
+  left: -10px;
+  right: -18px;
+  top: -20px;
+  height: 20px;
+  background: linear-gradient(90deg, #d8c5a4, #eee3cd);
+  transform: skewX(-24deg);
+}
+
+.rp-ctor-wardrobe--renderlike .rp-ctor-col {
+  border-right: 7px solid rgba(234, 220, 191, .95);
+  background:
+    linear-gradient(90deg, rgba(65, 43, 20, .1), rgba(255, 255, 255, .08)),
+    repeating-linear-gradient(90deg, rgba(88, 60, 29, .12) 0, rgba(88, 60, 29, .12) 1px, transparent 1px, transparent 10px),
+    #bca77f;
+}
+
+.rp-ctor-wardrobe--renderlike .rp-ctor-col:last-child {
+  border-right: 0;
+}
+
+.rp-ctor-wardrobe--renderlike .rp-ctor-col.is-active {
+  box-shadow: inset 0 0 0 2px rgba(232, 97, 44, .86);
+}
+
+.rp-wardrobe-shelf {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background: linear-gradient(90deg, #d6c39f, #f0e3c9);
+  box-shadow: 0 4px 8px rgba(38, 24, 12, .18);
+}
+
+.rp-wardrobe-drawer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 12%;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(70, 44, 18, .04)),
+    repeating-linear-gradient(90deg, rgba(88, 60, 29, .08) 0, rgba(88, 60, 29, .08) 1px, transparent 1px, transparent 10px),
+    #d9c39d;
+  border-top: 4px solid #111;
+}
+
+.rp-wardrobe-rail {
+  position: absolute;
+  left: 20%;
+  right: 18%;
+  top: 26%;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #a7a7a7, #f3f1e9, #a1a1a1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, .2);
+}
+
+.rp-wardrobe-clothes {
+  position: absolute;
+  top: 31%;
+  width: 17%;
+  height: 36%;
+  border-radius: 46% 46% 10px 10px;
+  background: linear-gradient(180deg, #dfd7c8, #aaa18f);
+  box-shadow: 0 8px 12px rgba(42, 28, 16, .15);
+}
+
+.rp-wardrobe-clothes::before {
+  content: "";
+  position: absolute;
+  left: 42%;
+  top: -10px;
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid #8d8d87;
+  border-left: 2px solid #8d8d87;
+  transform: rotate(45deg);
+}
+
+.rp-wardrobe-clothes--one { left: 26%; }
+.rp-wardrobe-clothes--two { left: 40%; background: linear-gradient(180deg, #eee8dc, #c8c0b0); }
+.rp-wardrobe-clothes--three { left: 54%; background: linear-gradient(180deg, #c7c7c0, #8f918c); }
+
+.rp-wardrobe-towels {
+  position: absolute;
+  right: 14%;
+  width: 34%;
+  height: 8%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f1eee7, #cfc8ba);
+  box-shadow: 0 5px 9px rgba(42, 28, 16, .12);
+}
+
+.rp-wardrobe-towels--one { top: 46%; }
+.rp-wardrobe-towels--two { top: 58%; width: 40%; }
+
+.rp-wardrobe-box {
+  position: absolute;
+  left: 30%;
+  bottom: 9%;
+  width: 38%;
+  height: 18%;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ded8ca, #bcb3a1);
+  box-shadow: 0 8px 16px rgba(42, 28, 16, .14);
+}
+
+.rp-ref-scene--polished .rp-ctor-size {
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 10px 22px rgba(10, 10, 10, .05);
+}
+
 @media (max-width: 1480px) {
   .rp-target-summary {
     grid-template-rows: 104px 112px 128px 74px 98px minmax(82px, auto);
