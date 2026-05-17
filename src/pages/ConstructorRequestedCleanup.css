@@ -183,6 +183,72 @@
   pointer-events: none;
 }
 
+/* Active zone helper hints. */
+.rp-ref-zone-hints {
+  display: grid;
+  gap: 8px;
+  margin-top: -2px;
+}
+
+.rp-ref-zone-hint {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(226, 221, 212, .9);
+  background: rgba(255, 255, 255, .72);
+}
+
+.rp-ref-zone-hint svg {
+  width: 28px;
+  height: 28px;
+  padding: 7px;
+  border-radius: 999px;
+  background: #f2f1ed;
+  color: #7d786f;
+}
+
+.rp-ref-zone-hint span {
+  display: grid;
+  gap: 2px;
+}
+
+.rp-ref-zone-hint b {
+  color: #191815;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.rp-ref-zone-hint small {
+  color: #77736b;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.rp-ref-zone-hint.is-success {
+  background: rgba(234, 246, 236, .62);
+  border-color: rgba(47, 143, 69, .16);
+}
+
+.rp-ref-zone-hint.is-success svg {
+  background: #eaf6ec;
+  color: #2f8f45;
+}
+
+.rp-ref-zone-hint.is-warning {
+  background: rgba(255, 247, 238, .78);
+  border-color: rgba(232, 97, 44, .18);
+}
+
+.rp-ref-zone-hint.is-warning svg {
+  background: #fff1e8;
+  color: #e8612c;
+}
+
 /* Remove left bottom nav block. */
 .rp-ref-config-nav,
 .rp-ref-config-nav--polished {
@@ -311,6 +377,14 @@
 
   .rp-wardrobe-zone__label,
   .rp-wardrobe-zone small {
+    display: none;
+  }
+
+  .rp-ref-zone-hint {
+    padding: 8px;
+  }
+
+  .rp-ref-zone-hint small {
     display: none;
   }
 }
