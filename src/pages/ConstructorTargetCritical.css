@@ -1,0 +1,173 @@
+/* Critical target UI overrides. This file must be imported last. */
+
+/* Right summary: force legacy black price card into target light system if old markup/styles remain. */
+.rp-ctor-summary .rp-ref-price-card--main,
+.rp-ref-summary .rp-ref-price-card--main,
+.rp-ref-summary--product .rp-ref-price-card--main {
+  background: #fff !important;
+  color: #151515 !important;
+  border: 1px solid rgba(226, 221, 212, .95) !important;
+  box-shadow: 0 10px 24px rgba(36, 31, 24, .035) !important;
+}
+
+.rp-ctor-summary .rp-ref-price-card--main p,
+.rp-ctor-summary .rp-ref-price-card--main em,
+.rp-ref-summary .rp-ref-price-card--main p,
+.rp-ref-summary .rp-ref-price-card--main em,
+.rp-ref-summary--product .rp-ref-price-card--main p,
+.rp-ref-summary--product .rp-ref-price-card--main em {
+  color: #706c65 !important;
+}
+
+.rp-ctor-summary .rp-ref-price-card--main strong,
+.rp-ref-summary .rp-ref-price-card--main strong,
+.rp-ref-summary--product .rp-ref-price-card--main strong {
+  color: #111 !important;
+}
+
+.rp-ctor-summary .rp-ref-summary-status,
+.rp-ref-summary .rp-ref-summary-status,
+.rp-ref-summary--product .rp-ref-summary-status {
+  background: #f2f1ed !important;
+  color: #6f6b64 !important;
+}
+
+.rp-ctor-summary .rp-ref-price-card--main .rp-ref-summary-cta,
+.rp-ref-summary .rp-ref-price-card--main .rp-ref-summary-cta,
+.rp-ref-summary--product .rp-ref-price-card--main .rp-ref-summary-cta {
+  background: #0a0a0a !important;
+  color: #fff !important;
+}
+
+/* Checkout: remove old black amount card and match target light drawer. */
+.rp-checkout .rp-checkout__hero-total,
+.rp-checkout .rp-checkout__hero-total--structured,
+.rp-checkout--polished .rp-checkout__hero-total,
+.rp-checkout--structured .rp-checkout__hero-total {
+  background: linear-gradient(135deg, #fff 0%, #fff8f2 100%) !important;
+  color: #151515 !important;
+  border: 1px solid rgba(226, 221, 212, .95) !important;
+  box-shadow: 0 10px 24px rgba(36, 31, 24, .035) !important;
+}
+
+.rp-checkout .rp-checkout__hero-total span,
+.rp-checkout .rp-checkout__hero-total p,
+.rp-checkout--polished .rp-checkout__hero-total span,
+.rp-checkout--polished .rp-checkout__hero-total p {
+  color: #706c65 !important;
+}
+
+.rp-checkout .rp-checkout__hero-total strong,
+.rp-checkout--polished .rp-checkout__hero-total strong {
+  color: #111 !important;
+}
+
+.rp-checkout--polished .rp-checkout__panel,
+.rp-checkout--structured .rp-checkout__panel {
+  background: #f8f7f3 !important;
+  border-color: rgba(226, 221, 212, .98) !important;
+}
+
+.rp-checkout__step {
+  background: rgba(255, 255, 255, .9) !important;
+  border-color: rgba(226, 221, 212, .95) !important;
+}
+
+/* Materials: make option cards closer to target density even when older layers win. */
+.rp-ref-material-list--product button {
+  min-height: 64px !important;
+  padding: 9px 10px !important;
+  border-radius: 15px !important;
+}
+
+.rp-ref-material-list--product i {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+}
+
+.rp-ref-material-list--product strong {
+  font-size: 12px !important;
+}
+
+.rp-ref-material-list--product small {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+
+.rp-ref-material-list--product em {
+  display: none !important;
+}
+
+.rp-ref-option-list button,
+.rp-ref-handle-list--product button,
+.rp-ref-option-list--compact button {
+  min-height: 54px !important;
+  padding: 9px 11px !important;
+  border-radius: 15px !important;
+}
+
+.rp-ref-option-list b,
+.rp-ref-handle-list--product b,
+.rp-ref-option-list--compact b {
+  min-width: 42px !important;
+  min-height: 42px !important;
+  font-size: 9px !important;
+}
+
+.rp-ref-option-list em,
+.rp-ref-handle-list--product em,
+.rp-ref-option-list--compact em {
+  display: none !important;
+}
+
+/* Filling step: reduce heavy vertical feel. */
+.rp-ref-active-section--polished {
+  padding: 12px 14px !important;
+  border-radius: 14px !important;
+}
+
+.rp-ref-preset-grid--polished button {
+  min-height: 62px !important;
+  border-radius: 14px !important;
+}
+
+.rp-ref-section-tabs button {
+  min-height: 42px !important;
+  border-radius: 12px !important;
+}
+
+/* Desktop/laptop compact safety. */
+@media (max-width: 1380px), (max-height: 820px) {
+  .rp-ref-material-list--product button {
+    min-height: 56px !important;
+    grid-template-columns: 36px minmax(0, 1fr) auto !important;
+  }
+
+  .rp-ref-material-list--product i {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .rp-ref-material-list--product small,
+  .rp-ref-material-list--product b {
+    display: none !important;
+  }
+
+  .rp-ref-option-list button,
+  .rp-ref-handle-list--product button,
+  .rp-ref-option-list--compact button {
+    min-height: 48px !important;
+  }
+
+  .rp-ref-option-list b,
+  .rp-ref-handle-list--product b,
+  .rp-ref-option-list--compact b {
+    min-width: 38px !important;
+    min-height: 38px !important;
+  }
+
+  .rp-checkout__hero-total strong {
+    font-size: 28px !important;
+  }
+}
