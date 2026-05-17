@@ -9,6 +9,7 @@ import "./styles/constructor-fill-polish.css";
 import "./styles/constructor-step-flow.css";
 import "./styles/constructor-commercial-polish.css";
 import "./styles/constructor-quick-fixes.css";
+import "./pages/ConstructorRequestedCleanup.css";
 import "./styles/constructor-input-guard.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
