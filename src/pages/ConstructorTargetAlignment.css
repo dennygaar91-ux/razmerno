@@ -359,6 +359,138 @@
   border-radius: 12px;
 }
 
+/* Target UI alignment pass 1: section map and quick actions. */
+.rp-ref-viewer {
+  grid-template-rows: 42px minmax(0, 1fr) 50px 104px;
+}
+
+.rp-ref-quick-actions--polished {
+  min-height: 50px;
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .82);
+  border: 1px solid rgba(226, 221, 212, .9);
+  box-shadow: 0 10px 22px rgba(36, 31, 24, .035);
+}
+
+.rp-ref-quick-actions--polished button {
+  min-height: 38px;
+  padding: 0 9px;
+  border-radius: 11px;
+  background: transparent;
+}
+
+.rp-ref-quick-actions--polished button:hover,
+.rp-ref-quick-actions--polished button.is-active {
+  background: #f7f4ef;
+}
+
+.rp-ref-quick-actions__icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  background: #f2f0eb;
+}
+
+.rp-ref-quick-actions--polished button span:not(.rp-ref-quick-actions__icon) {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.rp-ref-quick-actions--polished small {
+  margin-top: 3px;
+  font-size: 8px;
+  line-height: 1.1;
+}
+
+.rp-target-section-map {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .84);
+  border-color: rgba(226, 221, 212, .9);
+}
+
+.rp-target-section-map .rp-ref-section-map__head {
+  margin-bottom: 9px;
+}
+
+.rp-target-section-map h3 {
+  font-size: 14px;
+  letter-spacing: -.02em;
+}
+
+.rp-target-section-map p {
+  margin: 5px 0 0;
+  color: #6f6b64;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.rp-target-section-map .rp-ref-section-map__head > button {
+  min-height: 28px;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: #fff7f1;
+  color: #e8612c;
+  border: 1px solid rgba(232, 97, 44, .14);
+  font-size: 9px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.rp-target-section-map .rp-ref-section-map__grid {
+  gap: 7px;
+}
+
+.rp-target-section-map .rp-ref-section-map__item {
+  min-height: 48px;
+  padding: 0;
+  display: block !important;
+  border-radius: 12px;
+  background: #fbfaf7;
+  border: 1px solid rgba(10, 10, 10, .065);
+  box-shadow: none;
+}
+
+.rp-target-section-map .rp-ref-section-map__item.is-active {
+  border-color: rgba(232, 97, 44, .9);
+  box-shadow: inset 0 0 0 1px rgba(232, 97, 44, .9), 0 8px 16px rgba(232, 97, 44, .08);
+  background: #fffaf6;
+}
+
+.rp-target-section-map .rp-ref-section-map__select {
+  min-height: 48px;
+  padding: 8px;
+  grid-template-columns: 24px minmax(0, 1fr);
+  column-gap: 8px;
+}
+
+.rp-target-section-map .rp-ref-section-map__select > span {
+  width: 24px;
+  height: 24px;
+  background: #f0eee9;
+  font-size: 10px;
+}
+
+.rp-target-section-map .rp-ref-section-map__item.is-active .rp-ref-section-map__select > span {
+  background: #e8612c;
+  color: #fff;
+}
+
+.rp-target-section-map .rp-ref-section-map__select strong {
+  font-size: 11px;
+}
+
+.rp-target-section-map .rp-ref-section-map__select b {
+  margin-top: 2px;
+  color: #77736b;
+  font-size: 8px;
+}
+
+.rp-target-section-map .rp-ref-section-map__select em {
+  display: none;
+}
+
 /* Target UI alignment pass 1: materials step should feel like the accepted mockup, not an admin catalogue. */
 .rp-ref-selected-material {
   margin-top: 13px;
@@ -678,13 +810,36 @@
   }
 
   .rp-ref-viewer {
-    grid-template-rows: 38px minmax(0, 1fr) 48px 104px;
+    grid-template-rows: 38px minmax(0, 1fr) 46px 94px;
     gap: 7px;
     padding: 10px;
   }
 
   .rp-ref-section-map {
     padding: 11px;
+  }
+
+  .rp-target-section-map .rp-ref-section-map__head > button {
+    display: none;
+  }
+
+  .rp-target-section-map .rp-ref-section-map__select {
+    min-height: 42px;
+    grid-template-columns: 21px minmax(0, 1fr);
+    padding: 7px;
+  }
+
+  .rp-target-section-map .rp-ref-section-map__select > span {
+    width: 21px;
+    height: 21px;
+  }
+
+  .rp-target-section-map .rp-ref-section-map__select b {
+    display: none;
+  }
+
+  .rp-ref-quick-actions--polished small {
+    display: none;
   }
 
   .rp-ref-material-spec-grid {
@@ -753,6 +908,27 @@
 
   .rp-ref-step-hint {
     margin-top: 11px;
+  }
+
+  .rp-ref-viewer {
+    grid-template-rows: 36px minmax(0, 1fr) 44px 86px;
+  }
+
+  .rp-target-section-map p,
+  .rp-target-section-map .rp-ref-section-map__head > button {
+    display: none;
+  }
+
+  .rp-target-section-map .rp-ref-section-map__head {
+    margin-bottom: 7px;
+  }
+
+  .rp-target-section-map .rp-ref-section-map__item {
+    min-height: 40px;
+  }
+
+  .rp-target-section-map .rp-ref-section-map__select {
+    min-height: 40px;
   }
 
   .rp-ref-selected-material {
