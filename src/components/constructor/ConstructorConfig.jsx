@@ -65,6 +65,24 @@ function StepHint({ title, text }) {
   )
 }
 
+function ZoneHints({ hints = [] }) {
+  if (!hints.length) return null
+
+  return (
+    <div className="rp-ref-zone-hints" aria-label="Подсказки выбранной зоны">
+      {hints.map((hint) => (
+        <div className={`rp-ref-zone-hint is-${hint.type}`} key={`${hint.title}-${hint.text}`}>
+          <Icon name={hint.type === 'success' ? 'check-circle' : 'clock'} size={14} />
+          <span>
+            <b>{hint.title}</b>
+            <small>{hint.text}</small>
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function OptionList({ items = [], activeId, field, onChange, compact = false }) {
   if (!items.length) {
     return <div className="rp-ref-empty-option">Варианты пока не добавлены</div>
@@ -193,7 +211,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
   )
 }
 
-function FillingStep({ project, warnings, activeSectionWarnings, activeZone, onSectionSelect, onZoneSelect, onZoneSplit, onSectionPartChange, onRailToggle, onPresetApply, onCopySection, onApplySectionToAll }) {
+function FillingStep({ project, warnings, activeSectionWarnings, activeZone, zoneHints, onSectionSelect, onZoneSelect, onZoneSplit, onSectionPartChange, onRailToggle, onPresetApply, onCopySection, onApplySectionToAll }) {
   const activeSection = project.filling[project.activeSection - 1] ?? { shelves: 0, drawers: 0, rail: false }
   const selectedZone = activeZone?.zone
   const selectedContent = selectedZone?.content ?? activeSection
@@ -226,6 +244,7 @@ function FillingStep({ project, warnings, activeSectionWarnings, activeZone, onS
       </div>
 
       <ZonePicker project={project} activeZone={activeZone} onZoneSelect={onZoneSelect} onZoneSplit={onZoneSplit} />
+      <ZoneHints hints={zoneHints} />
 
       <div className="rp-ref-active-section rp-ref-active-section--polished">
         <div>
@@ -381,6 +400,7 @@ export default function ConstructorConfig({
   activeWarnings,
   activeSectionWarnings,
   activeZone,
+  zoneHints = [],
   materials = [],
   edgeOptions = [],
   handleOptions = [],
@@ -418,7 +438,7 @@ export default function ConstructorConfig({
       eyebrow: 'Шаг 2 из 3',
       title: 'Наполнение секций',
       text: 'Соберите внутреннюю логику шкафа: полки, ящики и штанги в каждой секции.',
-      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={currentWarnings} activeZone={activeZone} onSectionSelect={onSectionSelect} onZoneSelect={onZoneSelect} onZoneSplit={onZoneSplit} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} onCopySection={handleCopySection} onApplySectionToAll={handleApplySectionToAll} />,
+      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={currentWarnings} activeZone={activeZone} zoneHints={zoneHints} onSectionSelect={onSectionSelect} onZoneSelect={onZoneSelect} onZoneSplit={onZoneSplit} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} onCopySection={handleCopySection} onApplySectionToAll={handleApplySectionToAll} />,
     },
     materials: {
       number: 3,
