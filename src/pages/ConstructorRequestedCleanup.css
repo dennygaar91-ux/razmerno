@@ -1,51 +1,49 @@
 /* Requested constructor cleanup layer. Must be imported after constructor legacy styles. */
 
-/* 1. Remove constructor hero/title block. Site header from Landing is used instead. */
+/* Remove constructor hero/title block. Site header from Landing is used instead. */
 .rp-ctor-page--reference .rp-ctor-hero {
   display: none !important;
 }
 
-.rp-ctor-page--with-header,
 .rp-ctor-page--reference {
   padding-top: 86px !important;
+  padding-bottom: 18px !important;
 }
 
-/* 3. Remove step subtitles. */
+/* Remove step subtitles. */
 .rp-ctor-flow small {
   display: none !important;
 }
 
 .rp-ctor-flow {
-  height: 56px !important;
-  margin-bottom: 12px !important;
+  width: min(1464px, calc(100vw - 72px)) !important;
+  height: 52px !important;
+  margin: 0 auto 12px !important;
+  border-radius: 16px !important;
 }
 
 .rp-ctor-flow > button,
 .rp-ctor-flow > div {
   grid-template-columns: 30px minmax(0, 1fr) !important;
   align-items: center !important;
+  padding: 0 28px !important;
 }
 
 .rp-ctor-flow p {
   overflow: visible !important;
   text-overflow: clip !important;
   white-space: nowrap !important;
+  font-size: 14px !important;
 }
 
-/* 2. Viewer: bottom quick actions + section map are removed in JSX. Stretch model area. */
+/* Viewer: bottom quick actions + section map are removed. Stretch model area. */
 .rp-ref-viewer--expanded,
 .rp-ctor-viewer.rp-ref-viewer--expanded {
   grid-template-rows: 42px minmax(0, 1fr) !important;
   gap: 10px !important;
+  padding: 12px !important;
 }
 
-.rp-ref-viewer--expanded .rp-ref-viewer-scene,
-.rp-ref-viewer--expanded .rp-viewer-scene,
-.rp-ref-viewer--expanded [class*="scene"] {
-  min-height: 0 !important;
-}
-
-/* Safety hide if old viewer children are still present from cache/legacy chunks. */
 .rp-ref-viewer--expanded .rp-ref-quick-actions,
 .rp-ref-viewer--expanded .rp-ref-quick-actions--polished,
 .rp-ref-viewer--expanded .rp-ref-section-map,
@@ -53,7 +51,25 @@
   display: none !important;
 }
 
-/* 5. Remove left bottom nav block. */
+.rp-ref-viewer--expanded .rp-ref-scene,
+.rp-ref-viewer--expanded .rp-ref-scene--polished {
+  min-height: 0 !important;
+  height: 100% !important;
+  border-radius: 18px !important;
+}
+
+.rp-ref-viewer--expanded .rp-ref-canvas-slot,
+.rp-ref-viewer--expanded .rp-wardrobe-mockup,
+.rp-ref-viewer--expanded [class*="mockup"] {
+  transform: scale(1.08) !important;
+  transform-origin: center !important;
+}
+
+.rp-ref-scene__hint {
+  display: none !important;
+}
+
+/* Remove left bottom nav block. */
 .rp-ref-config-nav,
 .rp-ref-config-nav--polished {
   display: none !important;
@@ -63,7 +79,7 @@
   grid-template-rows: auto minmax(0, 1fr) !important;
 }
 
-/* 4. Additional block now lives in materials. */
+/* Additional block moved to materials. */
 .rp-target-additional-card {
   display: none !important;
 }
@@ -80,16 +96,15 @@
 
 .rp-ref-additional-materials__rows {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .rp-ref-additional-materials__rows div {
-  min-height: 38px;
+  min-height: 36px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto 38px;
   align-items: center;
   gap: 10px;
-  padding: 0 2px;
 }
 
 .rp-ref-additional-materials__rows span {
@@ -120,7 +135,7 @@
   position: relative;
 }
 
-.rp-ref-additional-materials__rows b::after {
+.rp-ref-additional-materials__rows b:after {
   content: "";
   position: absolute;
   top: 3px;
@@ -131,33 +146,64 @@
   background: #fff;
 }
 
-/* With fewer blocks, keep three columns aligned under the site header. */
+/* Keep three columns aligned under site header. */
+.rp-ctor-page--reference .rp-ctor-shell {
+  width: min(1464px, calc(100vw - 72px)) !important;
+  gap: 12px !important;
+}
+
 .rp-ctor-page--reference .rp-ctor-config,
 .rp-ctor-page--reference .rp-ctor-viewer,
 .rp-ctor-page--reference .rp-ctor-summary {
-  height: calc(100vh - 166px) !important;
+  height: calc(100vh - 158px) !important;
   min-height: 620px !important;
   max-height: none !important;
 }
 
 .rp-target-summary {
-  grid-template-rows: 104px 128px 138px 78px 104px !important;
+  grid-template-rows: 104px 128px 138px 78px minmax(104px, 1fr) !important;
+  gap: 8px !important;
+}
+
+.rp-target-kit-card {
+  min-height: 0 !important;
+}
+
+.rp-target-price-card button {
+  height: 34px !important;
+  min-height: 34px !important;
 }
 
 @media (max-height: 820px) and (min-width: 1181px) {
-  .rp-ctor-page--with-header,
   .rp-ctor-page--reference {
     padding-top: 78px !important;
   }
 
   .rp-ctor-flow {
-    height: 50px !important;
+    height: 48px !important;
+    margin-bottom: 10px !important;
   }
 
   .rp-ctor-page--reference .rp-ctor-config,
   .rp-ctor-page--reference .rp-ctor-viewer,
   .rp-ctor-page--reference .rp-ctor-summary {
-    height: calc(100vh - 140px) !important;
+    height: calc(100vh - 136px) !important;
     min-height: 560px !important;
+  }
+
+  .rp-target-summary {
+    grid-template-rows: 92px 112px 112px 66px minmax(84px, 1fr) !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .rp-ctor-flow,
+  .rp-ctor-page--reference .rp-ctor-shell {
+    width: calc(100vw - 40px) !important;
+  }
+
+  .rp-ctor-flow > button,
+  .rp-ctor-flow > div {
+    padding: 0 18px !important;
   }
 }
