@@ -1,0 +1,163 @@
+/* Requested constructor cleanup layer. Must be imported after constructor legacy styles. */
+
+/* 1. Remove constructor hero/title block. Site header from Landing is used instead. */
+.rp-ctor-page--reference .rp-ctor-hero {
+  display: none !important;
+}
+
+.rp-ctor-page--with-header,
+.rp-ctor-page--reference {
+  padding-top: 86px !important;
+}
+
+/* 3. Remove step subtitles. */
+.rp-ctor-flow small {
+  display: none !important;
+}
+
+.rp-ctor-flow {
+  height: 56px !important;
+  margin-bottom: 12px !important;
+}
+
+.rp-ctor-flow > button,
+.rp-ctor-flow > div {
+  grid-template-columns: 30px minmax(0, 1fr) !important;
+  align-items: center !important;
+}
+
+.rp-ctor-flow p {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+/* 2. Viewer: bottom quick actions + section map are removed in JSX. Stretch model area. */
+.rp-ref-viewer--expanded,
+.rp-ctor-viewer.rp-ref-viewer--expanded {
+  grid-template-rows: 42px minmax(0, 1fr) !important;
+  gap: 10px !important;
+}
+
+.rp-ref-viewer--expanded .rp-ref-viewer-scene,
+.rp-ref-viewer--expanded .rp-viewer-scene,
+.rp-ref-viewer--expanded [class*="scene"] {
+  min-height: 0 !important;
+}
+
+/* Safety hide if old viewer children are still present from cache/legacy chunks. */
+.rp-ref-viewer--expanded .rp-ref-quick-actions,
+.rp-ref-viewer--expanded .rp-ref-quick-actions--polished,
+.rp-ref-viewer--expanded .rp-ref-section-map,
+.rp-ref-viewer--expanded .rp-target-section-map {
+  display: none !important;
+}
+
+/* 5. Remove left bottom nav block. */
+.rp-ref-config-nav,
+.rp-ref-config-nav--polished {
+  display: none !important;
+}
+
+.rp-ref-config--polished {
+  grid-template-rows: auto minmax(0, 1fr) !important;
+}
+
+/* 4. Additional block now lives in materials. */
+.rp-target-additional-card {
+  display: none !important;
+}
+
+.rp-ref-additional-materials {
+  padding-bottom: 10px !important;
+}
+
+.rp-ref-additional-materials h3 span {
+  color: #77736b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rp-ref-additional-materials__rows {
+  display: grid;
+  gap: 10px;
+}
+
+.rp-ref-additional-materials__rows div {
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 38px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 2px;
+}
+
+.rp-ref-additional-materials__rows span {
+  color: #151515;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.rp-ref-additional-materials__rows em {
+  justify-self: end;
+  min-height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: #eaf6ec;
+  color: #2f8f45;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.rp-ref-additional-materials__rows b {
+  width: 38px;
+  height: 20px;
+  border-radius: 999px;
+  background: #0a0a0a;
+  position: relative;
+}
+
+.rp-ref-additional-materials__rows b::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* With fewer blocks, keep three columns aligned under the site header. */
+.rp-ctor-page--reference .rp-ctor-config,
+.rp-ctor-page--reference .rp-ctor-viewer,
+.rp-ctor-page--reference .rp-ctor-summary {
+  height: calc(100vh - 166px) !important;
+  min-height: 620px !important;
+  max-height: none !important;
+}
+
+.rp-target-summary {
+  grid-template-rows: 104px 128px 138px 78px 104px !important;
+}
+
+@media (max-height: 820px) and (min-width: 1181px) {
+  .rp-ctor-page--with-header,
+  .rp-ctor-page--reference {
+    padding-top: 78px !important;
+  }
+
+  .rp-ctor-flow {
+    height: 50px !important;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-config,
+  .rp-ctor-page--reference .rp-ctor-viewer,
+  .rp-ctor-page--reference .rp-ctor-summary {
+    height: calc(100vh - 140px) !important;
+    min-height: 560px !important;
+  }
+}
