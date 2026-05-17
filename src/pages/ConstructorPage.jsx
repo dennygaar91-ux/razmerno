@@ -10,6 +10,7 @@ import { calculatePrice, getActiveSectionWarnings, getPriceBreakdown, getProject
 import { buildConstructorPayload } from '../utils/constructorPayload'
 import { normalizeConstructorProject } from '../utils/constructorProjectNormalize'
 import { clearConstructorProject, loadConstructorProject, loadConstructorProjectId, loadConstructorProjectMeta, saveConstructorProject, saveConstructorProjectId } from '../utils/constructorStorage'
+import { applyDrawerBlockToSection, clearActiveZone, getActiveZone, selectZone, setActiveZoneDrawers, setActiveZoneRail, setActiveZoneShelves, splitActiveZone } from '../utils/constructorZones'
 import { calculateConstructorEstimate } from '../services/constructorEstimate'
 import { loadConstructorProjectRemote, saveConstructorProjectRemote } from '../services/constructorProjects'
 import './ConstructorPage.css'
@@ -95,6 +96,7 @@ export default function ConstructorPage() {
   const summary = getProjectSummary(project)
   const warnings = getWarnings(project, summary)
   const activeWarnings = getActiveSectionWarnings(project)
+  const activeZone = getActiveZone(project)
   const localBreakdown = useMemo(() => getPriceBreakdown(project, summary), [project, summary])
   const localPrice = useMemo(() => calculatePrice(project, summary), [project, summary])
   const projectWithPrice = useMemo(() => {
@@ -148,6 +150,24 @@ export default function ConstructorPage() {
     setNotice('')
   }
 
+  function updateZoneProject(updater) {
+    setProject(current => normalizeConstructorProject(updater(current)))
+    setNotice('')
+  }
+
+  function updateZoneProjectWithResult(updater) {
+    setProject(current => {
+      const { project: nextProject, result } = updater(current)
+      if (!result?.ok) {
+        setNotice(result?.reason || 'Это действие нельзя применить к выбранной зоне.')
+        return current
+      }
+
+      setNotice('')
+      return normalizeConstructorProject(nextProject)
+    })
+  }
+
   function updateDimensions(key, delta) {
     updateProject(current => ({
       ...current,
@@ -163,50 +183,77 @@ export default function ConstructorPage() {
   }
 
   function setActiveSection(sectionNumber) {
-    updateProject(current => ({ ...current, activeSection: clamp(sectionNumber, 1, current.sections) }))
-  }
+    updateZoneProject(current => {
+      const safeSection = clamp(sectionNumber, 1, current.sections)
+      const section = current.zoneLayout?.sections?.[safeSection - 1]
+      if (!section) return { ...current, activeSection: safeSection }
 
-  function updateSectionPart(type, delta) {
-    updateProject(current => {
-      const index = current.activeSection - 1
-      const filling = current.filling.map((section, sectionIndex) => {
-        if (sectionIndex !== index) return section
-        return { ...section, [type]: Math.max(0, section[type] + delta) }
-      })
-      return { ...current, filling }
+      const zoneId = section.activeZoneId || section.zones?.[0]?.id
+      return zoneId ? selectZone(current, section.id, zoneId) : { ...current, activeSection: safeSection }
     })
   }
 
+  function selectActiveZone(sectionId, zoneId) {
+    updateZoneProject(current => selectZone(current, sectionId, zoneId))
+  }
+
+  function splitCurrentZone(position = 'middle') {
+    updateZoneProject(current => splitActiveZone(current, position))
+  }
+
+  function updateSectionPart(type, delta) {
+    if (type === 'shelves') {
+      updateZoneProject(current => {
+        const active = getActiveZone(current)
+        const currentShelves = active?.zone?.content?.shelves ?? 0
+        return setActiveZoneShelves(current, Math.max(0, currentShelves + delta))
+      })
+      return
+    }
+
+    if (type === 'drawers') {
+      updateZoneProjectWithResult(current => {
+        const active = getActiveZone(current)
+        const currentDrawers = active?.zone?.content?.drawers ?? 0
+        return setActiveZoneDrawers(current, Math.max(0, currentDrawers + delta))
+      })
+    }
+  }
+
   function toggleRail() {
-    updateProject(current => {
-      const index = current.activeSection - 1
-      const filling = current.filling.map((section, sectionIndex) => (
-        sectionIndex === index ? { ...section, rail: !section.rail } : section
-      ))
-      return { ...current, filling }
+    updateZoneProjectWithResult(current => {
+      const active = getActiveZone(current)
+      const nextEnabled = !active?.zone?.content?.rail
+      return setActiveZoneRail(current, nextEnabled)
     })
   }
 
   function clearActiveSection() {
-    updateProject(current => {
-      const index = current.activeSection - 1
-      const filling = current.filling.map((section, sectionIndex) => (
-        sectionIndex === index ? { shelves: 0, drawers: 0, rail: false } : section
-      ))
-      return { ...current, filling }
-    })
+    updateZoneProject(current => clearActiveZone(current))
   }
 
   function applyPreset(presetName) {
-    const preset = FILLING_PRESETS[presetName]
-    if (!preset) return
-    updateProject(current => {
-      const index = current.activeSection - 1
-      const filling = current.filling.map((section, sectionIndex) => (
-        sectionIndex === index ? { ...preset } : section
-      ))
-      return { ...current, filling }
-    })
+    if (presetName === 'drawers') {
+      updateZoneProjectWithResult(current => {
+        const activeSectionId = current.zoneLayout?.active?.sectionId || current.zoneLayout?.sections?.[current.activeSection - 1]?.id
+        return applyDrawerBlockToSection(current, activeSectionId, 3)
+      })
+      return
+    }
+
+    if (presetName === 'shelves') {
+      updateZoneProject(current => setActiveZoneShelves(current, 5))
+      return
+    }
+
+    if (presetName === 'clothes') {
+      updateZoneProjectWithResult(current => setActiveZoneRail(setActiveZoneShelves(current, 1), true))
+      return
+    }
+
+    if (presetName === 'empty') {
+      updateZoneProject(current => clearActiveZone(current))
+    }
   }
 
   function copyToNextSection() {
@@ -330,11 +377,14 @@ export default function ConstructorPage() {
         <ConstructorConfig
           activeStep={activeStep}
           activeWarnings={activeWarnings}
+          activeZone={activeZone}
           onActiveStepChange={setActiveStep}
           project={project}
           onDimensionChange={updateDimensions}
           onSectionChange={updateSections}
           onSectionSelect={setActiveSection}
+          onZoneSelect={selectActiveZone}
+          onZoneSplit={splitCurrentZone}
           onSectionPartChange={updateSectionPart}
           onRailToggle={toggleRail}
           onClearSection={clearActiveSection}
@@ -351,6 +401,7 @@ export default function ConstructorPage() {
         <ConstructorViewer
           project={projectWithPrice}
           onSectionSelect={setActiveSection}
+          onZoneSelect={selectActiveZone}
           onSectionPartChange={updateSectionPart}
           onRailToggle={toggleRail}
           onClearSection={clearActiveSection}
