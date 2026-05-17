@@ -13,6 +13,12 @@ const fillingPresets = [
   ['empty', 'Пусто', 'очистить секцию', 'Начать секцию заново'],
 ]
 
+const additionalReliabilityRows = [
+  ['Задняя стенка', 'Рекомендуем'],
+  ['ПВХ 2 мм на видимых торцах', 'Включена'],
+  ['Крепление к стене', 'Рекомендуем'],
+]
+
 function CounterField({ label, value, hint, unit = '', min, max, onMinus, onPlus }) {
   const minusDisabled = typeof min === 'number' && value <= min
   const plusDisabled = typeof max === 'number' && value >= max
@@ -286,6 +292,19 @@ function MaterialsStep({ project, materials = [], edgeOptions = [], handleOption
         <OptionList items={hardwareOptions} activeId={project.material.hardwareId} field="hardwareId" onChange={onMaterialChange} compact />
       </div>
 
+      <div className="rp-ref-block rp-ref-block--polished rp-ref-additional-materials">
+        <h3>5. Дополнительно <span>/ Надёжность и сборка</span></h3>
+        <div className="rp-ref-additional-materials__rows">
+          {additionalReliabilityRows.map(([title, badge]) => (
+            <div key={title}>
+              <span>{title}</span>
+              <em>{badge}</em>
+              <b aria-hidden="true" />
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="rp-ref-block rp-ref-info rp-ref-info--materials">
         <Icon name="check-circle" size={16} />
         <span>Спецификация готовится как структура для будущей базы: материал → кромка → фурнитура → правила расчёта.</span>
@@ -303,10 +322,6 @@ export default function ConstructorConfig({
   edgeOptions = [],
   handleOptions = [],
   hardwareOptions = [],
-  canGoBack,
-  canGoNext,
-  onBack,
-  onNext,
   onDimensionChange,
   onSectionsChange,
   onSectionSelect,
@@ -324,7 +339,6 @@ export default function ConstructorConfig({
       title: 'Размеры шкафа',
       text: 'Сначала задаём габариты. Это основа для деталировки, стоимости и ограничений по наполнению.',
       body: <DimensionsStep project={project} warnings={warnings} onDimensionChange={onDimensionChange} onSectionsChange={onSectionsChange} />,
-      next: 'Далее: наполнение',
     },
     filling: {
       number: 2,
@@ -332,7 +346,6 @@ export default function ConstructorConfig({
       title: 'Наполнение секций',
       text: 'Соберите внутреннюю логику шкафа: полки, ящики и штанги в каждой секции.',
       body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={activeSectionWarnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} onCopySection={onCopySection} onApplySectionToAll={onApplySectionToAll} />,
-      next: 'Далее: материалы',
     },
     materials: {
       number: 3,
@@ -340,7 +353,6 @@ export default function ConstructorConfig({
       title: 'Материалы и фурнитура',
       text: 'Выберите декор корпуса, кромку, открывание и фурнитуру. Это будущая структура спецификации.',
       body: <MaterialsStep project={project} materials={materials} edgeOptions={edgeOptions} handleOptions={handleOptions} hardwareOptions={hardwareOptions} onMaterialChange={onMaterialChange} />,
-      next: 'В корзину',
     },
   }
 
@@ -359,11 +371,6 @@ export default function ConstructorConfig({
 
       <div className="rp-ref-step-body">
         {current.body}
-      </div>
-
-      <div className="rp-ref-config-nav rp-ref-config-nav--polished">
-        <button type="button" disabled={!canGoBack} onClick={onBack}>Назад</button>
-        <button className="is-primary" type="button" onClick={onNext}>{canGoNext ? current.next : 'В корзину'}<Icon name="arrow-right" size={15} /></button>
       </div>
     </aside>
   )
