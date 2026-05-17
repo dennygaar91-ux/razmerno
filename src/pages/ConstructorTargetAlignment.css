@@ -1,0 +1,543 @@
+/* Target UI alignment pass 1: shell, hero, flow and left panel density. */
+.rp-ctor-page--reference {
+  padding: 24px 30px 26px;
+  background: #f7f6f2;
+}
+
+.rp-ctor-page--reference .rp-ctor-hero {
+  min-height: 112px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+
+.rp-ctor-kicker {
+  margin-bottom: 8px;
+  color: #34322f;
+  font-size: 10px;
+  letter-spacing: .2em;
+}
+
+.rp-ctor-hero h1 {
+  max-width: 650px;
+  font-size: clamp(36px, 2.42vw, 42px);
+  line-height: .95;
+  letter-spacing: -.055em;
+}
+
+.rp-ctor-lead {
+  max-width: 635px;
+  margin-top: 12px;
+  color: #5f5b54;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+.rp-ctor-badges {
+  margin-top: 12px;
+  gap: 7px;
+}
+
+.rp-ctor-badges span {
+  min-height: 28px;
+  padding: 0 12px;
+  border-color: rgba(10, 10, 10, .07);
+  background: rgba(255, 255, 255, .68);
+  color: #38352f;
+  font-size: 11px;
+}
+
+.rp-ctor-actions {
+  padding-top: 15px;
+  gap: 10px;
+}
+
+.rp-ctor-actions button {
+  height: 42px;
+  min-width: 118px;
+  padding: 0 17px;
+  border-radius: 11px;
+  border-color: rgba(10, 10, 10, .1);
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 1px 2px rgba(10, 10, 10, .025);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.rp-ctor-actions button.is-primary {
+  min-width: 132px;
+  padding-inline: 20px;
+}
+
+.rp-ctor-flow {
+  height: 60px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  border-color: rgba(10, 10, 10, .08);
+  background: rgba(255, 255, 255, .78);
+}
+
+.rp-ctor-flow div {
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  padding: 0 24px;
+}
+
+.rp-ctor-flow div:not(:last-child)::after {
+  height: 60px;
+  right: -20px;
+  width: 40px;
+}
+
+.rp-ctor-flow span {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.rp-ctor-flow p {
+  font-size: 15px;
+  line-height: 1.05;
+}
+
+.rp-ctor-flow small {
+  margin-top: 4px;
+  color: #6f6b64;
+  font-size: 11px;
+}
+
+.rp-ctor-page--reference .rp-ctor-shell {
+  gap: 13px;
+  grid-template-columns: calc(25% - 9px) calc(50% - 9px) calc(25% - 9px);
+}
+
+.rp-ctor-page--reference .rp-ctor-card {
+  border-radius: 17px;
+  border-color: rgba(226, 221, 212, .95);
+  background: rgba(255, 255, 255, .86);
+  box-shadow: 0 10px 24px rgba(36, 31, 24, .035);
+}
+
+.rp-ctor-page--reference .rp-ctor-config,
+.rp-ctor-page--reference .rp-ctor-viewer,
+.rp-ctor-page--reference .rp-ctor-summary {
+  height: calc(100vh - 222px);
+  min-height: 652px;
+  max-height: 732px;
+}
+
+.rp-ref-config--polished {
+  padding: 20px 21px 18px;
+}
+
+.rp-ref-panel-head--polished {
+  grid-template-columns: 30px 1fr;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom-color: rgba(10, 10, 10, .055);
+}
+
+.rp-ref-panel-head--polished > span {
+  width: 30px;
+  height: 30px;
+  background: #fff7f1;
+  border-color: rgba(232, 97, 44, .34);
+  color: #e8612c;
+}
+
+.rp-ref-panel-head--polished em {
+  margin-bottom: 7px;
+  color: #e8612c;
+  font-size: 9px;
+  letter-spacing: .16em;
+}
+
+.rp-ref-panel-head--polished h2 {
+  font-size: 21px;
+  line-height: 1.02;
+  letter-spacing: -.045em;
+}
+
+.rp-ref-panel-head--polished p {
+  margin-top: 7px;
+  color: #5f5b54;
+  font-size: 12px;
+  line-height: 1.38;
+}
+
+.rp-ref-step-hint {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border-color: rgba(232, 97, 44, .17);
+  background: rgba(232, 97, 44, .055);
+}
+
+.rp-ref-step-hint b {
+  font-size: 12px;
+}
+
+.rp-ref-step-hint span {
+  color: #73564a;
+  font-size: 11px;
+  line-height: 1.32;
+}
+
+.rp-ref-step-body {
+  padding-right: 7px;
+}
+
+.rp-ref-fields--polished {
+  margin-top: 14px;
+  border-radius: 13px;
+  border-color: rgba(10, 10, 10, .07);
+}
+
+.rp-ref-field--polished {
+  min-height: 59px;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  padding: 10px 11px;
+}
+
+.rp-ref-field strong {
+  font-size: 12px;
+}
+
+.rp-ref-field span {
+  margin-top: 4px;
+  color: #7b776f;
+  font-size: 10px;
+}
+
+.rp-ref-counter {
+  height: 34px;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  border-radius: 9px;
+}
+
+.rp-ref-counter button,
+.rp-ref-counter input {
+  font-size: 12px;
+}
+
+.rp-ref-counter-wrap small {
+  font-size: 9px;
+}
+
+.rp-ref-block--polished {
+  margin-top: 18px;
+}
+
+.rp-ref-block h3 {
+  font-size: 16px;
+}
+
+.rp-ref-block p {
+  margin: 7px 0 12px;
+  color: #706c65;
+  font-size: 12px;
+}
+
+.rp-ref-section-widths {
+  border-radius: 12px;
+  border-color: rgba(10, 10, 10, .07);
+}
+
+.rp-ref-section-widths button {
+  height: 42px;
+  background: #fff;
+}
+
+.rp-ref-section-widths button span {
+  font-size: 9px;
+}
+
+.rp-ref-section-widths button b {
+  font-size: 11px;
+}
+
+.rp-ref-section-tabs button {
+  min-height: 44px;
+  border-radius: 11px;
+}
+
+.rp-ref-active-section--polished {
+  padding: 13px 14px;
+  border-radius: 14px;
+}
+
+.rp-ref-active-section--polished strong {
+  font-size: 11px;
+}
+
+.rp-ref-section-tools {
+  margin-top: 8px;
+  gap: 8px;
+}
+
+.rp-ref-section-tools button {
+  min-height: 36px;
+  border-radius: 12px;
+}
+
+.rp-ref-preset-grid--polished {
+  gap: 9px;
+}
+
+.rp-ref-preset-grid--polished button {
+  min-height: 67px;
+  border-radius: 13px;
+  padding: 12px;
+}
+
+.rp-ref-preset-grid--polished button span {
+  font-size: 13px;
+}
+
+.rp-ref-preset-grid--polished em {
+  font-size: 9px;
+}
+
+.rp-ref-config-nav--polished {
+  padding-top: 14px;
+  gap: 10px;
+}
+
+.rp-ref-config-nav--polished button {
+  height: 46px;
+  border-radius: 999px;
+}
+
+.rp-ref-config-nav--polished button.is-primary {
+  box-shadow: 0 12px 22px rgba(10, 10, 10, .11);
+}
+
+.rp-ref-info {
+  min-height: 40px;
+  border-radius: 13px;
+  font-size: 11px;
+}
+
+.rp-ref-viewer {
+  padding: 12px;
+  grid-template-rows: 42px minmax(0, 1fr) 52px 118px;
+  gap: 9px;
+}
+
+.rp-ref-view-mode button,
+.rp-ref-scale button,
+.rp-ref-scale b {
+  height: 34px;
+  border-radius: 10px;
+}
+
+.rp-ref-quick-actions--polished {
+  min-height: 52px;
+  border-radius: 14px;
+}
+
+.rp-ref-quick-actions--polished button {
+  min-height: 40px;
+  border-radius: 11px;
+}
+
+.rp-ref-section-map {
+  border-radius: 14px;
+  padding: 13px;
+}
+
+.rp-ref-section-map h3 {
+  font-size: 15px;
+}
+
+.rp-ref-section-map p {
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+
+.rp-ref-section-map__item {
+  border-radius: 12px;
+}
+
+@media (max-width: 1480px) {
+  .rp-ctor-page--reference {
+    padding: 22px 24px 24px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-hero {
+    min-height: 98px;
+  }
+
+  .rp-ctor-hero h1 {
+    font-size: 34px;
+  }
+
+  .rp-ctor-lead {
+    max-width: 570px;
+    font-size: 12px;
+  }
+
+  .rp-ctor-actions button {
+    min-width: 108px;
+    padding-inline: 14px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-config,
+  .rp-ctor-page--reference .rp-ctor-viewer,
+  .rp-ctor-page--reference .rp-ctor-summary {
+    height: calc(100vh - 205px);
+    min-height: 626px;
+    max-height: 704px;
+  }
+
+  .rp-ref-config--polished {
+    padding: 18px 17px 16px;
+  }
+
+  .rp-ref-field--polished {
+    min-height: 56px;
+    grid-template-columns: minmax(0, 1fr) 122px;
+  }
+
+  .rp-ref-preset-grid--polished button {
+    min-height: 60px;
+  }
+}
+
+@media (max-width: 1380px) {
+  .rp-ctor-page--reference {
+    padding: 18px 20px 22px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-hero {
+    min-height: 84px;
+    margin-bottom: 9px;
+  }
+
+  .rp-ctor-hero h1 {
+    font-size: 30px;
+  }
+
+  .rp-ctor-lead {
+    margin-top: 8px;
+    max-width: 520px;
+    font-size: 11px;
+  }
+
+  .rp-ctor-badges span {
+    min-height: 24px;
+    font-size: 10px;
+  }
+
+  .rp-ctor-actions {
+    padding-top: 7px;
+  }
+
+  .rp-ctor-actions button {
+    height: 38px;
+    min-width: 96px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .rp-ctor-flow {
+    height: 56px;
+    margin-bottom: 10px;
+  }
+
+  .rp-ctor-flow div {
+    padding: 0 18px;
+  }
+
+  .rp-ctor-flow p {
+    font-size: 13px;
+  }
+
+  .rp-ctor-flow small {
+    font-size: 10px;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-config,
+  .rp-ctor-page--reference .rp-ctor-viewer,
+  .rp-ctor-page--reference .rp-ctor-summary {
+    height: calc(100vh - 180px);
+    min-height: 590px;
+    max-height: 650px;
+  }
+
+  .rp-ref-panel-head--polished h2 {
+    font-size: 19px;
+  }
+
+  .rp-ref-step-hint {
+    padding: 9px 11px;
+  }
+
+  .rp-ref-fields--polished {
+    margin-top: 11px;
+  }
+
+  .rp-ref-field--polished {
+    min-height: 52px;
+    grid-template-columns: minmax(0, 1fr) 112px;
+    padding: 8px 10px;
+  }
+
+  .rp-ref-counter {
+    height: 31px;
+    grid-template-columns: 31px minmax(0, 1fr) 31px;
+  }
+
+  .rp-ref-block--polished {
+    margin-top: 14px;
+  }
+
+  .rp-ref-preset-grid--polished button {
+    min-height: 54px;
+  }
+
+  .rp-ref-viewer {
+    grid-template-rows: 38px minmax(0, 1fr) 48px 104px;
+    gap: 7px;
+    padding: 10px;
+  }
+
+  .rp-ref-section-map {
+    padding: 11px;
+  }
+}
+
+@media (max-height: 820px) and (min-width: 1181px) {
+  .rp-ctor-page--reference .rp-ctor-hero {
+    min-height: 72px;
+  }
+
+  .rp-ctor-hero h1 {
+    font-size: 28px;
+  }
+
+  .rp-ctor-badges {
+    display: none;
+  }
+
+  .rp-ctor-page--reference .rp-ctor-config,
+  .rp-ctor-page--reference .rp-ctor-viewer,
+  .rp-ctor-page--reference .rp-ctor-summary {
+    height: calc(100vh - 164px);
+    min-height: 560px;
+  }
+
+  .rp-ref-panel-head--polished p,
+  .rp-ref-step-hint span,
+  .rp-ref-block p {
+    display: none;
+  }
+
+  .rp-ref-panel-head--polished {
+    padding-bottom: 11px;
+  }
+
+  .rp-ref-step-hint {
+    margin-top: 11px;
+  }
+}
