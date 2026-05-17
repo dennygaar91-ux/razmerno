@@ -1,24 +1,24 @@
-function ShelvesContent({ section }) {
-  const shelfCount = Math.min(section.shelves, 5)
+function ShelvesContent({ content }) {
+  const shelfCount = Math.min(content?.shelves ?? 0, 5)
 
   return (
     <>
       {Array.from({ length: shelfCount }, (_, index) => (
-        <span className="rp-wardrobe-shelf" key={`shelf-${index}`} style={{ top: `${18 + index * 14}%` }} />
+        <span className="rp-wardrobe-shelf rp-wardrobe-zone-shelf" key={`shelf-${index}`} style={{ top: `${22 + index * 14}%` }} />
       ))}
-      {section.shelves >= 3 && (
+      {shelfCount >= 3 && (
         <>
           <i className="rp-wardrobe-towels rp-wardrobe-towels--one" />
           <i className="rp-wardrobe-towels rp-wardrobe-towels--two" />
         </>
       )}
-      {section.shelves >= 1 && <i className="rp-wardrobe-box" />}
+      {shelfCount >= 1 && <i className="rp-wardrobe-box" />}
     </>
   )
 }
 
-function RailContent({ section }) {
-  if (!section.rail) return null
+function RailContent({ content }) {
+  if (!content?.rail) return null
 
   return (
     <>
@@ -30,24 +30,75 @@ function RailContent({ section }) {
   )
 }
 
-function DrawersContent({ section }) {
-  const drawerCount = Math.min(section.drawers, 3)
+function DrawersContent({ content }) {
+  const drawerCount = Math.min(content?.drawers ?? 0, 4)
 
   return (
     <>
       {Array.from({ length: drawerCount }, (_, index) => (
-        <b className="rp-wardrobe-drawer" key={`drawer-${index}`} style={{ bottom: `${2 + index * 13}%` }} />
+        <b className="rp-wardrobe-drawer rp-wardrobe-zone-drawer" key={`drawer-${index}`} style={{ bottom: `${4 + index * 19}%` }} />
       ))}
     </>
   )
 }
 
-function SectionMockup({ section, active }) {
+function LegacySectionMockup({ section, active }) {
   return (
     <div className={`rp-ctor-col ${active ? 'is-active' : ''}`}>
-      <ShelvesContent section={section} />
-      <RailContent section={section} />
-      <DrawersContent section={section} />
+      <ShelvesContent content={section} />
+      <RailContent content={section} />
+      <DrawersContent content={section} />
+    </div>
+  )
+}
+
+function ZoneContent({ zone }) {
+  const content = zone?.content ?? {}
+
+  return (
+    <>
+      <ShelvesContent content={content} />
+      <RailContent content={content} />
+      <DrawersContent content={content} />
+    </>
+  )
+}
+
+function ZoneLayer({ zone, section, active }) {
+  const sectionHeight = Math.max(section.height || 1, 1)
+  const bottom = (zone.fromY / sectionHeight) * 100
+  const height = Math.max(4, (zone.height / sectionHeight) * 100)
+  const contentType = zone?.content?.type || 'empty'
+
+  return (
+    <div
+      className={`rp-wardrobe-zone ${active ? 'is-active' : ''} has-${contentType}`}
+      style={{ bottom: `${bottom}%`, height: `${height}%` }}
+      title={`${zone.label} · ${zone.height} мм`}
+    >
+      <span className="rp-wardrobe-zone__label">{zone.label}</span>
+      <small>{zone.height} мм</small>
+      <ZoneContent zone={zone} />
+    </div>
+  )
+}
+
+function DividerLayer({ divider, section }) {
+  const sectionHeight = Math.max(section.height || 1, 1)
+  const bottom = (divider.y / sectionHeight) * 100
+
+  return <span className="rp-wardrobe-zone-divider" style={{ bottom: `${bottom}%` }} />
+}
+
+function ZoneSectionMockup({ section, activeSection, activeZoneId }) {
+  return (
+    <div className={`rp-ctor-col rp-ctor-col--zones ${activeSection ? 'is-active' : ''}`}>
+      {section.zones.map((zone) => (
+        <ZoneLayer zone={zone} section={section} active={zone.id === activeZoneId} key={zone.id} />
+      ))}
+      {section.dividers.map((divider) => (
+        <DividerLayer divider={divider} section={section} key={divider.id} />
+      ))}
     </div>
   )
 }
@@ -70,18 +121,25 @@ function getMockupStyle(project, sectionCount) {
 }
 
 export default function WardrobeMockup({ project }) {
-  const sections = project?.filling ?? [
+  const zoneSections = project?.zoneLayout?.sections
+  const legacySections = project?.filling ?? [
     { shelves: 4, drawers: 2, rail: false },
     { shelves: 1, drawers: 0, rail: true },
     { shelves: 3, drawers: 0, rail: false },
   ]
+  const sections = Array.isArray(zoneSections) && zoneSections.length ? zoneSections : legacySections
+  const isZoneMode = Array.isArray(zoneSections) && zoneSections.length > 0
+  const activeSectionId = project?.zoneLayout?.active?.sectionId
+  const activeZoneId = project?.zoneLayout?.active?.zoneId
   const style = getMockupStyle(project, sections.length)
 
   return (
-    <div className="rp-ctor-wardrobe rp-ctor-wardrobe--renderlike" style={style} aria-hidden="true">
+    <div className={`rp-ctor-wardrobe rp-ctor-wardrobe--renderlike ${isZoneMode ? 'rp-ctor-wardrobe--zones' : ''}`} style={style} aria-hidden="true">
       <div className="rp-ctor-top" />
       {sections.map((section, index) => (
-        <SectionMockup section={section} active={project?.activeSection === index + 1} key={index} />
+        isZoneMode
+          ? <ZoneSectionMockup section={section} activeSection={activeSectionId === section.id || project?.activeSection === index + 1} activeZoneId={activeZoneId} key={section.id} />
+          : <LegacySectionMockup section={section} active={project?.activeSection === index + 1} key={index} />
       ))}
     </div>
   )
