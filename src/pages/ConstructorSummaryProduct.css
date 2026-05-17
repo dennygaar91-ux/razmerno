@@ -8,7 +8,6 @@
 @import './ConstructorScreenshotFixes.css';
 @import './ConstructorSectionMapFix.css';
 @import './ConstructorFinalCompactFix.css';
-@import './ConstructorTargetAlignment.css';
 
 .rp-ref-summary--product {
   grid-template-rows: 188px 92px 162px 112px auto 104px;
@@ -291,3 +290,5 @@
     display: none;
   }
 }
+
+@import './ConstructorTargetAlignment.css';
