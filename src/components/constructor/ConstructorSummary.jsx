@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import Icon from '../../icons/Icon'
 import { getEstimateRows } from '../../utils/constructorPricing'
 
 function formatPrice(value) {
@@ -37,7 +36,6 @@ function ConfettiIcon() {
 
 export default function ConstructorSummary({ project, summary, warnings = [], estimateState = 'idle', onCheckout }) {
   const [estimateOpen, setEstimateOpen] = useState(false)
-  const hardwareTitle = project.material.hardware ?? 'Стандарт'
 
   const projectRows = [
     ['Размер (В × Ш × Г)', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
@@ -56,12 +54,6 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
     ['Фурнитура', '1 компл.'],
   ]
 
-  const additionalRows = [
-    ['Задняя стенка', 'Рекомендуем'],
-    [project.material.edge, 'Включена'],
-    ['Крепление к стене', 'Рекомендуем'],
-  ]
-
   const isReady = warnings.length === 0
   const isCalculating = estimateState === 'loading'
   const hasEstimateError = estimateState === 'error'
@@ -78,7 +70,7 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         <div>
           <span>Ваш проект</span>
           <h3>Шкаф почти готов</h3>
-          <p>Отличный выбор! Осталось выбрать материалы и добавить проект в корзину.</p>
+          <p>Осталось выбрать материалы и добавить проект в корзину.</p>
         </div>
         <ConfettiIcon />
       </section>
@@ -86,7 +78,7 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
       <section className="rp-target-card rp-target-price-card">
         <p>Стоимость комплекта</p>
         <strong>{formatPrice(project.price)} ₽</strong>
-        <span>{isCalculating ? 'Пересчитываем по текущим параметрам…' : 'Предварительно, по текущим размерам и наполнению'}</span>
+        <span>{isCalculating ? 'Пересчитываем…' : 'Предварительно, по текущим размерам и наполнению'}</span>
         <button type="button" onClick={onCheckout}>В корзину</button>
       </section>
 
@@ -134,17 +126,6 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
           {estimateRows.map(row => <EstimateRow key={row.key} row={row} total={estimateTotal} />)}
         </section>
       )}
-
-      <section className="rp-target-card rp-target-additional-card">
-        <h3>Дополнительно <span>/ Надёжность и сборка</span></h3>
-        {additionalRows.map(([title, badge]) => (
-          <div key={title}>
-            <span>{title}</span>
-            <em>{badge}</em>
-            <b aria-hidden="true" />
-          </div>
-        ))}
-      </section>
     </aside>
   )
 }
