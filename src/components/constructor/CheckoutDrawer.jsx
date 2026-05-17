@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { createConstructorOrder } from '../../services/constructorOrders'
 
 function formatPrice(value) {
-  return new Intl.NumberFormat('ru-RU').format(value)
+  const numericValue = Number(value)
+  const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+  return new Intl.NumberFormat('ru-RU').format(safeValue)
 }
 
 const initialCustomer = {
