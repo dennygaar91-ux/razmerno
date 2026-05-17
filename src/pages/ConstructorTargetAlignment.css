@@ -359,6 +359,244 @@
   border-radius: 12px;
 }
 
+/* Target UI alignment pass 1: checkout drawer should use the same light card system. */
+.rp-checkout--polished .rp-checkout__panel {
+  width: min(530px, calc(100vw - 32px));
+  border-radius: 24px;
+  border: 1px solid rgba(226, 221, 212, .98);
+  background: #f8f7f3;
+  box-shadow: 0 26px 70px rgba(25, 20, 14, .18);
+}
+
+.rp-checkout__overlay {
+  background: rgba(25, 20, 14, .22);
+  backdrop-filter: blur(6px);
+}
+
+.rp-checkout__head--polished {
+  padding: 22px 22px 14px;
+  border-bottom: 1px solid rgba(226, 221, 212, .9);
+}
+
+.rp-checkout__head--polished p {
+  color: #e8612c;
+  letter-spacing: .18em;
+  font-size: 9px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.rp-checkout__head--polished h2 {
+  max-width: 360px;
+  margin-top: 8px;
+  color: #151515;
+  font-size: 26px;
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+
+.rp-checkout__head--polished > div > span {
+  max-width: 370px;
+  margin-top: 8px;
+  color: #6f6b64;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.rp-checkout__head--polished > button {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(10, 10, 10, .075);
+  color: #151515;
+}
+
+.rp-checkout__body--polished {
+  padding: 14px 22px;
+  gap: 10px;
+}
+
+.rp-checkout__hero-total {
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff;
+  color: #151515;
+  border: 1px solid rgba(226, 221, 212, .95);
+  box-shadow: 0 10px 24px rgba(36, 31, 24, .035);
+}
+
+.rp-checkout__hero-total--structured {
+  background: linear-gradient(135deg, #fff 0%, #fff8f2 100%);
+}
+
+.rp-checkout__hero-total span,
+.rp-checkout__hero-total p {
+  color: #706c65;
+}
+
+.rp-checkout__hero-total span {
+  font-size: 10px;
+  letter-spacing: .02em;
+}
+
+.rp-checkout__hero-total strong {
+  margin-top: 8px;
+  color: #111;
+  font-size: 34px;
+  line-height: .92;
+}
+
+.rp-checkout__hero-total p {
+  margin-top: 8px;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.rp-checkout__step {
+  padding: 14px;
+  border-radius: 18px;
+  border-color: rgba(226, 221, 212, .95);
+  background: rgba(255, 255, 255, .9);
+}
+
+.rp-checkout__step-head {
+  grid-template-columns: 26px 1fr;
+  gap: 10px;
+  margin-bottom: 11px;
+}
+
+.rp-checkout__step-head > span {
+  width: 26px;
+  height: 26px;
+  background: #fff7f1;
+  border: 1px solid rgba(232, 97, 44, .24);
+  color: #e8612c;
+  font-size: 11px;
+}
+
+.rp-checkout__step-head h3 {
+  color: #151515;
+  font-size: 14px;
+}
+
+.rp-checkout__step-head p {
+  color: #77736b;
+  font-size: 10px;
+}
+
+.rp-checkout__summary--compact {
+  gap: 7px;
+}
+
+.rp-checkout__summary--compact div {
+  padding-bottom: 7px;
+  border-bottom-color: rgba(226, 221, 212, .9);
+}
+
+.rp-checkout__summary--compact dt,
+.rp-checkout__summary--compact dd {
+  font-size: 10px;
+}
+
+.rp-checkout__fields--polished {
+  gap: 8px;
+}
+
+.rp-checkout__fields--polished input,
+.rp-checkout__fields--polished textarea {
+  min-height: 42px;
+  border-radius: 13px;
+  border-color: rgba(226, 221, 212, .95);
+  background: #fff;
+  font-size: 12px;
+}
+
+.rp-checkout__fields--polished textarea {
+  min-height: 66px;
+}
+
+.rp-checkout__option-grid {
+  gap: 7px;
+}
+
+.rp-checkout__option-grid button {
+  min-height: 50px;
+  padding: 9px 10px;
+  border-radius: 14px;
+  border-color: rgba(226, 221, 212, .95);
+  background: #fff;
+  font-size: 11px;
+}
+
+.rp-checkout__option-grid button span {
+  font-size: 9px;
+}
+
+.rp-checkout__option-grid button.is-active,
+.rp-checkout__option-grid--pay button.is-active {
+  border-color: rgba(10, 10, 10, .9);
+  background: #fff;
+  color: #151515;
+  box-shadow: inset 0 0 0 1px #111;
+}
+
+.rp-checkout__option-grid--pay button.is-active span {
+  color: #77736b;
+}
+
+.rp-checkout__agreement {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  border-color: rgba(226, 221, 212, .95);
+  color: #6f6b64;
+  font-size: 10px;
+}
+
+.rp-checkout__note,
+.rp-checkout__status {
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.rp-checkout__foot--polished {
+  padding: 12px 22px 18px;
+  border-top: 1px solid rgba(226, 221, 212, .9);
+  background: rgba(248, 247, 243, .96);
+  grid-template-columns: 1fr 1.1fr;
+  gap: 9px;
+}
+
+.rp-checkout__foot--polished button {
+  height: 42px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.rp-checkout__foot--polished .rp-checkout__primary {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.rp-checkout__foot--polished .rp-checkout__secondary {
+  background: #fff;
+  border: 1px solid rgba(226, 221, 212, .95);
+}
+
+.rp-checkout__success {
+  min-height: 440px;
+  border-radius: 20px;
+  background: #fff;
+  border-color: rgba(226, 221, 212, .95);
+}
+
+.rp-checkout__success-icon {
+  background: #eaf6ec;
+  color: #2f9a48;
+}
+
 /* Target UI alignment pass 1: section map and quick actions. */
 .rp-ref-viewer {
   grid-template-rows: 42px minmax(0, 1fr) 50px 104px;
@@ -695,6 +933,23 @@
     min-height: 60px;
   }
 
+  .rp-checkout--polished .rp-checkout__panel {
+    width: min(510px, calc(100vw - 24px));
+  }
+
+  .rp-checkout__head--polished h2 {
+    font-size: 24px;
+  }
+
+  .rp-checkout__hero-total strong {
+    font-size: 31px;
+  }
+
+  .rp-checkout__option-grid--delivery,
+  .rp-checkout__fields--delivery {
+    grid-template-columns: 1fr;
+  }
+
   .rp-ref-material-list--product button {
     min-height: 64px;
     grid-template-columns: 40px minmax(0, 1fr) auto;
@@ -842,6 +1097,32 @@
     display: none;
   }
 
+  .rp-checkout--polished .rp-checkout__panel {
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: min(490px, calc(100vw - 20px));
+    border-radius: 20px;
+  }
+
+  .rp-checkout__head--polished {
+    padding: 18px 18px 12px;
+  }
+
+  .rp-checkout__body--polished {
+    padding: 12px 18px;
+  }
+
+  .rp-checkout__foot--polished {
+    padding: 10px 18px 14px;
+  }
+
+  .rp-checkout__step-head p,
+  .rp-checkout__hero-total p,
+  .rp-checkout__note {
+    display: none;
+  }
+
   .rp-ref-material-spec-grid {
     display: none;
   }
@@ -939,5 +1220,25 @@
   .rp-ref-handle-list--product button,
   .rp-ref-option-list--compact button {
     min-height: 46px;
+  }
+
+  .rp-checkout__hero-total {
+    padding: 13px;
+  }
+
+  .rp-checkout__hero-total strong {
+    font-size: 27px;
+  }
+
+  .rp-checkout__step {
+    padding: 11px;
+  }
+
+  .rp-checkout__step-head {
+    margin-bottom: 8px;
+  }
+
+  .rp-checkout__option-grid button {
+    min-height: 45px;
   }
 }
