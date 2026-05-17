@@ -1,11 +1,5 @@
 import { formatSection, getSectionLabel } from './viewerUtils'
 
-const scenarioActions = [
-  ['clothes', 'Одежда'],
-  ['shelves', 'Полки'],
-  ['drawers', 'Ящики'],
-]
-
 function getSectionMeta(section) {
   const label = getSectionLabel(section)
   const isEmpty = label === 'Пусто'
@@ -25,25 +19,15 @@ function getSectionMeta(section) {
   }
 }
 
-export default function SectionMap({ project, activeSection, onSectionSelect, onPresetApply, onPresetApplyToSection }) {
+export default function SectionMap({ project, activeSection, onSectionSelect, onPresetApply }) {
   const activeMeta = getSectionMeta(activeSection)
 
-  function handleScenarioClick(sectionNumber, presetId) {
-    if (onPresetApplyToSection) {
-      onPresetApplyToSection(sectionNumber, presetId)
-      return
-    }
-
-    onSectionSelect(sectionNumber)
-    onPresetApply(presetId)
-  }
-
   return (
-    <div className="rp-ref-section-map rp-ref-section-map--polished rp-ref-section-map--smart">
+    <div className="rp-ref-section-map rp-ref-section-map--polished rp-ref-section-map--smart rp-target-section-map">
       <div className="rp-ref-section-map__head">
         <div>
           <h3>Карта секций</h3>
-          <p>Активна секция {project.activeSection}: {activeMeta.label} · {activeMeta.short}</p>
+          <p>Секция {project.activeSection}: {activeMeta.label} · {activeMeta.short}</p>
         </div>
         <button type="button" onClick={() => onPresetApply('clothes')}>Сценарий одежды</button>
       </div>
@@ -62,11 +46,6 @@ export default function SectionMap({ project, activeSection, onSectionSelect, on
                 <b>{meta.details}</b>
                 <em>{active ? 'Редактируется' : 'Выбрать'}</em>
               </button>
-              <div className="rp-ref-section-map__actions" aria-label={`Быстрые сценарии для секции ${sectionNumber}`}>
-                {scenarioActions.map(([presetId, label]) => (
-                  <button type="button" key={presetId} onClick={() => handleScenarioClick(sectionNumber, presetId)}>{label}</button>
-                ))}
-              </div>
             </article>
           )
         })}
