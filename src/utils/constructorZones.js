@@ -16,21 +16,6 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(numeric) ? numeric : fallback
 }
 
-function cloneLayout(layout) {
-  return {
-    ...layout,
-    active: { ...layout.active },
-    sections: layout.sections.map(section => ({
-      ...section,
-      dividers: section.dividers.map(divider => ({ ...divider })),
-      zones: section.zones.map(zone => ({
-        ...zone,
-        content: { ...zone.content },
-      })),
-    })),
-  }
-}
-
 function getSectionById(layout, sectionId) {
   return layout.sections.find(section => section.id === sectionId) || layout.sections[0]
 }
@@ -47,7 +32,7 @@ function syncSectionLegacyFilling(section) {
 }
 
 function syncProjectFillingFromLayout(project, layout) {
-  return layout.sections.map((section, index) => syncSectionLegacyFilling(section, project.filling?.[index]))
+  return layout.sections.map((section) => syncSectionLegacyFilling(section))
 }
 
 function updateSectionInLayout(layout, nextSection) {
@@ -78,6 +63,10 @@ function setZoneContent(section, zoneId, content) {
       }
       : zone),
   }
+}
+
+function makeActionError(reason, action, suggestion = null) {
+  return { ok: false, reason, action, suggestion }
 }
 
 export function getZoneRules(project) {
@@ -247,13 +236,53 @@ export function getActiveZone(project) {
   return { section, zone }
 }
 
+export function getActiveZoneHints(project) {
+  const active = getActiveZone(project)
+  if (!active?.zone) return []
+
+  const rules = getZoneRules(project)
+  const { zone, section } = active
+  const hints = []
+
+  if (zone.height < MIN_ZONE_GAP_MM * 2 + MATERIAL_THICKNESS_MM) {
+    hints.push({ type: 'warning', title: 'Полку сюда уже не добавить', text: `Для разделения зоны нужно минимум ${MIN_ZONE_GAP_MM * 2 + MATERIAL_THICKNESS_MM} мм по высоте.` })
+  } else {
+    hints.push({ type: 'success', title: 'Зону можно разделить', text: 'Полка поставится по центру или ниже, а секция разделится на две области.' })
+  }
+
+  if (!rules.canUseDrawers) {
+    hints.push({ type: 'warning', title: 'Ящики недоступны', text: 'Для ящиков нужна глубина от 450 мм и ширина секции от 350 мм.' })
+  } else if (zone.height < MIN_DRAWER_FACE_HEIGHT_MM) {
+    hints.push({ type: 'warning', title: 'Зона слишком низкая для ящиков', text: `Минимальная высота одного фасада — ${MIN_DRAWER_FACE_HEIGHT_MM} мм.` })
+  } else {
+    const drawerCount = Math.min(4, Math.floor(zone.height / MIN_DRAWER_FACE_HEIGHT_MM))
+    hints.push({ type: 'success', title: `Поместится до ${drawerCount} ящ.`, text: `${zone.label}: ${zone.height} мм, секция ${section.index}.` })
+  }
+
+  if (!rules.canUseRail) {
+    hints.push({ type: 'warning', title: 'Штанга недоступна', text: 'Для обычной штанги нужна глубина от 520 мм и ширина секции от 400 мм.' })
+  } else if (zone.height < 700) {
+    hints.push({ type: 'warning', title: 'Мало высоты для штанги', text: 'Для одежды на плечиках нужна зона от 700 мм.' })
+  }
+
+  return hints.slice(0, 3)
+}
+
 export function splitZoneByShelf(section, zoneId, position = 'middle') {
   const zone = section?.zones?.find(item => item.id === zoneId)
-  if (!section || !zone) return section
+  if (!section || !zone) return { section, result: makeActionError('Выберите зону, которую нужно разделить.', 'Нажмите на область внутри шкафа или выберите её в списке зон.') }
 
   const minY = zone.fromY + MIN_ZONE_GAP_MM
   const maxY = zone.toY - MIN_ZONE_GAP_MM
-  if (maxY <= minY) return section
+  if (maxY <= minY) {
+    return {
+      section,
+      result: makeActionError(
+        'В этой зоне недостаточно места для новой полки.',
+        `Минимальное расстояние между полками — ${MIN_ZONE_GAP_MM} мм. Выберите более высокую зону или уберите соседний разделитель.`
+      ),
+    }
+  }
 
   const rawY = position === 'upper-third'
     ? zone.fromY + Math.round(zone.height * 0.66)
@@ -270,8 +299,7 @@ export function splitZoneByShelf(section, zoneId, position = 'middle') {
   const dividerId = `${section.id}-divider-${section.dividers.length + 1}`
   const bottomZone = createEmptyZone(section.index - 1, zone.fromY, bottomTo, `bottom-${section.dividers.length + 1}`)
   const topZone = createEmptyZone(section.index - 1, topFrom, zone.toY, `top-${section.dividers.length + 1}`)
-
-  return {
+  const nextSection = {
     ...section,
     activeZoneId: bottomZone.id,
     dividers: [
@@ -283,6 +311,8 @@ export function splitZoneByShelf(section, zoneId, position = 'middle') {
       .concat(bottomZone, topZone)
       .sort((a, b) => a.fromY - b.fromY),
   }
+
+  return { section: nextSection, result: { ok: true, message: 'Полка добавлена. Теперь можно настроить верхнюю и нижнюю зоны отдельно.' } }
 }
 
 export function canPlaceDrawersInZone(project, zone, drawerCount = 3) {
@@ -290,18 +320,18 @@ export function canPlaceDrawersInZone(project, zone, drawerCount = 3) {
   const count = clamp(toNumber(drawerCount, 3), 1, 4)
   const requiredHeight = count * MIN_DRAWER_FACE_HEIGHT_MM
 
-  if (!zone) return { ok: false, reason: 'Выберите зону для ящиков' }
-  if (!rules.canUseDrawers) return { ok: false, reason: 'Для ящиков нужна глубина от 450 мм и ширина секции от 350 мм' }
+  if (!zone) return makeActionError('Выберите зону для ящиков.', 'Нажмите на область внутри шкафа или выберите её в списке зон.')
+  if (!rules.canUseDrawers) return makeActionError('Ящики здесь недоступны.', 'Для ящиков нужна глубина от 450 мм и ширина секции от 350 мм.')
   if (zone.height < requiredHeight) {
-    const possibleCount = Math.max(1, Math.floor(zone.height / MIN_DRAWER_FACE_HEIGHT_MM))
-    return {
-      ok: false,
-      reason: `Для ${count} ящиков нужно минимум ${requiredHeight} мм по высоте`,
-      suggestion: possibleCount < count ? { type: 'reduceDrawers', count: possibleCount } : null,
-    }
+    const possibleCount = Math.max(0, Math.floor(zone.height / MIN_DRAWER_FACE_HEIGHT_MM))
+    return makeActionError(
+      `Для ${count} ящиков нужно минимум ${requiredHeight} мм по высоте.`,
+      possibleCount > 0 ? `В этой зоне можно поставить ${possibleCount} ящ. или увеличить высоту зоны.` : 'Выберите более высокую зону или сначала разделите секцию иначе.',
+      possibleCount > 0 && possibleCount < count ? { type: 'reduceDrawers', count: possibleCount } : null,
+    )
   }
 
-  return { ok: true }
+  return { ok: true, message: `${count} ящ. помещаются в выбранную зону.` }
 }
 
 export function getRecommendedDrawerBlockHeight(sectionHeight, drawerCount = 3) {
@@ -330,14 +360,18 @@ export function selectZone(project, sectionId, zoneId) {
 export function splitActiveZone(project, position = 'middle') {
   const layout = normalizeZoneLayout(project, project.filling)
   const section = getSectionById(layout, layout.active?.sectionId)
-  const nextSection = splitZoneByShelf(section, layout.active?.zoneId || section.activeZoneId, position)
+  const { section: nextSection, result } = splitZoneByShelf(section, layout.active?.zoneId || section.activeZoneId, position)
+  if (!result?.ok) return { project, result }
   const nextLayout = updateSectionInLayout(layout, nextSection)
 
   return {
-    ...project,
-    activeSection: nextSection.index,
-    filling: syncProjectFillingFromLayout(project, nextLayout),
-    zoneLayout: nextLayout,
+    project: {
+      ...project,
+      activeSection: nextSection.index,
+      filling: syncProjectFillingFromLayout(project, nextLayout),
+      zoneLayout: nextLayout,
+    },
+    result,
   }
 }
 
@@ -346,7 +380,7 @@ export function setActiveZoneShelves(project, shelves) {
   const section = getSectionById(layout, layout.active?.sectionId)
   const zoneId = layout.active?.zoneId || section.activeZoneId
   const zone = section.zones.find(item => item.id === zoneId)
-  if (!zone) return project
+  if (!zone) return { project, result: makeActionError('Выберите зону для полок.', 'Нажмите на область внутри шкафа или выберите её в списке зон.') }
 
   const nextSection = setZoneContent(section, zoneId, {
     type: shelves > 0 ? 'shelves' : 'empty',
@@ -357,10 +391,13 @@ export function setActiveZoneShelves(project, shelves) {
   const nextLayout = updateSectionInLayout(layout, nextSection)
 
   return {
-    ...project,
-    activeSection: nextSection.index,
-    filling: syncProjectFillingFromLayout(project, nextLayout),
-    zoneLayout: nextLayout,
+    project: {
+      ...project,
+      activeSection: nextSection.index,
+      filling: syncProjectFillingFromLayout(project, nextLayout),
+      zoneLayout: nextLayout,
+    },
+    result: { ok: true },
   }
 }
 
@@ -370,7 +407,7 @@ export function setActiveZoneDrawers(project, drawers) {
   const zoneId = layout.active?.zoneId || section.activeZoneId
   const zone = section.zones.find(item => item.id === zoneId)
   const count = clamp(toNumber(drawers, 0), 0, 4)
-  if (!zone) return { project, result: { ok: false, reason: 'Выберите зону для ящиков' } }
+  if (!zone) return { project, result: makeActionError('Выберите зону для ящиков.', 'Нажмите на область внутри шкафа или выберите её в списке зон.') }
   if (count === 0) {
     const cleared = setZoneContent(section, zoneId, { type: 'empty' })
     const nextLayout = updateSectionInLayout(layout, cleared)
@@ -395,7 +432,7 @@ export function setActiveZoneDrawers(project, drawers) {
       filling: syncProjectFillingFromLayout(project, nextLayout),
       zoneLayout: nextLayout,
     },
-    result: { ok: true },
+    result,
   }
 }
 
@@ -405,9 +442,12 @@ export function setActiveZoneRail(project, enabled) {
   const zoneId = layout.active?.zoneId || section.activeZoneId
   const zone = section.zones.find(item => item.id === zoneId)
   const rules = getZoneRules(project)
-  if (!zone) return { project, result: { ok: false, reason: 'Выберите зону для штанги' } }
-  if (enabled && (!rules.canUseRail || zone.height < 700)) {
-    return { project, result: { ok: false, reason: 'Для штанги нужна глубина от 520 мм и высота зоны от 700 мм' } }
+  if (!zone) return { project, result: makeActionError('Выберите зону для штанги.', 'Нажмите на область внутри шкафа или выберите её в списке зон.') }
+  if (enabled && !rules.canUseRail) {
+    return { project, result: makeActionError('Штанга здесь недоступна.', 'Для обычной штанги нужна глубина от 520 мм и ширина секции от 400 мм.') }
+  }
+  if (enabled && zone.height < 700) {
+    return { project, result: makeActionError('В зоне мало высоты для штанги.', 'Для одежды на плечиках нужна зона от 700 мм. Выберите более высокую зону.') }
   }
 
   const nextSection = setZoneContent(section, zoneId, {
@@ -451,9 +491,12 @@ export function applyDrawerBlockToSection(project, sectionId, drawerCount = 3) {
   const blockHeight = getRecommendedDrawerBlockHeight(section.height, count)
   const splitY = blockHeight
   const baseZone = section.zones[0]
-  if (!baseZone || section.zones.length > 1) return { project, result: { ok: false, reason: 'Автоблок ящиков доступен для пустой неразделённой секции' } }
+  if (!baseZone || section.zones.length > 1) {
+    return { project, result: makeActionError('Автоблок ящиков доступен только для пустой неразделённой секции.', 'Выберите пустую секцию или поставьте ящики в конкретную зону через счётчик.') }
+  }
 
-  const splitSection = splitZoneByShelf(section, baseZone.id, splitY)
+  const { section: splitSection, result: splitResult } = splitZoneByShelf(section, baseZone.id, splitY)
+  if (!splitResult?.ok) return { project, result: splitResult }
   const bottomZone = splitSection.zones.find(zone => zone.fromY === 0) || splitSection.zones[0]
   const result = canPlaceDrawersInZone(project, bottomZone, count)
   if (!result.ok) return { project, result }
@@ -473,6 +516,6 @@ export function applyDrawerBlockToSection(project, sectionId, drawerCount = 3) {
       filling: syncProjectFillingFromLayout(project, nextLayout),
       zoneLayout: nextLayout,
     },
-    result: { ok: true },
+    result: { ok: true, message: 'Ящики добавлены снизу. Система автоматически поставила верхнюю полку блока.' },
   }
 }
