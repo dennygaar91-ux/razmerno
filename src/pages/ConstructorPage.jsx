@@ -6,7 +6,7 @@ import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
 import StatusBadge from '../components/constructor/StatusBadge'
 import Icon from '../icons/Icon'
 import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, EDGE_OPTIONS, HANDLE_OPTIONS, HARDWARE_OPTIONS } from '../data/constructorCatalog'
-import { getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
+import { calculatePrice, getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
 import { normalizeConstructorProject } from '../utils/constructorProjectNormalize'
 import { clearConstructorProject, loadConstructorProject, loadConstructorProjectId, loadConstructorProjectMeta, saveConstructorProject, saveConstructorProjectId } from '../utils/constructorStorage'
@@ -36,6 +36,10 @@ const FILLING_PRESETS = {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
+}
+
+function isFiniteNumber(value) {
+  return typeof value === 'number' && Number.isFinite(value)
 }
 
 function formatProjectDate(value) {
@@ -89,14 +93,16 @@ export default function ConstructorPage() {
   const estimateTimerRef = useRef(null)
 
   const summary = getProjectSummary(project)
-  const warnings = getWarnings(project)
+  const warnings = getWarnings(project, summary)
   const activeWarnings = getActiveSectionWarnings(project)
   const localBreakdown = useMemo(() => getPriceBreakdown(project, summary), [project, summary])
+  const localPrice = useMemo(() => calculatePrice(project, summary), [project, summary])
   const projectWithPrice = useMemo(() => {
-    const price = remoteEstimate?.totalPrice ?? localBreakdown.totalPrice
+    const remoteTotal = remoteEstimate?.totalPrice ?? remoteEstimate?.total
+    const price = isFiniteNumber(remoteTotal) ? remoteTotal : localPrice
     const priceBreakdown = remoteEstimate?.breakdown ?? localBreakdown
     return { ...project, price, priceBreakdown }
-  }, [project, localBreakdown, remoteEstimate])
+  }, [project, localBreakdown, localPrice, remoteEstimate])
   const status = getProjectStatus(syncState, projectMeta)
   const estimateStatus = getEstimateStatus(estimateState)
   const orderPayload = useMemo(() => buildConstructorPayload(projectWithPrice, { summary, warnings }), [projectWithPrice, summary, warnings])
