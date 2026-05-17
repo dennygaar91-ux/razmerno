@@ -10,7 +10,7 @@ function FallbackNote({ error }) {
   )
 }
 
-export default function CanvasSlot({ sceneProps, renderCanvas }) {
+export default function CanvasSlot({ sceneProps, renderCanvas, onZoneSelect }) {
   const canvasReady = typeof renderCanvas === 'function'
 
   const canvasContent = useMemo(() => {
@@ -29,7 +29,7 @@ export default function CanvasSlot({ sceneProps, renderCanvas }) {
   return (
     <div className={`rp-canvas-slot ${shouldRenderFallback ? 'is-fallback' : 'is-canvas'}`} data-renderer={shouldRenderFallback ? 'css' : 'three'}>
       <div className="rp-canvas-slot__stage">
-        {shouldRenderFallback ? <WardrobeMockup project={sceneProps} /> : canvasContent}
+        {shouldRenderFallback ? <WardrobeMockup project={sceneProps} onZoneSelect={onZoneSelect} /> : canvasContent}
       </div>
       {shouldRenderFallback && <FallbackNote error={canvasReady && !canvasContent} />}
     </div>
