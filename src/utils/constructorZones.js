@@ -16,6 +16,70 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(numeric) ? numeric : fallback
 }
 
+function cloneLayout(layout) {
+  return {
+    ...layout,
+    active: { ...layout.active },
+    sections: layout.sections.map(section => ({
+      ...section,
+      dividers: section.dividers.map(divider => ({ ...divider })),
+      zones: section.zones.map(zone => ({
+        ...zone,
+        content: { ...zone.content },
+      })),
+    })),
+  }
+}
+
+function getSectionById(layout, sectionId) {
+  return layout.sections.find(section => section.id === sectionId) || layout.sections[0]
+}
+
+function syncSectionLegacyFilling(section) {
+  return section.zones.reduce((acc, zone) => {
+    const content = zone.content || {}
+    return {
+      shelves: acc.shelves + toNumber(content.shelves, 0),
+      drawers: acc.drawers + toNumber(content.drawers, 0),
+      rail: acc.rail || Boolean(content.rail),
+    }
+  }, { shelves: section.dividers.length, drawers: 0, rail: false })
+}
+
+function syncProjectFillingFromLayout(project, layout) {
+  return layout.sections.map((section, index) => syncSectionLegacyFilling(section, project.filling?.[index]))
+}
+
+function updateSectionInLayout(layout, nextSection) {
+  return {
+    ...layout,
+    sections: layout.sections.map(section => section.id === nextSection.id ? nextSection : section),
+    active: {
+      type: 'zone',
+      sectionId: nextSection.id,
+      zoneId: nextSection.activeZoneId,
+    },
+  }
+}
+
+function setZoneContent(section, zoneId, content) {
+  return {
+    ...section,
+    activeZoneId: zoneId,
+    zones: section.zones.map(zone => zone.id === zoneId
+      ? {
+        ...zone,
+        content: {
+          type: content.type || 'empty',
+          shelves: toNumber(content.shelves, 0),
+          drawers: toNumber(content.drawers, 0),
+          rail: Boolean(content.rail),
+        },
+      }
+      : zone),
+  }
+}
+
 export function getZoneRules(project) {
   const height = toNumber(project?.dimensions?.height, 0)
   const width = toNumber(project?.dimensions?.width, 0)
@@ -244,4 +308,171 @@ export function getRecommendedDrawerBlockHeight(sectionHeight, drawerCount = 3) 
   const minHeight = drawerCount * MIN_DRAWER_FACE_HEIGHT_MM
   const target = Math.max(DEFAULT_DRAWER_BLOCK_HEIGHT_MM, minHeight)
   return clamp(target, minHeight, Math.max(minHeight, sectionHeight - MIN_ZONE_GAP_MM))
+}
+
+export function selectZone(project, sectionId, zoneId) {
+  const layout = normalizeZoneLayout(project, project.filling)
+  const section = getSectionById(layout, sectionId)
+  const zone = section.zones.find(item => item.id === zoneId) || section.zones[0]
+  const nextLayout = {
+    ...layout,
+    active: { type: 'zone', sectionId: section.id, zoneId: zone.id },
+    sections: layout.sections.map(item => item.id === section.id ? { ...item, activeZoneId: zone.id } : item),
+  }
+
+  return {
+    ...project,
+    activeSection: section.index,
+    zoneLayout: nextLayout,
+  }
+}
+
+export function splitActiveZone(project, position = 'middle') {
+  const layout = normalizeZoneLayout(project, project.filling)
+  const section = getSectionById(layout, layout.active?.sectionId)
+  const nextSection = splitZoneByShelf(section, layout.active?.zoneId || section.activeZoneId, position)
+  const nextLayout = updateSectionInLayout(layout, nextSection)
+
+  return {
+    ...project,
+    activeSection: nextSection.index,
+    filling: syncProjectFillingFromLayout(project, nextLayout),
+    zoneLayout: nextLayout,
+  }
+}
+
+export function setActiveZoneShelves(project, shelves) {
+  const layout = normalizeZoneLayout(project, project.filling)
+  const section = getSectionById(layout, layout.active?.sectionId)
+  const zoneId = layout.active?.zoneId || section.activeZoneId
+  const zone = section.zones.find(item => item.id === zoneId)
+  if (!zone) return project
+
+  const nextSection = setZoneContent(section, zoneId, {
+    type: shelves > 0 ? 'shelves' : 'empty',
+    shelves: clamp(toNumber(shelves, 0), 0, 8),
+    drawers: 0,
+    rail: false,
+  })
+  const nextLayout = updateSectionInLayout(layout, nextSection)
+
+  return {
+    ...project,
+    activeSection: nextSection.index,
+    filling: syncProjectFillingFromLayout(project, nextLayout),
+    zoneLayout: nextLayout,
+  }
+}
+
+export function setActiveZoneDrawers(project, drawers) {
+  const layout = normalizeZoneLayout(project, project.filling)
+  const section = getSectionById(layout, layout.active?.sectionId)
+  const zoneId = layout.active?.zoneId || section.activeZoneId
+  const zone = section.zones.find(item => item.id === zoneId)
+  const count = clamp(toNumber(drawers, 0), 0, 4)
+  if (!zone) return { project, result: { ok: false, reason: 'Выберите зону для ящиков' } }
+  if (count === 0) {
+    const cleared = setZoneContent(section, zoneId, { type: 'empty' })
+    const nextLayout = updateSectionInLayout(layout, cleared)
+    return { project: { ...project, filling: syncProjectFillingFromLayout(project, nextLayout), zoneLayout: nextLayout }, result: { ok: true } }
+  }
+
+  const result = canPlaceDrawersInZone(project, zone, count)
+  if (!result.ok) return { project, result }
+
+  const nextSection = setZoneContent(section, zoneId, {
+    type: 'drawers',
+    shelves: 0,
+    drawers: count,
+    rail: false,
+  })
+  const nextLayout = updateSectionInLayout(layout, nextSection)
+
+  return {
+    project: {
+      ...project,
+      activeSection: nextSection.index,
+      filling: syncProjectFillingFromLayout(project, nextLayout),
+      zoneLayout: nextLayout,
+    },
+    result: { ok: true },
+  }
+}
+
+export function setActiveZoneRail(project, enabled) {
+  const layout = normalizeZoneLayout(project, project.filling)
+  const section = getSectionById(layout, layout.active?.sectionId)
+  const zoneId = layout.active?.zoneId || section.activeZoneId
+  const zone = section.zones.find(item => item.id === zoneId)
+  const rules = getZoneRules(project)
+  if (!zone) return { project, result: { ok: false, reason: 'Выберите зону для штанги' } }
+  if (enabled && (!rules.canUseRail || zone.height < 700)) {
+    return { project, result: { ok: false, reason: 'Для штанги нужна глубина от 520 мм и высота зоны от 700 мм' } }
+  }
+
+  const nextSection = setZoneContent(section, zoneId, {
+    type: enabled ? 'rail' : 'empty',
+    shelves: 0,
+    drawers: 0,
+    rail: Boolean(enabled),
+  })
+  const nextLayout = updateSectionInLayout(layout, nextSection)
+
+  return {
+    project: {
+      ...project,
+      activeSection: nextSection.index,
+      filling: syncProjectFillingFromLayout(project, nextLayout),
+      zoneLayout: nextLayout,
+    },
+    result: { ok: true },
+  }
+}
+
+export function clearActiveZone(project) {
+  const layout = normalizeZoneLayout(project, project.filling)
+  const section = getSectionById(layout, layout.active?.sectionId)
+  const zoneId = layout.active?.zoneId || section.activeZoneId
+  const nextSection = setZoneContent(section, zoneId, { type: 'empty' })
+  const nextLayout = updateSectionInLayout(layout, nextSection)
+
+  return {
+    ...project,
+    activeSection: nextSection.index,
+    filling: syncProjectFillingFromLayout(project, nextLayout),
+    zoneLayout: nextLayout,
+  }
+}
+
+export function applyDrawerBlockToSection(project, sectionId, drawerCount = 3) {
+  const layout = normalizeZoneLayout(project, project.filling)
+  const section = getSectionById(layout, sectionId)
+  const count = clamp(toNumber(drawerCount, 3), 1, 4)
+  const blockHeight = getRecommendedDrawerBlockHeight(section.height, count)
+  const splitY = blockHeight
+  const baseZone = section.zones[0]
+  if (!baseZone || section.zones.length > 1) return { project, result: { ok: false, reason: 'Автоблок ящиков доступен для пустой неразделённой секции' } }
+
+  const splitSection = splitZoneByShelf(section, baseZone.id, splitY)
+  const bottomZone = splitSection.zones.find(zone => zone.fromY === 0) || splitSection.zones[0]
+  const result = canPlaceDrawersInZone(project, bottomZone, count)
+  if (!result.ok) return { project, result }
+
+  const nextSection = setZoneContent(splitSection, bottomZone.id, {
+    type: 'drawers',
+    shelves: 0,
+    drawers: count,
+    rail: false,
+  })
+  const nextLayout = updateSectionInLayout(layout, nextSection)
+
+  return {
+    project: {
+      ...project,
+      activeSection: nextSection.index,
+      filling: syncProjectFillingFromLayout(project, nextLayout),
+      zoneLayout: nextLayout,
+    },
+    result: { ok: true },
+  }
 }
