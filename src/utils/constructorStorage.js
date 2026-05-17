@@ -43,15 +43,15 @@ export function saveConstructorProject(project) {
   memoryMeta = meta
 
   const storage = getLocalStorage()
-  if (!storage) return true
+  if (!storage) return { ok: true, meta, persistent: false }
 
   try {
     storage.setItem(STORAGE_KEY, JSON.stringify(project))
     storage.setItem(PROJECT_META_KEY, JSON.stringify(meta))
-    return true
+    return { ok: true, meta, persistent: true }
   } catch (error) {
     console.warn('Failed to save constructor project:', error)
-    return true
+    return { ok: true, meta, persistent: false }
   }
 }
 
