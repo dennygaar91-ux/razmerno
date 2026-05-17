@@ -1,6 +1,6 @@
 import CanvasSlot from './CanvasSlot'
 
-export default function ViewerScene({ sceneProps, renderCanvas }) {
+export default function ViewerScene({ sceneProps, renderCanvas, onZoneSelect }) {
   const { dimensions, activeSection, meta } = sceneProps
 
   return (
@@ -17,11 +17,11 @@ export default function ViewerScene({ sceneProps, renderCanvas }) {
       </div>
 
       <span className="rp-ctor-size rp-ctor-size--h"><em>Высота</em>{dimensions.height} мм</span>
-      <CanvasSlot sceneProps={sceneProps} renderCanvas={renderCanvas} />
+      <CanvasSlot sceneProps={sceneProps} renderCanvas={renderCanvas} onZoneSelect={onZoneSelect} />
       <span className="rp-ctor-size rp-ctor-size--w"><em>Ширина</em>{dimensions.width} мм</span>
       <span className="rp-ctor-size rp-ctor-size--d"><em>Глубина</em>{dimensions.depth} мм</span>
 
-      <div className="rp-ref-scene__hint">Выберите секцию на модели или в карте ниже</div>
+      <div className="rp-ref-scene__hint">Нажмите на область шкафа, чтобы выбрать зону</div>
     </div>
   )
 }
