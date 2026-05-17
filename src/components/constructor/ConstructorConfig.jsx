@@ -8,7 +8,7 @@ const dimensionFields = [
 
 const fillingPresets = [
   ['clothes', 'Гардероб', 'штанга + полка', 'Для одежды на плечиках'],
-  ['shelves', 'Полки', '5 полок', 'Для белья, коробок и хранения'],
+  ['shelves', 'Полки в зоне', '5 полок', 'Заполнить выбранную область полками'],
   ['drawers', 'Ящики снизу', '3 ящика', 'Система сама добавит верхнюю полку'],
   ['empty', 'Пусто', 'очистить зону', 'Начать выбранную зону заново'],
 ]
@@ -127,7 +127,7 @@ function ZonePicker({ project, activeZone, onZoneSelect, onZoneSplit }) {
       <div className="rp-ref-zone-card__head">
         <div>
           <h3>Зоны секции</h3>
-          <p>Полка делит секцию на отдельные области. Выберите область и настройте её наполнение.</p>
+          <p>Разделительная полка создаёт отдельные области. Обычные полки ниже добавляются уже внутрь выбранной зоны.</p>
         </div>
         <span>{zones.length}</span>
       </div>
@@ -228,7 +228,7 @@ function FillingStep({ project, warnings, activeSectionWarnings, activeZone, zon
 
   return (
     <>
-      <StepHint title="Настройте секцию или зону" text="Сначала выберите секцию, затем область внутри неё. Полка делит секцию на верхнюю и нижнюю зоны." />
+      <StepHint title="Настройте секцию или зону" text="Выберите секцию и область внутри неё. Если нужно получить верхнюю и нижнюю область — используйте “Разделить полкой”." />
 
       <div className="rp-ref-block rp-ref-block--topless rp-ref-block--polished">
         <h3>Секция для редактирования</h3>
@@ -261,7 +261,7 @@ function FillingStep({ project, warnings, activeSectionWarnings, activeZone, zon
 
       <div className="rp-ref-block rp-ref-block--polished">
         <h3>Готовые сценарии</h3>
-        <p>Быстро заполните выбранную зону. Ящики снизу автоматически создают верхнюю полку.</p>
+        <p>Быстро заполните выбранную зону. “Ящики снизу” автоматически создаёт отдельный нижний блок с полкой сверху.</p>
         <div className="rp-ref-preset-grid rp-ref-preset-grid--polished">
           {fillingPresets.map(([id, title, text, description]) => (
             <button type="button" key={id} onClick={() => onPresetApply(id)}>
@@ -274,8 +274,8 @@ function FillingStep({ project, warnings, activeSectionWarnings, activeZone, zon
       </div>
 
       <div className="rp-ref-fields rp-ref-fields--compact rp-ref-fields--polished">
-        <CounterField label="Полки" value={selectedContent.shelves || 0} hint="новая полка делит выбранную зону" min={0} max={8} onMinus={() => onSectionPartChange('shelves', -1)} onPlus={() => onSectionPartChange('shelves', 1)} />
-        <CounterField label="Ящики" value={selectedContent.drawers || 0} hint="для ящиков нужна зона с верхней и нижней границей" min={0} max={4} onMinus={() => onSectionPartChange('drawers', -1)} onPlus={() => onSectionPartChange('drawers', 1)} />
+        <CounterField label="Полки внутри зоны" value={selectedContent.shelves || 0} hint="добавляются внутри выбранной области, не создавая новую зону" min={0} max={8} onMinus={() => onSectionPartChange('shelves', -1)} onPlus={() => onSectionPartChange('shelves', 1)} />
+        <CounterField label="Ящики" value={selectedContent.drawers || 0} hint="для ящиков нужна подходящая высота, ширина и глубина" min={0} max={4} onMinus={() => onSectionPartChange('drawers', -1)} onPlus={() => onSectionPartChange('drawers', 1)} />
       </div>
 
       <div className="rp-ref-block rp-ref-block--polished">
