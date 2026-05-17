@@ -3,7 +3,9 @@ import Icon from '../../icons/Icon'
 import { getEstimateRows } from '../../utils/constructorPricing'
 
 function formatPrice(value) {
-  return new Intl.NumberFormat('ru-RU').format(value)
+  const numericValue = Number(value)
+  const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+  return new Intl.NumberFormat('ru-RU').format(safeValue)
 }
 
 function EstimateRow({ row, total }) {
