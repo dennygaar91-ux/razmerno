@@ -128,6 +128,12 @@ function SummaryStatusList({ warnings, warningGroups, isReady }) {
   )
 }
 
+const nextSteps = [
+  ['1', 'Проверим проект', 'Технолог посмотрит размеры, секции и выбранные материалы.'],
+  ['2', 'Уточним стоимость', 'Подтвердим цену после проверки материалов, фурнитуры и работ.'],
+  ['3', 'Подготовим комплект', 'После согласования подготовим детали, кромку и фурнитуру для сборки.'],
+]
+
 export default function ConstructorSummary({ project, summary, warnings = [], estimateState = 'idle', onCheckout }) {
   const [estimateOpen, setEstimateOpen] = useState(false)
 
@@ -141,11 +147,11 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
   ]
 
   const kitItems = [
-    ['Корпус', `${summary.parts ?? 36} деталей`],
-    ['Полки', `${summary.shelves} шт.`],
+    ['Детали корпуса', `${summary.parts ?? 36} позиций`],
+    ['Полки и перегородки', `${summary.shelves} полок`],
     ['Ящики', `${summary.drawers} шт.`],
-    ['Фасады', '0 шт.'],
-    ['Фурнитура', '1 компл.'],
+    ['Кромка', project.material?.edge ?? 'ABS по выбранной спецификации'],
+    ['Фурнитура', project.material?.hardware ?? '1 комплект'],
   ]
 
   const dimensionsDone = project.dimensions.height > 0 && project.dimensions.width > 0 && project.dimensions.depth > 0
@@ -177,20 +183,24 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
   const statusClass = isCalculating ? 'is-loading' : hasEstimateError ? 'has-error' : isReady ? 'is-ready' : warnings.length ? 'has-warning' : 'is-neutral'
 
   return (
-    <aside className={`rp-ctor-summary rp-ref-summary rp-target-summary ${statusClass}`}>
-      <section className="rp-target-card rp-target-ready-card">
+    <aside className={`rp-ctor-summary rp-ref-summary rp-target-summary rp-summary-trust ${statusClass}`}>
+      <section className="rp-target-card rp-target-ready-card rp-summary-trust-card">
         <div>
           <span>Ваш проект</span>
-          <h3>Текущая конфигурация</h3>
-          <p>{isReady ? 'Параметры заполнены. Можно перейти к заявке.' : criticalCount ? 'Есть ограничения, которые лучше исправить до заявки.' : 'Проверьте размеры, наполнение и материалы перед заявкой.'}</p>
+          <h3>{isReady ? 'Можно отправлять' : 'Почти готово'}</h3>
+          <p>{isReady ? 'Параметры заполнены. Заявку можно передать на проверку технологом.' : criticalCount ? 'Есть ограничения, которые лучше исправить до заявки.' : 'Проверьте размеры, наполнение и материалы перед заявкой.'}</p>
         </div>
       </section>
 
-      <section className="rp-target-card rp-target-price-card">
-        <p>Стоимость комплекта</p>
+      <section className="rp-target-card rp-target-price-card rp-summary-price-card">
+        <p>Предварительная стоимость</p>
         <strong>{formatPrice(project.price)} ₽</strong>
-        <span>{isCalculating ? 'Пересчитываем…' : 'Предварительно, по текущим размерам и наполнению'}</span>
-        <button type="button" onClick={onCheckout}>В корзину</button>
+        <span>{isCalculating ? 'Пересчитываем…' : 'Расчёт по текущим размерам, наполнению и выбранной спецификации'}</span>
+        <div className="rp-summary-price-card__trust">
+          <small>Не финальный счёт</small>
+          <small>Проверка технологом</small>
+        </div>
+        <button type="button" onClick={onCheckout}>Отправить заявку</button>
       </section>
 
       <section className="rp-target-card rp-target-project-card">
@@ -215,15 +225,31 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         <SummaryStatusList warnings={warnings} warningGroups={warningGroups} isReady={isReady} />
       </section>
 
-      <section className="rp-target-card rp-target-kit-card">
+      <section className="rp-target-card rp-target-kit-card rp-summary-kit-card">
         <div className="rp-target-kit-head">
-          <h3>Комплект <span>/ Что получите</span></h3>
-          <button type="button" onClick={() => setEstimateOpen(open => !open)}>{estimateOpen ? 'Скрыть' : 'Подробнее'}</button>
+          <h3>Состав комплекта</h3>
+          <button type="button" onClick={() => setEstimateOpen(open => !open)}>{estimateOpen ? 'Скрыть смету' : 'Показать смету'}</button>
         </div>
         <div className="rp-target-kit-items">
           {kitItems.map(([title, text]) => (
             <div key={title}>
               <i />
+              <span>{title}</span>
+              <small>{text}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rp-target-card rp-summary-next-card">
+        <div className="rp-summary-next-card__head">
+          <span>После заявки</span>
+          <h3>Что будет дальше</h3>
+        </div>
+        <div className="rp-summary-next-card__steps">
+          {nextSteps.map(([num, title, text]) => (
+            <div key={num}>
+              <b>{num}</b>
               <span>{title}</span>
               <small>{text}</small>
             </div>
