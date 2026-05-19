@@ -8,10 +8,10 @@ const dimensionFields = [
 
 const fillingPresets = [
   ['clothes', 'Гардероб', 'верхняя полка + штанга', 'Разделим секцию и соберём сценарий одежды'],
-  ['shelves', 'Полки', '4–5 полок', 'Заполнить выбранную зону полками'],
+  ['shelves', 'Полки', '4–5 полок', 'Заполнить выбранную секцию полками'],
   ['drawers', 'Ящики снизу', 'блок из 3 ящиков', 'Снизу ящики, сверху разделительная полка'],
   ['combo', 'Комбо', 'ящики + полки', 'Снизу ящики, сверху полки'],
-  ['empty', 'Пусто', 'очистить зону', 'Очистить выбранную зону без удаления полок'],
+  ['empty', 'Пусто', 'очистить секцию', 'Очистить выбранную секцию'],
 ]
 
 function CounterField({ label, value, hint, unit = '', min, max, onMinus, onPlus }) {
@@ -105,7 +105,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
         <CounterField
           label="Секции"
           value={project.sections}
-          hint="от 1 до 6 вертикальных зон"
+          hint="от 1 до 6 вертикальных секций"
           min={1}
           max={6}
           onMinus={() => onSectionsChange(-1)}
@@ -116,12 +116,12 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
       <div className="rp-ref-block rp-ref-block--polished">
         <h3>Ширина секции</h3>
         <p>Сейчас каждая секция примерно по {sectionWidth} мм</p>
-        <div className="rp-ref-section-widths" style={{ gridTemplateColumns: `repeat(${project.sections}, 1fr)` }}>
+        <div className="rp-ref-section-width-diagram" aria-label="Пропорции секций">
           {Array.from({ length: project.sections }, (_, index) => (
-            <button type="button" key={index}>
-              <span>{index + 1}</span>
-              <b>{sectionWidth} мм</b>
-            </button>
+            <span key={index} style={{ flex: 1 }}>
+              <b>{index + 1}</b>
+              <em>{sectionWidth} мм</em>
+            </span>
           ))}
         </div>
       </div>
@@ -131,13 +131,10 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
   )
 }
 
-function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply, onCopySection, onApplySectionToAll, onZoneSelect, onZoneSplit, onZoneShelvesBoost, onZoneDrawersPreset, onZoneRailToggle, onZoneClear, zoneHints, activeZone }) {
+function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onPresetApply, onCopySection, onApplySectionToAll, onClearSection, onZoneRailToggle }) {
   const activeSection = project.filling[project.activeSection - 1] ?? { shelves: 0, drawers: 0, rail: false }
-  const railDisabled = project.dimensions.depth < 520
+  const railDisabled = project.dimensions.depth < 550
 
-
-  const activeSectionId = `section-${project.activeSection}`
-  const activeZones = project.zoneLayout?.sections?.find(section => section.id === activeSectionId)?.zones ?? []
   const activePreset = activeSection.rail && activeSection.shelves <= 2 && activeSection.drawers === 0
     ? 'Гардероб'
     : activeSection.shelves >= 4 && !activeSection.drawers && !activeSection.rail
@@ -150,22 +147,30 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
 
   return (
     <>
-      <StepHint title="Настройте одну секцию" text="Выберите секцию ниже, затем добавьте полки, ящики или штангу. Изменения сразу видны в центре." />
+      <StepHint title="Настройте выбранную секцию" text="Выберите секцию и добавьте полки, ящики или штангу. Активная секция подсвечивается в центре и на карте." />
 
       <div className="rp-ref-block rp-ref-block--topless rp-ref-block--polished">
         <h3>Секция для редактирования</h3>
-        <p>Активная секция подсвечивается в визуализации</p>
+        <p>Клик по секции синхронно меняет левую панель, viewer и карту снизу.</p>
         <div className="rp-ref-section-tabs">
-          {project.filling.map((section, index) => (
-            <button className={project.activeSection === index + 1 ? 'is-active' : ''} type="button" key={index} onClick={() => onSectionSelect(index + 1)}>
-              <span>{index + 1}</span>
-              <small>{section.shelves}П · {section.drawers}Я · {section.rail ? 'Ш' : '—'}</small>
-            </button>
-          ))}
+          {project.filling.map((section, index) => {
+            const details = [
+              section.shelves ? `${section.shelves} полок` : 'без полок',
+              section.drawers ? `${section.drawers} ящиков` : 'без ящиков',
+              section.rail ? 'штанга' : 'без штанги',
+            ].join(', ')
+
+            return (
+              <button className={project.activeSection === index + 1 ? 'is-active' : ''} type="button" key={index} onClick={() => onSectionSelect(index + 1)} title={`Секция ${index + 1}: ${details}`}>
+                <span>{index + 1}</span>
+                <small>{details}</small>
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      <div className="rp-ref-active-section rp-ref-active-section--polished">
+      <div className="rp-ref-active-section rp-ref-active-section--polished rp-ref-active-section--with-actions">
         <div>
           <span>Секция {project.activeSection}</span>
           <b>{activePreset}</b>
@@ -173,32 +178,16 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
         <strong>{activeSection.shelves} полок · {activeSection.drawers} ящиков · {activeSection.rail ? 'штанга' : 'без штанги'}</strong>
       </div>
 
-      {activeZones.length > 0 && (
-        <div className="rp-ref-block rp-ref-block--polished">
-          <h3>Зоны секции</h3>
-          <p>Выберите зону для настройки содержимого</p>
-          <div className="rp-ref-zone-tabs">
-            {activeZones.map(zone => (
-              <button key={zone.id} type="button" className={activeZone?.id === zone.id ? 'is-active' : ''} onClick={() => onZoneSelect(activeSectionId, zone.id)}>
-                <span>{zone.label}</span>
-                <small>{Math.round(zone.height)} мм</small>
-              </button>
-            ))}
-          </div>
+      <div className="rp-ref-block rp-ref-block--polished rp-ref-section-direct-actions">
+        <h3>Действия для секции {project.activeSection}</h3>
+        <p>Эти кнопки применяются только к активной секции.</p>
+        <div className="rp-ref-zone-actions rp-ref-zone-actions--section">
+          <button type="button" onClick={() => onSectionPartChange('shelves', 1)}>+ Полка</button>
+          <button type="button" onClick={() => onSectionPartChange('drawers', 1)}>+ Ящик</button>
+          <button type="button" onClick={onZoneRailToggle} disabled={railDisabled}>{activeSection.rail ? 'Убрать штангу' : 'Штанга'}</button>
+          <button type="button" onClick={onClearSection}>Очистить</button>
         </div>
-      )}
-
-      <div className="rp-ref-block rp-ref-block--polished">
-        <h3>Что сделать с выбранной зоной?</h3>
-        <p>Основные действия для быстрого сценария без ручной деталировки.</p>
-        <div className="rp-ref-zone-actions">
-          <button type="button" onClick={() => onZoneSplit('middle')} disabled={!zoneHints?.canSplit}>Разделить полкой</button>
-          <button type="button" onClick={onZoneShelvesBoost}>Полки внутри зоны</button>
-          <button type="button" onClick={onZoneDrawersPreset} disabled={!zoneHints?.canDrawers}>Ящики</button>
-          <button type="button" onClick={onZoneRailToggle} disabled={!zoneHints?.canRail && !activeZone?.content?.rail}>{activeZone?.content?.rail ? 'Убрать штангу' : 'Штанга'}</button>
-          <button type="button" onClick={onZoneClear}>Очистить выбранную зону</button>
-        </div>
-        {zoneHints?.splitReason && <p className="rp-ref-zone-hint">{zoneHints.splitReason}</p>}
+        {railDisabled && <p className="rp-ref-zone-hint">Для штанги нужна глубина секции от 550 мм.</p>}
       </div>
 
       <div className="rp-ref-section-tools">
@@ -222,16 +211,7 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
 
       <div className="rp-ref-fields rp-ref-fields--compact rp-ref-fields--polished">
         <CounterField label="Полки" value={activeSection.shelves} hint="минимальный комфортный шаг — 200 мм" min={0} max={8} onMinus={() => onSectionPartChange('shelves', -1)} onPlus={() => onSectionPartChange('shelves', 1)} />
-        <CounterField label="Ящики" value={activeSection.drawers} hint="ориентир фасада — от 200 мм" min={0} max={4} onMinus={() => onSectionPartChange('drawers', -1)} onPlus={() => onSectionPartChange('drawers', 1)} />
-      </div>
-
-      <div className="rp-ref-block rp-ref-block--polished">
-        <h3>Штанга</h3>
-        <p>{railDisabled ? 'Недоступна при глубине меньше 520 мм' : 'Подходит для одежды на плечиках'}</p>
-        <button className={`rp-ref-toggle-option ${activeSection.rail ? 'is-active' : ''}`} type="button" disabled={railDisabled} onClick={onZoneRailToggle}>
-          <span>{activeSection.rail ? 'Штанга включена' : 'Добавить штангу'}</span>
-          <b />
-        </button>
+        <CounterField label="Ящики" value={activeSection.drawers} hint="минимальная высота фасада — 150 мм" min={0} max={4} onMinus={() => onSectionPartChange('drawers', -1)} onPlus={() => onSectionPartChange('drawers', 1)} />
       </div>
 
       <WarningList warnings={activeSectionWarnings?.length ? activeSectionWarnings : warnings} />
@@ -265,7 +245,7 @@ function MaterialsStep({ project, materials = [], edgeOptions = [], handleOption
 
   return (
     <>
-      <StepHint title="Соберите спецификацию" text="Корпус, кромка, открывание и фурнитура уже разнесены так, чтобы позже подключить каталог и админку." />
+      <StepHint title="Соберите спецификацию" text="При выборе декора цвет шкафа меняется в предпросмотре. Это помогает проверить внешний вид до заявки." />
 
       <div className="rp-ref-selected-material rp-ref-selected-material--spec">
         <i className={`rp-ref-material-swatch rp-ref-material-swatch--${selectedMaterial.tone}`} />
@@ -349,14 +329,8 @@ export default function ConstructorConfig({
   onPresetApply,
   onCopySection,
   onApplySectionToAll,
-  onZoneSelect,
-  onZoneSplit,
-  onZoneShelvesBoost,
-  onZoneDrawersPreset,
+  onClearSection,
   onZoneRailToggle,
-  onZoneClear,
-  zoneHints,
-  activeZone,
 }) {
   const stepContent = {
     dimensions: {
@@ -372,7 +346,7 @@ export default function ConstructorConfig({
       eyebrow: 'Шаг 2 из 3',
       title: 'Наполнение секций',
       text: 'Соберите внутреннюю логику шкафа: полки, ящики и штанги в каждой секции.',
-      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={activeSectionWarnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} onCopySection={onCopySection} onApplySectionToAll={onApplySectionToAll} onZoneSelect={onZoneSelect} onZoneSplit={onZoneSplit} onZoneShelvesBoost={onZoneShelvesBoost} onZoneDrawersPreset={onZoneDrawersPreset} onZoneRailToggle={onZoneRailToggle} onZoneClear={onZoneClear} zoneHints={zoneHints} activeZone={activeZone} />,
+      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={activeSectionWarnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onPresetApply={onPresetApply} onCopySection={onCopySection} onApplySectionToAll={onApplySectionToAll} onClearSection={onClearSection} onZoneRailToggle={onZoneRailToggle ?? onRailToggle} />,
       next: 'Далее: материалы',
     },
     materials: {
