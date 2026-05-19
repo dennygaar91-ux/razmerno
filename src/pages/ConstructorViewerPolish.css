@@ -32,6 +32,7 @@
   color: #111 !important;
   box-shadow: 0 10px 24px rgba(36, 31, 24, .08) !important;
   backdrop-filter: blur(10px) !important;
+  pointer-events: none !important;
 }
 
 .rp-canvas-slot {
@@ -39,7 +40,7 @@
   inset: 58px 34px 46px !important;
   display: grid !important;
   place-items: center !important;
-  pointer-events: none !important;
+  pointer-events: auto !important;
 }
 
 .rp-canvas-slot__stage {
@@ -69,6 +70,7 @@
   display: grid !important;
   gap: 2px !important;
   text-align: right !important;
+  pointer-events: none !important;
 }
 
 .rp-canvas-slot__fallback-note span {
@@ -96,6 +98,7 @@
   filter: drop-shadow(0 30px 34px rgba(70, 54, 34, .16)) !important;
   border-radius: 10px !important;
   background: transparent !important;
+  pointer-events: auto !important;
 }
 
 .rp-ctor-wardrobe::after,
@@ -109,6 +112,7 @@
   border-radius: 999px !important;
   background: radial-gradient(ellipse at center, rgba(61, 45, 25, .24) 0%, rgba(61, 45, 25, .09) 46%, transparent 72%) !important;
   z-index: -1 !important;
+  pointer-events: none !important;
 }
 
 .rp-ctor-wardrobe--renderlike .rp-ctor-top {
@@ -146,6 +150,7 @@
   background: rgba(17, 17, 17, .92) !important;
   color: #fff !important;
   box-shadow: 0 12px 24px rgba(17, 17, 17, .16) !important;
+  pointer-events: none !important;
 }
 
 .rp-ctor-zone {
@@ -154,6 +159,7 @@
     linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .04)),
     var(--wardrobe-panel-soft, #ead7b8) !important;
   border-color: var(--wardrobe-line, rgba(100, 67, 30, .24)) !important;
+  cursor: pointer !important;
 }
 
 .rp-ctor-zone.is-active {
@@ -161,6 +167,11 @@
     linear-gradient(180deg, rgba(255, 255, 255, .32), rgba(255, 255, 255, .06)),
     var(--wardrobe-panel-soft, #ead7b8) !important;
   border-color: rgba(17, 17, 17, .74) !important;
+}
+
+.rp-ctor-zone:focus-visible {
+  outline: 2px solid #111 !important;
+  outline-offset: 3px !important;
 }
 
 .rp-wardrobe-shelf {
@@ -171,6 +182,7 @@
     var(--wardrobe-panel, #d7b98b) !important;
   border: 1px solid var(--wardrobe-line, rgba(100, 67, 30, .22)) !important;
   box-shadow: 0 4px 9px rgba(70, 54, 34, .08) !important;
+  pointer-events: none !important;
 }
 
 .rp-wardrobe-drawer {
@@ -181,6 +193,7 @@
     var(--wardrobe-panel, #d7b98b) !important;
   border: 1px solid var(--wardrobe-line, rgba(100, 67, 30, .25)) !important;
   box-shadow: inset 0 -1px 0 rgba(70, 54, 34, .08) !important;
+  pointer-events: none !important;
 }
 
 .rp-wardrobe-rail {
@@ -188,6 +201,11 @@
   border-radius: 999px !important;
   background: linear-gradient(90deg, #bfc2c0, #f6f7f4, #a9aba8) !important;
   box-shadow: 0 3px 8px rgba(40, 40, 40, .16) !important;
+  pointer-events: none !important;
+}
+
+.rp-wardrobe-empty {
+  pointer-events: none !important;
 }
 
 .rp-ref-scene--polished .rp-ctor-size,
@@ -205,6 +223,7 @@
   font-size: 11px !important;
   font-weight: 950 !important;
   box-shadow: 0 10px 24px rgba(36, 31, 24, .07) !important;
+  pointer-events: none !important;
 }
 
 .rp-ref-scene--polished .rp-ctor-size em,
@@ -247,6 +266,7 @@
   align-items: center !important;
   gap: 10px !important;
   box-shadow: 0 10px 24px rgba(36, 31, 24, .06) !important;
+  pointer-events: none !important;
 }
 
 .rp-ref-scene__badge span {
@@ -271,6 +291,7 @@
   display: flex !important;
   align-items: center !important;
   gap: 6px !important;
+  pointer-events: none !important;
 }
 
 .rp-ref-scene__meta span {
@@ -310,6 +331,7 @@
   font-size: 10px !important;
   font-weight: 800 !important;
   white-space: nowrap !important;
+  pointer-events: none !important;
 }
 
 /* Stage 2.2 — meaningful 3D / 2D modes */
@@ -376,6 +398,7 @@
   text-transform: uppercase !important;
   letter-spacing: .08em !important;
   white-space: nowrap !important;
+  pointer-events: none !important;
 }
 
 .rp-ref-technical-grid__label--top {
