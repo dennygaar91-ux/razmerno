@@ -36,14 +36,41 @@ function buildZoneLayout(project) {
 
   return {
     version: 1,
+    dimensions: { ...project.dimensions },
+    sectionsCount: project.sections,
     active: { type: 'zone', sectionId: sectionIdFromIndex(project.activeSection - 1), zoneId: `${sectionIdFromIndex(project.activeSection - 1)}-zone-main` },
     sections,
   }
 }
 
+function isZoneLayoutStale(project) {
+  const layout = project.zoneLayout
+  if (!layout || !Array.isArray(layout.sections)) return true
+  if (layout.sections.length !== project.sections) return true
+  if (layout.sectionsCount && layout.sectionsCount !== project.sections) return true
+
+  const expectedSectionWidth = Math.round(project.dimensions.width / project.sections)
+  const dimensions = layout.dimensions
+
+  if (dimensions) {
+    if (dimensions.width !== project.dimensions.width) return true
+    if (dimensions.height !== project.dimensions.height) return true
+    if (dimensions.depth !== project.dimensions.depth) return true
+  }
+
+  return layout.sections.some((section, index) => (
+    section.index !== index + 1
+    || section.width !== expectedSectionWidth
+    || section.height !== project.dimensions.height
+    || !Array.isArray(section.zones)
+    || section.zones.length === 0
+    || section.zones.some(zone => zone.toY > project.dimensions.height || zone.height <= 0)
+  ))
+}
+
 function ensureLayout(project) {
   const next = clone(project)
-  if (!next.zoneLayout || !Array.isArray(next.zoneLayout.sections)) next.zoneLayout = buildZoneLayout(next)
+  if (isZoneLayoutStale(next)) next.zoneLayout = buildZoneLayout(next)
   return next
 }
 
