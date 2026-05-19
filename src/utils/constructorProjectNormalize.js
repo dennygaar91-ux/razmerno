@@ -1,5 +1,5 @@
 import { DEFAULT_PROJECT, EDGE_OPTIONS, HANDLE_OPTIONS, HARDWARE_OPTIONS, MATERIALS } from '../data/constructorCatalog'
-import { normalizeZoneLayout } from './constructorZones'
+import { ensureZoneLayout } from './constructorZones'
 
 function normalizeNumber(value, fallback) {
   const parsed = Number(value)
@@ -28,7 +28,8 @@ export function normalizeConstructorProject(project) {
   const hardware = HARDWARE_OPTIONS.find(item => item.id === source.material?.hardwareId) ?? HARDWARE_OPTIONS[0]
   const fillingSource = Array.isArray(source.filling) && source.filling.length ? source.filling : DEFAULT_PROJECT.filling
   const filling = Array.from({ length: sections }, (_, index) => normalizeSection(fillingSource[index] ?? { shelves: 1, drawers: 0, rail: false }))
-  const normalizedBase = {
+
+  const normalized = {
     ...DEFAULT_PROJECT,
     ...source,
     dimensions,
@@ -57,8 +58,5 @@ export function normalizeConstructorProject(project) {
     },
   }
 
-  return {
-    ...normalizedBase,
-    zoneLayout: normalizeZoneLayout(normalizedBase, filling),
-  }
+  return ensureZoneLayout(normalized)
 }

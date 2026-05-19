@@ -9,8 +9,8 @@ import { DEFAULT_PROJECT, DIMENSION_LIMITS, MATERIALS, EDGE_OPTIONS, HANDLE_OPTI
 import { calculatePrice, getActiveSectionWarnings, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
 import { buildConstructorPayload } from '../utils/constructorPayload'
 import { normalizeConstructorProject } from '../utils/constructorProjectNormalize'
+import { applyComboPresetToSection, applyDrawerBlockToSection, applyShelvesPresetToZone, applyWardrobePresetToSection, clearActiveZone, getActiveZone, getActiveZoneHints, selectZone, setActiveZoneDrawers, setActiveZoneRail, setActiveZoneShelves, splitActiveZone } from '../utils/constructorZones'
 import { clearConstructorProject, loadConstructorProject, loadConstructorProjectId, loadConstructorProjectMeta, saveConstructorProject, saveConstructorProjectId } from '../utils/constructorStorage'
-import { applyDrawerBlockToSection, clearActiveZone, getActiveZone, getActiveZoneHints, selectZone, setActiveZoneDrawers, setActiveZoneRail, setActiveZoneShelves, splitActiveZone } from '../utils/constructorZones'
 import { calculateConstructorEstimate } from '../services/constructorEstimate'
 import { loadConstructorProjectRemote, saveConstructorProjectRemote } from '../services/constructorProjects'
 import './ConstructorPage.css'
@@ -21,12 +21,20 @@ import './ConstructorAdaptive.css'
 import './ConstructorSummaryProduct.css'
 import './ConstructorTargetAlignment.css'
 import './ConstructorTargetCritical.css'
+import './ConstructorFinalUI.css'
 
 const FLOW_STEPS = [
   { id: 'dimensions', num: '1', title: 'Размеры', text: 'Укажите габариты и секции' },
   { id: 'filling', num: '2', title: 'Наполнение', text: 'Выберите полки, ящики и штанги' },
   { id: 'materials', num: '3', title: 'Материалы', text: 'Подберите декоры и фурнитуру' },
 ]
+
+const FILLING_PRESETS = {
+  clothes: { shelves: 1, drawers: 0, rail: true },
+  shelves: { shelves: 5, drawers: 0, rail: false },
+  drawers: { shelves: 1, drawers: 3, rail: false },
+  empty: { shelves: 0, drawers: 0, rail: false },
+}
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
@@ -65,17 +73,21 @@ function getProjectStatus(syncState, meta) {
   return { label: 'Новый проект', tone: 'neutral', text: 'Автосохранение включено' }
 }
 
+function applyZoneUpdate(result, setProject, setNotice) {
+  if (!result) return
+  if (result.ok) {
+    setProject(result.project)
+    return
+  }
+  setProject(result.project)
+  if (result.reason) setNotice(result.reason)
+}
+
 function getEstimateStatus(estimateState) {
   if (estimateState === 'loading') return { label: 'Пересчитываем', tone: 'loading' }
   if (estimateState === 'error') return { label: 'Предварительная цена', tone: 'error' }
   if (estimateState === 'success') return { label: 'Цена обновлена', tone: 'success' }
   return { label: 'Цена сразу', tone: 'neutral' }
-}
-
-function getActionNotice(result) {
-  if (!result) return ''
-  if (result.ok) return result.message || ''
-  return [result.reason, result.action].filter(Boolean).join(' ')
 }
 
 export default function ConstructorPage() {
@@ -95,12 +107,10 @@ export default function ConstructorPage() {
   const summary = getProjectSummary(project)
   const warnings = getWarnings(project, summary)
   const activeWarnings = getActiveSectionWarnings(project)
-  const activeZone = getActiveZone(project)
-  const zoneHints = getActiveZoneHints(project)
   const localBreakdown = useMemo(() => getPriceBreakdown(project, summary), [project, summary])
   const localPrice = useMemo(() => calculatePrice(project, summary), [project, summary])
   const projectWithPrice = useMemo(() => {
-    const remoteTotal = remoteEstimate?.totalPrice ?? remoteEstimate?.total
+    const remoteTotal = remoteEstimate?.totalPrice ?? remoteEstimate?.total ?? localPrice
     const price = isFiniteNumber(remoteTotal) ? remoteTotal : localPrice
     const priceBreakdown = remoteEstimate?.breakdown ?? localBreakdown
     return { ...project, price, priceBreakdown }
@@ -150,26 +160,6 @@ export default function ConstructorPage() {
     setNotice('')
   }
 
-  function updateZoneProject(updater) {
-    setProject(current => normalizeConstructorProject(updater(current)))
-    setNotice('')
-  }
-
-  function updateZoneProjectWithResult(updater) {
-    setProject(current => {
-      const { project: nextProject, result } = updater(current)
-      const nextNotice = getActionNotice(result)
-
-      if (!result?.ok) {
-        setNotice(nextNotice || 'Это действие нельзя применить к выбранной зоне.')
-        return current
-      }
-
-      setNotice(nextNotice)
-      return normalizeConstructorProject(nextProject)
-    })
-  }
-
   function updateDimensions(key, delta) {
     updateProject(current => ({
       ...current,
@@ -185,81 +175,50 @@ export default function ConstructorPage() {
   }
 
   function setActiveSection(sectionNumber) {
-    updateZoneProject(current => {
-      const safeSection = clamp(sectionNumber, 1, current.sections)
-      const section = current.zoneLayout?.sections?.[safeSection - 1]
-      if (!section) return { ...current, activeSection: safeSection }
-
-      const zoneId = section.activeZoneId || section.zones?.[0]?.id
-      return zoneId ? selectZone(current, section.id, zoneId) : { ...current, activeSection: safeSection }
-    })
-  }
-
-  function selectActiveZone(sectionId, zoneId) {
-    updateZoneProject(current => selectZone(current, sectionId, zoneId))
-  }
-
-  function splitCurrentZone(position = 'middle') {
-    updateZoneProjectWithResult(current => splitActiveZone(current, position))
+    updateProject(current => ({ ...current, activeSection: clamp(sectionNumber, 1, current.sections) }))
   }
 
   function updateSectionPart(type, delta) {
-    if (type === 'shelves') {
-      updateZoneProjectWithResult(current => {
-        const active = getActiveZone(current)
-        const currentShelves = active?.zone?.content?.shelves ?? 0
-        return setActiveZoneShelves(current, Math.max(0, currentShelves + delta))
+    updateProject(current => {
+      const index = current.activeSection - 1
+      const filling = current.filling.map((section, sectionIndex) => {
+        if (sectionIndex !== index) return section
+        return { ...section, [type]: Math.max(0, section[type] + delta) }
       })
-      return
-    }
-
-    if (type === 'drawers') {
-      updateZoneProjectWithResult(current => {
-        const active = getActiveZone(current)
-        const currentDrawers = active?.zone?.content?.drawers ?? 0
-        return setActiveZoneDrawers(current, Math.max(0, currentDrawers + delta))
-      })
-    }
+      return { ...current, filling }
+    })
   }
 
   function toggleRail() {
-    updateZoneProjectWithResult(current => {
-      const active = getActiveZone(current)
-      const nextEnabled = !active?.zone?.content?.rail
-      return setActiveZoneRail(current, nextEnabled)
+    updateProject(current => {
+      const index = current.activeSection - 1
+      const filling = current.filling.map((section, sectionIndex) => (
+        sectionIndex === index ? { ...section, rail: !section.rail } : section
+      ))
+      return { ...current, filling }
     })
   }
 
   function clearActiveSection() {
-    updateZoneProject(current => clearActiveZone(current))
+    updateProject(current => {
+      const index = current.activeSection - 1
+      const filling = current.filling.map((section, sectionIndex) => (
+        sectionIndex === index ? { shelves: 0, drawers: 0, rail: false } : section
+      ))
+      return { ...current, filling }
+    })
   }
 
   function applyPreset(presetName) {
-    if (presetName === 'drawers') {
-      updateZoneProjectWithResult(current => {
-        const activeSectionId = current.zoneLayout?.active?.sectionId || current.zoneLayout?.sections?.[current.activeSection - 1]?.id
-        return applyDrawerBlockToSection(current, activeSectionId, 3)
-      })
-      return
-    }
-
-    if (presetName === 'shelves') {
-      updateZoneProjectWithResult(current => setActiveZoneShelves(current, 5))
-      return
-    }
-
-    if (presetName === 'clothes') {
-      updateZoneProjectWithResult(current => {
-        const shelfResult = setActiveZoneShelves(current, 1)
-        if (!shelfResult.result?.ok) return shelfResult
-        return setActiveZoneRail(shelfResult.project, true)
-      })
-      return
-    }
-
-    if (presetName === 'empty') {
-      updateZoneProject(current => clearActiveZone(current))
-    }
+    const preset = FILLING_PRESETS[presetName]
+    if (!preset) return
+    updateProject(current => {
+      const index = current.activeSection - 1
+      const filling = current.filling.map((section, sectionIndex) => (
+        sectionIndex === index ? { ...preset } : section
+      ))
+      return { ...current, filling }
+    })
   }
 
   function copyToNextSection() {
@@ -277,6 +236,74 @@ export default function ConstructorPage() {
     updateProject(current => {
       const source = current.filling[current.activeSection - 1]
       return { ...current, filling: current.filling.map(() => ({ ...source })) }
+    })
+  }
+
+  function handleZoneSelect(sectionId, zoneId) {
+    updateProject(current => selectZone(current, sectionId, zoneId))
+  }
+
+  function handleZoneSplit() {
+    setNotice('')
+    setProject(current => {
+      const result = splitActiveZone(current, 'middle')
+      if (!result.ok && result.reason) setNotice(result.reason)
+      return normalizeConstructorProject(result.project)
+    })
+  }
+
+  function handleZoneShelvesBoost() {
+    setNotice('')
+    setProject(current => {
+      const zone = getActiveZone(current)
+      const nextShelves = Math.min(6, Math.max(1, (zone?.content?.shelves ?? 0) + 1))
+      const result = setActiveZoneShelves(current, nextShelves)
+      if (!result.ok && result.reason) setNotice(result.reason)
+      return normalizeConstructorProject(result.project)
+    })
+  }
+
+  function handleZoneDrawersPreset() {
+    setNotice('')
+    setProject(current => {
+      const result = setActiveZoneDrawers(current, 3)
+      if (!result.ok && result.reason) setNotice(result.reason)
+      return normalizeConstructorProject(result.project)
+    })
+  }
+
+  function handleZoneRailToggle() {
+    setNotice('')
+    setProject(current => {
+      const zone = getActiveZone(current)
+      const result = setActiveZoneRail(current, !zone?.content?.rail)
+      if (!result.ok && result.reason) setNotice(result.reason)
+      return normalizeConstructorProject(result.project)
+    })
+  }
+
+  function handleZoneClear() {
+    setNotice('')
+    setProject(current => {
+      const result = clearActiveZone(current)
+      if (!result.ok && result.reason) setNotice(result.reason)
+      return normalizeConstructorProject(result.project)
+    })
+  }
+
+  function applyZonePreset(presetName) {
+    setNotice('')
+    setProject(current => {
+      const sectionId = `section-${current.activeSection}`
+      let result = null
+      if (presetName === 'clothes') result = applyWardrobePresetToSection(current, sectionId)
+      else if (presetName === 'shelves') result = applyShelvesPresetToZone(current, 5)
+      else if (presetName === 'drawers') result = applyDrawerBlockToSection(current, sectionId, 3)
+      else if (presetName === 'combo') result = applyComboPresetToSection(current, sectionId)
+      else if (presetName === 'empty') result = clearActiveZone(current)
+      if (!result) return current
+      if (!result.ok && result.reason) setNotice(result.reason)
+      return normalizeConstructorProject(result.project)
     })
   }
 
@@ -382,22 +409,26 @@ export default function ConstructorPage() {
       <main className="rp-ctor-shell" aria-label="Конструктор шкафа">
         <ConstructorConfig
           activeStep={activeStep}
-          activeWarnings={activeWarnings}
-          activeZone={activeZone}
-          zoneHints={zoneHints}
+          activeSectionWarnings={activeWarnings}
           onActiveStepChange={setActiveStep}
           project={project}
           onDimensionChange={updateDimensions}
-          onSectionChange={updateSections}
+          onSectionsChange={updateSections}
           onSectionSelect={setActiveSection}
-          onZoneSelect={selectActiveZone}
-          onZoneSplit={splitCurrentZone}
           onSectionPartChange={updateSectionPart}
           onRailToggle={toggleRail}
+          onZoneSelect={handleZoneSelect}
+          onZoneSplit={handleZoneSplit}
+          onZoneShelvesBoost={handleZoneShelvesBoost}
+          onZoneDrawersPreset={handleZoneDrawersPreset}
+          onZoneRailToggle={handleZoneRailToggle}
+          onZoneClear={handleZoneClear}
+          zoneHints={getActiveZoneHints(project)}
+          activeZone={getActiveZone(project)}
           onClearSection={clearActiveSection}
-          onPresetApply={applyPreset}
-          onCopyToNext={copyToNextSection}
-          onApplyToAll={applyToAllSections}
+          onPresetApply={applyZonePreset}
+          onCopySection={copyToNextSection}
+          onApplySectionToAll={applyToAllSections}
           onMaterialChange={setMaterial}
           materials={MATERIALS}
           edgeOptions={EDGE_OPTIONS}
@@ -408,11 +439,18 @@ export default function ConstructorPage() {
         <ConstructorViewer
           project={projectWithPrice}
           onSectionSelect={setActiveSection}
-          onZoneSelect={selectActiveZone}
           onSectionPartChange={updateSectionPart}
           onRailToggle={toggleRail}
+          onZoneSelect={handleZoneSelect}
+          onZoneSplit={handleZoneSplit}
+          onZoneShelvesBoost={handleZoneShelvesBoost}
+          onZoneDrawersPreset={handleZoneDrawersPreset}
+          onZoneRailToggle={handleZoneRailToggle}
+          onZoneClear={handleZoneClear}
+          zoneHints={getActiveZoneHints(project)}
+          activeZone={getActiveZone(project)}
           onClearSection={clearActiveSection}
-          onPresetApply={applyPreset}
+          onPresetApply={applyZonePreset}
         />
 
         <ConstructorSummary

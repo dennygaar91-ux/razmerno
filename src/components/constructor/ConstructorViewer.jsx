@@ -1,14 +1,23 @@
+import SectionMap from './viewer/SectionMap'
+import ViewerQuickActions from './viewer/ViewerQuickActions'
 import ViewerScene from './viewer/ViewerScene'
 import ViewerToolbar from './viewer/ViewerToolbar'
 import { buildViewerSceneProps } from './viewer/viewerUtils'
 
-export default function ConstructorViewer({ project, renderCanvas, onZoneSelect }) {
+const EMPTY_SECTION = { shelves: 0, drawers: 0, rail: false }
+
+export default function ConstructorViewer({ project, onSectionSelect, onSectionPartChange, onRailToggle, onClearSection, onPresetApply, onPresetApplyToSection, onZoneSelect, renderCanvas }) {
+  const activeSection = project.filling[project.activeSection - 1] ?? EMPTY_SECTION
+  const railDisabled = project.dimensions.depth < 520
   const sceneProps = buildViewerSceneProps(project)
+  const sceneWithHandlers = { ...sceneProps, onSectionSelect, onZoneSelect }
 
   return (
-    <section className="rp-ctor-card rp-ctor-viewer rp-ref-viewer rp-ref-viewer--expanded" aria-label="Предпросмотр шкафа">
+    <section className="rp-ctor-card rp-ctor-viewer rp-ref-viewer" aria-label="Предпросмотр шкафа">
       <ViewerToolbar />
-      <ViewerScene sceneProps={sceneProps} renderCanvas={renderCanvas} onZoneSelect={onZoneSelect} />
+      <ViewerScene sceneProps={sceneWithHandlers} renderCanvas={renderCanvas} />
+      <ViewerQuickActions activeSection={activeSection} railDisabled={railDisabled} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onClearSection={onClearSection} />
+      <SectionMap project={project} activeSection={activeSection} onSectionSelect={onSectionSelect} onPresetApply={onPresetApply} onPresetApplyToSection={onPresetApplyToSection} />
     </section>
   )
 }

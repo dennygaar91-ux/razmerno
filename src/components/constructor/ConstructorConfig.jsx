@@ -7,16 +7,11 @@ const dimensionFields = [
 ]
 
 const fillingPresets = [
-  ['clothes', 'Гардероб', 'штанга + полка', 'Для одежды на плечиках'],
-  ['shelves', 'Полки в зоне', '5 полок', 'Заполнить выбранную область полками'],
-  ['drawers', 'Ящики снизу', '3 ящика', 'Система сама добавит верхнюю полку'],
-  ['empty', 'Пусто', 'очистить зону', 'Начать выбранную зону заново'],
-]
-
-const additionalReliabilityRows = [
-  ['Задняя стенка', 'Рекомендуем'],
-  ['ПВХ 2 мм на видимых торцах', 'Включена'],
-  ['Крепление к стене', 'Рекомендуем'],
+  ['clothes', 'Гардероб', 'верхняя полка + штанга', 'Разделим секцию и соберём сценарий одежды'],
+  ['shelves', 'Полки', '4–5 полок', 'Заполнить выбранную зону полками'],
+  ['drawers', 'Ящики снизу', 'блок из 3 ящиков', 'Снизу ящики, сверху разделительная полка'],
+  ['combo', 'Комбо', 'ящики + полки', 'Снизу ящики, сверху полки'],
+  ['empty', 'Пусто', 'очистить зону', 'Очистить выбранную зону без удаления полок'],
 ]
 
 function CounterField({ label, value, hint, unit = '', min, max, onMinus, onPlus }) {
@@ -65,24 +60,6 @@ function StepHint({ title, text }) {
   )
 }
 
-function ZoneHints({ hints = [] }) {
-  if (!hints.length) return null
-
-  return (
-    <div className="rp-ref-zone-hints" aria-label="Подсказки выбранной зоны">
-      {hints.map((hint) => (
-        <div className={`rp-ref-zone-hint is-${hint.type}`} key={`${hint.title}-${hint.text}`}>
-          <Icon name={hint.type === 'success' ? 'check-circle' : 'clock'} size={14} />
-          <span>
-            <b>{hint.title}</b>
-            <small>{hint.text}</small>
-          </span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 function OptionList({ items = [], activeId, field, onChange, compact = false }) {
   if (!items.length) {
     return <div className="rp-ref-empty-option">Варианты пока не добавлены</div>
@@ -100,63 +77,6 @@ function OptionList({ items = [], activeId, field, onChange, compact = false }) 
           <b>{item.priceAdd ? `+${item.priceAdd.toLocaleString('ru-RU')} ₽` : item.badge}</b>
         </button>
       ))}
-    </div>
-  )
-}
-
-function getZoneContentLabel(zone) {
-  const content = zone?.content ?? {}
-
-  if (content.type === 'drawers' || content.drawers > 0) return `${content.drawers || 0} ящ.`
-  if (content.type === 'rail' || content.rail) return 'штанга'
-  if (content.type === 'shelves' || content.shelves > 0) return `${content.shelves || 0} пол.`
-  return 'пусто'
-}
-
-function ZonePicker({ project, activeZone, onZoneSelect, onZoneSplit }) {
-  const activeSection = project.zoneLayout?.sections?.[project.activeSection - 1]
-  const zones = activeSection?.zones ?? []
-  const selectedZoneId = activeZone?.zone?.id ?? activeSection?.activeZoneId
-  const selectedZone = zones.find(zone => zone.id === selectedZoneId) ?? zones[0]
-  const canSplit = Boolean(selectedZone && selectedZone.height >= 420)
-
-  if (!activeSection || !zones.length) return null
-
-  return (
-    <div className="rp-ref-zone-card rp-ref-zone-card--polished">
-      <div className="rp-ref-zone-card__head">
-        <div>
-          <h3>Зоны секции</h3>
-          <p>Разделительная полка создаёт отдельные области. Обычные полки ниже добавляются уже внутрь выбранной зоны.</p>
-        </div>
-        <span>{zones.length}</span>
-      </div>
-
-      <div className="rp-ref-zone-list" role="list">
-        {zones.slice().reverse().map((zone) => (
-          <button
-            type="button"
-            role="listitem"
-            className={zone.id === selectedZoneId ? 'is-active' : ''}
-            key={zone.id}
-            onClick={() => onZoneSelect(activeSection.id, zone.id)}
-          >
-            <span>{zone.label}</span>
-            <small>{zone.height} мм · {getZoneContentLabel(zone)}</small>
-          </button>
-        ))}
-      </div>
-
-      <div className="rp-ref-zone-selected">
-        <span>Выбрана зона</span>
-        <b>{selectedZone?.label ?? 'Зона'}</b>
-        <small>{selectedZone?.height ?? 0} мм по высоте</small>
-      </div>
-
-      <div className="rp-ref-zone-actions">
-        <button type="button" disabled={!canSplit} onClick={() => onZoneSplit('middle')}>Разделить полкой</button>
-        <button type="button" disabled={!canSplit} onClick={() => onZoneSplit('lower-third')}>Полка ниже</button>
-      </div>
     </div>
   )
 }
@@ -211,24 +131,26 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
   )
 }
 
-function FillingStep({ project, warnings, activeSectionWarnings, activeZone, zoneHints, onSectionSelect, onZoneSelect, onZoneSplit, onSectionPartChange, onRailToggle, onPresetApply, onCopySection, onApplySectionToAll }) {
+function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onRailToggle, onPresetApply, onCopySection, onApplySectionToAll, onZoneSelect, onZoneSplit, onZoneShelvesBoost, onZoneDrawersPreset, onZoneRailToggle, onZoneClear, zoneHints, activeZone }) {
   const activeSection = project.filling[project.activeSection - 1] ?? { shelves: 0, drawers: 0, rail: false }
-  const selectedZone = activeZone?.zone
-  const selectedContent = selectedZone?.content ?? activeSection
   const railDisabled = project.dimensions.depth < 520
-  const activePreset = selectedContent.rail && selectedContent.shelves <= 2 && selectedContent.drawers === 0
+
+
+  const activeSectionId = `section-${project.activeSection}`
+  const activeZones = project.zoneLayout?.sections?.find(section => section.id === activeSectionId)?.zones ?? []
+  const activePreset = activeSection.rail && activeSection.shelves <= 2 && activeSection.drawers === 0
     ? 'Гардероб'
-    : selectedContent.shelves >= 4 && !selectedContent.drawers && !selectedContent.rail
+    : activeSection.shelves >= 4 && !activeSection.drawers && !activeSection.rail
       ? 'Полки'
-      : selectedContent.drawers >= 2
+      : activeSection.drawers >= 2
         ? 'Ящики'
-        : !selectedContent.shelves && !selectedContent.drawers && !selectedContent.rail
+        : !activeSection.shelves && !activeSection.drawers && !activeSection.rail
           ? 'Пусто'
           : 'Смешанная'
 
   return (
     <>
-      <StepHint title="Настройте секцию или зону" text="Выберите секцию и область внутри неё. Если нужно получить верхнюю и нижнюю область — используйте “Разделить полкой”." />
+      <StepHint title="Настройте одну секцию" text="Выберите секцию ниже, затем добавьте полки, ящики или штангу. Изменения сразу видны в центре." />
 
       <div className="rp-ref-block rp-ref-block--topless rp-ref-block--polished">
         <h3>Секция для редактирования</h3>
@@ -243,15 +165,40 @@ function FillingStep({ project, warnings, activeSectionWarnings, activeZone, zon
         </div>
       </div>
 
-      <ZonePicker project={project} activeZone={activeZone} onZoneSelect={onZoneSelect} onZoneSplit={onZoneSplit} />
-      <ZoneHints hints={zoneHints} />
-
       <div className="rp-ref-active-section rp-ref-active-section--polished">
         <div>
           <span>Секция {project.activeSection}</span>
           <b>{activePreset}</b>
         </div>
-        <strong>{selectedContent.shelves || 0} полок · {selectedContent.drawers || 0} ящиков · {selectedContent.rail ? 'штанга' : 'без штанги'}</strong>
+        <strong>{activeSection.shelves} полок · {activeSection.drawers} ящиков · {activeSection.rail ? 'штанга' : 'без штанги'}</strong>
+      </div>
+
+      {activeZones.length > 0 && (
+        <div className="rp-ref-block rp-ref-block--polished">
+          <h3>Зоны секции</h3>
+          <p>Выберите зону для настройки содержимого</p>
+          <div className="rp-ref-zone-tabs">
+            {activeZones.map(zone => (
+              <button key={zone.id} type="button" className={activeZone?.id === zone.id ? 'is-active' : ''} onClick={() => onZoneSelect(activeSectionId, zone.id)}>
+                <span>{zone.label}</span>
+                <small>{Math.round(zone.height)} мм</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="rp-ref-block rp-ref-block--polished">
+        <h3>Что сделать с выбранной зоной?</h3>
+        <p>Основные действия для быстрого сценария без ручной деталировки.</p>
+        <div className="rp-ref-zone-actions">
+          <button type="button" onClick={() => onZoneSplit('middle')} disabled={!zoneHints?.canSplit}>Разделить полкой</button>
+          <button type="button" onClick={onZoneShelvesBoost}>Полки внутри зоны</button>
+          <button type="button" onClick={onZoneDrawersPreset} disabled={!zoneHints?.canDrawers}>Ящики</button>
+          <button type="button" onClick={onZoneRailToggle} disabled={!zoneHints?.canRail && !activeZone?.content?.rail}>{activeZone?.content?.rail ? 'Убрать штангу' : 'Штанга'}</button>
+          <button type="button" onClick={onZoneClear}>Очистить выбранную зону</button>
+        </div>
+        {zoneHints?.splitReason && <p className="rp-ref-zone-hint">{zoneHints.splitReason}</p>}
       </div>
 
       <div className="rp-ref-section-tools">
@@ -261,7 +208,7 @@ function FillingStep({ project, warnings, activeSectionWarnings, activeZone, zon
 
       <div className="rp-ref-block rp-ref-block--polished">
         <h3>Готовые сценарии</h3>
-        <p>Быстро заполните выбранную зону. “Ящики снизу” автоматически создаёт отдельный нижний блок с полкой сверху.</p>
+        <p>Быстро заполните выбранную секцию</p>
         <div className="rp-ref-preset-grid rp-ref-preset-grid--polished">
           {fillingPresets.map(([id, title, text, description]) => (
             <button type="button" key={id} onClick={() => onPresetApply(id)}>
@@ -274,15 +221,15 @@ function FillingStep({ project, warnings, activeSectionWarnings, activeZone, zon
       </div>
 
       <div className="rp-ref-fields rp-ref-fields--compact rp-ref-fields--polished">
-        <CounterField label="Полки внутри зоны" value={selectedContent.shelves || 0} hint="добавляются внутри выбранной области, не создавая новую зону" min={0} max={8} onMinus={() => onSectionPartChange('shelves', -1)} onPlus={() => onSectionPartChange('shelves', 1)} />
-        <CounterField label="Ящики" value={selectedContent.drawers || 0} hint="для ящиков нужна подходящая высота, ширина и глубина" min={0} max={4} onMinus={() => onSectionPartChange('drawers', -1)} onPlus={() => onSectionPartChange('drawers', 1)} />
+        <CounterField label="Полки" value={activeSection.shelves} hint="минимальный комфортный шаг — 200 мм" min={0} max={8} onMinus={() => onSectionPartChange('shelves', -1)} onPlus={() => onSectionPartChange('shelves', 1)} />
+        <CounterField label="Ящики" value={activeSection.drawers} hint="ориентир фасада — от 200 мм" min={0} max={4} onMinus={() => onSectionPartChange('drawers', -1)} onPlus={() => onSectionPartChange('drawers', 1)} />
       </div>
 
       <div className="rp-ref-block rp-ref-block--polished">
         <h3>Штанга</h3>
-        <p>{railDisabled ? 'Недоступна при глубине меньше 520 мм' : 'Подходит для одежды на плечиках в выбранной зоне'}</p>
-        <button className={`rp-ref-toggle-option ${selectedContent.rail ? 'is-active' : ''}`} type="button" disabled={railDisabled} onClick={onRailToggle}>
-          <span>{selectedContent.rail ? 'Штанга включена' : 'Добавить штангу'}</span>
+        <p>{railDisabled ? 'Недоступна при глубине меньше 520 мм' : 'Подходит для одежды на плечиках'}</p>
+        <button className={`rp-ref-toggle-option ${activeSection.rail ? 'is-active' : ''}`} type="button" disabled={railDisabled} onClick={onZoneRailToggle}>
+          <span>{activeSection.rail ? 'Штанга включена' : 'Добавить штангу'}</span>
           <b />
         </button>
       </div>
@@ -372,19 +319,6 @@ function MaterialsStep({ project, materials = [], edgeOptions = [], handleOption
         <OptionList items={hardwareOptions} activeId={project.material.hardwareId} field="hardwareId" onChange={onMaterialChange} compact />
       </div>
 
-      <div className="rp-ref-block rp-ref-block--polished rp-ref-additional-materials">
-        <h3>5. Дополнительно <span>/ Надёжность и сборка</span></h3>
-        <div className="rp-ref-additional-materials__rows">
-          {additionalReliabilityRows.map(([title, badge]) => (
-            <div key={title}>
-              <span>{title}</span>
-              <em>{badge}</em>
-              <b aria-hidden="true" />
-            </div>
-          ))}
-        </div>
-      </div>
-
       <div className="rp-ref-block rp-ref-info rp-ref-info--materials">
         <Icon name="check-circle" size={16} />
         <span>Спецификация готовится как структура для будущей базы: материал → кромка → фурнитура → правила расчёта.</span>
@@ -397,48 +331,49 @@ export default function ConstructorConfig({
   activeStep,
   project,
   warnings,
-  activeWarnings,
   activeSectionWarnings,
-  activeZone,
-  zoneHints = [],
   materials = [],
   edgeOptions = [],
   handleOptions = [],
   hardwareOptions = [],
+  canGoBack,
+  canGoNext,
+  onBack,
+  onNext,
   onDimensionChange,
   onSectionsChange,
-  onSectionChange,
   onSectionSelect,
-  onZoneSelect,
-  onZoneSplit,
   onSectionPartChange,
   onRailToggle,
   onMaterialChange,
   onPresetApply,
   onCopySection,
-  onCopyToNext,
   onApplySectionToAll,
-  onApplyToAll,
+  onZoneSelect,
+  onZoneSplit,
+  onZoneShelvesBoost,
+  onZoneDrawersPreset,
+  onZoneRailToggle,
+  onZoneClear,
+  zoneHints,
+  activeZone,
 }) {
-  const handleSectionsChange = onSectionsChange ?? onSectionChange
-  const handleCopySection = onCopySection ?? onCopyToNext
-  const handleApplySectionToAll = onApplySectionToAll ?? onApplyToAll
-  const currentWarnings = activeSectionWarnings ?? activeWarnings
-
   const stepContent = {
     dimensions: {
       number: 1,
       eyebrow: 'Шаг 1 из 3',
       title: 'Размеры шкафа',
       text: 'Сначала задаём габариты. Это основа для деталировки, стоимости и ограничений по наполнению.',
-      body: <DimensionsStep project={project} warnings={warnings} onDimensionChange={onDimensionChange} onSectionsChange={handleSectionsChange} />,
+      body: <DimensionsStep project={project} warnings={warnings} onDimensionChange={onDimensionChange} onSectionsChange={onSectionsChange} />,
+      next: 'Далее: наполнение',
     },
     filling: {
       number: 2,
       eyebrow: 'Шаг 2 из 3',
       title: 'Наполнение секций',
       text: 'Соберите внутреннюю логику шкафа: полки, ящики и штанги в каждой секции.',
-      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={currentWarnings} activeZone={activeZone} zoneHints={zoneHints} onSectionSelect={onSectionSelect} onZoneSelect={onZoneSelect} onZoneSplit={onZoneSplit} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} onCopySection={handleCopySection} onApplySectionToAll={handleApplySectionToAll} />,
+      body: <FillingStep project={project} warnings={warnings} activeSectionWarnings={activeSectionWarnings} onSectionSelect={onSectionSelect} onSectionPartChange={onSectionPartChange} onRailToggle={onRailToggle} onPresetApply={onPresetApply} onCopySection={onCopySection} onApplySectionToAll={onApplySectionToAll} onZoneSelect={onZoneSelect} onZoneSplit={onZoneSplit} onZoneShelvesBoost={onZoneShelvesBoost} onZoneDrawersPreset={onZoneDrawersPreset} onZoneRailToggle={onZoneRailToggle} onZoneClear={onZoneClear} zoneHints={zoneHints} activeZone={activeZone} />,
+      next: 'Далее: материалы',
     },
     materials: {
       number: 3,
@@ -446,6 +381,7 @@ export default function ConstructorConfig({
       title: 'Материалы и фурнитура',
       text: 'Выберите декор корпуса, кромку, открывание и фурнитуру. Это будущая структура спецификации.',
       body: <MaterialsStep project={project} materials={materials} edgeOptions={edgeOptions} handleOptions={handleOptions} hardwareOptions={hardwareOptions} onMaterialChange={onMaterialChange} />,
+      next: 'В корзину',
     },
   }
 
@@ -464,6 +400,11 @@ export default function ConstructorConfig({
 
       <div className="rp-ref-step-body">
         {current.body}
+      </div>
+
+      <div className="rp-ref-config-nav rp-ref-config-nav--polished">
+        <button type="button" disabled={!canGoBack} onClick={onBack}>Назад</button>
+        <button className="is-primary" type="button" onClick={onNext}>{canGoNext ? current.next : 'В корзину'}<Icon name="arrow-right" size={15} /></button>
       </div>
     </aside>
   )
