@@ -23,14 +23,12 @@ function EstimateRow({ row, total }) {
   )
 }
 
-function ConfettiIcon() {
+function CheckItem({ done, children, warning }) {
   return (
-    <div className="rp-target-ready-icon" aria-hidden="true">
-      <span />
-      <i />
-      <b />
-      <em />
-    </div>
+    <li className={done ? 'is-done' : warning ? 'has-warning' : ''}>
+      <span>{done ? '✓' : warning ? '!' : '○'}</span>
+      <b>{children}</b>
+    </li>
   )
 }
 
@@ -54,14 +52,16 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
     ['Фурнитура', '1 компл.'],
   ]
 
-  const isReady = warnings.length === 0
+  const dimensionsDone = project.dimensions.height > 0 && project.dimensions.width > 0 && project.dimensions.depth > 0
+  const fillingDone = summary.elements > 0
+  const materialsDone = Boolean(project.material?.materialId && project.material?.edgeId && project.material?.handleId && project.material?.hardwareId)
+  const isReady = warnings.length === 0 && dimensionsDone && fillingDone && materialsDone
   const isCalculating = estimateState === 'loading'
   const hasEstimateError = estimateState === 'error'
   const breakdown = project.priceBreakdown ?? {}
   const estimateRows = useMemo(() => getEstimateRows(project, summary, breakdown), [project, summary, breakdown])
   const estimateTotal = estimateRows.reduce((sum, row) => sum + row.value, 0)
-  const checkPercent = isCalculating ? 52 : isReady ? 92 : 68
-  const statusText = isCalculating ? 'Проверяем' : hasEstimateError ? 'Предварительно' : isReady ? 'Можно оформлять' : `${warnings.length} рекомендац.`
+  const statusText = isCalculating ? 'Проверяем' : hasEstimateError ? 'Предварительно' : isReady ? 'Готово к заявке' : 'Проверьте пункты'
   const statusClass = isCalculating ? 'is-loading' : hasEstimateError ? 'has-error' : isReady ? 'is-ready' : 'has-warning'
 
   return (
@@ -69,10 +69,9 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
       <section className="rp-target-card rp-target-ready-card">
         <div>
           <span>Ваш проект</span>
-          <h3>Шкаф почти готов</h3>
-          <p>Осталось выбрать материалы и добавить проект в корзину.</p>
+          <h3>Текущая конфигурация</h3>
+          <p>{isReady ? 'Параметры заполнены. Можно перейти к заявке.' : 'Проверьте размеры, наполнение и материалы перед заявкой.'}</p>
         </div>
-        <ConfettiIcon />
       </section>
 
       <section className="rp-target-card rp-target-price-card">
@@ -91,13 +90,17 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         ))}
       </section>
 
-      <section className="rp-target-card rp-target-check-card">
+      <section className="rp-target-card rp-target-check-card rp-target-check-card--list">
         <div className="rp-target-check-card__head">
-          <h3>Проверка</h3>
+          <h3>Проверка проекта</h3>
           <span>{statusText}</span>
         </div>
-        <div className="rp-target-progress"><i style={{ width: `${checkPercent}%` }} /></div>
-        <p>{isReady ? 'Конструкция надёжна и готова к сборке' : warnings[0]} <b>{checkPercent}%</b></p>
+        <ul className="rp-target-checklist">
+          <CheckItem done={dimensionsDone}>Размеры заданы</CheckItem>
+          <CheckItem done={fillingDone}>Наполнение настроено</CheckItem>
+          <CheckItem done={materialsDone}>Материалы выбраны</CheckItem>
+          <CheckItem done={!warnings.length} warning={warnings.length > 0}>{warnings.length ? warnings[0] : 'Ограничений нет'}</CheckItem>
+        </ul>
       </section>
 
       <section className="rp-target-card rp-target-kit-card">

@@ -18,7 +18,7 @@ function ZoneContent({ zone }) {
 }
 
 function SectionMockup({ section, active, onZoneSelect }) {
-  const zones = section.zones?.length ? section.zones : [{ id: `${section.id}-zone-main`, fromY: 0, toY: section.height || 100, height: section.height || 100, label: 'Основная зона', content: section }]
+  const zones = section.zones?.length ? section.zones : [{ id: `${section.id}-zone-main`, fromY: 0, toY: section.height || 100, height: section.height || 100, label: 'Основная секция', content: section }]
   const total = Math.max(1, zones.reduce((sum, zone) => sum + (zone.height || 0), 0))
 
   return (
@@ -55,13 +55,18 @@ function getMockupStyle(project, sectionCount) {
   }
 }
 
+function getMaterialTone(project) {
+  return project?.material?.tone ?? project?.meta?.materialTone ?? 'wood'
+}
+
 export default function WardrobeMockup({ project, onZoneSelect }) {
   const zoneSections = project?.zoneLayout?.sections
   const sections = zoneSections?.length ? zoneSections : (project?.filling ?? []).map((section, index) => ({ id: `section-${index + 1}`, zones: [{ id: `section-${index + 1}-zone-main`, height: project?.dimensions?.height ?? 2400, content: section }], activeZoneId: `section-${index + 1}-zone-main` }))
   const style = getMockupStyle(project, sections.length)
+  const materialTone = getMaterialTone(project)
 
   return (
-    <div className="rp-ctor-wardrobe rp-ctor-wardrobe--renderlike" style={style} aria-hidden="true">
+    <div className={`rp-ctor-wardrobe rp-ctor-wardrobe--renderlike rp-ctor-wardrobe--tone-${materialTone}`} style={style} aria-hidden="true">
       <div className="rp-ctor-top" />
       {sections.map((section, index) => (
         <SectionMockup section={section} active={project?.activeSection === index + 1} onZoneSelect={onZoneSelect} key={section.id || index} />
