@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ConstructorConfig from '../components/constructor/ConstructorConfig'
+import ConstructorFlow from '../components/constructor/ConstructorFlow'
 import ConstructorViewer from '../components/constructor/ConstructorViewer'
 import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
@@ -392,17 +393,13 @@ export default function ConstructorPage() {
         </div>
       </section>
 
-      <section className="rp-ctor-flow" aria-label="Шаги настройки шкафа">
-        {FLOW_STEPS.map(step => (
-          <button type="button" className={activeStep === step.id ? 'is-active' : ''} key={step.id} onClick={() => setActiveStep(step.id)}>
-            <span>{step.num}</span>
-            <div>
-              <p>{step.title}</p>
-              <small>{step.text}</small>
-            </div>
-          </button>
-        ))}
-      </section>
+      <ConstructorFlow
+        steps={FLOW_STEPS}
+        activeStep={activeStep}
+        project={project}
+        summary={summary}
+        onStepChange={setActiveStep}
+      />
 
       {notice && <p className="rp-ctor-notice" role="status">{notice}</p>}
 
