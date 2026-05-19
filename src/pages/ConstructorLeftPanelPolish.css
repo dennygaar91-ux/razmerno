@@ -1,0 +1,118 @@
+/* =========================================================
+   Stage 4.1 — Left panel presets
+   Goal: help users start from furniture scenarios instead of raw technical fields
+   ========================================================= */
+
+.rp-ref-dimension-presets {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.rp-ref-block-title-row {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+.rp-ref-block-title-row h3 {
+  margin: 0 !important;
+  color: #151515 !important;
+  font-size: 13px !important;
+  line-height: 1.1 !important;
+  letter-spacing: -.02em !important;
+}
+
+.rp-ref-block-title-row p {
+  margin: 5px 0 0 !important;
+  color: #70695d !important;
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+}
+
+.rp-ref-dimension-presets__grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.rp-ref-dimension-presets__grid button {
+  min-width: 0 !important;
+  min-height: 84px !important;
+  padding: 11px !important;
+  border: 1px solid rgba(226, 221, 212, .95) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  color: #151515 !important;
+  display: grid !important;
+  gap: 5px !important;
+  align-content: start !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease !important;
+}
+
+.rp-ref-dimension-presets__grid button:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(17, 17, 17, .18) !important;
+  box-shadow: 0 10px 24px rgba(36, 31, 24, .06) !important;
+}
+
+.rp-ref-dimension-presets__grid button.is-active {
+  border-color: #111 !important;
+  background: #fffdf8 !important;
+  box-shadow: 0 0 0 1px rgba(17, 17, 17, .08), 0 12px 28px rgba(36, 31, 24, .07) !important;
+}
+
+.rp-ref-dimension-presets__grid button span {
+  color: #151515 !important;
+  font-size: 11px !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+}
+
+.rp-ref-dimension-presets__grid button strong {
+  color: #151515 !important;
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+  font-weight: 900 !important;
+  letter-spacing: -.01em !important;
+}
+
+.rp-ref-dimension-presets__grid button small {
+  color: #70695d !important;
+  font-size: 9px !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+}
+
+.rp-ref-dimension-presets__grid button.is-active::after {
+  content: 'Выбрано' !important;
+  justify-self: start !important;
+  margin-top: 2px !important;
+  padding: 4px 7px !important;
+  border-radius: 999px !important;
+  background: #111 !important;
+  color: #fff !important;
+  font-size: 8px !important;
+  line-height: 1 !important;
+  font-weight: 850 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+}
+
+@media (max-width: 1380px), (max-height: 820px) {
+  .rp-ref-dimension-presets__grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .rp-ref-dimension-presets__grid button {
+    min-height: 64px !important;
+    padding: 9px !important;
+  }
+
+  .rp-ref-dimension-presets__grid button small {
+    display: none !important;
+  }
+}

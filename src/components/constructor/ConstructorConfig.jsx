@@ -6,6 +6,37 @@ const dimensionFields = [
   ['depth', 'Глубина', 'от 300 до 800 мм', 50, 'мм'],
 ]
 
+const dimensionPresets = [
+  {
+    id: 'narrow',
+    title: 'Узкий шкаф',
+    text: 'Для ниши, прихожей или небольшого хранения',
+    dimensions: { height: 2200, width: 900, depth: 550 },
+    sections: 2,
+  },
+  {
+    id: 'standard',
+    title: 'Стандартный',
+    text: 'Базовый старт для спальни или гардеробной',
+    dimensions: { height: 2400, width: 1600, depth: 600 },
+    sections: 3,
+  },
+  {
+    id: 'wide',
+    title: 'Широкий шкаф',
+    text: 'Когда нужно больше секций и места для вещей',
+    dimensions: { height: 2500, width: 2400, depth: 600 },
+    sections: 4,
+  },
+  {
+    id: 'low',
+    title: 'Низкая тумба',
+    text: 'Для простого хранения без высокой одежды',
+    dimensions: { height: 900, width: 1200, depth: 450 },
+    sections: 2,
+  },
+]
+
 const fillingPresets = [
   ['clothes', 'Гардероб', 'верхняя полка + штанга', 'Разделим секцию и соберём сценарий одежды'],
   ['shelves', 'Полки', '4–5 полок', 'Заполнить выбранную секцию полками'],
@@ -16,6 +47,13 @@ const fillingPresets = [
 
 function getSectionWidth(project) {
   return Math.round(project.dimensions.width / project.sections)
+}
+
+function isDimensionPresetActive(project, preset) {
+  return project.dimensions.height === preset.dimensions.height
+    && project.dimensions.width === preset.dimensions.width
+    && project.dimensions.depth === preset.dimensions.depth
+    && project.sections === preset.sections
 }
 
 function getDimensionAdvisories(project) {
@@ -210,6 +248,33 @@ function OptionList({ items = [], activeId, field, onChange, compact = false }) 
   )
 }
 
+function DimensionPresetGrid({ project, onPresetApply }) {
+  return (
+    <div className="rp-ref-block rp-ref-block--polished rp-ref-dimension-presets">
+      <div className="rp-ref-block-title-row">
+        <div>
+          <h3>Быстрый старт</h3>
+          <p>Выберите типовой сценарий, а затем точно поправьте размеры ниже.</p>
+        </div>
+      </div>
+      <div className="rp-ref-dimension-presets__grid">
+        {dimensionPresets.map((preset) => {
+          const active = isDimensionPresetActive(project, preset)
+          const size = `${preset.dimensions.height}×${preset.dimensions.width}×${preset.dimensions.depth}`
+
+          return (
+            <button className={active ? 'is-active' : ''} type="button" key={preset.id} onClick={() => onPresetApply(preset)}>
+              <span>{preset.title}</span>
+              <strong>{size} мм</strong>
+              <small>{preset.sections} секц. · {preset.text}</small>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange }) {
   const sectionWidth = getSectionWidth(project)
   const advisories = getDimensionAdvisories(project)
@@ -219,9 +284,18 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
     height: advisories.find(item => item.key === 'low-height'),
   }
 
+  function applyDimensionPreset(preset) {
+    onDimensionChange('height', preset.dimensions.height - project.dimensions.height)
+    onDimensionChange('width', preset.dimensions.width - project.dimensions.width)
+    onDimensionChange('depth', preset.dimensions.depth - project.dimensions.depth)
+    onSectionsChange(preset.sections - project.sections)
+  }
+
   return (
     <>
       <StepHint title="Начните с габаритов" text="Укажите реальные размеры ниши или места, где будет стоять шкаф. Секции распределятся автоматически." />
+
+      <DimensionPresetGrid project={project} onPresetApply={applyDimensionPreset} />
 
       <div className="rp-ref-fields rp-ref-fields--polished">
         {dimensionFields.map(([key, label, hint, step, unit]) => (
