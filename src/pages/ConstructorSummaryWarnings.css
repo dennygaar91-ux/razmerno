@@ -39,6 +39,11 @@
   border-color: rgba(220, 170, 35, .38) !important;
 }
 
+.rp-summary-status-group.is-info {
+  background: #f6f5f1 !important;
+  border-color: rgba(226, 221, 212, .95) !important;
+}
+
 .rp-summary-status-group__head {
   display: flex !important;
   align-items: center !important;
@@ -97,6 +102,10 @@
 
 .rp-summary-status-list__item.is-recommendation > span {
   background: #9b7200 !important;
+}
+
+.rp-summary-status-list__item.is-info > span {
+  background: #5f5a51 !important;
 }
 
 .rp-summary-status-list__item.is-success > span {

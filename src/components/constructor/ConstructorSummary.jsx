@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { getEstimateRows } from '../../utils/constructorPricing'
+import { getEstimateRows, groupConstructorWarnings } from '../../utils/constructorPricing'
 
 function formatPrice(value) {
   const numericValue = Number(value)
@@ -32,21 +32,10 @@ function CheckItem({ done, children, warning }) {
   )
 }
 
-function classifyWarning(text) {
-  const lower = String(text).toLowerCase()
-  const criticalWords = ['нужна глубина', 'слишком узк', 'минимальная', 'мало места', 'не помещаться', 'требует']
-  const isCritical = criticalWords.some(word => lower.includes(word))
-
-  return {
-    text,
-    severity: isCritical ? 'critical' : 'recommendation',
-  }
-}
-
-function SummaryStatusList({ warnings, isReady }) {
-  const classified = warnings.map(classifyWarning)
-  const critical = classified.filter(item => item.severity === 'critical')
-  const recommendations = classified.filter(item => item.severity !== 'critical')
+function SummaryStatusList({ warnings, warningGroups, isReady }) {
+  const critical = warningGroups.critical
+  const recommendations = warningGroups.recommendations
+  const info = warningGroups.info
 
   if (isReady) {
     return (
@@ -114,6 +103,24 @@ function SummaryStatusList({ warnings, isReady }) {
         </div>
       )}
 
+      {info.length > 0 && (
+        <div className="rp-summary-status-group is-info">
+          <div className="rp-summary-status-group__head">
+            <span>Инфо</span>
+            <b>{info.length}</b>
+          </div>
+          {info.slice(0, 2).map((item) => (
+            <div className="rp-summary-status-list__item is-info" key={item.text}>
+              <span>i</span>
+              <div>
+                <b>{item.text}</b>
+                <small>Информационная подсказка для проверки проекта.</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {warnings.length > 6 && (
         <p className="rp-summary-status-list__more">Показаны основные пункты. Остальные рекомендации видны в левой панели.</p>
       )}
@@ -144,15 +151,16 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
   const dimensionsDone = project.dimensions.height > 0 && project.dimensions.width > 0 && project.dimensions.depth > 0
   const fillingDone = summary.elements > 0
   const materialsDone = Boolean(project.material?.materialId && project.material?.edgeId && project.material?.handleId && project.material?.hardwareId)
+  const warningGroups = useMemo(() => groupConstructorWarnings(warnings), [warnings])
+  const criticalCount = warningGroups.critical.length
+  const recommendationCount = warningGroups.recommendations.length
+  const infoCount = warningGroups.info.length
   const isReady = warnings.length === 0 && dimensionsDone && fillingDone && materialsDone
   const isCalculating = estimateState === 'loading'
   const hasEstimateError = estimateState === 'error'
   const breakdown = project.priceBreakdown ?? {}
   const estimateRows = useMemo(() => getEstimateRows(project, summary, breakdown), [project, summary, breakdown])
   const estimateTotal = estimateRows.reduce((sum, row) => sum + row.value, 0)
-  const classifiedWarnings = warnings.map(classifyWarning)
-  const criticalCount = classifiedWarnings.filter(item => item.severity === 'critical').length
-  const recommendationCount = warnings.length - criticalCount
   const statusText = isCalculating
     ? 'Проверяем'
     : hasEstimateError
@@ -161,9 +169,11 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         ? `${criticalCount} критично`
         : recommendationCount
           ? `${recommendationCount} рекомендац.`
-          : isReady
-            ? 'Готово к заявке'
-            : 'Проверьте пункты'
+          : infoCount
+            ? `${infoCount} инфо`
+            : isReady
+              ? 'Готово к заявке'
+              : 'Проверьте пункты'
   const statusClass = isCalculating ? 'is-loading' : hasEstimateError ? 'has-error' : isReady ? 'is-ready' : warnings.length ? 'has-warning' : 'is-neutral'
 
   return (
@@ -202,7 +212,7 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
           <CheckItem done={fillingDone}>Наполнение настроено</CheckItem>
           <CheckItem done={materialsDone}>Материалы выбраны</CheckItem>
         </ul>
-        <SummaryStatusList warnings={warnings} isReady={isReady} />
+        <SummaryStatusList warnings={warnings} warningGroups={warningGroups} isReady={isReady} />
       </section>
 
       <section className="rp-target-card rp-target-kit-card">

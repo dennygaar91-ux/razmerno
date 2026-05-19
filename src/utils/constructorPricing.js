@@ -2,6 +2,39 @@ function roundMoney(value) {
   return Math.round(value / 10) * 10
 }
 
+const WARNING_SEVERITY_RULES = [
+  {
+    severity: 'critical',
+    patterns: ['нужна глубина', 'может не помещаться', 'меньше 350', 'меньше 200', 'меньше 150', 'слишком много полок'],
+  },
+  {
+    severity: 'recommendation',
+    patterns: ['лучше', 'рекомендуем', 'потребуют', 'надбавку'],
+  },
+]
+
+export function classifyConstructorWarning(text) {
+  const warningText = String(text ?? '').trim()
+  const lower = warningText.toLowerCase()
+  const matchedRule = WARNING_SEVERITY_RULES.find(rule => rule.patterns.some(pattern => lower.includes(pattern)))
+
+  return {
+    text: warningText,
+    severity: matchedRule?.severity ?? 'info',
+  }
+}
+
+export function groupConstructorWarnings(warnings = []) {
+  const classified = warnings.filter(Boolean).map(classifyConstructorWarning)
+
+  return {
+    classified,
+    critical: classified.filter(item => item.severity === 'critical'),
+    recommendations: classified.filter(item => item.severity === 'recommendation'),
+    info: classified.filter(item => item.severity === 'info'),
+  }
+}
+
 function getSectionWarnings(section, sectionIndex, project) {
   const warnings = []
   const sectionHeight = project.dimensions.height
