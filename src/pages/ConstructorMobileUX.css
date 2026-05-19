@@ -180,6 +180,10 @@
     align-items: center !important;
   }
 
+  .has-checkout-open .rp-mobile-cta {
+    display: none !important;
+  }
+
   .rp-mobile-cta div {
     min-width: 0 !important;
     display: grid !important;
