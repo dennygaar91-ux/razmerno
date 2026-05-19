@@ -30,6 +30,7 @@ import './ConstructorWarningsPolish.css'
 import './ConstructorSummaryWarnings.css'
 import './ConstructorLeftPanelPolish.css'
 import './ConstructorSummaryTrust.css'
+import './ConstructorSaveShare.css'
 
 const FLOW_STEPS = [
   { id: 'dimensions', num: '1', title: 'Размеры', text: 'Укажите габариты и секции' },
@@ -98,6 +99,16 @@ function getEstimateStatus(estimateState) {
   return { label: 'Цена сразу', tone: 'neutral' }
 }
 
+function getProjectShareUrl(projectId) {
+  if (!projectId) return ''
+  if (typeof window === 'undefined') return `/constructor?project=${projectId}`
+  const url = new URL(window.location.href)
+  url.pathname = '/constructor'
+  url.search = `?project=${projectId}`
+  url.hash = ''
+  return url.toString()
+}
+
 export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
@@ -127,6 +138,7 @@ export default function ConstructorPage() {
   const status = getProjectStatus(syncState, projectMeta)
   const estimateStatus = getEstimateStatus(estimateState)
   const orderPayload = useMemo(() => buildConstructorPayload(projectWithPrice, { summary, warnings }), [projectWithPrice, summary, warnings])
+  const shareUrl = useMemo(() => getProjectShareUrl(projectId), [projectId])
 
   useEffect(() => () => {
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current)
@@ -377,6 +389,20 @@ export default function ConstructorPage() {
     }
   }
 
+  async function handleCopyProjectLink() {
+    if (!shareUrl) {
+      setNotice('Сначала сохраните проект — после этого появится ссылка для отправки.')
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setNotice('Ссылка на проект скопирована.')
+    } catch {
+      setNotice('Не удалось скопировать ссылку автоматически. Можно выделить ссылку вручную.')
+    }
+  }
+
   function handleClearConfirmed() {
     clearConstructorProject()
     setProjectId('')
@@ -407,8 +433,25 @@ export default function ConstructorPage() {
           <button type="button" onClick={handleLoad}><Icon name="upload" size={16} />Загрузить</button>
           <button type="button" onClick={() => setClearConfirmOpen(true)}><Icon name="x" size={16} />Очистить</button>
           <button type="button" onClick={handleSave}><Icon name="bookmark" size={16} />Сохранить</button>
+          <button type="button" onClick={handleCopyProjectLink}><Icon name="upload" size={16} />Ссылка</button>
           <button className="is-primary" type="button" onClick={() => setCheckoutOpen(true)}><Icon name="cart" size={17} />В корзину</button>
         </div>
+      </section>
+
+      <section className="rp-save-share" aria-label="Сохранение и ссылка проекта">
+        <div className={`rp-save-share__status is-${status.tone}`}>
+          <span>{status.label}</span>
+          <b>{status.text}</b>
+        </div>
+        <div className="rp-save-share__project">
+          <span>ID проекта</span>
+          <b>{projectId || 'появится после сохранения'}</b>
+        </div>
+        <div className="rp-save-share__link">
+          <span>Ссылка для отправки</span>
+          <b>{shareUrl || 'сначала сохраните проект'}</b>
+        </div>
+        <button type="button" onClick={handleCopyProjectLink} disabled={!shareUrl}>Копировать ссылку</button>
       </section>
 
       <ConstructorFlow
