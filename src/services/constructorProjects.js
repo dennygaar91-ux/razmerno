@@ -1,4 +1,5 @@
 import { apiGet, apiPost, shouldUseMockApi } from './constructorApiClient'
+import { buildBackendProjectContract } from '../utils/constructorContracts'
 import { loadConstructorProject, saveConstructorProject } from '../utils/constructorStorage'
 
 async function createMockProject(project) {
@@ -37,7 +38,12 @@ export async function saveConstructorProjectRemote(project) {
     return createMockProject(project)
   }
 
-  return apiPost('/api/constructor/projects', project)
+  return apiPost('/api/constructor/projects', {
+    contractVersion: 'razmerno-constructor-v1',
+    schemaVersion: 'project-save-mvp-v1',
+    project: buildBackendProjectContract(project),
+    frontendSnapshot: project,
+  })
 }
 
 export async function loadConstructorProjectRemote(projectId) {
