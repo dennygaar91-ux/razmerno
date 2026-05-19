@@ -1,0 +1,237 @@
+/* =========================================================
+   Stage 2.3 — Viewer section map polish
+   Goal: make bottom section navigation lighter and less competitive with the wardrobe preview
+   ========================================================= */
+
+.rp-ref-section-map--compact {
+  padding: 12px !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, .82) !important;
+  border: 1px solid rgba(226, 221, 212, .9) !important;
+  box-shadow: 0 12px 30px rgba(36, 31, 24, .045) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.rp-ref-section-map__head--compact {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 10px !important;
+}
+
+.rp-ref-section-map__head--compact div {
+  min-width: 0 !important;
+}
+
+.rp-ref-section-map__head--compact span {
+  display: block !important;
+  margin-bottom: 3px !important;
+  color: #8a847a !important;
+  font-size: 8px !important;
+  font-weight: 900 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+
+.rp-ref-section-map__head--compact h3 {
+  margin: 0 !important;
+  color: #151515 !important;
+  font-size: 13px !important;
+  line-height: 1.05 !important;
+  letter-spacing: -.03em !important;
+}
+
+.rp-ref-section-map__head--compact p {
+  margin: 4px 0 0 !important;
+  color: #70695d !important;
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.rp-ref-section-map__head--compact button {
+  flex: 0 0 auto !important;
+  min-height: 30px !important;
+  padding: 0 11px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(226, 221, 212, .95) !important;
+  background: #fff !important;
+  color: #151515 !important;
+  font-size: 10px !important;
+  font-weight: 850 !important;
+  box-shadow: none !important;
+}
+
+.rp-ref-section-map__rail {
+  display: grid !important;
+  gap: 6px !important;
+  min-height: 58px !important;
+  padding: 6px !important;
+  border-radius: 15px !important;
+  background: #f7f5ef !important;
+  border: 1px solid rgba(226, 221, 212, .78) !important;
+}
+
+.rp-ref-section-map__segment {
+  position: relative !important;
+  min-width: 0 !important;
+  min-height: 46px !important;
+  padding: 7px 8px !important;
+  border: 1px solid rgba(226, 221, 212, .9) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, .76) !important;
+  color: #151515 !important;
+  display: grid !important;
+  grid-template-columns: 22px minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  column-gap: 7px !important;
+  row-gap: 2px !important;
+  align-items: center !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease !important;
+}
+
+.rp-ref-section-map__segment:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(17, 17, 17, .18) !important;
+  background: #fff !important;
+}
+
+.rp-ref-section-map__segment.is-active {
+  border-color: rgba(17, 17, 17, .88) !important;
+  background: #fff !important;
+  box-shadow: 0 8px 22px rgba(36, 31, 24, .075) !important;
+}
+
+.rp-ref-section-map__segment span {
+  grid-row: 1 / 3 !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 999px !important;
+  background: #f0ede6 !important;
+  color: #151515 !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+}
+
+.rp-ref-section-map__segment.is-active span {
+  background: #111 !important;
+  color: #fff !important;
+}
+
+.rp-ref-section-map__segment strong {
+  min-width: 0 !important;
+  color: #151515 !important;
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.rp-ref-section-map__segment small {
+  min-width: 0 !important;
+  color: #8a847a !important;
+  font-size: 8px !important;
+  line-height: 1 !important;
+  font-weight: 750 !important;
+}
+
+.rp-ref-section-map__segment i {
+  position: absolute !important;
+  left: 8px !important;
+  right: 8px !important;
+  bottom: 0 !important;
+  height: 2px !important;
+  border-radius: 999px 999px 0 0 !important;
+  background: transparent !important;
+}
+
+.rp-ref-section-map__segment.is-active i {
+  background: #111 !important;
+}
+
+.rp-ref-section-map__segment.is-clothes i { background: #111 !important; opacity: .28 !important; }
+.rp-ref-section-map__segment.is-shelves i { background: #977248 !important; opacity: .35 !important; }
+.rp-ref-section-map__segment.is-drawers i { background: #73695d !important; opacity: .35 !important; }
+.rp-ref-section-map__segment.is-mixed i { background: #e8612c !important; opacity: .45 !important; }
+.rp-ref-section-map__segment.is-empty i { background: #d9d4ca !important; opacity: .7 !important; }
+.rp-ref-section-map__segment.is-active i { opacity: 1 !important; }
+
+.rp-ref-section-map__legend {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  margin-top: 8px !important;
+  color: #8a847a !important;
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+
+.rp-ref-section-map__legend span,
+.rp-ref-section-map__legend b {
+  min-width: 0 !important;
+  font-weight: 750 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.rp-ref-section-map__legend b {
+  color: #151515 !important;
+  text-align: right !important;
+}
+
+.rp-ref-section-map__grid,
+.rp-ref-section-map__item,
+.rp-ref-section-map__select {
+  box-shadow: none !important;
+}
+
+@media (max-width: 1380px), (max-height: 820px) {
+  .rp-ref-section-map--compact {
+    padding: 10px !important;
+  }
+
+  .rp-ref-section-map__head--compact {
+    margin-bottom: 8px !important;
+  }
+
+  .rp-ref-section-map__head--compact span,
+  .rp-ref-section-map__legend {
+    display: none !important;
+  }
+
+  .rp-ref-section-map__head--compact p {
+    font-size: 9px !important;
+  }
+
+  .rp-ref-section-map__rail {
+    min-height: 50px !important;
+    padding: 5px !important;
+  }
+
+  .rp-ref-section-map__segment {
+    min-height: 40px !important;
+    padding: 6px !important;
+    grid-template-columns: 20px minmax(0, 1fr) !important;
+    gap: 5px !important;
+  }
+
+  .rp-ref-section-map__segment span {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .rp-ref-section-map__segment small {
+    display: none !important;
+  }
+}
