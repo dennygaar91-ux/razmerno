@@ -1,5 +1,6 @@
 import { apiPost, shouldUseMockApi } from './constructorApiClient'
 import { calculatePrice, getPriceBreakdown, getProjectSummary, getWarnings } from '../utils/constructorPricing'
+import { buildEstimateRequestContract } from '../utils/constructorContracts'
 
 async function createMockEstimate(project) {
   await new Promise(resolve => setTimeout(resolve, 220))
@@ -26,5 +27,5 @@ export async function calculateConstructorEstimate(project) {
     return createMockEstimate(project)
   }
 
-  return apiPost('/api/constructor/estimate', project)
+  return apiPost('/api/constructor/estimate', buildEstimateRequestContract(project))
 }
