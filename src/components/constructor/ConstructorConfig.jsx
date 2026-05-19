@@ -14,15 +14,120 @@ const fillingPresets = [
   ['empty', 'Пусто', 'очистить секцию', 'Очистить выбранную секцию'],
 ]
 
-function CounterField({ label, value, hint, unit = '', min, max, onMinus, onPlus }) {
+function getSectionWidth(project) {
+  return Math.round(project.dimensions.width / project.sections)
+}
+
+function getDimensionAdvisories(project) {
+  const sectionWidth = getSectionWidth(project)
+  const hasRail = project.filling.some(section => section.rail)
+  const hasDrawers = project.filling.some(section => section.drawers > 0)
+  const advisories = []
+
+  if (project.dimensions.depth < 550) {
+    advisories.push({
+      key: 'depth-rail',
+      tone: hasRail ? 'warning' : 'info',
+      title: 'Глубина для одежды',
+      text: hasRail
+        ? 'Для штанги нужна глубина от 550 мм. Сейчас одежда на плечиках может не помещаться.'
+        : 'Если планируете штангу, лучше поставить глубину от 550 мм.',
+    })
+  }
+
+  if (sectionWidth < 350) {
+    advisories.push({
+      key: 'section-too-narrow',
+      tone: 'warning',
+      title: 'Секции слишком узкие',
+      text: `Сейчас секция примерно ${sectionWidth} мм. Лучше уменьшить количество секций или увеличить ширину шкафа.`,
+    })
+  } else if (sectionWidth < 420 && hasDrawers) {
+    advisories.push({
+      key: 'drawer-width',
+      tone: 'recommendation',
+      title: 'Ширина для ящиков',
+      text: `Для ящиков комфортнее ширина секции от 420 мм. Сейчас примерно ${sectionWidth} мм.`,
+    })
+  }
+
+  if (project.dimensions.height < 1200) {
+    advisories.push({
+      key: 'low-height',
+      tone: 'info',
+      title: 'Низкий шкаф',
+      text: 'При небольшой высоте лучше не добавлять много полок и ящиков, чтобы оставить полезный объём.',
+    })
+  }
+
+  return advisories
+}
+
+function getActiveSectionAdvisories(project, activeSection) {
+  const sectionWidth = getSectionWidth(project)
+  const usefulHeight = project.dimensions.height - activeSection.drawers * 170 - (activeSection.rail ? 950 : 0)
+  const shelfGap = activeSection.shelves > 1 ? usefulHeight / (activeSection.shelves + 1) : usefulHeight
+  const drawerFaceHeight = activeSection.drawers > 0 ? project.dimensions.height / activeSection.drawers : project.dimensions.height
+  const advisories = []
+
+  if (activeSection.rail && project.dimensions.depth < 550) {
+    advisories.push({
+      key: 'active-rail-depth',
+      tone: 'warning',
+      title: 'Штанга требует глубину',
+      text: 'Для одежды на плечиках нужна глубина от 550 мм. Увеличьте глубину или уберите штангу.',
+    })
+  }
+
+  if (activeSection.drawers > 0 && sectionWidth < 420) {
+    advisories.push({
+      key: 'active-drawer-width',
+      tone: 'recommendation',
+      title: 'Ящики могут быть узкими',
+      text: `Секция примерно ${sectionWidth} мм. Для ящиков комфортнее от 420 мм.`,
+    })
+  }
+
+  if (activeSection.shelves > 1 && shelfGap < 200) {
+    advisories.push({
+      key: 'active-shelf-gap',
+      tone: 'warning',
+      title: 'Мало места между полками',
+      text: 'Комфортный шаг между полками — от 200 мм. Уберите часть полок или увеличьте высоту.',
+    })
+  }
+
+  if (activeSection.drawers > 0 && drawerFaceHeight < 150) {
+    advisories.push({
+      key: 'active-drawer-height',
+      tone: 'warning',
+      title: 'Низкие фасады ящиков',
+      text: 'Минимальная высота фасада ящика — около 150 мм. Лучше уменьшить количество ящиков.',
+    })
+  }
+
+  if (!advisories.length) {
+    advisories.push({
+      key: 'active-ok',
+      tone: 'success',
+      title: 'Секция выглядит безопасно',
+      text: 'Критичных ограничений по выбранной секции сейчас нет.',
+    })
+  }
+
+  return advisories
+}
+
+function CounterField({ label, value, hint, unit = '', min, max, onMinus, onPlus, advisory }) {
   const minusDisabled = typeof min === 'number' && value <= min
   const plusDisabled = typeof max === 'number' && value >= max
 
   return (
-    <div className="rp-ref-field rp-ref-field--polished">
+    <div className={`rp-ref-field rp-ref-field--polished ${advisory ? `has-advisory is-${advisory.tone}` : ''}`}>
       <div>
         <strong>{label}</strong>
         <span>{hint}</span>
+        {advisory && <small className="rp-ref-field-advisory">{advisory.text}</small>}
       </div>
       <div className="rp-ref-counter-wrap">
         <div className="rp-ref-counter">
@@ -36,15 +141,39 @@ function CounterField({ label, value, hint, unit = '', min, max, onMinus, onPlus
   )
 }
 
+function AdvisoryCard({ advisory }) {
+  return (
+    <div className={`rp-ref-advisory-card is-${advisory.tone}`}>
+      <Icon name={advisory.tone === 'success' ? 'check-circle' : 'clock'} size={14} />
+      <div>
+        <b>{advisory.title}</b>
+        <span>{advisory.text}</span>
+      </div>
+    </div>
+  )
+}
+
+function AdvisoryList({ title, items }) {
+  if (!items?.length) return null
+
+  return (
+    <div className="rp-ref-advisory-list">
+      {title && <h3>{title}</h3>}
+      {items.map((item) => <AdvisoryCard advisory={item} key={item.key} />)}
+    </div>
+  )
+}
+
 function WarningList({ warnings }) {
   if (!warnings?.length) return null
 
   return (
-    <div className="rp-ref-warnings">
+    <details className="rp-ref-warnings rp-ref-warnings--details">
+      <summary>Все рекомендации проекта <span>{warnings.length}</span></summary>
       {warnings.map((warning) => (
         <p key={warning}><Icon name="clock" size={14} />{warning}</p>
       ))}
-    </div>
+    </details>
   )
 }
 
@@ -82,7 +211,13 @@ function OptionList({ items = [], activeId, field, onChange, compact = false }) 
 }
 
 function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange }) {
-  const sectionWidth = Math.round(project.dimensions.width / project.sections)
+  const sectionWidth = getSectionWidth(project)
+  const advisories = getDimensionAdvisories(project)
+  const advisoryByField = {
+    depth: advisories.find(item => item.key === 'depth-rail'),
+    width: advisories.find(item => item.key === 'section-too-narrow' || item.key === 'drawer-width'),
+    height: advisories.find(item => item.key === 'low-height'),
+  }
 
   return (
     <>
@@ -96,6 +231,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
             value={project.dimensions[key]}
             hint={hint}
             unit={unit}
+            advisory={advisoryByField[key]}
             min={key === 'height' ? 200 : key === 'width' ? 400 : 300}
             max={key === 'height' ? 2800 : key === 'width' ? 3000 : 800}
             onMinus={() => onDimensionChange(key, -step)}
@@ -108,6 +244,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
           hint="от 1 до 6 вертикальных секций"
           min={1}
           max={6}
+          advisory={sectionWidth < 350 ? { tone: 'warning', text: `Сейчас секция примерно ${sectionWidth} мм — это слишком узко.` } : undefined}
           onMinus={() => onSectionsChange(-1)}
           onPlus={() => onSectionsChange(1)}
         />
@@ -126,6 +263,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
         </div>
       </div>
 
+      <AdvisoryList title="Подсказки по размерам" items={advisories} />
       <WarningList warnings={warnings} />
     </>
   )
@@ -134,6 +272,7 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
 function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onPresetApply, onCopySection, onApplySectionToAll, onClearSection, onZoneRailToggle }) {
   const activeSection = project.filling[project.activeSection - 1] ?? { shelves: 0, drawers: 0, rail: false }
   const railDisabled = project.dimensions.depth < 550
+  const activeAdvisories = getActiveSectionAdvisories(project, activeSection)
 
   const activePreset = activeSection.rail && activeSection.shelves <= 2 && activeSection.drawers === 0
     ? 'Гардероб'
@@ -177,6 +316,8 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
         </div>
         <strong>{activeSection.shelves} полок · {activeSection.drawers} ящиков · {activeSection.rail ? 'штанга' : 'без штанги'}</strong>
       </div>
+
+      <AdvisoryList title="Проверка выбранной секции" items={activeAdvisories} />
 
       <div className="rp-ref-block rp-ref-block--polished rp-ref-section-direct-actions">
         <h3>Действия для секции {project.activeSection}</h3>
