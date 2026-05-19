@@ -32,6 +32,95 @@ function CheckItem({ done, children, warning }) {
   )
 }
 
+function classifyWarning(text) {
+  const lower = String(text).toLowerCase()
+  const criticalWords = ['нужна глубина', 'слишком узк', 'минимальная', 'мало места', 'не помещаться', 'требует']
+  const isCritical = criticalWords.some(word => lower.includes(word))
+
+  return {
+    text,
+    severity: isCritical ? 'critical' : 'recommendation',
+  }
+}
+
+function SummaryStatusList({ warnings, isReady }) {
+  const classified = warnings.map(classifyWarning)
+  const critical = classified.filter(item => item.severity === 'critical')
+  const recommendations = classified.filter(item => item.severity !== 'critical')
+
+  if (isReady) {
+    return (
+      <div className="rp-summary-status-list rp-summary-status-list--ok">
+        <div className="rp-summary-status-list__item is-success">
+          <span>✓</span>
+          <div>
+            <b>Критичных ограничений нет</b>
+            <small>Проект можно отправить на проверку технологом.</small>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!warnings.length) {
+    return (
+      <div className="rp-summary-status-list rp-summary-status-list--ok">
+        <div className="rp-summary-status-list__item is-success">
+          <span>✓</span>
+          <div>
+            <b>Ограничений нет</b>
+            <small>Заполните оставшиеся шаги, чтобы перейти к заявке.</small>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rp-summary-status-list">
+      {critical.length > 0 && (
+        <div className="rp-summary-status-group is-critical">
+          <div className="rp-summary-status-group__head">
+            <span>Критично</span>
+            <b>{critical.length}</b>
+          </div>
+          {critical.slice(0, 3).map((item) => (
+            <div className="rp-summary-status-list__item is-critical" key={item.text}>
+              <span>!</span>
+              <div>
+                <b>{item.text}</b>
+                <small>Лучше исправить до заявки, чтобы технолог не вернул проект на доработку.</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {recommendations.length > 0 && (
+        <div className="rp-summary-status-group is-recommendation">
+          <div className="rp-summary-status-group__head">
+            <span>Рекомендации</span>
+            <b>{recommendations.length}</b>
+          </div>
+          {recommendations.slice(0, 3).map((item) => (
+            <div className="rp-summary-status-list__item is-recommendation" key={item.text}>
+              <span>i</span>
+              <div>
+                <b>{item.text}</b>
+                <small>Можно отправить проект, но лучше проверить параметр.</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {warnings.length > 6 && (
+        <p className="rp-summary-status-list__more">Показаны основные пункты. Остальные рекомендации видны в левой панели.</p>
+      )}
+    </div>
+  )
+}
+
 export default function ConstructorSummary({ project, summary, warnings = [], estimateState = 'idle', onCheckout }) {
   const [estimateOpen, setEstimateOpen] = useState(false)
 
@@ -61,8 +150,21 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
   const breakdown = project.priceBreakdown ?? {}
   const estimateRows = useMemo(() => getEstimateRows(project, summary, breakdown), [project, summary, breakdown])
   const estimateTotal = estimateRows.reduce((sum, row) => sum + row.value, 0)
-  const statusText = isCalculating ? 'Проверяем' : hasEstimateError ? 'Предварительно' : isReady ? 'Готово к заявке' : 'Проверьте пункты'
-  const statusClass = isCalculating ? 'is-loading' : hasEstimateError ? 'has-error' : isReady ? 'is-ready' : 'has-warning'
+  const classifiedWarnings = warnings.map(classifyWarning)
+  const criticalCount = classifiedWarnings.filter(item => item.severity === 'critical').length
+  const recommendationCount = warnings.length - criticalCount
+  const statusText = isCalculating
+    ? 'Проверяем'
+    : hasEstimateError
+      ? 'Предварительно'
+      : criticalCount
+        ? `${criticalCount} критично`
+        : recommendationCount
+          ? `${recommendationCount} рекомендац.`
+          : isReady
+            ? 'Готово к заявке'
+            : 'Проверьте пункты'
+  const statusClass = isCalculating ? 'is-loading' : hasEstimateError ? 'has-error' : isReady ? 'is-ready' : warnings.length ? 'has-warning' : 'is-neutral'
 
   return (
     <aside className={`rp-ctor-summary rp-ref-summary rp-target-summary ${statusClass}`}>
@@ -70,7 +172,7 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         <div>
           <span>Ваш проект</span>
           <h3>Текущая конфигурация</h3>
-          <p>{isReady ? 'Параметры заполнены. Можно перейти к заявке.' : 'Проверьте размеры, наполнение и материалы перед заявкой.'}</p>
+          <p>{isReady ? 'Параметры заполнены. Можно перейти к заявке.' : criticalCount ? 'Есть ограничения, которые лучше исправить до заявки.' : 'Проверьте размеры, наполнение и материалы перед заявкой.'}</p>
         </div>
       </section>
 
@@ -90,17 +192,17 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
         ))}
       </section>
 
-      <section className="rp-target-card rp-target-check-card rp-target-check-card--list">
+      <section className="rp-target-card rp-target-check-card rp-target-check-card--list rp-target-check-card--structured">
         <div className="rp-target-check-card__head">
           <h3>Проверка проекта</h3>
           <span>{statusText}</span>
         </div>
-        <ul className="rp-target-checklist">
+        <ul className="rp-target-checklist rp-target-checklist--base">
           <CheckItem done={dimensionsDone}>Размеры заданы</CheckItem>
           <CheckItem done={fillingDone}>Наполнение настроено</CheckItem>
           <CheckItem done={materialsDone}>Материалы выбраны</CheckItem>
-          <CheckItem done={!warnings.length} warning={warnings.length > 0}>{warnings.length ? warnings[0] : 'Ограничений нет'}</CheckItem>
         </ul>
+        <SummaryStatusList warnings={warnings} isReady={isReady} />
       </section>
 
       <section className="rp-target-card rp-target-kit-card">
