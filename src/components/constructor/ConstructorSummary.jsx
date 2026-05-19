@@ -134,6 +134,11 @@ const nextSteps = [
   ['3', 'Подготовим комплект', 'После согласования подготовим детали, кромку и фурнитуру для сборки.'],
 ]
 
+const estimateTrustItems = [
+  ['Что входит', 'ЛДСП, распил, кромление, базовая фурнитура и упаковка.'],
+  ['Что уточняется', 'Доставка, сборка, нестандартная фурнитура и финальная проверка технологом.'],
+]
+
 export default function ConstructorSummary({ project, summary, warnings = [], estimateState = 'idle', onCheckout }) {
   const [estimateOpen, setEstimateOpen] = useState(false)
 
@@ -258,13 +263,28 @@ export default function ConstructorSummary({ project, summary, warnings = [], es
       </section>
 
       {estimateOpen && (
-        <section className="rp-target-card rp-ref-breakdown-card rp-ref-breakdown-card--open rp-ref-breakdown-card--detailed">
-          <div className="rp-ref-breakdown-card__head">
-            <h3>Предварительная смета</h3>
-            <span>{formatPrice(estimateTotal)} ₽</span>
+        <section className="rp-target-card rp-ref-breakdown-card rp-ref-breakdown-card--open rp-ref-breakdown-card--detailed rp-summary-estimate-card">
+          <div className="rp-ref-breakdown-card__head rp-summary-estimate-card__head">
+            <div>
+              <span>Расчёт</span>
+              <h3>Предварительная смета</h3>
+            </div>
+            <strong>{formatPrice(estimateTotal)} ₽</strong>
           </div>
-          <p className="rp-ref-breakdown-note">Сейчас это frontend-оценка. Backend позже будет считать по актуальным ценам материалов, фурнитуры и работ.</p>
+          <p className="rp-ref-breakdown-note rp-summary-estimate-card__note">Смета помогает понять структуру цены. Финальную стоимость подтвердим после проверки технологом и актуальных цен материалов.</p>
+          <div className="rp-summary-estimate-total">
+            <span>Итого по текущей конфигурации</span>
+            <b>{formatPrice(estimateTotal)} ₽</b>
+          </div>
           {estimateRows.map(row => <EstimateRow key={row.key} row={row} total={estimateTotal} />)}
+          <div className="rp-summary-estimate-trust">
+            {estimateTrustItems.map(([title, text]) => (
+              <div key={title}>
+                <b>{title}</b>
+                <span>{text}</span>
+              </div>
+            ))}
+          </div>
         </section>
       )}
     </aside>
