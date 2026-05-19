@@ -45,6 +45,41 @@ const fillingPresets = [
   ['empty', 'Пусто', 'очистить секцию', 'Очистить выбранную секцию'],
 ]
 
+const fillingScenarios = [
+  {
+    id: 'clothes',
+    icon: '👕',
+    title: 'Для одежды',
+    text: 'Штанга и верхняя полка для вещей на плечиках',
+    result: 'сценарий гардероба',
+    preset: 'clothes',
+  },
+  {
+    id: 'linen',
+    icon: '▤',
+    title: 'Для белья',
+    text: 'Блок ящиков для белья, аксессуаров и мелких вещей',
+    result: 'ящики снизу',
+    preset: 'drawers',
+  },
+  {
+    id: 'hallway',
+    icon: '🧥',
+    title: 'Для прихожей',
+    text: 'Комбо из ящиков и полок для повседневного хранения',
+    result: 'ящики + полки',
+    preset: 'combo',
+  },
+  {
+    id: 'boxes',
+    icon: '□',
+    title: 'Для коробок',
+    text: 'Больше открытых полок для коробок и сезонных вещей',
+    result: 'много полок',
+    preset: 'shelves',
+  },
+]
+
 function getSectionWidth(project) {
   return Math.round(project.dimensions.width / project.sections)
 }
@@ -343,6 +378,30 @@ function DimensionsStep({ project, warnings, onDimensionChange, onSectionsChange
   )
 }
 
+function FillingScenarioGrid({ onScenarioApply }) {
+  return (
+    <div className="rp-ref-block rp-ref-block--polished rp-ref-filling-scenarios">
+      <div className="rp-ref-block-title-row">
+        <div>
+          <h3>Что будет храниться?</h3>
+          <p>Выберите сценарий для активной секции. Его можно потом уточнить кнопками ниже.</p>
+        </div>
+      </div>
+      <div className="rp-ref-filling-scenarios__grid">
+        {fillingScenarios.map((scenario) => (
+          <button type="button" key={scenario.id} onClick={() => onScenarioApply(scenario.preset)}>
+            <span>{scenario.icon}</span>
+            <strong>{scenario.title}</strong>
+            <small>{scenario.text}</small>
+            <em>{scenario.result}</em>
+          </button>
+        ))}
+      </div>
+      <p className="rp-ref-filling-scenarios__note">Сценарий применяется только к выбранной секции, чтобы не сломать уже настроенные части шкафа.</p>
+    </div>
+  )
+}
+
 function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect, onSectionPartChange, onPresetApply, onCopySection, onApplySectionToAll, onClearSection, onZoneRailToggle }) {
   const activeSection = project.filling[project.activeSection - 1] ?? { shelves: 0, drawers: 0, rail: false }
   const railDisabled = project.dimensions.depth < 550
@@ -361,6 +420,8 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
   return (
     <>
       <StepHint title="Настройте выбранную секцию" text="Выберите секцию и добавьте полки, ящики или штангу. Активная секция подсвечивается в центре и на карте." />
+
+      <FillingScenarioGrid onScenarioApply={onPresetApply} />
 
       <div className="rp-ref-block rp-ref-block--topless rp-ref-block--polished">
         <h3>Секция для редактирования</h3>
@@ -411,8 +472,8 @@ function FillingStep({ project, warnings, activeSectionWarnings, onSectionSelect
       </div>
 
       <div className="rp-ref-block rp-ref-block--polished">
-        <h3>Готовые сценарии</h3>
-        <p>Быстро заполните выбранную секцию</p>
+        <h3>Точные действия</h3>
+        <p>Для ручной настройки выбранной секции</p>
         <div className="rp-ref-preset-grid rp-ref-preset-grid--polished">
           {fillingPresets.map(([id, title, text, description]) => (
             <button type="button" key={id} onClick={() => onPresetApply(id)}>
