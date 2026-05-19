@@ -16,6 +16,12 @@ const initialCustomer = {
   comment: '',
 }
 
+const successSteps = [
+  ['1', 'Проверка технологом', 'Проверим размеры, материалы, фурнитуру и возможность производства.'],
+  ['2', 'Подтверждение стоимости', 'Если потребуется, уточним доставку, сборку и нестандартные позиции.'],
+  ['3', 'Оплата и запуск', 'После согласования отправим ссылку на оплату и запустим комплект в работу.'],
+]
+
 function validateCustomer(customer, agreementAccepted) {
   const errors = {}
 
@@ -244,17 +250,35 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
 
         <div className="rp-checkout__body rp-checkout__body--polished">
           {isSuccess ? (
-            <section className="rp-checkout__success" role="status">
+            <section className="rp-checkout__success rp-checkout__success--final" role="status">
               <div className="rp-checkout__success-icon">✓</div>
-              <h3>Заявка {orderId} создана</h3>
-              <p>Следующий шаг — менеджер проверит деталировку, подтвердит стоимость и отправит ссылку на оплату.</p>
+              <span className="rp-checkout__success-kicker">Заявка принята</span>
+              <h3>{orderId ? `Заявка ${orderId} создана` : 'Заявка создана'}</h3>
+              <p>Мы получили параметры шкафа. Оплата пока не списывается: сначала технолог проверит проект, подтвердит стоимость и только после этого менеджер отправит следующий шаг.</p>
+
+              <div className="rp-checkout__success-total">
+                <span>Ориентир по заявке</span>
+                <b>{formatPrice(finalTotal)} ₽</b>
+                <small>Финальная сумма может измениться после проверки материалов, доставки и сборки.</small>
+              </div>
+
               <dl>
                 <div><dt>Комплект</dt><dd>{formatPrice(project.price)} ₽</dd></div>
                 <div><dt>Доставка</dt><dd>{deliveryPrice ? `${formatPrice(deliveryPrice)} ₽` : 'самовывоз'}</dd></div>
                 <div><dt>Сборка</dt><dd>{assemblySelected ? `${formatPrice(assemblyPrice)} ₽` : 'не выбрана'}</dd></div>
-                <div><dt>Итого ориентир</dt><dd>{formatPrice(finalTotal)} ₽</dd></div>
                 <div><dt>Контакт</dt><dd>{customer.phone}</dd></div>
+                <div><dt>Адрес</dt><dd>{customer.address}</dd></div>
               </dl>
+
+              <div className="rp-checkout__success-next">
+                {successSteps.map(([num, title, text]) => (
+                  <div key={num}>
+                    <b>{num}</b>
+                    <span>{title}</span>
+                    <small>{text}</small>
+                  </div>
+                ))}
+              </div>
             </section>
           ) : (
             <>
