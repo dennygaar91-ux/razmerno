@@ -105,6 +105,38 @@
   line-height: 1.05 !important;
 }
 
+.rp-ctor-flow > button::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 26px !important;
+  right: 26px !important;
+  bottom: 0 !important;
+  height: 2px !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+}
+
+.rp-ctor-flow > button.is-active::after {
+  background: #111 !important;
+}
+
+.rp-ctor-flow > button.is-complete span {
+  background: #111 !important;
+  color: #fff !important;
+}
+
+.rp-ctor-flow > button.is-complete span::before {
+  content: '✓' !important;
+}
+
+.rp-ctor-flow > button.is-complete span {
+  font-size: 0 !important;
+}
+
+.rp-ctor-flow > button.is-complete span::before {
+  font-size: 12px !important;
+}
+
 .rp-ctor-page--reference .rp-ctor-shell {
   gap: 12px !important;
 }
@@ -118,7 +150,7 @@
 }
 
 .rp-target-summary {
-  grid-template-rows: 102px minmax(128px, auto) 138px 78px 104px minmax(90px, auto) !important;
+  grid-template-rows: 92px minmax(128px, auto) 138px 124px 104px minmax(90px, auto) !important;
   gap: 8px !important;
 }
 
@@ -142,6 +174,56 @@
 .rp-target-price-card strong {
   font-size: 32px !important;
   line-height: .95 !important;
+}
+
+.rp-target-check-card--list {
+  min-height: 120px !important;
+}
+
+.rp-target-checklist {
+  list-style: none !important;
+  display: grid !important;
+  gap: 6px !important;
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+}
+
+.rp-target-checklist li {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 7px !important;
+  color: #706c65 !important;
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+}
+
+.rp-target-checklist li span {
+  display: grid !important;
+  place-items: center !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 999px !important;
+  background: #f1eee8 !important;
+  color: #111 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+}
+
+.rp-target-checklist li.is-done span {
+  background: #111 !important;
+  color: #fff !important;
+}
+
+.rp-target-checklist li.has-warning span {
+  background: #f6d777 !important;
+  color: #3f2a00 !important;
+}
+
+.rp-target-checklist li b {
+  min-width: 0 !important;
+  font-weight: 650 !important;
+  color: inherit !important;
 }
 
 /* Right summary: force legacy black price card into target light system if old markup/styles remain. */
@@ -281,6 +363,155 @@
   border-radius: 12px !important;
 }
 
+.rp-ref-section-tabs small,
+.rp-ref-section-map__item b {
+  white-space: normal !important;
+}
+
+.rp-ref-zone-actions--section button:first-child,
+.rp-ref-zone-actions--section button:nth-child(2),
+.rp-ref-zone-actions--section button:nth-child(3),
+.rp-ref-section-map__item.is-active .rp-ref-section-map__select {
+  border-color: #111 !important;
+}
+
+.rp-ref-section-direct-actions .rp-ref-zone-hint,
+.rp-ref-warnings p {
+  background: #fff7d6 !important;
+  border-color: rgba(220, 170, 35, .45) !important;
+  color: #4f3800 !important;
+}
+
+.rp-ref-step-hint,
+.rp-ref-info--materials {
+  background: #f2f1ed !important;
+  color: #3b3935 !important;
+}
+
+.rp-ref-step-hint svg,
+.rp-ref-info--materials svg {
+  color: #111 !important;
+}
+
+.rp-ref-section-width-diagram {
+  display: flex !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-height: 46px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(226, 221, 212, .95) !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+}
+
+.rp-ref-section-width-diagram span {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  border-right: 1px solid rgba(226, 221, 212, .8) !important;
+}
+
+.rp-ref-section-width-diagram span:last-child {
+  border-right: 0 !important;
+}
+
+.rp-ref-section-width-diagram b {
+  font-size: 11px !important;
+  color: #111 !important;
+}
+
+.rp-ref-section-width-diagram em {
+  font-size: 8px !important;
+  font-style: normal !important;
+  color: #706c65 !important;
+}
+
+.rp-ctor-viewer .cp-quick-actions,
+.rp-ctor-viewer .rp-ref-quick-actions,
+.rp-ctor-viewer .rp-target-quick-actions {
+  display: none !important;
+}
+
+.rp-ref-scene {
+  position: relative !important;
+}
+
+.rp-ref-scene::after {
+  content: 'Редактируется секция ' attr(data-active-section) !important;
+  position: absolute !important;
+  left: 22px !important;
+  bottom: 18px !important;
+  z-index: 3 !important;
+  padding: 7px 10px !important;
+  border-radius: 999px !important;
+  background: #111 !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+}
+
+.rp-ctor-col.is-active {
+  outline: 2px solid #111 !important;
+  outline-offset: 4px !important;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, .16) !important;
+}
+
+.rp-ctor-col.is-active::after {
+  content: 'Секция' !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: -30px !important;
+  transform: translateX(-50%) !important;
+  padding: 5px 9px !important;
+  border-radius: 999px !important;
+  background: #111 !important;
+  color: #fff !important;
+  font-size: 9px !important;
+  font-weight: 750 !important;
+}
+
+.rp-ctor-wardrobe--tone-wood,
+.rp-ctor-wardrobe--tone-sonoma {
+  --wardrobe-panel: #d7b98b;
+  --wardrobe-panel-soft: #ead7b8;
+  --wardrobe-line: rgba(100, 67, 30, .28);
+}
+
+.rp-ctor-wardrobe--tone-white {
+  --wardrobe-panel: #f7f5ef;
+  --wardrobe-panel-soft: #fffdf8;
+  --wardrobe-line: rgba(120, 116, 104, .22);
+}
+
+.rp-ctor-wardrobe--tone-gray {
+  --wardrobe-panel: #b8b8b2;
+  --wardrobe-panel-soft: #d7d7d1;
+  --wardrobe-line: rgba(70, 70, 68, .28);
+}
+
+.rp-ctor-wardrobe--tone-oak {
+  --wardrobe-panel: #c69a5f;
+  --wardrobe-panel-soft: #e3c188;
+  --wardrobe-line: rgba(91, 58, 20, .28);
+}
+
+.rp-ctor-wardrobe--renderlike,
+.rp-ctor-wardrobe--renderlike .rp-ctor-top,
+.rp-ctor-wardrobe--renderlike .rp-ctor-col,
+.rp-ctor-wardrobe--renderlike .rp-ctor-zone,
+.rp-ctor-wardrobe--renderlike .rp-wardrobe-shelf,
+.rp-ctor-wardrobe--renderlike .rp-wardrobe-drawer {
+  background-color: var(--wardrobe-panel, #d7b98b) !important;
+  border-color: var(--wardrobe-line, rgba(100, 67, 30, .28)) !important;
+}
+
+.rp-ctor-wardrobe--renderlike .rp-ctor-zone {
+  background: linear-gradient(180deg, var(--wardrobe-panel-soft, #ead7b8), var(--wardrobe-panel, #d7b98b)) !important;
+}
+
 /* Desktop/laptop compact safety. */
 @media (max-width: 1380px), (max-height: 820px) {
   .rp-ctor-page--reference {
@@ -335,7 +566,7 @@
   }
 
   .rp-target-summary {
-    grid-template-rows: 96px minmax(116px, auto) 116px 70px 88px 74px !important;
+    grid-template-rows: 82px minmax(116px, auto) 116px 116px 88px 74px !important;
   }
 
   .rp-target-price-card strong {
