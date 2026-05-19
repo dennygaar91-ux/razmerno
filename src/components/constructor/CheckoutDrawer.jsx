@@ -73,18 +73,27 @@ function CheckoutProgress({ current }) {
   )
 }
 
+function getDeliveryPrice(deliveryMode, outsideMkadKm) {
+  if (deliveryMode === 'pickup') return 0
+  if (deliveryMode === 'mo') return 6000 + Math.max(0, Number(outsideMkadKm) || 0) * 75
+  return 6000
+}
+
 export default function CheckoutDrawer({ open, project, summary, orderPayload, onClose }) {
   const [customer, setCustomer] = useState(initialCustomer)
   const [errors, setErrors] = useState({})
   const [submitState, setSubmitState] = useState('idle')
   const [checkoutStep, setCheckoutStep] = useState('review')
   const [deliveryMode, setDeliveryMode] = useState('mkad')
+  const [outsideMkadKm, setOutsideMkadKm] = useState(0)
+  const [assemblySelected, setAssemblySelected] = useState(false)
   const [paymentMode, setPaymentMode] = useState('after-check')
   const [agreementAccepted, setAgreementAccepted] = useState(true)
   const [orderId, setOrderId] = useState('')
 
-  const deliveryPrice = deliveryMode === 'pickup' ? 0 : 6000
-  const finalTotal = project.price + deliveryPrice
+  const deliveryPrice = getDeliveryPrice(deliveryMode, outsideMkadKm)
+  const assemblyPrice = assemblySelected ? Math.round(project.price * 0.1 / 10) * 10 : 0
+  const finalTotal = project.price + deliveryPrice + assemblyPrice
 
   const orderRows = useMemo(() => [
     ['Размер', `${project.dimensions.height} × ${project.dimensions.width} × ${project.dimensions.depth} мм`],
@@ -94,6 +103,12 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
     ['Наполнение', `${summary.shelves} полок · ${summary.drawers} ящиков · ${summary.rails} штанг`],
     ['Срок', '10–14 дней'],
   ], [project, summary])
+
+  const checkoutTotals = [
+    ['Комплект деталей', project.price],
+    ['Доставка', deliveryPrice],
+    ['Сборка', assemblyPrice],
+  ]
 
   useEffect(() => {
     if (!open) return undefined
@@ -135,6 +150,23 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
     setSubmitState('idle')
   }
 
+  function updateDeliveryMode(nextMode) {
+    setDeliveryMode(nextMode)
+    if (nextMode !== 'mo') setOutsideMkadKm(0)
+    setSubmitState('idle')
+  }
+
+  function updateOutsideMkadKm(value) {
+    const numericValue = Math.max(0, Math.min(250, Number(value) || 0))
+    setOutsideMkadKm(numericValue)
+    setSubmitState('idle')
+  }
+
+  function updateAssembly(value) {
+    setAssemblySelected(value)
+    setSubmitState('idle')
+  }
+
   async function handleSubmit() {
     const nextErrors = validateCustomer(customer, agreementAccepted)
     setErrors(nextErrors)
@@ -151,9 +183,19 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
       delivery: {
         mode: deliveryMode,
         price: deliveryPrice,
+        outsideMkadKm: deliveryMode === 'mo' ? outsideMkadKm : 0,
+        basePrice: deliveryMode === 'pickup' ? 0 : 6000,
+        pricePerKm: deliveryMode === 'mo' ? 75 : 0,
         address: customer.address,
         entrance: customer.entrance,
         floor: customer.floor,
+      },
+      services: {
+        assembly: {
+          selected: assemblySelected,
+          rate: 0.1,
+          price: assemblyPrice,
+        },
       },
       auth: {
         mode: 'guest',
@@ -209,6 +251,7 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
               <dl>
                 <div><dt>Комплект</dt><dd>{formatPrice(project.price)} ₽</dd></div>
                 <div><dt>Доставка</dt><dd>{deliveryPrice ? `${formatPrice(deliveryPrice)} ₽` : 'самовывоз'}</dd></div>
+                <div><dt>Сборка</dt><dd>{assemblySelected ? `${formatPrice(assemblyPrice)} ₽` : 'не выбрана'}</dd></div>
                 <div><dt>Итого ориентир</dt><dd>{formatPrice(finalTotal)} ₽</dd></div>
                 <div><dt>Контакт</dt><dd>{customer.phone}</dd></div>
               </dl>
@@ -220,7 +263,16 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
               <section className="rp-checkout__hero-total rp-checkout__hero-total--structured">
                 <span>Ориентировочно к оплате после проверки</span>
                 <strong>{formatPrice(finalTotal)} ₽</strong>
-                <p>Комплект {formatPrice(project.price)} ₽ + доставка {deliveryPrice ? `${formatPrice(deliveryPrice)} ₽` : '0 ₽'}.</p>
+                <p>Комплект {formatPrice(project.price)} ₽ + доставка {deliveryPrice ? `${formatPrice(deliveryPrice)} ₽` : '0 ₽'}{assemblySelected ? ` + сборка ${formatPrice(assemblyPrice)} ₽` : ''}.</p>
+              </section>
+
+              <section className="rp-checkout__total-breakdown" aria-label="Состав предварительной суммы">
+                {checkoutTotals.map(([label, value]) => (
+                  <div key={label}>
+                    <span>{label}</span>
+                    <b>{value ? `${formatPrice(value)} ₽` : '0 ₽'}</b>
+                  </div>
+                ))}
               </section>
 
               {checkoutStep === 'review' ? (
@@ -248,9 +300,26 @@ export default function CheckoutDrawer({ open, project, summary, orderPayload, o
                   </div>
 
                   <div className="rp-checkout__option-grid rp-checkout__option-grid--delivery" role="group" aria-label="Способ доставки">
-                    <button className={deliveryMode === 'mkad' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'mkad'} onClick={() => setDeliveryMode('mkad')}>Москва МКАД<span>6 000 ₽</span></button>
-                    <button className={deliveryMode === 'mo' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'mo'} onClick={() => setDeliveryMode('mo')}>МО / за МКАД<span>от 6 000 ₽ + км</span></button>
-                    <button className={deliveryMode === 'pickup' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'pickup'} onClick={() => setDeliveryMode('pickup')}>Самовывоз<span>0 ₽</span></button>
+                    <button className={deliveryMode === 'mkad' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'mkad'} onClick={() => updateDeliveryMode('mkad')}>Москва МКАД<span>6 000 ₽</span></button>
+                    <button className={deliveryMode === 'mo' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'mo'} onClick={() => updateDeliveryMode('mo')}>МО / за МКАД<span>6 000 ₽ + 75 ₽/км</span></button>
+                    <button className={deliveryMode === 'pickup' ? 'is-active' : ''} type="button" aria-pressed={deliveryMode === 'pickup'} onClick={() => updateDeliveryMode('pickup')}>Самовывоз<span>0 ₽</span></button>
+                  </div>
+
+                  {deliveryMode === 'mo' && (
+                    <label className="rp-checkout__distance" htmlFor="checkout-distance">
+                      <span>Км за МКАД</span>
+                      <input id="checkout-distance" type="number" min="0" max="250" value={outsideMkadKm} onChange={(event) => updateOutsideMkadKm(event.target.value)} />
+                      <small>Доставка: 6 000 ₽ + {outsideMkadKm} км × 75 ₽ = {formatPrice(deliveryPrice)} ₽</small>
+                    </label>
+                  )}
+
+                  <div className="rp-checkout__service-card">
+                    <div>
+                      <span>Дополнительная услуга</span>
+                      <b>Сборка мебели</b>
+                      <small>+10% от стоимости комплекта: {formatPrice(assemblyPrice || Math.round(project.price * 0.1 / 10) * 10)} ₽</small>
+                    </div>
+                    <button className={assemblySelected ? 'is-active' : ''} type="button" aria-pressed={assemblySelected} onClick={() => updateAssembly(!assemblySelected)}>{assemblySelected ? 'Выбрана' : 'Добавить'}</button>
                   </div>
 
                   <div className="rp-checkout__fields rp-checkout__fields--polished rp-checkout__fields--delivery">
