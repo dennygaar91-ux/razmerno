@@ -109,6 +109,12 @@ function getProjectShareUrl(projectId) {
   return url.toString()
 }
 
+function getProjectIdFromUrl() {
+  if (typeof window === 'undefined') return ''
+  const params = new URLSearchParams(window.location.search)
+  return params.get('project')?.trim() ?? ''
+}
+
 export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
@@ -123,6 +129,7 @@ export default function ConstructorPage() {
   const [remoteEstimate, setRemoteEstimate] = useState(null)
   const saveTimerRef = useRef(null)
   const estimateTimerRef = useRef(null)
+  const urlLoadAttemptedRef = useRef(false)
 
   const summary = getProjectSummary(project)
   const warnings = getWarnings(project, summary)
@@ -143,6 +150,36 @@ export default function ConstructorPage() {
   useEffect(() => () => {
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current)
     if (estimateTimerRef.current) window.clearTimeout(estimateTimerRef.current)
+  }, [])
+
+  useEffect(() => {
+    if (urlLoadAttemptedRef.current) return
+    const urlProjectId = getProjectIdFromUrl()
+    if (!urlProjectId) return
+
+    urlLoadAttemptedRef.current = true
+    setSyncState('loading')
+
+    async function loadProjectFromUrl() {
+      const remoteResult = await loadConstructorProjectRemote(urlProjectId)
+
+      if (remoteResult.ok) {
+        setProject(remoteResult.project)
+        setProjectId(remoteResult.projectId ?? urlProjectId)
+        saveConstructorProjectId(remoteResult.projectId ?? urlProjectId)
+        setNotice(`Загружен проект по ссылке: ${remoteResult.projectId ?? urlProjectId}`)
+        setShowOnboarding(false)
+        setSyncState('loaded')
+        return
+      }
+
+      setProjectId(urlProjectId)
+      saveConstructorProjectId(urlProjectId)
+      setNotice('Ссылка проекта найдена, но remote-загрузка пока недоступна. Оставляем локальную версию проекта.')
+      setSyncState('error')
+    }
+
+    loadProjectFromUrl()
   }, [])
 
   useEffect(() => {
