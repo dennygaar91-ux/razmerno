@@ -3,9 +3,13 @@
    Goal: make the constructor usable as a vertical mobile flow, not only a compressed desktop
    ========================================================= */
 
+.rp-mobile-cta {
+  display: none !important;
+}
+
 @media (max-width: 920px) {
   .rp-ctor-page--reference {
-    padding-bottom: 92px !important;
+    padding-bottom: 108px !important;
   }
 
   .rp-ctor-hero {
@@ -136,7 +140,7 @@
   .rp-ref-config-nav,
   .rp-ref-config-nav--polished {
     position: sticky !important;
-    bottom: 12px !important;
+    bottom: 84px !important;
     z-index: 30 !important;
     padding: 8px !important;
     border-radius: 999px !important;
@@ -154,6 +158,69 @@
   .rp-target-price-card button,
   .rp-summary-price-card button {
     min-height: 46px !important;
+  }
+
+  .rp-mobile-cta {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    z-index: 80 !important;
+    min-height: 66px !important;
+    padding: 9px !important;
+    border-radius: 22px !important;
+    background: rgba(17, 17, 17, .94) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, .1) !important;
+    box-shadow: 0 22px 58px rgba(0, 0, 0, .24) !important;
+    backdrop-filter: blur(18px) !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  .rp-mobile-cta div {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 2px !important;
+  }
+
+  .rp-mobile-cta span {
+    color: rgba(255, 255, 255, .62) !important;
+    font-size: 8px !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    letter-spacing: .09em !important;
+    text-transform: uppercase !important;
+  }
+
+  .rp-mobile-cta b {
+    color: #fff !important;
+    font-size: 18px !important;
+    line-height: 1 !important;
+    font-weight: 950 !important;
+    letter-spacing: -.045em !important;
+  }
+
+  .rp-mobile-cta small {
+    color: rgba(255, 255, 255, .66) !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+  }
+
+  .rp-mobile-cta button {
+    min-width: 112px !important;
+    min-height: 46px !important;
+    padding: 0 16px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 12px !important;
+    font-weight: 950 !important;
+    cursor: pointer !important;
   }
 
   .rp-checkout__panel {
@@ -197,6 +264,14 @@
   .rp-ref-active-section--with-actions strong {
     max-width: 100% !important;
     text-align: left !important;
+  }
+
+  .rp-mobile-cta {
+    border-radius: 20px !important;
+  }
+
+  .rp-mobile-cta button {
+    min-width: 96px !important;
   }
 
   .rp-checkout__head,
