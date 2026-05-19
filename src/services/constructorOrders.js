@@ -16,10 +16,31 @@ async function createMockOrder(payload) {
   }
 }
 
-export async function createConstructorOrder(payload) {
-  if (shouldUseMockApi()) {
-    return createMockOrder(payload)
+function normalizeOrderContract(payload) {
+  if (payload?.contractVersion && payload?.schemaVersion) {
+    return payload
   }
 
-  return apiPost('/api/constructor/orders', payload)
+  return {
+    contractVersion: 'razmerno-constructor-v1',
+    schemaVersion: 'order-mvp-v1',
+    requestId: `order_${Date.now().toString(36)}`,
+    order: payload,
+    audit: {
+      createdBy: 'guest_checkout',
+      source: 'razmerno_constructor',
+      paymentRequiredNow: false,
+      finalPriceRequiresManagerReview: true,
+    },
+  }
+}
+
+export async function createConstructorOrder(payload) {
+  const contractPayload = normalizeOrderContract(payload)
+
+  if (shouldUseMockApi()) {
+    return createMockOrder(contractPayload)
+  }
+
+  return apiPost('/api/constructor/orders', contractPayload)
 }
