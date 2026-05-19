@@ -25,6 +25,7 @@ import './ConstructorTargetAlignment.css'
 import './ConstructorTargetCritical.css'
 import './ConstructorFinalUI.css'
 import './ConstructorViewerPolish.css'
+import './ConstructorSectionMapPolish.css'
 
 const FLOW_STEPS = [
   { id: 'dimensions', num: '1', title: 'Размеры', text: 'Укажите габариты и секции' },
