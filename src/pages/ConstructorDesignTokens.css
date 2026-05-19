@@ -1,0 +1,93 @@
+/* =========================================================
+   Stage 10.1 — Constructor Design System Tokens
+   Goal: centralize visual foundation without rewriting existing UI
+   ========================================================= */
+
+:root {
+  --rzm-font-main: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --rzm-color-page: #f7f3ea;
+  --rzm-color-surface: #ffffff;
+  --rzm-color-surface-warm: #fffdf8;
+  --rzm-color-ink: #151515;
+  --rzm-color-ink-soft: #3f3a32;
+  --rzm-color-muted: #70695d;
+  --rzm-color-muted-2: #8a847a;
+  --rzm-color-border: rgba(226, 221, 212, .92);
+  --rzm-color-border-soft: rgba(226, 221, 212, .62);
+  --rzm-color-accent: #111111;
+  --rzm-color-accent-contrast: #ffffff;
+  --rzm-color-success: #1f7a4d;
+  --rzm-color-warning: #9a5b00;
+  --rzm-color-error: #b42318;
+
+  --rzm-radius-xs: 10px;
+  --rzm-radius-sm: 14px;
+  --rzm-radius-md: 18px;
+  --rzm-radius-lg: 22px;
+  --rzm-radius-xl: 28px;
+  --rzm-radius-pill: 999px;
+
+  --rzm-shadow-card: 0 18px 42px rgba(36, 31, 24, .08);
+  --rzm-shadow-card-strong: 0 24px 70px rgba(36, 31, 24, .13);
+  --rzm-shadow-floating: 0 22px 58px rgba(0, 0, 0, .24);
+
+  --rzm-container: 1280px;
+  --rzm-page-gutter: 24px;
+  --rzm-page-gutter-mobile: 12px;
+
+  --rzm-space-1: 4px;
+  --rzm-space-2: 8px;
+  --rzm-space-3: 12px;
+  --rzm-space-4: 16px;
+  --rzm-space-5: 20px;
+  --rzm-space-6: 24px;
+  --rzm-space-8: 32px;
+
+  --rzm-motion-fast: 140ms ease;
+  --rzm-motion-base: 200ms ease;
+  --rzm-motion-slow: 320ms ease;
+}
+
+.rp-ctor-page,
+.rp-checkout,
+.rp-confirm {
+  font-family: var(--rzm-font-main);
+}
+
+.rp-ctor-page {
+  background: var(--rzm-color-page);
+  color: var(--rzm-color-ink);
+}
+
+.rp-ctor-page button,
+.rp-checkout button,
+.rp-confirm button {
+  transition: transform var(--rzm-motion-fast), border-color var(--rzm-motion-fast), background var(--rzm-motion-fast), color var(--rzm-motion-fast), box-shadow var(--rzm-motion-fast);
+}
+
+.rp-ctor-page button:hover,
+.rp-checkout button:hover,
+.rp-confirm button:hover {
+  transform: translateY(-1px);
+}
+
+.rp-ctor-page button:focus-visible,
+.rp-checkout button:focus-visible,
+.rp-confirm button:focus-visible,
+.rp-ctor-page input:focus-visible,
+.rp-checkout input:focus-visible,
+.rp-checkout textarea:focus-visible {
+  outline: 2px solid rgba(17, 17, 17, .78);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rp-ctor-page *,
+  .rp-checkout *,
+  .rp-confirm * {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
