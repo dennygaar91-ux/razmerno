@@ -320,3 +320,141 @@
 .rp-checkout--two-step .rp-checkout__fields--delivery {
   margin-top: 12px !important;
 }
+
+.rp-onboarding {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 90 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 24px !important;
+}
+.rp-onboarding__overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  border: 0 !important;
+  background: rgba(20, 18, 15, .38) !important;
+  backdrop-filter: blur(10px) !important;
+}
+.rp-onboarding__panel {
+  position: relative !important;
+  z-index: 1 !important;
+  width: min(720px, 100%) !important;
+  max-height: min(760px, calc(100vh - 40px)) !important;
+  overflow: auto !important;
+  border: 1px solid var(--ctor-border) !important;
+  border-radius: 28px !important;
+  background: #fff !important;
+  box-shadow: 0 28px 80px rgba(20, 18, 15, .24) !important;
+  padding: 20px !important;
+}
+.rp-onboarding__head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin-bottom: 18px !important;
+}
+.rp-onboarding__head span {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .09em !important;
+  color: var(--ctor-muted) !important;
+}
+.rp-onboarding__head button {
+  width: 34px !important;
+  height: 34px !important;
+  border: 1px solid var(--ctor-border) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-size: 20px !important;
+}
+.rp-onboarding__hero {
+  padding: 24px !important;
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, #f8f7f3 0%, #fff8ef 100%) !important;
+  border: 1px solid var(--ctor-border) !important;
+}
+.rp-onboarding__hero p {
+  margin: 0 0 8px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #111 !important;
+}
+.rp-onboarding__hero h2 {
+  max-width: 620px !important;
+  margin: 0 !important;
+  color: #111 !important;
+  font-size: clamp(28px, 4vw, 44px) !important;
+  line-height: .98 !important;
+  letter-spacing: -.06em !important;
+}
+.rp-onboarding__hero span {
+  display: block !important;
+  max-width: 560px !important;
+  margin-top: 14px !important;
+  color: var(--ctor-muted) !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+.rp-onboarding__steps {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+}
+.rp-onboarding__steps article,
+.rp-onboarding__note {
+  border: 1px solid var(--ctor-border) !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  padding: 14px !important;
+}
+.rp-onboarding__steps strong,
+.rp-onboarding__note b {
+  display: block !important;
+  color: #111 !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+}
+.rp-onboarding__steps p,
+.rp-onboarding__note p {
+  margin: 8px 0 0 !important;
+  color: var(--ctor-muted) !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+.rp-onboarding__note {
+  margin-top: 10px !important;
+  background: #fff7d6 !important;
+  border-color: rgba(220, 170, 35, .45) !important;
+}
+.rp-onboarding__actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  margin-top: 16px !important;
+}
+.rp-onboarding__actions button {
+  min-height: 42px !important;
+  padding: 0 16px !important;
+  border: 1px solid var(--ctor-border) !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-weight: 800 !important;
+}
+.rp-onboarding__actions button.is-primary {
+  background: #111 !important;
+  border-color: #111 !important;
+  color: #fff !important;
+}
+@media (max-width: 720px) {
+  .rp-onboarding { padding: 12px !important; }
+  .rp-onboarding__panel { border-radius: 22px !important; padding: 14px !important; }
+  .rp-onboarding__steps { grid-template-columns: 1fr !important; }
+  .rp-onboarding__actions { flex-direction: column-reverse !important; }
+  .rp-onboarding__actions button { width: 100% !important; }
+}
