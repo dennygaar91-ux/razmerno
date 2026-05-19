@@ -459,7 +459,7 @@ export default function ConstructorPage() {
   }
 
   return (
-    <div className="rp-ctor-page rp-ctor-page--reference">
+    <div className={`rp-ctor-page rp-ctor-page--reference ${checkoutOpen ? 'has-checkout-open' : ''}`}>
       <ConstructorOnboarding open={showOnboarding} onStart={handleOnboardingStart} onClose={() => setShowOnboarding(false)} />
 
       <section className="rp-ctor-hero">
