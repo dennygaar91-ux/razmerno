@@ -31,6 +31,7 @@ import './ConstructorSummaryWarnings.css'
 import './ConstructorLeftPanelPolish.css'
 import './ConstructorSummaryTrust.css'
 import './ConstructorSaveShare.css'
+import './ConstructorCheckoutBusiness.css'
 
 const FLOW_STEPS = [
   { id: 'dimensions', num: '1', title: 'Размеры', text: 'Укажите габариты и секции' },
