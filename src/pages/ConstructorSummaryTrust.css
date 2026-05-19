@@ -1,0 +1,156 @@
+/* =========================================================
+   Stage 5.1 — Summary trust panel
+   Goal: turn right summary into a commercial trust block
+   ========================================================= */
+
+.rp-summary-trust-card h3 {
+  letter-spacing: -.035em !important;
+}
+
+.rp-summary-price-card {
+  position: relative !important;
+  overflow: hidden !important;
+  background: #111 !important;
+  color: #fff !important;
+  border-color: #111 !important;
+}
+
+.rp-summary-price-card::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: -40% -20% auto auto !important;
+  width: 160px !important;
+  height: 160px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, .08) !important;
+  pointer-events: none !important;
+}
+
+.rp-summary-price-card p,
+.rp-summary-price-card span {
+  color: rgba(255, 255, 255, .68) !important;
+}
+
+.rp-summary-price-card strong {
+  color: #fff !important;
+  font-size: 28px !important;
+  letter-spacing: -.055em !important;
+}
+
+.rp-summary-price-card button {
+  background: #fff !important;
+  color: #111 !important;
+  border-color: #fff !important;
+}
+
+.rp-summary-price-card__trust {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  margin-top: 10px !important;
+}
+
+.rp-summary-price-card__trust small {
+  min-height: 24px !important;
+  padding: 0 9px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, .1) !important;
+  color: rgba(255, 255, 255, .82) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+}
+
+.rp-summary-kit-card .rp-target-kit-head h3 {
+  letter-spacing: -.025em !important;
+}
+
+.rp-summary-kit-card .rp-target-kit-head h3 span {
+  display: none !important;
+}
+
+.rp-summary-next-card {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.rp-summary-next-card__head span {
+  display: block !important;
+  color: #8a847a !important;
+  font-size: 9px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+}
+
+.rp-summary-next-card__head h3 {
+  margin: 5px 0 0 !important;
+  color: #151515 !important;
+  font-size: 14px !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  letter-spacing: -.03em !important;
+}
+
+.rp-summary-next-card__steps {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.rp-summary-next-card__steps div {
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  column-gap: 9px !important;
+  row-gap: 2px !important;
+  align-items: start !important;
+  padding: 9px !important;
+  border-radius: 14px !important;
+  background: #f7f6f2 !important;
+  border: 1px solid rgba(226, 221, 212, .85) !important;
+}
+
+.rp-summary-next-card__steps b {
+  grid-row: 1 / 3 !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 999px !important;
+  background: #111 !important;
+  color: #fff !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+}
+
+.rp-summary-next-card__steps span {
+  color: #151515 !important;
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+  font-weight: 850 !important;
+}
+
+.rp-summary-next-card__steps small {
+  color: #70695d !important;
+  font-size: 9px !important;
+  line-height: 1.35 !important;
+  font-weight: 600 !important;
+}
+
+@media (max-width: 1380px), (max-height: 820px) {
+  .rp-summary-price-card strong {
+    font-size: 24px !important;
+  }
+
+  .rp-summary-price-card__trust,
+  .rp-summary-next-card__steps small {
+    display: none !important;
+  }
+
+  .rp-summary-next-card__steps div {
+    min-height: 38px !important;
+    align-items: center !important;
+  }
+}
