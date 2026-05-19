@@ -1,0 +1,173 @@
+/* =========================================================
+   Stage 3.2 — Summary warning structure
+   Goal: make right panel distinguish critical issues, recommendations and safe state
+   ========================================================= */
+
+.rp-target-check-card--structured {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.rp-target-check-card--structured .rp-target-checklist--base {
+  margin-top: 0 !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid rgba(226, 221, 212, .78) !important;
+}
+
+.rp-summary-status-list {
+  display: grid !important;
+  gap: 9px !important;
+  margin-top: 2px !important;
+}
+
+.rp-summary-status-group {
+  display: grid !important;
+  gap: 7px !important;
+  padding: 9px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(226, 221, 212, .9) !important;
+  background: #fff !important;
+}
+
+.rp-summary-status-group.is-critical {
+  background: #fff0e8 !important;
+  border-color: rgba(232, 97, 44, .36) !important;
+}
+
+.rp-summary-status-group.is-recommendation {
+  background: #fff8dc !important;
+  border-color: rgba(220, 170, 35, .38) !important;
+}
+
+.rp-summary-status-group__head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.rp-summary-status-group__head span {
+  color: #151515 !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+}
+
+.rp-summary-status-group__head b {
+  min-width: 22px !important;
+  height: 22px !important;
+  padding: 0 7px !important;
+  border-radius: 999px !important;
+  background: rgba(17, 17, 17, .92) !important;
+  color: #fff !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+}
+
+.rp-summary-status-list__item {
+  display: grid !important;
+  grid-template-columns: 20px minmax(0, 1fr) !important;
+  gap: 8px !important;
+  align-items: start !important;
+  padding: 8px !important;
+  border-radius: 13px !important;
+  border: 1px solid rgba(226, 221, 212, .65) !important;
+  background: rgba(255, 255, 255, .72) !important;
+}
+
+.rp-summary-status-list__item > span {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 999px !important;
+  display: grid !important;
+  place-items: center !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+}
+
+.rp-summary-status-list__item.is-critical > span {
+  background: #c84a1b !important;
+}
+
+.rp-summary-status-list__item.is-recommendation > span {
+  background: #9b7200 !important;
+}
+
+.rp-summary-status-list__item.is-success > span {
+  background: #2f8a45 !important;
+}
+
+.rp-summary-status-list__item b {
+  display: block !important;
+  color: #151515 !important;
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+  font-weight: 800 !important;
+}
+
+.rp-summary-status-list__item small {
+  display: block !important;
+  margin-top: 4px !important;
+  color: #70695d !important;
+  font-size: 9px !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+}
+
+.rp-summary-status-list--ok {
+  padding: 9px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(70, 150, 80, .24) !important;
+  background: #eef8ef !important;
+}
+
+.rp-summary-status-list__more {
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+  background: #f7f6f2 !important;
+  color: #70695d !important;
+  font-size: 9px !important;
+  line-height: 1.35 !important;
+  font-weight: 650 !important;
+}
+
+.rp-target-summary.has-warning .rp-target-check-card__head > span {
+  background: #fff0e8 !important;
+  border: 1px solid rgba(232, 97, 44, .36) !important;
+  color: #642800 !important;
+}
+
+.rp-target-summary.is-neutral .rp-target-check-card__head > span {
+  background: #f2f1ed !important;
+  border: 1px solid rgba(226, 221, 212, .95) !important;
+  color: #5f5a51 !important;
+}
+
+.rp-target-summary.is-ready .rp-target-check-card__head > span {
+  background: #eef8ef !important;
+  border: 1px solid rgba(70, 150, 80, .24) !important;
+  color: #2f6c3b !important;
+}
+
+@media (max-width: 1380px), (max-height: 820px) {
+  .rp-summary-status-group,
+  .rp-summary-status-list--ok {
+    padding: 7px !important;
+    gap: 6px !important;
+  }
+
+  .rp-summary-status-list__item {
+    padding: 7px !important;
+  }
+
+  .rp-summary-status-list__item small {
+    display: none !important;
+  }
+}
