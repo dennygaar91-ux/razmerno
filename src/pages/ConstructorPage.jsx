@@ -55,6 +55,12 @@ function isFiniteNumber(value) {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
+function formatPrice(value) {
+  const numericValue = Number(value)
+  const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+  return new Intl.NumberFormat('ru-RU').format(safeValue)
+}
+
 function formatProjectDate(value) {
   if (!value) return ''
   try {
@@ -558,6 +564,15 @@ export default function ConstructorPage() {
           onCheckout={() => setCheckoutOpen(true)}
         />
       </main>
+
+      <section className="rp-mobile-cta" aria-label="Быстрая заявка">
+        <div>
+          <span>Предварительно</span>
+          <b>{formatPrice(projectWithPrice.price)} ₽</b>
+          <small>{project.sections} секц. · {summary.elements} элем.</small>
+        </div>
+        <button type="button" onClick={() => setCheckoutOpen(true)}>Заявка</button>
+      </section>
 
       <CheckoutDrawer
         open={checkoutOpen}
