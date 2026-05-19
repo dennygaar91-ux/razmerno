@@ -139,13 +139,130 @@
   font-weight: 600 !important;
 }
 
+/* Stage 5.2 — estimate breakdown trust */
+.rp-summary-estimate-card {
+  border-color: rgba(17, 17, 17, .12) !important;
+  background: #fffdf8 !important;
+  box-shadow: 0 16px 36px rgba(36, 31, 24, .07) !important;
+}
+
+.rp-summary-estimate-card__head {
+  align-items: flex-start !important;
+  gap: 12px !important;
+}
+
+.rp-summary-estimate-card__head > div span {
+  display: block !important;
+  color: #8a847a !important;
+  font-size: 9px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+}
+
+.rp-summary-estimate-card__head h3 {
+  margin: 5px 0 0 !important;
+}
+
+.rp-summary-estimate-card__head strong {
+  color: #151515 !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.rp-summary-estimate-card__note {
+  margin: 0 !important;
+  padding: 9px 10px !important;
+  border-radius: 13px !important;
+  background: #f7f3e8 !important;
+  border: 1px solid rgba(226, 221, 212, .9) !important;
+  color: #70695d !important;
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+  font-weight: 650 !important;
+}
+
+.rp-summary-estimate-total {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding: 11px 12px !important;
+  border-radius: 16px !important;
+  background: #111 !important;
+  color: #fff !important;
+}
+
+.rp-summary-estimate-total span {
+  color: rgba(255, 255, 255, .68) !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  font-weight: 750 !important;
+}
+
+.rp-summary-estimate-total b {
+  color: #fff !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.rp-summary-estimate-card .rp-ref-estimate-row {
+  background: #fff !important;
+  border: 1px solid rgba(226, 221, 212, .85) !important;
+  border-radius: 14px !important;
+  padding: 10px !important;
+}
+
+.rp-summary-estimate-card .rp-ref-estimate-row__bar {
+  background: #f0ede6 !important;
+}
+
+.rp-summary-estimate-card .rp-ref-estimate-row__bar i {
+  background: #111 !important;
+}
+
+.rp-summary-estimate-trust {
+  display: grid !important;
+  gap: 7px !important;
+}
+
+.rp-summary-estimate-trust div {
+  padding: 9px 10px !important;
+  border-radius: 14px !important;
+  background: #f7f6f2 !important;
+  border: 1px solid rgba(226, 221, 212, .85) !important;
+  display: grid !important;
+  gap: 3px !important;
+}
+
+.rp-summary-estimate-trust b {
+  color: #151515 !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  font-weight: 850 !important;
+}
+
+.rp-summary-estimate-trust span {
+  color: #70695d !important;
+  font-size: 9px !important;
+  line-height: 1.35 !important;
+  font-weight: 600 !important;
+}
+
 @media (max-width: 1380px), (max-height: 820px) {
   .rp-summary-price-card strong {
     font-size: 24px !important;
   }
 
   .rp-summary-price-card__trust,
-  .rp-summary-next-card__steps small {
+  .rp-summary-next-card__steps small,
+  .rp-summary-estimate-card__note,
+  .rp-summary-estimate-trust {
     display: none !important;
   }
 
