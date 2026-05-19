@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ConstructorConfig from '../components/constructor/ConstructorConfig'
 import ConstructorFlow from '../components/constructor/ConstructorFlow'
+import ConstructorOnboarding from '../components/constructor/ConstructorOnboarding'
 import ConstructorViewer from '../components/constructor/ConstructorViewer'
 import ConstructorSummary from '../components/constructor/ConstructorSummary'
 import CheckoutDrawer from '../components/constructor/CheckoutDrawer'
@@ -94,6 +95,7 @@ function getEstimateStatus(estimateState) {
 export default function ConstructorPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(() => !loadConstructorProjectMeta())
   const [activeStep, setActiveStep] = useState('dimensions')
   const [project, setProject] = useState(getInitialProject)
   const [notice, setNotice] = useState('')
@@ -312,6 +314,11 @@ export default function ConstructorPage() {
     updateProject(current => ({ ...current, material: { ...current.material, [key]: value } }))
   }
 
+  function handleOnboardingStart() {
+    setActiveStep('dimensions')
+    setShowOnboarding(false)
+  }
+
   async function handleSave() {
     setSyncState('saving')
     const result = saveConstructorProject(project)
@@ -345,6 +352,7 @@ export default function ConstructorPage() {
         setProject(remoteResult.project)
         setProjectId(remoteResult.projectId)
         setNotice(`Загружен проект ${remoteResult.projectId}`)
+        setShowOnboarding(false)
         setSyncState('loaded')
         return
       }
@@ -355,6 +363,7 @@ export default function ConstructorPage() {
       setProject(normalizeConstructorProject(saved))
       setProjectMeta(loadConstructorProjectMeta())
       setNotice('Загружена локальная версия проекта.')
+      setShowOnboarding(false)
       setSyncState('loaded')
     } else {
       setNotice('Пока нет сохранённого проекта.')
@@ -374,6 +383,8 @@ export default function ConstructorPage() {
 
   return (
     <div className="rp-ctor-page rp-ctor-page--reference">
+      <ConstructorOnboarding open={showOnboarding} onStart={handleOnboardingStart} onClose={() => setShowOnboarding(false)} />
+
       <section className="rp-ctor-hero">
         <div>
           <p className="rp-ctor-kicker"><span /> Онлайн-конструктор</p>
@@ -386,6 +397,7 @@ export default function ConstructorPage() {
           </div>
         </div>
         <div className="rp-ctor-actions">
+          <button type="button" onClick={() => setShowOnboarding(true)}><Icon name="check-circle" size={16} />Как работает</button>
           <button type="button" onClick={handleLoad}><Icon name="upload" size={16} />Загрузить</button>
           <button type="button" onClick={() => setClearConfirmOpen(true)}><Icon name="x" size={16} />Очистить</button>
           <button type="button" onClick={handleSave}><Icon name="bookmark" size={16} />Сохранить</button>
