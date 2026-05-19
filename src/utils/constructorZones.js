@@ -148,6 +148,10 @@ export function createZoneLayout(project, filling = []) {
   }
 }
 
+export function ensureZoneLayout(project, filling = project?.filling ?? []) {
+  return normalizeZoneLayout(project, filling)
+}
+
 function normalizeZone(zone, sectionIndex, fallbackFromY, fallbackToY) {
   const fromY = toNumber(zone?.fromY, fallbackFromY)
   const toY = toNumber(zone?.toY, fallbackToY)
@@ -517,5 +521,66 @@ export function applyDrawerBlockToSection(project, sectionId, drawerCount = 3) {
       zoneLayout: nextLayout,
     },
     result: { ok: true, message: 'Ящики добавлены снизу. Система автоматически поставила верхнюю полку блока.' },
+  }
+}
+
+export function applyShelvesPresetToZone(project, shelves = 5) {
+  return setActiveZoneShelves(project, shelves)
+}
+
+export function applyWardrobePresetToSection(project, sectionId) {
+  const layout = normalizeZoneLayout(project, project.filling)
+  const section = getSectionById(layout, sectionId)
+  const baseZone = section.zones[0]
+
+  if (!baseZone || section.zones.length > 1) {
+    const shelfResult = setActiveZoneShelves(project, 1)
+    if (!shelfResult.result?.ok) return shelfResult
+    return setActiveZoneRail(shelfResult.project, true)
+  }
+
+  const railZoneHeight = Math.max(700, Math.round(section.height * 0.72))
+  const splitY = clamp(railZoneHeight, 700, Math.max(700, section.height - MIN_ZONE_GAP_MM))
+  const { section: splitSection, result: splitResult } = splitZoneByShelf(section, baseZone.id, splitY)
+  if (!splitResult?.ok) return { project, result: splitResult }
+
+  const bottomZone = splitSection.zones.find(zone => zone.fromY === 0) || splitSection.zones[0]
+  const topZone = splitSection.zones.find(zone => zone.id !== bottomZone.id) || splitSection.zones[1]
+  let nextSection = setZoneContent(splitSection, bottomZone.id, { type: 'rail', shelves: 0, drawers: 0, rail: true })
+  nextSection = setZoneContent(nextSection, topZone.id, { type: 'shelves', shelves: 1, drawers: 0, rail: false })
+  nextSection.activeZoneId = bottomZone.id
+
+  const nextLayout = updateSectionInLayout(layout, nextSection)
+
+  return {
+    project: {
+      ...project,
+      activeSection: nextSection.index,
+      filling: syncProjectFillingFromLayout(project, nextLayout),
+      zoneLayout: nextLayout,
+    },
+    result: { ok: true, message: 'Гардероб добавлен: сверху полка, ниже зона со штангой.' },
+  }
+}
+
+export function applyComboPresetToSection(project, sectionId) {
+  const drawerResult = applyDrawerBlockToSection(project, sectionId, 3)
+  if (!drawerResult.result?.ok) return drawerResult
+
+  const layout = normalizeZoneLayout(drawerResult.project, drawerResult.project.filling)
+  const section = getSectionById(layout, sectionId)
+  const topZone = section.zones.slice().sort((a, b) => b.fromY - a.fromY)[0]
+  const nextSection = setZoneContent(section, topZone.id, { type: 'shelves', shelves: 4, drawers: 0, rail: false })
+  nextSection.activeZoneId = topZone.id
+  const nextLayout = updateSectionInLayout(layout, nextSection)
+
+  return {
+    project: {
+      ...drawerResult.project,
+      activeSection: nextSection.index,
+      filling: syncProjectFillingFromLayout(drawerResult.project, nextLayout),
+      zoneLayout: nextLayout,
+    },
+    result: { ok: true, message: 'Комбо добавлено: снизу 3 ящика, сверху полки.' },
   }
 }
