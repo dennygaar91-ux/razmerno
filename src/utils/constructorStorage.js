@@ -12,6 +12,13 @@ const LEGACY_KEYS = [
 let memoryProject = null
 let memoryProjectId = ''
 let memoryMeta = null
+let storageWarningShown = false
+
+function warnStorageOnce(message, error) {
+  if (storageWarningShown) return
+  storageWarningShown = true
+  console.warn(message, error)
+}
 
 function getLocalStorage() {
   if (typeof window === 'undefined') return null
@@ -23,7 +30,7 @@ function getLocalStorage() {
     storage.removeItem(testKey)
     return storage
   } catch (error) {
-    console.warn('Constructor localStorage is unavailable:', error)
+    warnStorageOnce('Constructor localStorage is unavailable:', error)
     return null
   }
 }
@@ -50,7 +57,7 @@ export function saveConstructorProject(project) {
     storage.setItem(PROJECT_META_KEY, JSON.stringify(meta))
     return { ok: true, meta, persistent: true }
   } catch (error) {
-    console.warn('Failed to save constructor project:', error)
+    warnStorageOnce('Failed to save constructor project:', error)
     return { ok: true, meta, persistent: false }
   }
 }
@@ -67,7 +74,7 @@ export function loadConstructorProject() {
     memoryProject = parsed
     return parsed
   } catch (error) {
-    console.warn('Failed to load constructor project:', error)
+    warnStorageOnce('Failed to load constructor project:', error)
     return memoryProject
   }
 }
@@ -77,14 +84,14 @@ export function saveConstructorProjectId(projectId) {
 
   memoryProjectId = projectId
   const storage = getLocalStorage()
-  if (!storage) return true
+  if (!storage) return false
 
   try {
     storage.setItem(PROJECT_ID_KEY, projectId)
     return true
   } catch (error) {
-    console.warn('Failed to save constructor project id:', error)
-    return true
+    warnStorageOnce('Failed to save constructor project id:', error)
+    return false
   }
 }
 
@@ -97,7 +104,7 @@ export function loadConstructorProjectId() {
     memoryProjectId = projectId
     return projectId
   } catch (error) {
-    console.warn('Failed to load constructor project id:', error)
+    warnStorageOnce('Failed to load constructor project id:', error)
     return memoryProjectId
   }
 }
@@ -114,7 +121,7 @@ export function loadConstructorProjectMeta() {
     memoryMeta = parsed
     return parsed
   } catch (error) {
-    console.warn('Failed to load constructor project meta:', error)
+    warnStorageOnce('Failed to load constructor project meta:', error)
     return memoryMeta
   }
 }
@@ -134,7 +141,7 @@ export function clearConstructorProject() {
     LEGACY_KEYS.forEach(key => storage.removeItem(key))
     return true
   } catch (error) {
-    console.warn('Failed to clear constructor project:', error)
+    warnStorageOnce('Failed to clear constructor project:', error)
     return false
   }
 }

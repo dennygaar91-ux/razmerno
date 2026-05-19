@@ -1,0 +1,99 @@
+:root {
+  --ctor-bg: #f7f6f2;
+  --ctor-card: #fff;
+  --ctor-border: rgba(226, 221, 212, 0.95);
+  --ctor-radius: 18px;
+  --ctor-muted: #70695d;
+  --ctor-accent: #e8612c;
+}
+
+.rp-ctor-page { background: var(--ctor-bg); }
+.rp-ctor-shell { grid-template-columns: 25% 50% 25%; gap: 14px; }
+.rp-ctor-card,
+.rp-target-card,
+.rp-ref-block,
+.rp-checkout__step,
+.rp-checkout__hero-total,
+.rp-checkout__summary,
+.rp-ref-section-map,
+.rp-ref-active-section,
+.rp-ref-selected-material,
+.rp-ref-material-spec-grid,
+.rp-ref-field,
+.rp-ref-option-list button,
+.rp-ref-material-list button,
+.rp-ref-preset-grid button { background: var(--ctor-card); border: 1px solid var(--ctor-border); border-radius: var(--ctor-radius); box-shadow: none; }
+
+.rp-target-ready-card { background: #fffdf8; }
+.rp-target-ready-card span { text-transform: uppercase; letter-spacing: .08em; font-size: 11px; color: var(--ctor-muted); }
+.rp-target-price-card strong { color: #111; }
+.rp-target-price-card button,
+.rp-checkout__primary { border-radius: 12px; background: #111; color: #fff; }
+.rp-target-price-card,
+.rp-checkout__hero-total { background: #fff; color: #111; }
+
+.rp-target-kit-items div,
+.rp-target-additional-card div,
+.rp-target-project-card div { border-color: var(--ctor-border); }
+
+.rp-target-check-card .rp-target-progress { background: #e6f4ea; }
+.rp-target-check-card .rp-target-progress i { background: #35a66c; }
+
+.rp-ref-option-list button.is-active,
+.rp-ref-material-list button.is-active,
+.rp-ref-preset-grid button:focus-visible,
+.rp-ref-section-map__item.is-active,
+.rp-ref-section-map__select[aria-pressed='true'] {
+  border-color: var(--ctor-accent);
+  box-shadow: 0 0 0 1px rgba(232, 97, 44, .2);
+}
+
+.rp-ref-section-map__head button,
+.rp-checkout__secondary,
+.rp-ref-section-tools button { border: 1px solid var(--ctor-border); background: #fff; color: #222; border-radius: 10px; }
+
+.rp-ctor-viewer { background: linear-gradient(180deg, #fff 0%, #faf8f3 100%); }
+.rp-ref-viewer-quick,
+.rp-ref-toolbar,
+.rp-ref-viewer-scene,
+.rp-ref-section-map { border-color: var(--ctor-border); }
+
+.rp-checkout__panel { background: #f9f7f1; }
+.rp-checkout__head,
+.rp-checkout__body,
+.rp-checkout__foot { background: transparent; }
+.rp-checkout__body { overflow: auto; }
+.rp-checkout__foot { position: sticky; bottom: 0; padding-bottom: 16px; background: linear-gradient(180deg, rgba(249,247,241,0), #f9f7f1 35%); }
+
+@media (max-width: 1280px) {
+  .rp-ctor-shell { grid-template-columns: 1fr; }
+  .rp-ctor-config, .rp-ctor-summary, .rp-ctor-viewer { height: auto; min-height: auto; max-height: none; }
+}
+
+.rp-ref-zone-tabs,
+.rp-ref-zone-actions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.rp-ref-zone-tabs button,
+.rp-ref-zone-actions button {
+  min-height: 42px;
+  border: 1px solid var(--ctor-border);
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px 10px;
+  text-align: left;
+}
+.rp-ref-zone-tabs button.is-active { border-color: var(--ctor-accent); box-shadow: 0 0 0 1px rgba(232,97,44,.18); }
+.rp-ref-zone-hint { margin: 8px 2px 0; color: #7f5a49; font-size: 12px; }
+
+.rp-ctor-col { display: flex; flex-direction: column; gap: 6px; }
+.rp-ctor-zone {
+  position: relative;
+  width: 100%;
+  border: 1px solid rgba(209,199,184,.9);
+  border-radius: 8px;
+  background: rgba(255,255,255,.5);
+  cursor: pointer;
+  transition: border-color .16s, background .16s;
+}
+.rp-ctor-zone:hover { border-color: #c9ab9b; background: rgba(255,252,247,.9); }
+.rp-ctor-zone.is-active { border-color: var(--ctor-accent); background: rgba(232,97,44,.08); }
+.rp-wardrobe-empty { position: absolute; inset: auto 10px 8px; font-size: 10px; color: #8e8375; font-style: normal; }
