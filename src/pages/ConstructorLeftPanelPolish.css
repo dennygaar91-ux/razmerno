@@ -102,17 +102,104 @@
   letter-spacing: .08em !important;
 }
 
+/* Stage 4.2 — Filling scenarios */
+.rp-ref-filling-scenarios {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.rp-ref-filling-scenarios__grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.rp-ref-filling-scenarios__grid button {
+  min-width: 0 !important;
+  min-height: 92px !important;
+  padding: 11px !important;
+  border: 1px solid rgba(226, 221, 212, .95) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  color: #151515 !important;
+  display: grid !important;
+  gap: 5px !important;
+  align-content: start !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease, transform .16s ease !important;
+}
+
+.rp-ref-filling-scenarios__grid button:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(17, 17, 17, .18) !important;
+  box-shadow: 0 10px 24px rgba(36, 31, 24, .06) !important;
+}
+
+.rp-ref-filling-scenarios__grid button span {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 999px !important;
+  background: #f3f0e8 !important;
+  color: #151515 !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+}
+
+.rp-ref-filling-scenarios__grid button strong {
+  color: #151515 !important;
+  font-size: 11px !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+}
+
+.rp-ref-filling-scenarios__grid button small {
+  color: #70695d !important;
+  font-size: 9px !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+}
+
+.rp-ref-filling-scenarios__grid button em {
+  color: #8a847a !important;
+  font-size: 8px !important;
+  line-height: 1.2 !important;
+  font-style: normal !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+}
+
+.rp-ref-filling-scenarios__note {
+  margin: 0 !important;
+  padding: 9px 10px !important;
+  border-radius: 13px !important;
+  background: #f7f6f2 !important;
+  border: 1px solid rgba(226, 221, 212, .8) !important;
+  color: #70695d !important;
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+  font-weight: 650 !important;
+}
+
 @media (max-width: 1380px), (max-height: 820px) {
-  .rp-ref-dimension-presets__grid {
+  .rp-ref-dimension-presets__grid,
+  .rp-ref-filling-scenarios__grid {
     grid-template-columns: 1fr !important;
   }
 
-  .rp-ref-dimension-presets__grid button {
+  .rp-ref-dimension-presets__grid button,
+  .rp-ref-filling-scenarios__grid button {
     min-height: 64px !important;
     padding: 9px !important;
   }
 
-  .rp-ref-dimension-presets__grid button small {
+  .rp-ref-dimension-presets__grid button small,
+  .rp-ref-filling-scenarios__grid button small,
+  .rp-ref-filling-scenarios__grid button em {
     display: none !important;
   }
 }
