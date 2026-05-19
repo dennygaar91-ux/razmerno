@@ -5,11 +5,12 @@ function roundMoney(value) {
 function getSectionWarnings(section, sectionIndex, project) {
   const warnings = []
   const sectionHeight = project.dimensions.height
-  const usefulHeight = sectionHeight - section.drawers * 220 - (section.rail ? 950 : 0)
+  const usefulHeight = sectionHeight - section.drawers * 170 - (section.rail ? 950 : 0)
   const shelfGap = section.shelves > 1 ? usefulHeight / (section.shelves + 1) : usefulHeight
+  const drawerFaceHeight = section.drawers > 0 ? sectionHeight / section.drawers : sectionHeight
 
-  if (section.rail && project.dimensions.depth < 520) {
-    warnings.push(`Секция ${sectionIndex + 1}: для штанги нужна глубина от 520 мм.`)
+  if (section.rail && project.dimensions.depth < 550) {
+    warnings.push(`Секция ${sectionIndex + 1}: для штанги нужна глубина от 550 мм.`)
   }
 
   if (section.drawers > 0 && project.dimensions.width / project.sections < 420) {
@@ -18,6 +19,10 @@ function getSectionWarnings(section, sectionIndex, project) {
 
   if (section.shelves > 1 && shelfGap < 200) {
     warnings.push(`Секция ${sectionIndex + 1}: между полками получается меньше 200 мм.`)
+  }
+
+  if (section.drawers > 0 && drawerFaceHeight < 150) {
+    warnings.push(`Секция ${sectionIndex + 1}: высота фасада ящика меньше 150 мм.`)
   }
 
   if (section.drawers > 3 && project.dimensions.height < 1600) {
@@ -124,8 +129,8 @@ export function getWarnings(project, summary) {
   const warnings = []
   const { height, width, depth } = project.dimensions
 
-  if (depth < 520 && summary.rails > 0) {
-    warnings.push('Для штанги рекомендуем глубину от 520 мм. Сейчас одежда может не помещаться по плечикам.')
+  if (depth < 550 && summary.rails > 0) {
+    warnings.push('Для штанги рекомендуем глубину от 550 мм. Сейчас одежда может не помещаться по плечикам.')
   }
 
   if (height < 1200 && summary.shelves > 4) {
