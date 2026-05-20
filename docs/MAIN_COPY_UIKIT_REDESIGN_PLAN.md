@@ -27,6 +27,19 @@ This branch is a clean copy of main. It must not use the experimental ui-update 
 7. Mobile UX.
 8. Build, QA and PR.
 
-## Status
+## Progress
 
-Stage 1 started.
+Stage 1 — Clone main and audit UIKit: complete.
+
+Stage 2 — Safe UIKit foundation: in progress.
+
+Completed safely:
+
+- Created `main-copy` branch from clean `main`.
+- Added UIKit source audit.
+- Added `uikit-bridge.css` with design tokens only.
+- Imported UIKit bridge from `main.jsx`.
+- Added Header UIKit override layer without rewriting Header logic.
+- Added Hero UIKit override layer without changing Hero content or structure.
+
+Current rule: no route replacement, no constructor logic changes.
