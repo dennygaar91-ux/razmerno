@@ -41,6 +41,8 @@ Stage 5 — Account visual layer: complete.
 
 Stage 6 — Checkout visual layer: complete.
 
+Stage 7 — Mobile polish: complete.
+
 Completed safely:
 
 - Created `main-copy` branch from clean `main`.
@@ -64,5 +66,7 @@ Completed safely:
 - Preserved account layout, sidebar, active order, progress, history, saved projects and links.
 - Added `CheckoutUIKit.css` and imported it in existing `CheckoutDrawer.jsx`.
 - Preserved checkout validation, delivery logic, assembly +10%, payment mode, agreement, payload, submit and success state.
+- Added `uikit-mobile-polish.css` and imported it last in `main.jsx`.
+- Preserved all routes, components and logic while improving mobile spacing, card radius, CTA widths and drawer behavior.
 
 Current rule: no route replacement, no constructor logic changes.
