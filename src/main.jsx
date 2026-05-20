@@ -6,6 +6,7 @@ import "./styles/atoms.css";
 import "./components/uikit/uikit-tabs.css";
 import "./components/uikit/uikit-cards.css";
 import "./components/uikit/uikit-price.css";
+import "./components/constructor/CheckoutUIKit.css";
 import "./pages/ConstructorDesignTokens.css";
 import "./styles/constructor-layout-overrides.css";
 import "./styles/constructor-viewport-polish.css";
