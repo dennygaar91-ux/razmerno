@@ -86,3 +86,18 @@ Implemented:
 - Styled overlay, drawer, progress, hero total, fields, delivery/service cards, agreement, footer actions and success state in the UIKit/reference direction.
 
 Progress: 100%.
+
+## Stage 7 — Mobile UX
+
+Status: complete.
+
+Implemented:
+
+- Added a dedicated mobile/tablet override layer.
+- Imported uikit-mobile.css from main.jsx.
+- Improved mobile landing: compact navigation, hero scaling, stacked sections, full-width CTA and model cards.
+- Improved mobile constructor: sticky topbar, preview-first flow, compact wardrobe canvas, bottom controls, stacked settings and full-width price CTA.
+- Improved mobile account: horizontal sidebar navigation, stacked cards, compact project rows and single-column content.
+- Kept checkout bottom-sheet behavior for small screens.
+
+Progress: 100%.
