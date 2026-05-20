@@ -46,5 +46,8 @@ Completed safely:
 - Added TrustBar UIKit override layer without changing TrustBar content or structure.
 - Added Value UIKit override layer without changing Value content or structure.
 - Added HowItWorks UIKit override layer without changing HowItWorks content or structure.
+- Added Measure UIKit override layer without changing Measure content or structure.
+- Added Materials UIKit override layer without changing Materials content or structure.
+- Added ConstructorTeaser UIKit override layer without changing ConstructorTeaser content or structure.
 
 Current rule: no route replacement, no constructor logic changes.
