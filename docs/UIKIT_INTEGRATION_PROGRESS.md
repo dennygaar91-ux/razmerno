@@ -42,3 +42,18 @@ Implemented:
 - Kept the old Landing.jsx as fallback while the redesign is still staged in the ui-update branch.
 
 Progress: 100%.
+
+## Stage 4 — Constructor UIKit/reference shell
+
+Status: complete.
+
+Implemented:
+
+- Added ConstructorUIKitPage as a separate page instead of deleting the old ConstructorPage.
+- Switched /constructor and /constructor/* routes to ConstructorUIKitPage.
+- Removed the public Header from the constructor route by making the page self-contained.
+- Added project topbar, left settings panel, dotted center canvas, wardrobe preview, floating controls, help button and right preliminary price card.
+- Preserved core product logic: dimensions, sections, filling, material selection, preliminary price and checkout drawer.
+- Kept the original ConstructorPage file as fallback while the redesign remains staged in the ui-update branch.
+
+Progress: 100%.
