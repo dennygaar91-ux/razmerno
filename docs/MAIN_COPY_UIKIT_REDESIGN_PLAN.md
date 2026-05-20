@@ -35,6 +35,8 @@ Stage 2 — Safe UIKit foundation: complete.
 
 Stage 3 — Landing redesign: complete.
 
+Stage 4 — Constructor visual layer: complete.
+
 Completed safely:
 
 - Created `main-copy` branch from clean `main`.
@@ -52,5 +54,7 @@ Completed safely:
 - Added Assembly UIKit override layer without changing Assembly content or structure.
 - Added FearFaq UIKit override layer without changing FAQ state logic, questions, answers or CTA.
 - Added Footer UIKit override layer without changing footer links, contacts or text.
+- Added `ConstructorUIKit.css` and imported it last in existing `ConstructorPage.jsx`.
+- Preserved constructor state, pricing, zone logic, storage, remote estimate, checkout drawer and order payload.
 
 Current rule: no route replacement, no constructor logic changes.
