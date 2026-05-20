@@ -1,5 +1,6 @@
 import Icon from '../../../icons/Icon'
 import './Measure.css'
+import './MeasureUIKit.css'
 
 const STEPS = [
   { n: '1', t: 'Измерьте ширину',  d: 'В 2–3 точках от стены до стены — сверху, посередине, снизу. Берите минимальное значение.' },
