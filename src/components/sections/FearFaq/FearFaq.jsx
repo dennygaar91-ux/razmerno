@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../../../icons/Icon'
 import './FearFaq.css'
+import './FearFaqUIKit.css'
 
 const FEARS = [
   { q: 'Ошибусь в размере на пару мм',      a: 'Кажется, что это испортит весь комплект и придётся переделывать.' },
