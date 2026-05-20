@@ -1,0 +1,221 @@
+.app-shell {
+  background: var(--uikit-background);
+  color: var(--uikit-foreground);
+}
+
+.topbar {
+  height: 72px;
+  background: rgba(248, 248, 246, 0.9);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
+  backdrop-filter: blur(18px);
+  box-shadow: none;
+}
+
+.tb-logo {
+  color: var(--uikit-foreground);
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.055em;
+}
+
+.tb-logo em {
+  color: var(--uikit-foreground);
+}
+
+.tb-ic,
+.tb-av {
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: none;
+}
+
+.tb-av {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.sidebar {
+  background: var(--uikit-card);
+  border-right: 1px solid var(--uikit-border);
+  box-shadow: none;
+}
+
+.ni {
+  border-radius: 14px;
+  color: var(--uikit-muted-foreground);
+  font-weight: 760;
+}
+
+.ni:hover {
+  background: var(--uikit-muted);
+  color: var(--uikit-foreground);
+}
+
+.ni.active {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.ni--ex {
+  color: var(--uikit-muted-foreground);
+}
+
+.sbsep {
+  background: var(--uikit-border);
+}
+
+.acc-main {
+  background: var(--uikit-background);
+}
+
+.acc-greeting h1 {
+  color: var(--uikit-foreground);
+  font-size: clamp(38px, 4.4vw, 58px);
+  line-height: .98;
+  letter-spacing: -0.07em;
+}
+
+.acc-greeting p {
+  color: var(--uikit-muted-foreground);
+  font-size: 18px;
+}
+
+.section-title {
+  color: var(--uikit-muted-foreground);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.active-order,
+.card-block {
+  border-radius: 28px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: var(--uikit-shadow-soft);
+}
+
+.ao-name,
+.card-block-title,
+.order-meta-name,
+.project-name {
+  color: var(--uikit-foreground);
+  letter-spacing: -0.035em;
+}
+
+.ao-dims,
+.ao-num,
+.order-meta-dims,
+.order-meta-date,
+.project-dims,
+.project-date,
+.card-block-link {
+  color: var(--uikit-muted-foreground);
+}
+
+.badge,
+.status-tag {
+  border-radius: var(--uikit-radius-pill);
+  border: 1px solid var(--uikit-border);
+  background: var(--uikit-muted);
+  color: var(--uikit-foreground);
+}
+
+.badge-prod {
+  background: rgba(245, 158, 11, .12);
+  color: #9a6205;
+  border-color: rgba(245, 158, 11, .22);
+}
+
+.bdot {
+  background: var(--uikit-warning);
+}
+
+.progress-track {
+  background: var(--uikit-muted);
+  border-radius: 22px;
+  border: 1px solid var(--uikit-border);
+}
+
+.progress-dot {
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  color: var(--uikit-muted-foreground);
+}
+
+.progress-step.done .progress-dot,
+.progress-step.current .progress-dot {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+  border-color: var(--uikit-primary);
+}
+
+.progress-label {
+  color: var(--uikit-muted-foreground);
+}
+
+.btn-sm {
+  border-radius: var(--uikit-radius-pill);
+  font-weight: 820;
+}
+
+.btn-black {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.btn-outline {
+  background: var(--uikit-card);
+  color: var(--uikit-foreground);
+  border: 1px solid var(--uikit-border);
+}
+
+.order-row,
+.project-row,
+.new-project {
+  border-radius: 22px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+}
+
+.order-row:hover,
+.project-row:hover,
+.new-project:hover {
+  background: var(--uikit-muted);
+}
+
+.order-thumb {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--uikit-muted);
+}
+
+.tag-done {
+  background: rgba(16, 185, 129, .12);
+  color: #137146;
+  border-color: rgba(16, 185, 129, .22);
+}
+
+.tag-ready {
+  background: rgba(245, 158, 11, .12);
+  color: #9a6205;
+  border-color: rgba(245, 158, 11, .22);
+}
+
+.new-project {
+  color: var(--uikit-foreground);
+  justify-content: center;
+  font-weight: 840;
+}
+
+@media (max-width: 900px) {
+  .topbar {
+    height: 64px;
+  }
+
+  .active-order,
+  .card-block {
+    border-radius: 24px;
+  }
+}
