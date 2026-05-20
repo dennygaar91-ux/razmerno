@@ -12,6 +12,7 @@ import "./styles/constructor-step-flow.css";
 import "./styles/constructor-commercial-polish.css";
 import "./styles/constructor-quick-fixes.css";
 import "./pages/ConstructorRequestedCleanup.css";
+import "./styles/uikit-mobile-polish.css";
 import "./styles/constructor-input-guard.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
