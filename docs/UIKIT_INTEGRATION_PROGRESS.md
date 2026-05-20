@@ -27,3 +27,18 @@ Implemented:
 - Kept existing content and constructor logic untouched.
 
 Progress: 100%.
+
+## Stage 3 — Landing UIKit/reference redesign
+
+Status: complete.
+
+Implemented:
+
+- Added new LandingUIKit page.
+- Switched the root route to LandingUIKit.
+- Preserved the product meaning of Razmerno: furniture constructor, dimensions, filling, material, preliminary estimate, technology review and self-assembly kit.
+- Added hero, process, base models, assembly kit, materials, FAQ and final CTA sections.
+- Used the new UIKit components for button and status patterns.
+- Kept the old Landing.jsx as fallback while the redesign is still staged in the ui-update branch.
+
+Progress: 100%.
