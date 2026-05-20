@@ -1,0 +1,174 @@
+.rp-ctor-page {
+  background: var(--uikit-background);
+  color: var(--uikit-foreground);
+}
+
+.rp-ctor-hero {
+  margin: 0 auto;
+  padding-top: 120px;
+  padding-bottom: 34px;
+  background: radial-gradient(circle at 18% 24%, #fff 0, var(--uikit-background) 54%, #f2f2ef 100%);
+}
+
+.rp-ctor-kicker {
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  color: var(--uikit-muted-foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rp-ctor-kicker span {
+  background: var(--uikit-success);
+}
+
+.rp-ctor-hero h1 {
+  max-width: 760px;
+  color: var(--uikit-foreground);
+  font-size: clamp(42px, 5.6vw, 78px);
+  line-height: .96;
+  letter-spacing: -0.075em;
+}
+
+.rp-ctor-lead {
+  max-width: 680px;
+  color: var(--uikit-muted-foreground);
+  font-size: 19px;
+  line-height: 1.62;
+  letter-spacing: -0.025em;
+}
+
+.rp-ctor-badges span,
+.rp-ctor-actions button,
+.rp-save-share,
+.rp-ctor-notice {
+  border-color: var(--uikit-border);
+  background: var(--uikit-card);
+  color: var(--uikit-muted-foreground);
+  box-shadow: var(--uikit-shadow-soft);
+}
+
+.rp-ctor-actions button,
+.rp-save-share button,
+.rp-mobile-cta button {
+  border-radius: var(--uikit-radius-pill);
+  font-weight: 820;
+}
+
+.rp-ctor-actions button.is-primary,
+.rp-save-share button,
+.rp-mobile-cta button {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+  border-color: var(--uikit-primary);
+}
+
+.rp-save-share {
+  border-radius: 28px;
+}
+
+.rp-save-share__status,
+.rp-save-share__project,
+.rp-save-share__link {
+  border-radius: 18px;
+  background: var(--uikit-muted);
+  border-color: var(--uikit-border);
+}
+
+.rp-save-share span,
+.rp-save-share b {
+  color: inherit;
+}
+
+.rp-ctor-shell {
+  gap: 18px;
+  padding-top: 18px;
+  padding-bottom: 40px;
+}
+
+.rp-ctor-shell > * {
+  border-radius: 30px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: var(--uikit-shadow-soft);
+}
+
+.rp-ctor-shell input,
+.rp-ctor-shell select,
+.rp-ctor-shell textarea {
+  border-color: var(--uikit-border);
+  border-radius: 16px;
+  background: var(--uikit-card);
+  color: var(--uikit-foreground);
+}
+
+.rp-ctor-shell button {
+  border-radius: var(--uikit-radius-pill);
+}
+
+.rp-ctor-shell button[aria-pressed='true'],
+.rp-ctor-shell .is-active,
+.rp-ctor-shell .active {
+  border-color: var(--uikit-primary);
+}
+
+.rp-mobile-cta {
+  background: rgba(255,255,255,.92);
+  border-top: 1px solid var(--uikit-border);
+  backdrop-filter: blur(18px);
+}
+
+.rp-mobile-cta span,
+.rp-mobile-cta small {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-mobile-cta b {
+  color: var(--uikit-foreground);
+}
+
+.rp-confirm__panel {
+  border-radius: 28px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: 0 34px 110px rgba(17, 17, 17, 0.18);
+}
+
+.rp-confirm__panel p {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-confirm__panel h2 {
+  color: var(--uikit-foreground);
+  letter-spacing: -0.04em;
+}
+
+.rp-confirm__panel span {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-confirm__panel button {
+  border-radius: var(--uikit-radius-pill);
+}
+
+@media (max-width: 980px) {
+  .rp-ctor-hero {
+    padding-top: 92px;
+  }
+
+  .rp-ctor-shell {
+    gap: 14px;
+  }
+
+  .rp-ctor-shell > * {
+    border-radius: 24px;
+  }
+}
