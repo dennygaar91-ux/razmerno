@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./styles/tokens.css";
 import "./styles/atoms.css";
+import "./styles/uikit-bridge.css";
 import "./pages/ConstructorDesignTokens.css";
 import "./styles/constructor-layout-overrides.css";
 import "./styles/constructor-viewport-polish.css";
