@@ -71,3 +71,18 @@ Implemented:
 - Kept the original AccountPage file as fallback while the redesign remains staged in the ui-update branch.
 
 Progress: 100%.
+
+## Stage 6 — Checkout UIKit/reference drawer
+
+Status: complete.
+
+Implemented:
+
+- Kept the current CheckoutDrawer business logic intact.
+- Added a dedicated CheckoutUIKit CSS layer.
+- Imported CheckoutUIKit.css from main.jsx.
+- Preserved checkout flow: review, contacts, delivery, assembly, agreement, submit, success state.
+- Preserved honest commercial wording: preliminary estimate, technology review, no payment charged now.
+- Styled overlay, drawer, progress, hero total, fields, delivery/service cards, agreement, footer actions and success state in the UIKit/reference direction.
+
+Progress: 100%.
