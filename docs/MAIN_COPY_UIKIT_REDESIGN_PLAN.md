@@ -31,7 +31,9 @@ This branch is a clean copy of main. It must not use the experimental ui-update 
 
 Stage 1 — Clone main and audit UIKit: complete.
 
-Stage 2 — Safe UIKit foundation: in progress.
+Stage 2 — Safe UIKit foundation: complete.
+
+Stage 3 — Landing redesign: in progress.
 
 Completed safely:
 
@@ -41,5 +43,8 @@ Completed safely:
 - Imported UIKit bridge from `main.jsx`.
 - Added Header UIKit override layer without rewriting Header logic.
 - Added Hero UIKit override layer without changing Hero content or structure.
+- Added TrustBar UIKit override layer without changing TrustBar content or structure.
+- Added Value UIKit override layer without changing Value content or structure.
+- Added HowItWorks UIKit override layer without changing HowItWorks content or structure.
 
 Current rule: no route replacement, no constructor logic changes.
