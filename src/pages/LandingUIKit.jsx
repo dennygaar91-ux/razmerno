@@ -5,10 +5,10 @@ import './LandingUIKitHero.css'
 import './LandingUIKitSections.css'
 
 const processSteps = [
-  ['Размеры', 'Укажите ширину, высоту и глубину изделия с точностью до миллиметра.'],
-  ['Наполнение', 'Добавьте полки, ящики и штанги в понятном редакторе.'],
-  ['Дизайн', 'Выберите материал корпуса, фасадов, кромку и фурнитуру.'],
-  ['Производство', 'Мы проверим проект, подготовим детали, присадку и комплект фурнитуры.'],
+  ['Размеры', 'Укажите ширину, высоту и глубину изделия с точностью до миллиметра.', 'ruler'],
+  ['Наполнение', 'Добавьте полки, ящики и штанги в понятном редакторе.', 'layers'],
+  ['Дизайн', 'Выберите материал корпуса, фасадов, кромку и фурнитуру.', 'settings'],
+  ['Производство', 'Мы проверим проект, подготовим детали, присадку и комплект фурнитуры.', 'package'],
 ]
 
 const kitItems = [
@@ -63,9 +63,9 @@ export default function LandingUIKit() {
         <p className="rzm-home-kicker">Процесс создания</p>
         <h2>От идеи до готового изделия за 4 шага</h2>
         <div className="rzm-home-process">
-          {processSteps.map(([title, text], index) => (
+          {processSteps.map(([title, text, icon], index) => (
             <article key={title} className="rzm-home-card">
-              <div className="rzm-home-card__icon"><Icon name={index === 0 ? 'ruler' : index === 1 ? 'grid' : index === 2 ? 'palette' : 'box'} size={21} /></div>
+              <div className="rzm-home-card__icon"><Icon name={icon} size={21} /></div>
               <span>Шаг {String(index + 1).padStart(2, '0')}</span>
               <h3>{title}</h3>
               <p>{text}</p>
