@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./styles/tokens.css";
 import "./styles/atoms.css";
+import "./styles/uikit-bridge.css";
 import "./pages/ConstructorDesignTokens.css";
 import "./styles/constructor-layout-overrides.css";
 import "./styles/constructor-viewport-polish.css";
@@ -11,6 +12,7 @@ import "./styles/constructor-step-flow.css";
 import "./styles/constructor-commercial-polish.css";
 import "./styles/constructor-quick-fixes.css";
 import "./pages/ConstructorRequestedCleanup.css";
+import "./styles/uikit-mobile-polish.css";
 import "./styles/constructor-input-guard.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(

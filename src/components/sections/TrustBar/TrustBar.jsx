@@ -1,5 +1,6 @@
 import Icon from '../../../icons/Icon'
 import './TrustBar.css'
+import './TrustBarUIKit.css'
 
 const ITEMS = [
   { icon: 'clock',  text: <><strong>8–14 дней</strong> от замера до доставки</> },

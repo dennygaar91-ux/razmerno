@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import Icon from '../../../icons/Icon'
 import './ConstructorTeaser.css'
+import './ConstructorTeaserUIKit.css'
 
 const FEATS = [
   { t: 'Размеры в мм',       sub: '— точность до 1 мм' },

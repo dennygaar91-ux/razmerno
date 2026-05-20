@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import Icon from '../../../icons/Icon'
 import './Hero.css'
+import './HeroUIKit.css'
 
 const CHIPS = [
   { text: <><strong>Ошибётесь в замере?</strong> Проверим до запуска</> },

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import Icon from '../../icons/Icon'
 import useHeader from '../../hooks/useHeader'
 import './Header.css'
+import './HeaderUIKit.css'
 
 const CITIES = [
   { name: 'Москва', available: true },

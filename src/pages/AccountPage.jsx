@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Icon from '../icons/Icon'
 import './AccountPage.css'
+import './AccountUIKit.css'
 
 function Sidebar({ active }) {
   const navigate = useNavigate()

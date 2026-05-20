@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createConstructorOrder } from '../../services/constructorOrders'
+import './CheckoutUIKit.css'
 
 function formatPrice(value) {
   const numericValue = Number(value)

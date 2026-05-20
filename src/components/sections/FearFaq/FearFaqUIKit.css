@@ -1,0 +1,145 @@
+.fearfaq {
+  background: var(--uikit-background);
+  padding-top: 118px;
+  padding-bottom: 118px;
+}
+
+.fearfaq__hd .kicker {
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  color: var(--uikit-muted-foreground);
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.fearfaq__hd .h-lg {
+  margin-top: 24px;
+  letter-spacing: -0.07em;
+}
+
+.fearfaq__hd .italic {
+  color: #9b9b96;
+  font-style: normal;
+}
+
+.fear__g {
+  gap: 18px;
+}
+
+.fcol {
+  border-radius: 30px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: var(--uikit-shadow-soft);
+}
+
+.fcol--ok {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+  border-color: var(--uikit-primary);
+}
+
+.fcol__lbl {
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-muted);
+  color: var(--uikit-muted-foreground);
+}
+
+.fcol--ok .fcol__lbl {
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.72);
+}
+
+.fitem {
+  border-radius: 22px;
+  background: var(--uikit-muted);
+  border: 1px solid var(--uikit-border);
+}
+
+.fcol--ok .fitem {
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.1);
+}
+
+.fico {
+  border-radius: 50%;
+  background: var(--uikit-card);
+  color: var(--uikit-foreground);
+}
+
+.fcol--ok .fico {
+  background: rgba(255,255,255,.16);
+  color: #fff;
+}
+
+.fq {
+  color: var(--uikit-foreground);
+  letter-spacing: -0.025em;
+}
+
+.fa {
+  color: var(--uikit-muted-foreground);
+}
+
+.fcol--ok .fq {
+  color: #fff;
+}
+
+.fcol--ok .fa {
+  color: rgba(255,255,255,.68);
+}
+
+.faq__sep-l {
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.faq__sep-line {
+  background: var(--uikit-border);
+}
+
+.faqit {
+  border-radius: 22px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: var(--uikit-shadow-soft);
+  overflow: hidden;
+}
+
+.faqq {
+  color: var(--uikit-foreground);
+  letter-spacing: -0.025em;
+}
+
+.faqa {
+  color: var(--uikit-muted-foreground);
+}
+
+.faqpl {
+  background: var(--uikit-muted);
+  color: var(--uikit-foreground);
+}
+
+.fearfaq__cta .btn-pr {
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.fearfaq__note {
+  color: var(--uikit-muted-foreground);
+}
+
+@media (max-width: 980px) {
+  .fearfaq {
+    padding-top: 86px;
+    padding-bottom: 86px;
+  }
+}

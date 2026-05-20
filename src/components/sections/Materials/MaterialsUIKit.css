@@ -1,0 +1,126 @@
+.mats {
+  background: var(--uikit-background);
+  padding-top: 118px;
+  padding-bottom: 118px;
+}
+
+.mats__hd .kicker {
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  color: var(--uikit-muted-foreground);
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.mats__hd .h-lg {
+  margin-top: 24px;
+  letter-spacing: -0.07em;
+}
+
+.mats__hd .italic {
+  color: #9b9b96;
+  font-style: normal;
+}
+
+.mats__hd .lead {
+  color: var(--uikit-muted-foreground);
+  font-size: 19px;
+  line-height: 1.62;
+}
+
+.mats__sep-l {
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+  border: 1px solid var(--uikit-primary);
+}
+
+.mats__sep-line {
+  background: var(--uikit-border);
+}
+
+.decor-grid {
+  gap: 16px;
+}
+
+.decor-card {
+  border-radius: 24px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: var(--uikit-shadow-soft);
+  overflow: hidden;
+}
+
+.decor-img {
+  border-radius: 20px;
+  border: 1px solid var(--uikit-border);
+}
+
+.decor-label {
+  color: var(--uikit-foreground);
+  letter-spacing: -0.02em;
+}
+
+.decor-sub {
+  color: var(--uikit-muted-foreground);
+}
+
+.hw-grid {
+  gap: 18px;
+}
+
+.hwcard {
+  border-radius: 30px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: var(--uikit-shadow-soft);
+}
+
+.hwcard__vis {
+  border-radius: 26px;
+  background: var(--uikit-muted);
+  color: var(--uikit-foreground);
+}
+
+.hwcard__brand {
+  color: var(--uikit-foreground);
+  letter-spacing: -0.045em;
+}
+
+.hwcard__tier {
+  border-radius: var(--uikit-radius-pill);
+}
+
+.hwcard__tier--prem {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.hwcard__tier--std {
+  background: var(--uikit-muted);
+  color: var(--uikit-foreground);
+}
+
+.hwcard__d {
+  color: var(--uikit-muted-foreground);
+}
+
+.hwcard__li {
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-muted);
+  border: 1px solid var(--uikit-border);
+  color: var(--uikit-muted-foreground);
+}
+
+@media (max-width: 980px) {
+  .mats {
+    padding-top: 86px;
+    padding-bottom: 86px;
+  }
+}
