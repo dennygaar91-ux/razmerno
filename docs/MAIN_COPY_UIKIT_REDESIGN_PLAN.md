@@ -43,6 +43,8 @@ Stage 6 — Checkout visual layer: complete.
 
 Stage 7 — Mobile polish: complete.
 
+Stage 8 — Static QA and PR preparation: complete.
+
 Completed safely:
 
 - Created `main-copy` branch from clean `main`.
@@ -68,5 +70,6 @@ Completed safely:
 - Preserved checkout validation, delivery logic, assembly +10%, payment mode, agreement, payload, submit and success state.
 - Added `uikit-mobile-polish.css` and imported it last in `main.jsx`.
 - Preserved all routes, components and logic while improving mobile spacing, card radius, CTA widths and drawer behavior.
+- Added `MAIN_COPY_UIKIT_QA.md` with manual build and visual QA checklist.
 
-Current rule: no route replacement, no constructor logic changes.
+Final note: repository-level static QA is complete. Final approval still requires local or CI `npm run build` and visual review on Vercel preview.
