@@ -27,20 +27,31 @@ const baseModels = [
   ['tv', 'Тумба ТВ', 'Низкая модульная база'],
 ]
 
-function formatPrice(value) {
-  return Number(value || 0).toLocaleString('ru-RU')
-}
-
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
 }
 
 function getMaterialColor(material) {
-  const tone = material?.tone || material?.body || ''
+  const tone = material?.tone || material?.title || ''
   if (/дуб|wood|oak/i.test(tone)) return '#c8aa7a'
-  if (/графит|серый|gray/i.test(tone)) return '#5f625f'
+  if (/графит|серый|gray|stone/i.test(tone)) return '#5f625f'
   if (/кашемир|beige/i.test(tone)) return '#d8cab8'
   return '#f3f2ef'
+}
+
+function toProjectMaterial(material, currentMaterial) {
+  return {
+    ...currentMaterial,
+    body: material.fullTitle || material.title,
+    materialId: material.id,
+    thickness: material.thickness,
+    edge: material.edge,
+    edgeId: material.edgeId,
+    manufacturer: material.manufacturer,
+    article: material.article,
+    priceFactor: material.priceFactor,
+    tone: material.tone,
+  }
 }
 
 export default function ConstructorUIKitPage() {
@@ -87,14 +98,15 @@ export default function ConstructorUIKitPage() {
   }
 
   function selectMaterial(material) {
-    updateProject((current) => ({ ...current, material: { ...current.material, ...material } }))
+    updateProject((current) => ({ ...current, material: toProjectMaterial(material, current.material) }))
   }
 
   const rows = [
-    { label: 'Материалы', value: breakdown.materials },
+    { label: 'Материалы', value: breakdown.material },
+    { label: 'Распил', value: breakdown.cutting },
+    { label: 'Кромление', value: breakdown.edging },
     { label: 'Фурнитура', value: breakdown.hardware },
-    { label: 'Работа', value: breakdown.production },
-    { label: 'Доставка', value: breakdown.delivery },
+    { label: 'Упаковка', value: breakdown.packaging },
   ]
 
   return (
@@ -133,7 +145,7 @@ export default function ConstructorUIKitPage() {
 
         {activeTab === 'design' && (
           <section className="rzm-ctor-panel">
-            <div className="rzm-ctor-materials">{MATERIALS.slice(0, 4).map((material) => <UiMaterialCard key={material.materialId} title={material.body} subtitle={material.manufacturer || 'ЛДСП'} color={getMaterialColor(material)} active={project.material.materialId === material.materialId} onClick={() => selectMaterial(material)} />)}</div>
+            <div className="rzm-ctor-materials">{MATERIALS.slice(0, 4).map((material) => <UiMaterialCard key={material.id} title={material.title} subtitle={material.manufacturer || 'ЛДСП'} color={getMaterialColor(material)} active={project.material.materialId === material.id} onClick={() => selectMaterial(material)} />)}</div>
           </section>
         )}
       </aside>
