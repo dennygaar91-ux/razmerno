@@ -1,0 +1,47 @@
+.tbar {
+  background: var(--uikit-background);
+  border-top: 1px solid var(--uikit-border);
+  border-bottom: 1px solid var(--uikit-border);
+}
+
+.tbar__row {
+  padding: 18px;
+  border-radius: 28px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: var(--uikit-shadow-soft);
+  gap: 12px;
+}
+
+.tbar__item {
+  min-height: 58px;
+  padding: 0 16px;
+  border-radius: 18px;
+  background: var(--uikit-muted);
+  color: var(--uikit-muted-foreground);
+}
+
+.tbar__item strong {
+  color: var(--uikit-foreground);
+}
+
+.tbar__ic {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--uikit-card);
+  color: var(--uikit-foreground);
+}
+
+@media (max-width: 900px) {
+  .tbar__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .tbar__row {
+    grid-template-columns: 1fr;
+  }
+}
