@@ -1,5 +1,6 @@
 import Icon from '../../../icons/Icon'
 import './Materials.css'
+import './MaterialsUIKit.css'
 
 // ЛДСП — 8 вариантов (замените src на реальные ./materials/ldsp-N.png)
 const LDSP = [
