@@ -1,0 +1,116 @@
+.hdr {
+  height: 72px;
+  background: rgba(248, 248, 246, 0.82);
+  border-bottom: 1px solid rgba(17, 17, 17, 0.06);
+  box-shadow: none;
+}
+
+.hdr.scrolled {
+  height: 64px;
+  background: rgba(248, 248, 246, 0.94);
+  border-bottom-color: var(--uikit-border);
+}
+
+.hdr__in {
+  gap: 24px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 850;
+  letter-spacing: -0.055em;
+}
+
+.logo em {
+  color: var(--uikit-foreground);
+}
+
+.dnav {
+  justify-content: center;
+  gap: 6px;
+}
+
+.dnav a {
+  min-height: 38px;
+  padding: 0 15px;
+  border-radius: var(--uikit-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  color: var(--uikit-muted-foreground);
+  font-size: 13px;
+  font-weight: 720;
+  letter-spacing: -0.02em;
+}
+
+.dnav a::after {
+  display: none;
+}
+
+.dnav a:hover {
+  color: var(--uikit-foreground);
+  background: var(--uikit-muted);
+}
+
+.dnav a.active,
+.dnav a[href='/constructor'] {
+  color: var(--uikit-primary-foreground);
+  background: var(--uikit-primary);
+}
+
+.city-btn,
+.profile-ic,
+.burger {
+  background: var(--uikit-card);
+  border-color: var(--uikit-border);
+  box-shadow: none;
+}
+
+.city-btn {
+  height: 38px;
+  color: var(--uikit-muted-foreground);
+  font-weight: 720;
+}
+
+.profile-ic {
+  width: 40px;
+  height: 40px;
+}
+
+.hdr__r {
+  gap: 12px;
+}
+
+.hdr__r .btn-cta {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+  box-shadow: none;
+}
+
+.city-drop {
+  border-color: var(--uikit-border);
+  border-radius: 18px;
+  box-shadow: var(--uikit-shadow-soft);
+}
+
+.city-opt.active::after {
+  color: var(--uikit-foreground);
+}
+
+@media (max-width: 1080px) {
+  .hdr__in {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 540px) {
+  .hdr {
+    height: 64px;
+  }
+
+  .mnav {
+    top: 64px;
+  }
+}
