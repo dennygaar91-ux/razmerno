@@ -37,6 +37,8 @@ Stage 3 — Landing redesign: complete.
 
 Stage 4 — Constructor visual layer: complete.
 
+Stage 5 — Account visual layer: complete.
+
 Completed safely:
 
 - Created `main-copy` branch from clean `main`.
@@ -56,5 +58,7 @@ Completed safely:
 - Added Footer UIKit override layer without changing footer links, contacts or text.
 - Added `ConstructorUIKit.css` and imported it last in existing `ConstructorPage.jsx`.
 - Preserved constructor state, pricing, zone logic, storage, remote estimate, checkout drawer and order payload.
+- Added `AccountUIKit.css` and imported it last in existing `AccountPage.jsx`.
+- Preserved account layout, sidebar, active order, progress, history, saved projects and links.
 
 Current rule: no route replacement, no constructor logic changes.
