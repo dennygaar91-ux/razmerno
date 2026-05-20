@@ -1,0 +1,250 @@
+.rp-checkout {
+  color: var(--uikit-foreground);
+}
+
+.rp-checkout__overlay {
+  background: rgba(17, 17, 17, 0.42);
+  backdrop-filter: blur(8px);
+}
+
+.rp-checkout__panel {
+  background: var(--uikit-background);
+  border-left: 1px solid var(--uikit-border);
+  box-shadow: -34px 0 110px rgba(17, 17, 17, 0.18);
+}
+
+.rp-checkout__head {
+  background: rgba(255,255,255,.86);
+  border-bottom: 1px solid var(--uikit-border);
+  backdrop-filter: blur(18px);
+}
+
+.rp-checkout__head p {
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-muted);
+  color: var(--uikit-muted-foreground);
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.rp-checkout__head h2 {
+  color: var(--uikit-foreground);
+  letter-spacing: -0.055em;
+}
+
+.rp-checkout__head span {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-checkout__head button {
+  border-radius: 50%;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  color: var(--uikit-foreground);
+}
+
+.rp-checkout__progress {
+  padding: 6px;
+  border-radius: var(--uikit-radius-pill);
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+}
+
+.rp-checkout__progress span {
+  border-radius: var(--uikit-radius-pill);
+  color: var(--uikit-muted-foreground);
+  font-weight: 820;
+}
+
+.rp-checkout__progress span.is-active,
+.rp-checkout__progress span.is-done {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.rp-checkout__hero-total,
+.rp-checkout__total-breakdown,
+.rp-checkout__step,
+.rp-checkout__success {
+  border-radius: 26px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  box-shadow: var(--uikit-shadow-soft);
+}
+
+.rp-checkout__hero-total span,
+.rp-checkout__hero-total p,
+.rp-checkout__step p,
+.rp-checkout__summary dt,
+.rp-checkout__note,
+.rp-checkout__total-breakdown span {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-checkout__hero-total strong,
+.rp-checkout__step h3,
+.rp-checkout__summary dd,
+.rp-checkout__total-breakdown b {
+  color: var(--uikit-foreground);
+}
+
+.rp-checkout__summary div,
+.rp-checkout__total-breakdown div {
+  border-radius: 16px;
+  background: var(--uikit-muted);
+  border: 1px solid var(--uikit-border);
+}
+
+.rp-checkout__fields label,
+.rp-checkout__distance,
+.rp-checkout__service-card,
+.rp-checkout__agreement {
+  border-radius: 18px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+}
+
+.rp-checkout__fields span,
+.rp-checkout__distance span,
+.rp-checkout__service-card span {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-checkout__fields input,
+.rp-checkout__fields textarea,
+.rp-checkout__distance input {
+  border-radius: 14px;
+  background: var(--uikit-muted);
+  border: 1px solid var(--uikit-border);
+  color: var(--uikit-foreground);
+}
+
+.rp-checkout__fields label.has-error,
+.rp-checkout__agreement.has-error {
+  border-color: rgba(220, 38, 38, .42);
+}
+
+.rp-checkout__fields small,
+.rp-checkout__distance small,
+.rp-checkout__service-card small {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-checkout__option-grid button,
+.rp-checkout__service-card button {
+  border-radius: 18px;
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  color: var(--uikit-foreground);
+}
+
+.rp-checkout__option-grid button span,
+.rp-checkout__service-card button span {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-checkout__option-grid button.is-active,
+.rp-checkout__service-card button.is-active {
+  background: var(--uikit-primary);
+  border-color: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.rp-checkout__option-grid button.is-active span {
+  color: rgba(255,255,255,.68);
+}
+
+.rp-checkout__status {
+  border-radius: 16px;
+}
+
+.rp-checkout__status.is-error {
+  background: rgba(220, 38, 38, .1);
+  color: #a12121;
+  border: 1px solid rgba(220, 38, 38, .2);
+}
+
+.rp-checkout__status.is-loading {
+  background: rgba(17, 17, 17, .06);
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-checkout__success-icon {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.rp-checkout__success-kicker {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-checkout__success h3,
+.rp-checkout__success-total b {
+  color: var(--uikit-foreground);
+}
+
+.rp-checkout__success p,
+.rp-checkout__success-total span,
+.rp-checkout__success-total small,
+.rp-checkout__success dl dt,
+.rp-checkout__success-next small {
+  color: var(--uikit-muted-foreground);
+}
+
+.rp-checkout__success-total,
+.rp-checkout__success dl div,
+.rp-checkout__success-next div {
+  border-radius: 18px;
+  background: var(--uikit-muted);
+  border: 1px solid var(--uikit-border);
+}
+
+.rp-checkout__success-next b {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
+
+.rp-checkout__foot {
+  background: rgba(255,255,255,.9);
+  border-top: 1px solid var(--uikit-border);
+  backdrop-filter: blur(18px);
+}
+
+.rp-checkout__primary,
+.rp-checkout__secondary {
+  border-radius: var(--uikit-radius-pill);
+  font-weight: 840;
+}
+
+.rp-checkout__primary {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+  border-color: var(--uikit-primary);
+}
+
+.rp-checkout__secondary {
+  background: var(--uikit-card);
+  color: var(--uikit-foreground);
+  border: 1px solid var(--uikit-border);
+}
+
+@media (max-width: 720px) {
+  .rp-checkout__panel {
+    border-radius: 24px 24px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--uikit-border);
+  }
+
+  .rp-checkout__hero-total,
+  .rp-checkout__total-breakdown,
+  .rp-checkout__step,
+  .rp-checkout__success {
+    border-radius: 22px;
+  }
+}
