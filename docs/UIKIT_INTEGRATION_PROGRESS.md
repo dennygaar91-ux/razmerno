@@ -57,3 +57,17 @@ Implemented:
 - Kept the original ConstructorPage file as fallback while the redesign remains staged in the ui-update branch.
 
 Progress: 100%.
+
+## Stage 5 — Account UIKit/reference dashboard
+
+Status: complete.
+
+Implemented:
+
+- Added AccountUIKitPage as a separate dashboard page.
+- Switched /account route to AccountUIKitPage.
+- Preserved account content meaning: greeting, active order, progress, order history, saved projects and new project CTA.
+- Added reference-style sidebar, profile controls, search toolbar, project cards, status badges and order history cards.
+- Kept the original AccountPage file as fallback while the redesign remains staged in the ui-update branch.
+
+Progress: 100%.
