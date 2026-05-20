@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Landing from './pages/Landing'
+import Landing from './pages/LandingUIKit'
 import AuthPage from './pages/AuthPage'
 import AccountPage from './pages/AccountPage'
 import AccountOrderPage from './pages/AccountOrderPage'
