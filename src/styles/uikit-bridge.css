@@ -1,0 +1,33 @@
+:root {
+  --uikit-background: #F8F8F6;
+  --uikit-foreground: #111111;
+  --uikit-card: #FFFFFF;
+  --uikit-border: #E6E6E3;
+  --uikit-muted: #F1F1EF;
+  --uikit-muted-foreground: #6F6F6F;
+  --uikit-primary: #111111;
+  --uikit-primary-foreground: #FFFFFF;
+  --uikit-success: #10B981;
+  --uikit-warning: #F59E0B;
+  --uikit-destructive: #DC2626;
+  --uikit-radius: 12px;
+  --uikit-radius-lg: 24px;
+  --uikit-radius-pill: 999px;
+  --uikit-shadow-soft: 0 18px 48px rgba(17, 17, 17, 0.06);
+}
+
+.uikit-surface {
+  background: var(--uikit-card);
+  border: 1px solid var(--uikit-border);
+  border-radius: var(--uikit-radius-lg);
+  box-shadow: var(--uikit-shadow-soft);
+}
+
+.uikit-pill {
+  border-radius: var(--uikit-radius-pill);
+}
+
+.uikit-primary {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+}
