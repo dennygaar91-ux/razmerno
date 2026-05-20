@@ -33,7 +33,7 @@ Stage 1 — Clone main and audit UIKit: complete.
 
 Stage 2 — Safe UIKit foundation: complete.
 
-Stage 3 — Landing redesign: in progress.
+Stage 3 — Landing redesign: complete.
 
 Completed safely:
 
@@ -49,5 +49,8 @@ Completed safely:
 - Added Measure UIKit override layer without changing Measure content or structure.
 - Added Materials UIKit override layer without changing Materials content or structure.
 - Added ConstructorTeaser UIKit override layer without changing ConstructorTeaser content or structure.
+- Added Assembly UIKit override layer without changing Assembly content or structure.
+- Added FearFaq UIKit override layer without changing FAQ state logic, questions, answers or CTA.
+- Added Footer UIKit override layer without changing footer links, contacts or text.
 
 Current rule: no route replacement, no constructor logic changes.
