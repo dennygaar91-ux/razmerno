@@ -1,0 +1,32 @@
+# Main copy UIKit redesign plan
+
+Branch: main-copy.
+
+Base commit: c2944dbf0ac473cf5b752421364b035b8e392c71.
+
+This branch is a clean copy of main. It must not use the experimental ui-update branch.
+
+## Rules
+
+- Preserve the existing content and business logic.
+- Use UIKit files as visual source of truth.
+- Use reference screenshots as layout and spacing source of truth.
+- Do not replace working pages with simplified mock pages.
+- Redesign existing pages gradually.
+- Keep constructor logic intact.
+- One page or block per step.
+
+## Stages
+
+1. Clone main and audit UIKit.
+2. Add UIKit assets/components safely.
+3. Redesign landing without changing product meaning.
+4. Redesign constructor visual layer without removing logic.
+5. Redesign account/dashboard.
+6. Redesign checkout visual layer.
+7. Mobile UX.
+8. Build, QA and PR.
+
+## Status
+
+Stage 1 started.
