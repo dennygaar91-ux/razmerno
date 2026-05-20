@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Landing from './pages/LandingUIKit'
 import AuthPage from './pages/AuthPage'
-import AccountPage from './pages/AccountPage'
+import AccountPage from './pages/AccountUIKitPage'
 import AccountOrderPage from './pages/AccountOrderPage'
 import ConstructorPage from './pages/ConstructorUIKitPage'
 
