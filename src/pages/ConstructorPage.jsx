@@ -33,6 +33,7 @@ import './ConstructorSummaryTrust.css'
 import './ConstructorSaveShare.css'
 import './ConstructorCheckoutBusiness.css'
 import './ConstructorMobileUX.css'
+import './ConstructorUIKit.css'
 
 const FLOW_STEPS = [
   { id: 'dimensions', num: '1', title: 'Размеры', text: 'Укажите габариты и секции' },
