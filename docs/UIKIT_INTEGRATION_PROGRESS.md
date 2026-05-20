@@ -1,0 +1,103 @@
+# UIKit integration progress
+
+## Stage 1 — Audit and branch
+
+Status: complete.
+
+Branch: ui-update.
+
+Base commit: c2944dbf0ac473cf5b752421364b035b8e392c71.
+
+Notes:
+
+- Main project routes inspected.
+- Landing keeps existing content sections.
+- Constructor is currently wrapped by the public Header and must be separated during constructor redesign.
+- Existing constructor has many CSS layers; UIKit integration will be additive first, then page-by-page.
+
+## Stage 2 — UIKit foundation
+
+Status: complete.
+
+Implemented:
+
+- Added compact UIKit React component layer.
+- Added UIKit CSS slices for tabs, buttons, cards, empty states, material cards and price card.
+- Imported UIKit CSS from main.jsx.
+- Kept existing content and constructor logic untouched.
+
+Progress: 100%.
+
+## Stage 3 — Landing UIKit/reference redesign
+
+Status: complete.
+
+Implemented:
+
+- Added new LandingUIKit page.
+- Switched the root route to LandingUIKit.
+- Preserved the product meaning of Razmerno: furniture constructor, dimensions, filling, material, preliminary estimate, technology review and self-assembly kit.
+- Added hero, process, base models, assembly kit, materials, FAQ and final CTA sections.
+- Used the new UIKit components for button and status patterns.
+- Kept the old Landing.jsx as fallback while the redesign is still staged in the ui-update branch.
+
+Progress: 100%.
+
+## Stage 4 — Constructor UIKit/reference shell
+
+Status: complete.
+
+Implemented:
+
+- Added ConstructorUIKitPage as a separate page instead of deleting the old ConstructorPage.
+- Switched /constructor and /constructor/* routes to ConstructorUIKitPage.
+- Removed the public Header from the constructor route by making the page self-contained.
+- Added project topbar, left settings panel, dotted center canvas, wardrobe preview, floating controls, help button and right preliminary price card.
+- Preserved core product logic: dimensions, sections, filling, material selection, preliminary price and checkout drawer.
+- Kept the original ConstructorPage file as fallback while the redesign remains staged in the ui-update branch.
+
+Progress: 100%.
+
+## Stage 5 — Account UIKit/reference dashboard
+
+Status: complete.
+
+Implemented:
+
+- Added AccountUIKitPage as a separate dashboard page.
+- Switched /account route to AccountUIKitPage.
+- Preserved account content meaning: greeting, active order, progress, order history, saved projects and new project CTA.
+- Added reference-style sidebar, profile controls, search toolbar, project cards, status badges and order history cards.
+- Kept the original AccountPage file as fallback while the redesign remains staged in the ui-update branch.
+
+Progress: 100%.
+
+## Stage 6 — Checkout UIKit/reference drawer
+
+Status: complete.
+
+Implemented:
+
+- Kept the current CheckoutDrawer business logic intact.
+- Added a dedicated CheckoutUIKit CSS layer.
+- Imported CheckoutUIKit.css from main.jsx.
+- Preserved checkout flow: review, contacts, delivery, assembly, agreement, submit, success state.
+- Preserved honest commercial wording: preliminary estimate, technology review, no payment charged now.
+- Styled overlay, drawer, progress, hero total, fields, delivery/service cards, agreement, footer actions and success state in the UIKit/reference direction.
+
+Progress: 100%.
+
+## Stage 7 — Mobile UX
+
+Status: complete.
+
+Implemented:
+
+- Added a dedicated mobile/tablet override layer.
+- Imported uikit-mobile.css from main.jsx.
+- Improved mobile landing: compact navigation, hero scaling, stacked sections, full-width CTA and model cards.
+- Improved mobile constructor: sticky topbar, preview-first flow, compact wardrobe canvas, bottom controls, stacked settings and full-width price CTA.
+- Improved mobile account: horizontal sidebar navigation, stacked cards, compact project rows and single-column content.
+- Kept checkout bottom-sheet behavior for small screens.
+
+Progress: 100%.

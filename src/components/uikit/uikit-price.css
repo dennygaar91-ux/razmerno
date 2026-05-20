@@ -1,0 +1,9 @@
+.rzm-kit-price{height:calc(100vh - 88px);min-height:680px;padding:28px;display:flex;flex-direction:column}
+.rzm-kit-price__label{margin:0;color:#9b9b96;font-size:10px;font-weight:950;letter-spacing:.28em;text-transform:uppercase}
+.rzm-kit-price strong{display:block;margin:10px 0 4px;font-size:34px;line-height:1;font-weight:800;letter-spacing:-.05em}
+.rzm-kit-price__note{color:#6f6f6f;font-size:12px}
+.rzm-kit-price__rows{margin-top:36px;padding-top:24px;border-top:1px solid #e6e6e3;display:grid;gap:18px}
+.rzm-kit-price__rows p,.rzm-kit-price__footer p{margin:0;display:flex;align-items:center;justify-content:space-between;color:#6f6f6f;font-size:13px}
+.rzm-kit-price b{color:#111}
+.rzm-kit-price__footer{margin-top:auto;padding-top:26px;border-top:1px solid #e6e6e3;display:grid;gap:16px}
+.rzm-kit-price__footer small{text-align:center;color:#6f6f6f;font-size:11px}

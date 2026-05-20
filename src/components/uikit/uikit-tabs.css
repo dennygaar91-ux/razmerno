@@ -1,0 +1,8 @@
+.rzm-kit-tabs{display:inline-flex;align-items:center;gap:4px;padding:4px;border:1px solid #e6e6e3;border-radius:999px;background:#fff}
+.rzm-kit-tab{min-height:38px;padding:0 18px;border:0;border-radius:999px;background:transparent;color:#6f6f6f;font:inherit;font-size:13px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.rzm-kit-tab.is-active{background:#111;color:#fff;box-shadow:0 16px 34px rgba(17,17,17,.22)}
+.rzm-kit-button{height:52px;padding:0 24px;border:0;border-radius:14px;background:#050505;color:#fff;font-size:14px;font-weight:850;display:inline-flex;align-items:center;justify-content:center;gap:12px;cursor:pointer}
+.rzm-kit-button.is-secondary{background:#fff;color:#111;border:1px solid #e6e6e3}
+.rzm-kit-segmented{display:inline-flex;align-items:center;gap:8px;padding:8px;border-radius:20px;background:#fff;border:1px solid #e6e6e3}
+.rzm-kit-segmented button{width:44px;height:44px;border:0;border-radius:14px;color:#6f6f6f;background:transparent;display:grid;place-items:center;cursor:pointer}
+.rzm-kit-segmented button.is-active{color:#fff;background:#111}
