@@ -1,5 +1,6 @@
 import Icon from '../../../icons/Icon'
 import './HowItWorks.css'
+import './HowItWorksUIKit.css'
 
 const STEPS = [
   {
