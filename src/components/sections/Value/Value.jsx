@@ -1,5 +1,6 @@
 import Icon from '../../../icons/Icon'
 import './Value.css'
+import './ValueUIKit.css'
 
 const CARDS = [
   {
