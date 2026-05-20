@@ -1,0 +1,233 @@
+@media (max-width: 980px) {
+  .wrap {
+    width: min(100% - 32px, var(--container, 1280px));
+  }
+
+  .hdr {
+    height: 64px;
+  }
+
+  .hdr__in {
+    min-height: 64px;
+  }
+
+  .hero__l,
+  .value,
+  .how,
+  .meas,
+  .mats,
+  .cstr,
+  .asmb,
+  .fearfaq {
+    padding-top: 84px;
+    padding-bottom: 84px;
+  }
+
+  .hero__title,
+  .h-lg,
+  .acc-greeting h1,
+  .rp-ctor-hero h1 {
+    letter-spacing: -0.06em;
+  }
+
+  .fchips,
+  .value__grid,
+  .steps,
+  .meas__grid,
+  .decor-grid,
+  .hw-grid,
+  .asmb__grid,
+  .fear__g,
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__acts,
+  .cstr__acts,
+  .ao-actions,
+  .rp-ctor-actions {
+    flex-wrap: wrap;
+  }
+
+  .hero__acts .btn,
+  .cstr__acts .btn,
+  .ao-actions .btn-sm,
+  .rp-ctor-actions button {
+    min-height: 50px;
+  }
+
+  .vcard,
+  .step,
+  .mcard,
+  .decor-card,
+  .hwcard,
+  .astep,
+  .atips,
+  .fcol,
+  .faqit,
+  .active-order,
+  .card-block,
+  .rp-ctor-shell > *,
+  .rp-checkout__hero-total,
+  .rp-checkout__step,
+  .rp-checkout__success {
+    border-radius: 24px;
+  }
+
+  .rp-ctor-shell {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .rp-ctor-hero {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .rp-save-share {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+}
+
+@media (max-width: 720px) {
+  .wrap {
+    width: min(100% - 24px, var(--container, 1280px));
+  }
+
+  .logo,
+  .tb-logo,
+  .ft__logo {
+    font-size: 20px;
+  }
+
+  .hero__title {
+    font-size: clamp(42px, 13vw, 58px);
+  }
+
+  .h-lg,
+  .rp-ctor-hero h1,
+  .acc-greeting h1 {
+    font-size: clamp(34px, 10vw, 46px);
+  }
+
+  .hero__lead,
+  .lead,
+  .rp-ctor-lead,
+  .acc-greeting p {
+    font-size: 16px;
+    line-height: 1.58;
+  }
+
+  .hero__acts,
+  .cstr__acts,
+  .fearfaq__cta,
+  .rp-ctor-actions,
+  .ao-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .hero__acts .btn,
+  .cstr__acts .btn,
+  .fearfaq__cta .btn,
+  .rp-ctor-actions button,
+  .ao-actions .btn-sm {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tbar__row,
+  .decor-grid,
+  .mats__sep,
+  .faq__sep {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-checkout__panel {
+    width: 100%;
+    max-width: none;
+  }
+
+  .rp-checkout__foot {
+    gap: 10px;
+  }
+
+  .rp-checkout__primary,
+  .rp-checkout__secondary {
+    width: 100%;
+  }
+
+  .rp-checkout__progress {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-radius: 22px;
+  }
+
+  .rp-checkout__progress span {
+    min-height: 42px;
+  }
+
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    position: static;
+    width: auto;
+    height: auto;
+    display: flex;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--uikit-border);
+  }
+
+  .sidebar .sbsep,
+  .sidebar .ni--ex {
+    display: none;
+  }
+
+  .ni {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  .acc-main {
+    padding: 24px 16px 40px;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero__l,
+  .value,
+  .how,
+  .meas,
+  .mats,
+  .cstr,
+  .asmb,
+  .fearfaq {
+    padding-top: 68px;
+    padding-bottom: 68px;
+  }
+
+  .fchip,
+  .tbar__item,
+  .step__li,
+  .atip-pill,
+  .hwcard__li {
+    min-height: 44px;
+  }
+
+  .hero__r,
+  .meas__illus,
+  .cstr__card,
+  .asmb__photo {
+    border-radius: 24px;
+  }
+
+  .rp-mobile-cta {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
