@@ -3,25 +3,15 @@ import Landing from './pages/LandingUIKit'
 import AuthPage from './pages/AuthPage'
 import AccountPage from './pages/AccountPage'
 import AccountOrderPage from './pages/AccountOrderPage'
-import ConstructorPage from './pages/ConstructorPage'
-import Header from './components/Header/Header'
-
-function ConstructorRoute() {
-  return (
-    <>
-      <Header />
-      <ConstructorPage />
-    </>
-  )
-}
+import ConstructorPage from './pages/ConstructorUIKitPage'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/constructor" element={<ConstructorRoute />} />
-        <Route path="/constructor/*" element={<ConstructorRoute />} />
+        <Route path="/constructor" element={<ConstructorPage />} />
+        <Route path="/constructor/*" element={<ConstructorPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/account/order" element={<AccountOrderPage />} />
