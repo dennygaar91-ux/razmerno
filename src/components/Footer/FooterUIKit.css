@@ -1,0 +1,61 @@
+.ft {
+  background: var(--uikit-primary);
+  color: var(--uikit-primary-foreground);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.ft__g {
+  gap: 56px;
+}
+
+.ft__logo {
+  color: #fff;
+  letter-spacing: -0.055em;
+}
+
+.ft__logo em {
+  color: #fff;
+}
+
+.ft__d {
+  color: rgba(255,255,255,.62);
+  max-width: 340px;
+  line-height: 1.65;
+}
+
+.ft__ct {
+  color: rgba(255,255,255,.46);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ft__col a {
+  color: rgba(255,255,255,.72);
+  transition: color .16s ease, transform .16s ease;
+}
+
+.ft__col a:hover {
+  color: #fff;
+  transform: translateX(2px);
+}
+
+.ft__b {
+  border-top-color: rgba(255,255,255,.1);
+}
+
+.ft__cp,
+.ft__lk a {
+  color: rgba(255,255,255,.46);
+}
+
+.ft__lk a:hover {
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  .ft__g {
+    gap: 34px;
+  }
+}
