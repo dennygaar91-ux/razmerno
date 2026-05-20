@@ -39,6 +39,8 @@ Stage 4 — Constructor visual layer: complete.
 
 Stage 5 — Account visual layer: complete.
 
+Stage 6 — Checkout visual layer: complete.
+
 Completed safely:
 
 - Created `main-copy` branch from clean `main`.
@@ -60,5 +62,7 @@ Completed safely:
 - Preserved constructor state, pricing, zone logic, storage, remote estimate, checkout drawer and order payload.
 - Added `AccountUIKit.css` and imported it last in existing `AccountPage.jsx`.
 - Preserved account layout, sidebar, active order, progress, history, saved projects and links.
+- Added `CheckoutUIKit.css` and imported it in existing `CheckoutDrawer.jsx`.
+- Preserved checkout validation, delivery logic, assembly +10%, payment mode, agreement, payload, submit and success state.
 
 Current rule: no route replacement, no constructor logic changes.
