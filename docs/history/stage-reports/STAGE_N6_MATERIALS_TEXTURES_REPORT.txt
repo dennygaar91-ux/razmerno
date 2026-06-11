@@ -1,0 +1,52 @@
+Stage N6 — Materials and real textures
+
+Цель этапа:
+Довести шаг «Материалы» в новой 3D-first ветке до состояния, где пользователь видит реальные декоры через swatches/preview, а выбранные материалы напрямую связаны с 3D-текстурами.
+
+Запланированные задачи:
+1. Использовать реальные textureUrl материалов в UI swatches.
+2. Добавить click zoom-preview выбранного/кликнутого материала.
+3. Сохранить связь выбора материала с 3D renderer.
+4. Добавить фильтр фасадов по типу материала LDSP/MDF.
+5. Оставить заднюю стенку read-only с автоматическим HDF-декором.
+6. Проверить наличие всех textureUrl из materialCatalog в public/decors.
+7. Не трогать pricing/order/backend/Supabase/admin/export/legacy configurator.
+
+Сделано:
+1. MaterialPicker теперь использует реальную текстуру материала через backgroundImage url(textureUrl), а не только dotClass.
+2. Добавлен крупный rzm-3d-material-preview — click zoom-preview выбранного/кликнутого декора.
+3. Для фасадов добавлены tabs: Все / LDSP / MDF.
+4. Каждая строка материала показывает swatch, короткое название, бренд, код, тип и толщину.
+5. Активный материал получил более аккуратный check-state.
+6. Добавлен BackPanelMaterialPreview: задняя стенка HDF 3 мм подбирается автоматически и отображается read-only строкой.
+7. Добавлен check:stage-n6-material-textures, который проверяет маркеры N6 и наличие всех 19 texture files из materialCatalog.
+8. Three.js material system не переписывался: он уже использует TextureLoader, getTextureRepeatForMaterial и material tokens; Stage N6 синхронизировал UI с этой логикой.
+
+Не трогалось:
+- pricing engine;
+- расчёт стоимости;
+- отправка заявки;
+- checkout submit-flow;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- старый /configurator;
+- zone filling logic;
+- random preset;
+- checkout integration в новый 3D shell.
+
+Проверки:
+- npm run check:stage-n6-material-textures — passed;
+- npm run test:constructor-three — passed;
+- npm run test:constructor-three-safety — passed;
+- npm run test:browser-smoke-static — passed;
+- npm run test:zone-filling — passed;
+- npm run test:constructor-store — passed;
+- npm run test:layout-validation — passed;
+- npm run test:blueprint-geometry — passed;
+- targeted TypeScript check for changed files — passed.
+
+Ограничения среды:
+- npm run typecheck не завершился в sandbox за 120 секунд и не вывел TypeScript-ошибок;
+- npm run build не завершился в sandbox за 120 секунд на этапе Vite transforming.
+Локально нужно прогнать npm run typecheck и npm run build.

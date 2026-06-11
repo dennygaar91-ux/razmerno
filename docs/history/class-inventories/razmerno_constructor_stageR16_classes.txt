@@ -1,0 +1,98 @@
+Stage R16 — список новых/изменённых CSS-классов
+
+Новые классы Stage R16:
+
+1. .rzm-stage-r16-sidebar-polish
+   Где используется: src/static-pages/ConstructorPage.tsx на main конструктора.
+   Назначение: stage-marker и scoped-область для визуальной полировки desktop-sidebar без влияния на другие страницы.
+
+2. .rzm-r16-materials-step
+   Где используется: src/static-pages/constructor/components/MaterialsStep.tsx.
+   Назначение: корневой контейнер шага «Материалы» после пересборки R16.
+
+3. .rzm-r16-materials-card
+   Где используется: MaterialsStep.tsx.
+   Назначение: единая карточка шага «Материалы» с компактным вертикальным rhythm.
+
+4. .rzm-r16-step-head
+   Где используется: MaterialsStep.tsx.
+   Назначение: компактный header шага с eyebrow «Выберите внешний вид», заголовком «Материалы» и tooltip-кнопкой.
+
+5. .rzm-r16-current-materials
+   Где используется: MaterialsStep.tsx.
+   Назначение: компактная сводка выбранных декоров корпуса и фасадов без длинной summary-карточки.
+
+6. .rzm-r16-material-section
+   Где используется: MaterialsStep.tsx.
+   Назначение: секция выбора корпуса или фасадов.
+
+7. .rzm-r16-material-section-head
+   Где используется: MaterialsStep.tsx.
+   Назначение: заголовок секции и короткий spec-chip, например «ЛДСП 16 мм».
+
+8. .rzm-r16-material-list
+   Где используется: MaterialsStep.tsx.
+   Назначение: listbox выбора декора в компактном вертикальном списке.
+
+9. .rzm-r16-material-option
+   Где используется: MaterialsStep.tsx.
+   Назначение: строка выбора декора с swatch, названием, типом/толщиной и спокойным active-state.
+
+10. .rzm-r16-material-chip
+    Где используется: MaterialsStep.tsx.
+    Назначение: маленькое превью текстуры/цвета материала.
+
+11. .rzm-r16-material-copy
+    Где используется: MaterialsStep.tsx.
+    Назначение: текстовая часть строки материала: название и материал/толщина.
+
+12. .rzm-r16-material-spec
+    Где используется: MaterialsStep.tsx.
+    Назначение: компактный chip толщины материала.
+
+13. .rzm-r16-material-kind-tabs
+    Где используется: MaterialsStep.tsx.
+    Назначение: segmented-control выбора типа фасадов ЛДСП / МДФ.
+
+14. .rzm-r16-back-panel
+    Где используется: MaterialsStep.tsx.
+    Назначение: read-only строка задней стенки «ХДФ 3 мм · подобрана автоматически».
+
+15. .rzm-r16-material-issue
+    Где используется: MaterialsStep.tsx.
+    Назначение: компактное отображение material validation issue без большой warning-карточки.
+
+16. .rzm-stage-r16-class-inventory
+    Где используется: src/styles/constructor.css.
+    Назначение: технический marker наличия CSS-слоя Stage R16.
+
+Изменённые/усиленные существующие классы:
+
+1. .rzm-constructor-panel--simple
+   Где используется: ConstructorSidebar.tsx.
+   Изменение: внутри .rzm-stage-r16-sidebar-polish получил более спокойный surface, gap и радиусы.
+
+2. .rzm-constructor-card
+   Где используется: шаги sidebar.
+   Изменение: внутри .rzm-stage-r16-sidebar-polish унифицированы radius, background и border-shadow.
+
+3. .rzm-constructor-validation-panel--compact
+   Где используется: ConstructorValidationPanel.tsx.
+   Изменение: стал компактнее, менее агрессивный visual для проверки.
+
+4. .rzm-constructor-validation-item
+   Где используется: ConstructorValidationPanel.tsx.
+   Изменение: уменьшены padding/radius, текст ошибки ограничен двумя строками.
+
+5. .rzm-constructor-flow-actions / .rzm-constructor-submit--simple
+   Где используется: ConstructorFlowActions.tsx.
+   Изменение: аккуратнее spacing у нижних action-кнопок sidebar.
+
+Удалённые/выведенные из активного UI в рамках Stage R16:
+
+1. pricingNotice в MaterialsStep.tsx
+   Причина: смета/точность цены не должна визуально шуметь внутри шага «Материалы».
+   Важно: расчёт цены не менялся, убрана только карточка в UI шага.
+
+2. Старый MaterialSwatchGrid layout на .rzm-material-swatch-grid / .rzm-material-swatch-row
+   Причина: новый шаг материалов использует R16-классы; старые CSS-классы оставлены для обратной совместимости других мест, но активный UI шага их больше не использует.

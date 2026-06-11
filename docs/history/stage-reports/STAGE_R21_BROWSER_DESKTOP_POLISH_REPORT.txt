@@ -1,0 +1,60 @@
+Stage R21 — browser-backed desktop polish and test hardening
+
+Цель этапа:
+1. Продолжить desktop-polish после R20 без изменения pricing/order/backend/API/Supabase.
+2. Снизить риск ложных browser-smoke падений из-за отсутствующего Playwright browser binary.
+3. Убрать шум от checkmark в переключателе типа мебели.
+4. Сделать переключатель Шкаф / Тумба / Комод визуально более похожим на готовый product-control.
+5. Улучшить focus-visible и disabled-состояние 3D/2D переключателя.
+
+Что сделано:
+- В ConstructorPage добавлен stage-scope rzm-stage-r21-browser-and-desktop-polish.
+- В FurnitureTypeSwitch добавлен aria-pressed.
+- Галочка выбора теперь рендерится только у активной кнопки и aria-hidden=true.
+- Улучшен visual state переключателя типа мебели.
+- Добавлен focus-visible outline для ключевых controls desktop-конструктора.
+- Добавлена поддержка PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH в playwright.config.ts.
+- Добавлен cross-platform wrapper scripts/run-browser-smoke-system.mjs.
+- В package.json добавлен скрипт test:browser-smoke:system.
+- browser-smoke-static расширен проверками Stage R21.
+
+Что не трогалось:
+- pricing engine;
+- расчёт стоимости;
+- заявки;
+- submit-flow;
+- checkout validation;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- mobile UX;
+- 2D geometry;
+- Three.js business/geometry logic.
+
+QA:
+Прошли:
+- npm run typecheck
+- npm run test:browser-smoke-static
+- npm run build
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-state
+- npm run test:compartment-ui
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+Browser runtime:
+- npm run test:browser-smoke всё ещё зависит от установленного Playwright Chromium binary.
+- Добавлен npm run test:browser-smoke:system для случаев, когда есть внешний Chrome/Chromium.
+- В текущей sandbox-среде запуск через /usr/bin/chromium не дал валидного результата: Chromium блокирует переход на 127.0.0.1 как ERR_BLOCKED_BY_ADMINISTRATOR / запуск зависает. Это ограничение окружения, а не подтверждённый баг проекта.
+
+Риск:
+- Полный visual/browser smoke нужно подтвердить локально у пользователя, где Playwright Chromium уже установлен.
+
+Рекомендация для локальной проверки:
+1. npm install
+2. npm run test:browser-smoke
+3. если нужно использовать внешний Chrome/Chromium:
+   PowerShell:
+   $env:PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+   npm run test:browser-smoke:system

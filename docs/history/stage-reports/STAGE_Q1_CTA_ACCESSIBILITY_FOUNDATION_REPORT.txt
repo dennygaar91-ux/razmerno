@@ -1,0 +1,72 @@
+Stage Q1 — CTA, UI Kit Foundation, Accessibility Base
+
+Цель этапа:
+Сделать базовую систему интерфейса новой 3D-first ветки: primary CTA, доступные numeric controls, видимый focus, aria-label/aria-describedby, обязательность email/контактов и короткую подсказку для 3D-сцены.
+
+Что планировалось:
+1. Ввести единые button-классы: primary / secondary / ghost / icon.
+2. Сделать primary CTA оранжевым брендированным.
+3. Закрепить понятную помощь под primary CTA.
+4. Улучшить hit-zone кнопок + / − до 40–44 px.
+5. Добавить aria-label/title/disabled для + / −.
+6. Добавить semantic grouping для NumberControl.
+7. Добавить labels/aria-describedby для checkout fields.
+8. Явно пометить имя, телефон и email обязательными.
+9. Добавить видимый focus-visible для интерактивных элементов.
+10. Добавить сценическую подсказку «Вращайте модель мышкой».
+11. Не трогать pricing, order-flow, backend, Supabase, legacy /configurator.
+
+Что сделано:
+1. Constructor3DPage переведён на data-stage="Q1" и shell marker rzm-3d-shell--q1.
+2. Добавлены UI classes: rzm-ui-btn, rzm-ui-btn--primary, rzm-ui-btn--secondary, rzm-ui-btn--ghost, rzm-ui-btn--icon.
+3. CTA «Далее / Отправить заявку» получил оранжевый primary style.
+4. Кнопка «Назад» получила secondary style и aria-label.
+5. Primary CTA получил aria-describedby и поясняющий текст rzm-3d-primary-action-help.
+6. NumberControl теперь использует useId, role="group", aria-labelledby, aria-describedby, live value, min/max help text.
+7. Кнопки + / − теперь disabled на min/max, имеют aria-label, title и hit-zone 44×44 px.
+8. TextInput3D теперь использует id, htmlFor, required, aria-invalid, aria-describedby для ошибки.
+9. Имя, телефон и email явно помечены обязательными.
+10. Camera buttons получили aria-pressed и aria-label.
+11. Furniture type buttons получили aria-pressed и aria-label.
+12. Material rows получили aria-label выбора материала.
+13. Добавлен единый focus-visible style для кнопок, полей, ссылок и summary.
+14. Добавлена подсказка поверх 3D-сцены: «Вращайте модель мышкой».
+15. Добавлен static guard: check:stage-q1-accessibility-foundation.
+
+Что не трогалось:
+- pricing engine;
+- расчёт стоимости;
+- отправка заявки;
+- submitOrder;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- legacy /configurator;
+- 3D geometry;
+- random preset logic;
+- validation/auto-fix rules;
+- price list parser.
+
+Проверки:
+- npm run check:stage-q1-accessibility-foundation — passed
+- npm run test:browser-smoke-static — passed
+- npm run typecheck — passed
+- npm run build — passed
+- npm run test:validation-autofix — passed
+- npm run test:random-preset — passed
+- npm run test:zone-filling — passed
+- npm run test:constructor-store — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:layout-validation — passed
+- npm run test:blueprint-geometry — passed
+
+Ошибки и исправления:
+1. npm run typecheck сначала нашёл дублирующий type ThreeInteractionTarget в src/static-pages/constructor/three/threeTypes.ts.
+   Исправление: удалён дублирующий блок типа. После этого typecheck прошёл.
+
+Ограничения:
+- Playwright browser E2E в этой среде не запускался как обязательная проверка из-за ранее известной нестабильности Chromium в sandbox. Локально нужно прогнать npm run test:constructor3d-e2e.
+
+Следующий этап:
+Q2 — Price Clarity + Pricing Source Preparation.

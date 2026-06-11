@@ -1,0 +1,110 @@
+/* Stage Q9 — 3D loading, recalculation and performance states */
+.rzm-3d-shell--q9 .rzm-3d-runtime-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 239, .82);
+  color: rgba(42, 44, 65, .72);
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-runtime-status em {
+  font-style: normal;
+  color: #ff724c;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-price-chip small,
+.rzm-3d-shell--q9 .rzm-3d-price-status {
+  display: block;
+  margin-top: 2px;
+  color: rgba(42, 44, 65, .56);
+  font-size: 11px;
+  font-weight: 680;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-price-chip.is-calculating {
+  box-shadow: 0 18px 44px rgba(255, 114, 76, .14), inset 0 0 0 1px rgba(255, 114, 76, .24);
+}
+
+.rzm-3d-shell--q9 .rzm-3d-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  background: radial-gradient(circle at 50% 34%, rgba(255,255,255,.92), rgba(246,243,238,.84) 54%, rgba(236,231,222,.94));
+}
+
+.rzm-3d-shell--q9 .rzm-3d-loading-skeleton {
+  position: relative;
+  width: min(420px, 72%);
+  height: 260px;
+  margin: 0 auto 8px;
+  border-radius: 28px;
+  background: linear-gradient(90deg, rgba(255,255,255,.55), rgba(255,255,255,.92), rgba(255,255,255,.55));
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(42,44,65,.08), 0 24px 70px rgba(42,44,65,.08);
+}
+
+.rzm-3d-shell--q9 .rzm-3d-loading-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.62), transparent);
+  animation: rzm-q9-skeleton-sweep 1.35s ease-in-out infinite;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-loading-skeleton span {
+  position: absolute;
+  bottom: 42px;
+  width: 72px;
+  border-radius: 16px 16px 8px 8px;
+  background: rgba(42,44,65,.10);
+  box-shadow: inset 0 0 0 1px rgba(42,44,65,.06);
+}
+
+.rzm-3d-shell--q9 .rzm-3d-loading-skeleton span:nth-child(1) {
+  left: 72px;
+  height: 178px;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-loading-skeleton span:nth-child(2) {
+  left: 174px;
+  height: 206px;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-loading-skeleton span:nth-child(3) {
+  left: 276px;
+  height: 154px;
+}
+
+@keyframes rzm-q9-skeleton-sweep {
+  100% { transform: translateX(100%); }
+}
+
+.rzm-3d-shell--q9 .rzm-3d-loading small {
+  color: rgba(42, 44, 65, .46);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-fallback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-fallback-actions a {
+  margin: 0;
+}
+

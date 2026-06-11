@@ -1,0 +1,49 @@
+Stage Q5 — Filling Step Polish
+
+Цель:
+Доработать шаг «Наполнение» в новой 3D-first ветке /configurator-3d: сделать его понятнее, короче и ближе к логике «выбери зону на модели → добавь действие» без изменения pricing/backend/order-flow.
+
+Сделано:
+1. Страница Constructor3DPage переведена на data-stage="Q5" и shell marker rzm-3d-shell--q5.
+2. Шаг «Наполнение» получил отдельный scope rzm-3d-fill-polish.
+3. Добавлен instruction state: если зона не выбрана, пользователь видит короткое объяснение «Выберите зону на 3D-модели», а не набор всех controls.
+4. Добавлен блок текущего выбора: секция, зона, высота зоны, статус фасада.
+5. Добавлена группировка drawer-контента: текущий выбор, секции, действия, элементы зоны, фасады, зоны секции, список элементов, проверка.
+6. Действия зоны стали более структурными: Полка, Ящик, Штанга, Фасад.
+7. Добавлены счётчики наполнения выбранной зоны: Полки × N, Ящики × N, Штанга × N, Разделители × N.
+8. Добавлено явное пустое состояние «В зоне пока нет наполнения».
+9. Список зон получил aria-pressed и более понятные summary-строки.
+10. Проверка выбранной зоны вынесена в отдельный блок «Проверка», с inline issue и общим ValidationAssist.
+11. Добавлен CSS-слой Stage Q5 для instruction state, групп, counters, add menu и compact element rows.
+12. Добавлен static guard check:stage-q5-filling-polish.
+13. Обновлён test:browser-smoke-static под stage Q5.
+
+Проверки:
+- npm run check:stage-q5-filling-polish — passed
+- npm run test:browser-smoke-static — passed
+- npm run typecheck — passed
+- npm run build — passed
+- npm run test:validation-autofix — passed
+- npm run test:random-preset — passed
+- npm run test:zone-filling — passed
+- npm run test:constructor-store — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:layout-validation — passed
+- npm run test:blueprint-geometry — passed
+
+Ошибки и исправления:
+На первом прогоне build не запустился, потому что node_modules отсутствовал после распаковки архива. Выполнен npm install, после этого build и тесты прошли.
+
+Не трогалось:
+- pricing engine
+- расчёт стоимости
+- прайс-лист
+- submitOrder
+- backend/API/Supabase
+- admin/export
+- старый /configurator
+- 3D geometry
+- материалы
+- checkout
+- random preset logic

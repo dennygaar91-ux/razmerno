@@ -1,0 +1,41 @@
+Stage R12 — классы, добавленные/изменённые
+
+Изменённые/усиленные классы:
+- .rzm-constructor-page — уменьшен верхний отступ desktop-конструктора.
+- .rzm-constructor-shell--simple — desktop grid стабилизирован: 340px sidebar + гибкая сцена, ширина до 1420px.
+- .rzm-constructor-sidebar--simple — sidebar ограничен по высоте viewport и сделан sticky.
+- .rzm-constructor-panel--simple — внутренняя панель sidebar переведена в flex-column с overflow control.
+- .rzm-constructor-step-panel — содержимое шага получает внутренний scroll, чтобы не растягивать всю страницу.
+- .rzm-constructor-submit--simple — action buttons закреплены внизу sidebar.
+- .rzm-constructor-scene--simple — задана минимальная desktop-высота сцены.
+- .rzm-scene-workbar — верхняя рабочая панель сцены разделена на строки.
+- .rzm-scene-workbar-actions — scene toolbar переведён в desktop-grid.
+- .rzm-constructor-price-chip — цена выравнивается справа.
+- .rzm-constructor-canvas--clean — сцена получает стабильную высоту и радиус.
+- .rzm-fill-target-card — компактнее текущая область настройки.
+- .rzm-fill-section-card — карточки секций стали ниже и проще.
+- .rzm-fill-compartment-chip — chips отсеков стали компактнее.
+- .rzm-fill-action-card — уменьшен внутренний шум блока добавления наполнения.
+- .rzm-facade-mode-card — блок фасадов сокращён.
+- .rzm-handle-toggle-row — ряд ручек приведён к компактному виду.
+- .rzm-constructor-validation-panel--compact — новый компактный режим панели автопроверки.
+- .rzm-constructor-validation-item — в компактном режиме показывается одна основная ошибка.
+- .rzm-constructor-validation-more — компактная кнопка перехода к следующей ошибке.
+- .rzm-constructor-canvas--svg-fallback — очищен фон 2D fallback от лишней декоративности.
+- .rzm-constructor-model--blueprint — 2D-чертёж увеличен и лучше центрирован в сцене.
+- .rzm-blueprint-paper — снижена «карточность» 2D-чертежа.
+- .rzm-blueprint-grid line — сетка стала тише.
+- .rzm-blueprint-corpus — линии корпуса стали спокойнее.
+- .rzm-blueprint-material-note — подписи материалов вынесены аккуратнее вниз.
+- .rzm-scene-fallback-note — fallback note стал компактнее и честнее.
+- .rzm-scene-active-target — активная область справа стала спокойнее.
+
+Добавленные классы/модификаторы:
+- .rzm-constructor-validation-panel--compact — компактная автопроверка.
+- .rzm-scene-fallback-note--manual — ручной 2D не показывает тревожную плашку.
+- .rzm-stage-r12-desktop-stabilized — marker-класс для инвентаризации Stage R12.
+
+Функциональные изменения, связанные с классами:
+- Обычный режим «Наполнение» меньше показывает технические настройки.
+- «Отсеки по высоте» теперь доступны только в точной настройке.
+- Основная автопроверка больше не выводит до четырёх больших ошибок подряд.

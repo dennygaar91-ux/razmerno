@@ -1,0 +1,18 @@
+Stage Constructor 15 — classes
+
+Новые CSS-классы не добавлялись.
+Существующие классы не изменялись.
+
+Причина: этап был логическим/pricing-интеграционным. Он затронул только TypeScript helpers, quote hook, pricing types и прозрачность source of truth для сметы.
+
+Изменённые UI-состояния используют уже существующие классы:
+- rzm-constructor-price-chip
+- rzm-constructor-price-chip--exact
+- rzm-constructor-price-chip--fallback
+- rzm-constructor-price-chip--unknown
+- rzm-pricing-notice
+- rzm-pricing-notice--exact
+- rzm-pricing-notice--fallback
+- rzm-material-pricing-hint
+- rzm-material-pricing-hint--exact
+- rzm-material-pricing-hint--fallback

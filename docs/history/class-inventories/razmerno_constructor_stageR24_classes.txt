@@ -1,0 +1,30 @@
+Stage R24 — class inventory
+
+ADDED
+- rzm-stage-r24-blueprint-finalization — page-level scope for the Stage R24 2D drawing finalization CSS layer.
+- rzm-blueprint-svg--r24 — SVG-level marker for the revised 760×500 technical blueprint renderer.
+- rzm-constructor-model--blueprint-r24 — model wrapper marker for the finalized 2D blueprint mode.
+- rzm-blueprint-model--front-r24 — front-view blueprint group for the enlarged front drawing.
+- rzm-blueprint-model--side-r24 — side-view blueprint group for the cleaned side drawing.
+- rzm-blueprint-model--top-r24 — top-view blueprint group for the rebuilt top plan.
+- rzm-blueprint-facade-line — technical line showing the facade plane in side/top views.
+- rzm-blueprint-back-line — dashed technical line showing the back panel plane in side/top views.
+- rzm-blueprint-top-label — labels for front/back references in top view.
+- rzm-blueprint-top-label--front — front/facade label in top view.
+- rzm-blueprint-top-label--back — back-panel label in top view.
+- rzm-stage-r24-class-inventory — inert marker proving the CSS layer is present.
+
+CHANGED
+- rzm-constructor-model--blueprint — now renders a larger drawing area without material chips inside the SVG layer.
+- rzm-blueprint-svg — blueprint viewBox changed from 680×460 to 760×500 for a larger, calmer drawing composition.
+- rzm-blueprint-paper — expanded sheet area, softer technical paper appearance.
+- rzm-blueprint-grid — lighter technical grid, less visual noise.
+- rzm-blueprint-corpus — stronger product-outline stroke for readability.
+- rzm-blueprint-inner — quieter inner boundary for section/compartment clarity.
+- rzm-blueprint-facade — now transparent/dashed in 2D; no material-color decorative fill.
+- rzm-blueprint-active-area — thinner active outline and quieter orange fill.
+- rzm-blueprint-warning-marker — smaller and more technical warning marker.
+- rzm-blueprint-dimensions — cleaner dimension lines for width/height/depth.
+
+REMOVED FROM RENDER
+- rzm-blueprint-material-note — no longer rendered by ConstructorRealisticSvgModel; material summary belongs to the scene status bar, not inside the 2D drawing.

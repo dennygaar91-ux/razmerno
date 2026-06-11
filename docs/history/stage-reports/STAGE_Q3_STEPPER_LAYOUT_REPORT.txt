@@ -1,0 +1,48 @@
+Stage Q3 — Stepper + Layout Hierarchy
+
+Goal:
+Improve the constructor workflow hierarchy so that the current step, completed steps, future steps, warnings/errors, scene status, and exact price are visually separated and easier to scan.
+
+Implemented:
+1. Changed Constructor3DPage stage marker from Q2 to Q3.
+2. Added Q3 shell marker .rzm-3d-shell--q3.
+3. Added step descriptions for all four steps:
+   - Размеры — Габариты и секции
+   - Наполнение — Зоны и наполнение
+   - Материалы — Декоры и фасады
+   - Заявка — Контакты и смета
+4. Added getStepVisualState() to compute active/completed/warning/error/future state from current step and validation.stepStatuses.
+5. Added getStepIssueCount() to show compact issue badges on affected steps.
+6. Rebuilt stepper markup with role=list/listitem semantics.
+7. Added dedicated .rzm-3d-price-chip, separating exact price from the workflow stepper.
+8. Added Q3 CSS layer for stepper hierarchy, issue states, stagebar spacing, price chip, and toolbar hierarchy.
+9. Added check:stage-q3-stepper-layout static guard.
+10. Updated browser-smoke-static checks for Q3.
+
+Not changed:
+- pricing engine
+- order submit flow
+- backend/API/Supabase
+- legacy /configurator
+- 3D geometry
+- zone filling logic
+- materials logic
+- checkout behavior
+
+QA passed:
+- npm run check:stage-q3-stepper-layout
+- npm run test:browser-smoke-static
+- npm run typecheck
+- npm run build
+- npm run test:validation-autofix
+- npm run test:random-preset
+- npm run test:zone-filling
+- npm run test:constructor-store
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+Known limitation:
+Browser E2E was not run in the sandbox because the Playwright browser environment is not reliable here. Run locally:
+- npm run test:constructor3d-e2e

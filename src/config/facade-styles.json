@@ -1,0 +1,23 @@
+[
+  {
+    "id": "no-handle",
+    "name": "Без ручек",
+    "description": "Push-to-open — нажатие на фасад. Чистый минималистичный вид.",
+    "priceMultiplier": 1.15,
+    "icon": "no-handle"
+  },
+  {
+    "id": "hidden-handle",
+    "name": "Скрытая ручка",
+    "description": "Профиль Gola встроен в корпус — удобно и аккуратно.",
+    "priceMultiplier": 1.08,
+    "icon": "hidden-handle"
+  },
+  {
+    "id": "regular",
+    "name": "Классическая ручка",
+    "description": "Скоба из матовой нержавейки. Привычно и надёжно.",
+    "priceMultiplier": 1.0,
+    "icon": "regular"
+  }
+]

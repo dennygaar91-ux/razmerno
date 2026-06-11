@@ -1,0 +1,55 @@
+Stage N10 — E2E, QA and cleanup report
+
+Цель этапа:
+Закрепить новую 3D-first ветку /configurator-3d тестами и стабильными QA-маркерами, не продолжая визуальные патчи и не трогая pricing/order/backend/Supabase/admin/export/mobile.
+
+Что сделано:
+1. Constructor3DPage обновлён до data-stage="N10".
+2. Добавлен marker .rzm-3d-shell--n10 для финального 3D shell.
+3. Добавлен data-testid="constructor-3d-viewport" для стабильных browser-тестов.
+4. Чип «Рандомно» получил aria-label для E2E и accessibility.
+5. NumberControl получил aria-label для кнопок +/-.
+6. Добавлен browser spec tests/browser/configurator3d.spec.ts.
+7. Добавлен npm script test:constructor3d-e2e.
+8. Добавлен static guard check:stage-n10-e2e-cleanup.
+9. test:browser-smoke-static расширен проверками новой 3D-first ветки.
+
+Что проверяет новый E2E spec:
+- открытие /configurator-3d как активного N10 experience;
+- открытие alias routes /constructor-3d и /constructor3d;
+- сценарий размеры → наполнение → Рандомно → материалы → заявка;
+- интерактивность checkout-полей, доставки, сборки и согласия.
+
+Что не трогалось:
+- pricing engine;
+- расчёт стоимости;
+- отправка заявки;
+- submitOrder / API / backend / Supabase;
+- admin/export;
+- production/manufacturing logic;
+- legacy /configurator;
+- 3D geometry, materials, random preset и validation rules.
+
+QA:
+Пройдено:
+- npm run check:stage-n10-e2e-cleanup
+- npm run test:browser-smoke-static
+- npm run test:validation-autofix
+- npm run test:random-preset
+- npm run test:zone-filling
+- npm run test:constructor-store
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+
+Ограничения среды:
+- npm run typecheck не завершился за 300 секунд и не вывел TypeScript-ошибок.
+- npm run build трансформировал модули и дошёл до rendering chunks, но в sandbox завершился по timeout.
+- npm run test:constructor3d-e2e в sandbox завершился по timeout из-за нестабильного Playwright Chromium окружения.
+
+Что нужно проверить локально:
+- npm install
+- npm run typecheck
+- npm run build
+- npm run test:constructor3d-e2e
+- npm run dev
+- открыть http://localhost:5173/configurator-3d

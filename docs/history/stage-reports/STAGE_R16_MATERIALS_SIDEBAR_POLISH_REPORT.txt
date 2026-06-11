@@ -1,0 +1,78 @@
+Stage R16 — materials and sidebar visual polish
+
+Цель этапа:
+Довести шаг «Материалы» и общий sidebar constructora до более спокойного production-level вида: меньше карточек, меньше текста, компактные swatches, нормальные tabs ЛДСП/МДФ, read-only строка задней стенки, единая визуальная система внутри desktop-sidebar.
+
+Вопросы перед стартом:
+Дополнительных вопросов пользователю не было. Ранее зафиксировано: desktop first, mobile не трогать, pricing/order/backend/API/Supabase не трогать, материалы показывать компактно, задняя стенка должна быть одной read-only строкой.
+
+Планировалось:
+1. Упростить шаг «Материалы».
+2. Заменить крупную сетку/старые swatch-card на компактный listbox.
+3. Сделать tabs ЛДСП / МДФ более похожими на нормальный segmented-control.
+4. Оставить корпус только как ЛДСП 16 мм.
+5. Заднюю стенку показать одной read-only строкой.
+6. Убрать pricingNotice/сметную подсказку из шага «Материалы», не меняя расчёт.
+7. Добавить scoped CSS-слой Stage R16, чтобы не ломать другие страницы.
+8. Прогнать проверки и собрать архив.
+
+Сделано:
+1. Пересобран src/static-pages/constructor/components/MaterialsStep.tsx.
+2. Добавлен compact header: eyebrow «Выберите внешний вид», заголовок «Материалы», tooltip «?».
+3. Добавлена компактная текущая сводка: корпус и фасады.
+4. Корпус показывается как «ЛДСП 16 мм» и выбирается через компактные строки материалов.
+5. Фасады получили отдельный segmented-control ЛДСП / МДФ.
+6. Material option теперь строка: swatch, название, тип/толщина, spec-chip.
+7. Задняя стенка стала read-only строкой: «ХДФ 3 мм · подобрана автоматически» + выбранный HDF.
+8. Карточка pricingNotice убрана из активного UI шага «Материалы». Pricing engine, quote, order flow не менялись.
+9. Добавлен scoped class rzm-stage-r16-sidebar-polish на main конструктора.
+10. Добавлен CSS-слой Stage R16 в src/styles/constructor.css.
+11. Обновлён scripts/browser-smoke-static.mjs, чтобы проверял наличие R16 marker/classes.
+12. Добавлен файл razmerno_constructor_stageR16_classes.txt.
+
+Изменённые файлы:
+- src/static-pages/ConstructorPage.tsx
+- src/static-pages/constructor/components/MaterialsStep.tsx
+- src/static-pages/constructor/components/ConstructorStepPanel.tsx
+- src/styles/constructor.css
+- scripts/browser-smoke-static.mjs
+- razmerno_constructor_stageR16_classes.txt
+- STAGE_R16_MATERIALS_SIDEBAR_POLISH_REPORT.txt
+
+Проверки:
+PASSED:
+- npm run typecheck
+- npm run test:browser-smoke-static
+- npm run build
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-state
+- npm run test:compartment-ui
+- npm run test:layout-validation
+
+NOT PASSED в sandbox:
+- npm run test:browser-smoke
+
+Причина:
+В sandbox отсутствует Playwright Chromium binary: /home/oai/.cache/ms-playwright/chromium_headless_shell-1223/...
+Это ошибка окружения проверки, не подтверждённая ошибка кода. У пользователя на Windows Chromium уже установлен, поэтому browser-smoke нужно прогнать локально.
+
+Что не трогалось:
+- pricing engine
+- заявки
+- checkout-flow
+- API
+- backend
+- Supabase
+- admin
+- export logic
+- mobile UX/CSS
+- глубокий 3D visual polish
+
+Риски:
+1. Без локального browser-smoke и скриншота нельзя честно подтвердить pixel-level визуал.
+2. Sidebar стал аккуратнее, но следующий stage всё равно должен смотреть на общую visual density всей сцены и реальные скриншоты.
+3. 3D visual polish всё ещё не закрыт, хотя три.js safety tests проходят.
+
+Рекомендованный следующий этап:
+Stage R17 — 3D visual polish / render verification, но перед ним лучше локально прогнать browser-smoke и прислать новый скриншот шага «Материалы» и 2D/3D сцены.

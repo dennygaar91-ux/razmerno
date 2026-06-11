@@ -1,7 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/configurator",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/configurator/(.*)",
       "destination": "/index.html"
     }
   ]

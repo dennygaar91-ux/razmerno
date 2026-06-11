@@ -1,0 +1,426 @@
+[
+  {
+    "from": "STAGE_01_TECHNICAL_STABILIZATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_01_TECHNICAL_STABILIZATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_10_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_10_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_11_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_11_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_15_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_15_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_16_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_16_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_18_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_18_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_1_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_1_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_22_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_22_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_9_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_9_REPORT.txt"
+  },
+  {
+    "from": "STAGE_CONSTRUCTOR_9_STABILIZATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_CONSTRUCTOR_9_STABILIZATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N10_E2E_QA_CLEANUP_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N10_E2E_QA_CLEANUP_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N1_3D_FOUNDATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N1_3D_FOUNDATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N2_3D_MODEL_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N2_3D_MODEL_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N3_3D_SELECTION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N3_3D_SELECTION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N4_ZONE_FILLING_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N4_ZONE_FILLING_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N5_ZONE_FACADES_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N5_ZONE_FACADES_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N6_MATERIALS_TEXTURES_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N6_MATERIALS_TEXTURES_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N7_RANDOM_PRESET_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N7_RANDOM_PRESET_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N8_VALIDATION_AUTOFIX_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N8_VALIDATION_AUTOFIX_REPORT.txt"
+  },
+  {
+    "from": "STAGE_N9_CHECKOUT_INTEGRATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_N9_CHECKOUT_INTEGRATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q10_Q11_RESET_WCAG_QA_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q10_Q11_RESET_WCAG_QA_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q1_CTA_ACCESSIBILITY_FOUNDATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q1_CTA_ACCESSIBILITY_FOUNDATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q2_PRICE_CLARITY_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q2_PRICE_CLARITY_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q3_STEPPER_LAYOUT_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q3_STEPPER_LAYOUT_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q4_SIZES_STEP_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q4_SIZES_STEP_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q5_FILLING_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q5_FILLING_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q6_MATERIALS_STEP_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q6_MATERIALS_STEP_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q7_CHECKOUT_FINAL_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q7_CHECKOUT_FINAL_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q8_1_CSS_SCOPE_REPAIR_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q8_1_CSS_SCOPE_REPAIR_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q8_SCENE_INFO_SIMPLIFICATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q8_SCENE_INFO_SIMPLIFICATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_Q9_3D_LOADING_PERFORMANCE_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_Q9_3D_LOADING_PERFORMANCE_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R10_FINAL_CONSTRUCTOR_AUDIT.md",
+    "to": "docs/history/stage-reports/STAGE_R10_FINAL_CONSTRUCTOR_AUDIT.md"
+  },
+  {
+    "from": "STAGE_R11_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R11_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R12_DESKTOP_STABILIZATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R12_DESKTOP_STABILIZATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R13_DESKTOP_SHELL_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R13_DESKTOP_SHELL_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R14_ORDINARY_MODE_SIMPLIFICATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R14_ORDINARY_MODE_SIMPLIFICATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R15_2D_DRAWING_RENDERER_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R15_2D_DRAWING_RENDERER_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R16_MATERIALS_SIDEBAR_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R16_MATERIALS_SIDEBAR_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R17_THREE_PRODUCT_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R17_THREE_PRODUCT_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R18_CHECKOUT_SIMPLIFICATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R18_CHECKOUT_SIMPLIFICATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R19_DESKTOP_HARDENING_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R19_DESKTOP_HARDENING_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R20_DESKTOP_QA_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R20_DESKTOP_QA_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R21_BROWSER_DESKTOP_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R21_BROWSER_DESKTOP_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R22_SCENE_STATUS_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R22_SCENE_STATUS_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R23_THREE_RUNTIME_REPAIR_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R23_THREE_RUNTIME_REPAIR_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R24_2D_BLUEPRINT_FINALIZATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R24_2D_BLUEPRINT_FINALIZATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R25_SIDEBAR_WIZARD_FINALIZATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R25_SIDEBAR_WIZARD_FINALIZATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R26_MATERIALS_FINAL_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R26_MATERIALS_FINAL_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R27_SCENE_TOOLBAR_STATUS_SIMPLIFICATION_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R27_SCENE_TOOLBAR_STATUS_SIMPLIFICATION_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R28_CHECKOUT_QA_POLISH_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R28_CHECKOUT_QA_POLISH_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R29_DESKTOP_E2E_CLEANUP_REPORT.txt",
+    "to": "docs/history/stage-reports/STAGE_R29_DESKTOP_E2E_CLEANUP_REPORT.txt"
+  },
+  {
+    "from": "STAGE_R3_PRECISION_MODE_REPORT.md",
+    "to": "docs/history/stage-reports/STAGE_R3_PRECISION_MODE_REPORT.md"
+  },
+  {
+    "from": "STAGE_R7_CHECKOUT_REVIEW_REPORT.md",
+    "to": "docs/history/stage-reports/STAGE_R7_CHECKOUT_REVIEW_REPORT.md"
+  },
+  {
+    "from": "STAGE_R9_SCENE_PRICE_STATE_REPORT.md",
+    "to": "docs/history/stage-reports/STAGE_R9_SCENE_PRICE_STATE_REPORT.md"
+  },
+  {
+    "from": "razmerno_constructor_stage10_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stage10_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stage11_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stage11_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stage15_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stage15_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stage16_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stage16_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stage18_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stage18_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stage22_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stage22_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stage9_1_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stage9_1_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN10_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN10_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN1_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN1_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN2_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN2_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN3_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN3_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN4_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN4_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN5_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN5_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN6_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN6_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN7_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN7_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN8_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN8_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageN9_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageN9_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ10_Q11_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ10_Q11_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ1_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ1_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ2_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ2_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ3_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ3_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ4_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ4_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ5_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ5_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ6_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ6_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ7_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ7_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ8_1_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ8_1_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ8_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ8_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageQ9_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageQ9_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR10_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR10_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR12_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR12_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR13_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR13_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR14_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR14_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR15_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR15_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR16_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR16_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR17_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR17_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR18_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR18_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR19_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR19_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR20_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR20_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR21_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR21_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR22_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR22_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR23_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR23_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR24_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR24_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR25_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR25_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR26_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR26_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR27_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR27_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR28_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR28_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR29_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR29_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR3_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR3_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR7_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR7_classes.txt"
+  },
+  {
+    "from": "razmerno_constructor_stageR9_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_constructor_stageR9_classes.txt"
+  },
+  {
+    "from": "razmerno_home_v76_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_home_v76_classes.txt"
+  },
+  {
+    "from": "razmerno_home_v77_classes.txt",
+    "to": "docs/history/class-inventories/razmerno_home_v77_classes.txt"
+  }
+]

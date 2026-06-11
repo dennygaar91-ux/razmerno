@@ -1,0 +1,47 @@
+Stage Constructor 9 — 2D/3D переключатель, fallback и view modes
+
+Затронутые файлы:
+- src/static-pages/constructor/components/ConstructorScene.tsx
+- src/static-pages/constructor/components/ConstructorSceneCanvas.tsx
+- src/static-pages/constructor/components/ConstructorSceneViewSwitch.tsx
+- src/static-pages/constructor/components/ConstructorRealisticSvgModel.tsx
+- src/styles/constructor.css
+
+Сделано:
+- View mode перестал быть захардкоженным значением `free` и стал state внутри ConstructorScene.
+- В workbar сцены добавлен ConstructorSceneViewSwitch.
+- В 3D доступны виды: свободно, спереди, сбоку, сверху.
+- В 2D режимах `free` отключается, потому что это неинтерактивная SVG-схема.
+- При ручном переключении в 2D из режима `free` автоматически выбирается вид спереди.
+- Добавлена причина fallback: manual-2d / webgl-unavailable / three-error.
+- В Canvas добавлено понятное fallback-сообщение, что 2D-схема безопасна и настройка/заявка доступны.
+- SVG preview получил отдельную top-plan схему для вида сверху.
+- CSS добавил системные классы для fallback-note и top-plan схемы.
+
+Не трогалось:
+- checkout;
+- отправка заявки;
+- backend/API;
+- Supabase;
+- админка;
+- pricing engine;
+- production export internals;
+- текущая интеграция цены с заявкой.
+
+QA:
+- npm run typecheck — passed
+- node --no-warnings --import tsx src/static-pages/constructor/rules/projectRules.test.ts — passed
+- npm run test:constructor-store — passed
+- npm run test:constructor-draft — passed
+- npm run test:constructor-payload — passed
+- npm run test:production-preview — passed
+- npm run test:constructor-flow — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- node --no-warnings --import tsx src/shared/materials/materialCatalog.test.ts — passed
+- node --no-warnings --import tsx src/shared/materials/materialPresentation.test.ts — passed
+- npm run build — passed
+
+Ограничения:
+- 3D warning markers не добавлялись, потому что это отдельный этап визуализации ошибок в WebGL.
+- 2D side view пока использует существующую упрощённую SVG-трансформацию, top view получил отдельную схему.

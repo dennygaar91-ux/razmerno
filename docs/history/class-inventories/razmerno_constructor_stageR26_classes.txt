@@ -1,0 +1,36 @@
+Stage R26 — Materials Final Polish: список классов
+
+Добавленные/изменённые классы текущего этапа:
+- rzm-stage-r26-materials-final-polish — stage-scope на ConstructorPage; ограничивает CSS-правки материалов текущим этапом.
+- rzm-r26-materials-step — обёртка шага «Материалы»; помечает новую финальную версию material picker.
+- rzm-r26-materials-card — основная карточка шага «Материалы» с уплотнённым spacing.
+- rzm-r26-step-head — компактный заголовок шага без лишней help-кнопки.
+- rzm-r26-current-materials — текущий выбор корпуса/фасадов в верхней части шага.
+- rzm-r26-selected-material — компактная карточка выбранного материала со swatch, коротким названием и типом.
+- rzm-r26-material-section — секция выбора материалов: корпус или фасады.
+- rzm-r26-material-section-head — строка заголовка секции с техническим типом материала.
+- rzm-r26-material-list — список swatch-options без горизонтального скролла.
+- rzm-r26-material-option — кнопка выбора декора; premium-like строка swatch + название + meta/check.
+- rzm-r26-material-swatch — увеличенный swatch материала с текстурой.
+- rzm-r26-material-copy — текстовая часть material-option.
+- rzm-r26-material-check — правый статус option: толщина в inactive, check в active.
+- rzm-r26-material-kind-tabs — переключатель типа фасадов ЛДСП/МДФ.
+- rzm-r26-back-panel — read-only строка задней стенки ХДФ.
+- rzm-r26-material-issue — компактное validation-сообщение материалов.
+- rzm-stage-r26-class-inventory — технический маркер инвентаризации stage-классов.
+
+Существующие классы, которые переиспользуются и уточняются:
+- rzm-r16-materials-step — базовый layout шага материалов, сохранён для совместимости.
+- rzm-r16-materials-card — базовая карточка материалов.
+- rzm-r16-material-list — прежний список материалов; теперь дополнен rzm-r26-material-list.
+- rzm-r16-material-option — прежняя material-option; теперь дополнена rzm-r26-material-option.
+- rzm-r16-material-chip — прежний swatch; теперь дополнен rzm-r26-material-swatch.
+- rzm-r16-material-kind-tabs — прежние tabs фасадов; теперь дополнены rzm-r26-material-kind-tabs.
+- rzm-r16-back-panel — прежняя строка задней стенки; теперь дополнена rzm-r26-back-panel.
+- rzm-scene-status-material — материал в нижней status bar сцены; в R26 получил более короткие названия.
+
+Где используется:
+- src/static-pages/ConstructorPage.tsx — stage-scope rzm-stage-r26-materials-final-polish.
+- src/static-pages/constructor/components/MaterialsStep.tsx — все rzm-r26-* классы material picker.
+- src/static-pages/constructor/components/ConstructorSceneStatusBar.tsx — короткие material names в scene status bar.
+- src/styles/constructor.css — scoped CSS для R26.

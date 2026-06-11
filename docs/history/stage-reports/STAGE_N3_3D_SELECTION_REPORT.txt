@@ -1,0 +1,47 @@
+Stage N3 — 3D selection system
+
+Цель:
+Сделать первый реальный слой интерактивности в новой ветке /configurator-3d: выбор секций и зон кликом по 3D-модели, hover/selected states, labels и появление «+» только после выбора.
+
+Сделано:
+1. Добавлен тип ThreeInteractionTarget.
+2. buildThreeFurnitureModel теперь возвращает interactionTargets вместе с panels/dimensions.
+3. В threeSceneAdapter добавлен createInteractionTargets:
+   - создаёт цели выбора для секций;
+   - создаёт цели выбора для зон/compartments;
+   - учитывает selectedSectionId и selectedCompartmentId;
+   - генерирует короткие labels и полные labels.
+4. Добавлен компонент ThreeSelectionLayer:
+   - прозрачные hit-area mesh для клика;
+   - hover-state;
+   - labels внутри 3D через Html;
+   - «+» у выбранной секции/зоны.
+5. ThreeFurnitureViewer теперь принимает onSelectTarget и рендерит ThreeSelectionLayer.
+6. LazyThreeFurnitureViewer прокидывает onSelectTarget.
+7. Constructor3DPage теперь обрабатывает выбор из 3D:
+   - section target -> selectSection;
+   - compartment target -> selectCompartment.
+8. Drawer шага «Наполнение» больше не говорит, что выбор через 3D будет подключён позже; теперь это активная логика N3.
+9. Добавлен stage-scope data-stage="N3" и CSS для labels/+.
+10. Добавлен static guard check:stage-n3-3d-selection.
+11. Добавлен тест three adapter N3 на selectable section/zone targets.
+
+Не сделано в N3:
+1. «+» пока не открывает меню наполнения — это scope N4.
+2. Не добавляется полка/ящик/штанга — это scope N4.
+3. Не реализована логика деления зоны полкой — это scope N4.
+4. Не реализованы фасады по зонам — это scope N5.
+5. Не менялись pricing/order/backend/Supabase/admin/export.
+
+Проверки:
+- check:stage-n3-3d-selection — passed
+- test:browser-smoke-static — passed
+- build — passed
+- test:constructor-three — passed
+- test:constructor-three-safety — passed
+- test:layout-state — passed
+- test:layout-validation — passed
+- test:blueprint-geometry — passed
+
+Ограничение:
+- npm run typecheck в sandbox не завершился за лимит времени и не вывел TypeScript errors; targeted TypeScript check по изменённым файлам прошёл.

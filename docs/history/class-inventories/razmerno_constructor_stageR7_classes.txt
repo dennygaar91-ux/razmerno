@@ -1,0 +1,48 @@
+Stage R7 — checkout review and final snapshot clarity
+
+Новые / изменённые классы:
+
+1. .rzm-checkout-review-card
+   - Относится к новой карточке финальной проверки проекта в checkout.
+   - Используется в CheckoutProjectReviewCard.tsx.
+   - Назначение: контейнер блока «Что отправится менеджеру».
+
+2. .rzm-checkout-review-status
+   - Относится к pill-статусу validation на финальном экране.
+   - Используется в CheckoutProjectReviewCard.tsx.
+   - Назначение: показать, можно ли отправлять проект, есть ли warning или блокирующая ошибка.
+
+3. .rzm-checkout-review-status--valid
+   - Модификатор успешного validation-состояния.
+   - Используется вместе с .rzm-checkout-review-status.
+
+4. .rzm-checkout-review-status--warning
+   - Модификатор warning-состояния.
+   - Используется вместе с .rzm-checkout-review-status.
+
+5. .rzm-checkout-review-status--error
+   - Модификатор error-состояния.
+   - Используется вместе с .rzm-checkout-review-status.
+
+6. .rzm-checkout-review-grid
+   - Сетка итоговых параметров проекта.
+   - Используется в CheckoutProjectReviewCard.tsx.
+   - Содержит тип мебели, размеры, структуру, наполнение, фасады и материалы.
+
+7. .rzm-checkout-review-grid span
+   - Единый стиль ячеек внутри review grid.
+   - Используется для повторяющихся параметров финального snapshot.
+
+8. .rzm-checkout-review-grid b
+   - Лейбл параметра внутри ячейки.
+
+9. .rzm-checkout-review-grid strong
+   - Значение параметра внутри ячейки.
+
+Изменённые компоненты без новых классов:
+
+- CheckoutPriceCard.tsx
+  Убраны фейковые fallback-цены. Если quote ещё не готов, показывается «Считаем».
+
+- ConstructorCheckoutLayout.tsx
+  Передаёт snapshot и validation в CheckoutStep, а правая итоговая цена больше не показывает fallback 42800.

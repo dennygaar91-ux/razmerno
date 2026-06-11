@@ -1,0 +1,57 @@
+Stage R3 — классы HTML/CSS
+
+Добавлены:
+
+.rzm-step-mode-head
+- Header внутри шага конструктора.
+- Используется в SizesStep.
+- Разделяет заголовок/описание и pill текущего режима.
+
+.rzm-step-mode-pill
+- Pill текущего режима: «Обычный режим» / «Точная настройка».
+- Используется в SizesStep.
+
+.rzm-precision-hint-card
+- Спокойная подсказка в обычном режиме о том, что точные параметры доступны через toggle.
+- Используется в SizesStep и FillStep.
+
+.rzm-precision-editor
+- Общий визуальный слой для блоков точной настройки.
+- Используется совместно с .rzm-section-width-editor и .rzm-compartment-editor.
+
+.rzm-precision-summary-grid
+- Краткая сводка точной настройки размеров: количество секций, минимум, сумма.
+- Используется в SizesStep.
+
+.rzm-fill-section-list
+- Список секций в обычном режиме наполнения.
+- Используется в FillStep.
+
+.rzm-fill-section-card
+- Карточка секции в обычном режиме.
+- Показывает номер секции и краткое наполнение.
+- Имеет состояния .is-active, .has-error, .has-warning.
+
+.rzm-fill-precision-editor
+- Модификатор точного редактора наполнения.
+- Используется вместе с .rzm-compartment-editor и .rzm-precision-editor.
+
+.rzm-precision-section-map
+- Карта секций внутри точной настройки наполнения.
+- Используется в FillStep.
+
+.rzm-precision-section-card
+- Карточка секции внутри точной настройки.
+- Показывает номер, ширину и краткое наполнение.
+- Имеет состояния .is-active, .has-error, .has-warning.
+
+Изменены/расширены:
+
+.rzm-compartment-editor
+- Теперь может использоваться вместе с .rzm-precision-editor для более явного режима точной настройки.
+
+.rzm-facade-section-row
+- Получил более спокойный фон внутри точной настройки.
+
+.rzm-step-text
+- Используется в новых header-блоках для пояснения обычного/точного режима.

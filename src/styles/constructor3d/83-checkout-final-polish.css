@@ -1,0 +1,74 @@
+/* Stage Q7 — checkout final polish */
+.rzm-3d-shell .rzm-3d-drawer-footer.is-checkout {
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.rzm-3d-shell .rzm-3d-drawer-footer.is-checkout > div:first-child {
+  border: 1px solid rgba(255, 114, 76, 0.22);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 246, 241, 0.98), rgba(255, 255, 255, 0.86));
+  padding: 11px 12px;
+}
+
+.rzm-3d-shell .rzm-3d-consent--footer {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(42, 44, 65, 0.12);
+  padding: 11px 12px;
+}
+
+.rzm-3d-shell .rzm-3d-consent--footer input {
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  accent-color: #ff724c;
+}
+
+.rzm-3d-shell .rzm-3d-checkout--q7 {
+  gap: 12px;
+}
+
+.rzm-3d-shell .rzm-3d-checkout--q7 .rzm-3d-step-intro p {
+  color: rgba(42, 44, 65, 0.62);
+}
+
+.rzm-3d-shell .rzm-3d-checkout-price > header strong {
+  color: rgba(42, 44, 65, 0.66);
+  font-size: 12px;
+}
+
+.rzm-3d-shell .rzm-3d-checkout-price-list span:first-child {
+  border-top: 0;
+}
+
+.rzm-3d-shell .rzm-3d-checkout-details summary {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.rzm-3d-shell .rzm-3d-checkout-details summary::after {
+  content: "+";
+  color: #ff724c;
+  font-weight: 900;
+}
+
+.rzm-3d-shell .rzm-3d-checkout-details[open] summary::after {
+  content: "−";
+}
+
+.rzm-3d-shell .rzm-3d-checkout-submit-note {
+  border: 1px dashed rgba(255, 114, 76, 0.32);
+  border-radius: 16px;
+  background: rgba(255, 114, 76, 0.07);
+  color: rgba(42, 44, 65, 0.68);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.4;
+  padding: 10px 12px;
+}
+
+.rzm-3d-shell .rzm-3d-drawer-footer.is-checkout .rzm-3d-action-help {
+  margin-top: -2px;
+}
+

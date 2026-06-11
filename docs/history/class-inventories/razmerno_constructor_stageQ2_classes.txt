@@ -1,0 +1,21 @@
+Stage Q2 — Price Clarity + Pricing Source Preparation
+
+Новые / изменённые классы:
+- .rzm-3d-shell--q2 — stage marker нового 3D-shell после уточнения статуса точной цены.
+- .rzm-3d-price-note — отдельное примечание к проекту/технической проверке, не смешивается с ценой.
+
+Переиспользованные классы из Q1:
+- .rzm-ui-btn — базовая кнопка UI Kit.
+- .rzm-ui-btn--primary — основной оранжевый CTA.
+- .rzm-ui-btn--secondary — вторичная кнопка.
+- .rzm-ui-btn--ghost — нейтральная ghost-кнопка.
+- .rzm-ui-btn--icon — icon/± control с 44px hit-zone.
+- .rzm-3d-drawer-footer — нижний sticky-блок drawer с точной стоимостью и CTA.
+- .rzm-3d-checkout-price — карточка точной сметы на шаге заявки.
+- .rzm-3d-validation-panel — блок технологической проверки, отделённый от цены.
+- .rzm-3d-inline-validation — маленькое предупреждение/ошибка около проблемной настройки.
+
+Pricing / policy files:
+- src/pricing/pricingPolicy.ts — единое место для коэффициента CLIENT_PRICE_MULTIPLIER = 1.3, правил прайса и состава листов источника.
+- src/pricing/engine.ts — цена теперь isPreliminary: false; распил/присадка не добавляются отдельно; упаковка считается отдельной услугой.
+- src/pricing/productionServicesPricing.ts — debug/audit-оценка услуг больше не считает распил и присадку отдельной платной строкой.

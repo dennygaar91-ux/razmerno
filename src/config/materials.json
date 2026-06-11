@@ -1,0 +1,84 @@
+[
+  {
+    "id": "white-matt",
+    "name": "Белый матовый",
+    "vendor": "Egger",
+    "collection": "PerfectSense",
+    "pricePerLiter": 12,
+    "swatch": "linear-gradient(135deg, #f6f5f3 0%, #ecebe7 100%)",
+    "faces": [
+      "#ededeb",
+      "#f6f6f4",
+      "#cfcfce"
+    ],
+    "tag": "базовый",
+    "recommended": true
+  },
+  {
+    "id": "cashmere",
+    "name": "Кашемир",
+    "vendor": "Egger",
+    "collection": "PerfectSense",
+    "pricePerLiter": 14,
+    "swatch": "linear-gradient(135deg, #dcd7cd 0%, #c9c4ba 100%)",
+    "faces": [
+      "#d2cdc3",
+      "#e2ded5",
+      "#a9a49a"
+    ]
+  },
+  {
+    "id": "oak-natural",
+    "name": "Дуб натуральный",
+    "vendor": "Kronospan",
+    "collection": "Fronty",
+    "pricePerLiter": 22,
+    "swatch": "repeating-linear-gradient(92deg, #c7a378 0 3px, #b8915f 3px 7px, #d2ae84 7px 9px, #a9814f 9px 13px)",
+    "faces": [
+      "#c7a378",
+      "#d9bb93",
+      "#7d5d39"
+    ],
+    "recommended": true,
+    "tag": "популярный"
+  },
+  {
+    "id": "oak-dark",
+    "name": "Дуб тёмный",
+    "vendor": "Egger",
+    "collection": "Feelwood",
+    "pricePerLiter": 26,
+    "swatch": "repeating-linear-gradient(92deg, #6b4a2f 0 3px, #523821 3px 7px, #7a5638 7px 9px, #43291a 9px 13px)",
+    "faces": [
+      "#6b4a2f",
+      "#845e3e",
+      "#2f1d10"
+    ]
+  },
+  {
+    "id": "graphite",
+    "name": "Графит",
+    "vendor": "Egger",
+    "collection": "PerfectSense",
+    "pricePerLiter": 18,
+    "swatch": "linear-gradient(135deg, #3a3a3c 0%, #2a2a2c 100%)",
+    "faces": [
+      "#343436",
+      "#48484a",
+      "#1a1a1c"
+    ]
+  },
+  {
+    "id": "concrete",
+    "name": "Бетон светлый",
+    "vendor": "Kronospan",
+    "collection": "Urban",
+    "pricePerLiter": 20,
+    "swatch": "linear-gradient(135deg, #cac7c0 0%, #b9b6af 100%)",
+    "faces": [
+      "#c6c3bc",
+      "#d5d2cb",
+      "#8d8a83"
+    ]
+  }
+]

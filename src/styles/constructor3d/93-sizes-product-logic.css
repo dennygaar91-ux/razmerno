@@ -1,0 +1,86 @@
+/* Stage 08 — sizes step product logic */
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-sizes-step--stage08 {
+  gap: 14px;
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-furniture-type-block,
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-dimensions-block,
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-section-widths {
+  border-radius: 24px;
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-type-grid--stage08 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-type-card {
+  min-height: 78px;
+  border: 1px solid rgba(42,44,65,.11);
+  border-radius: 18px;
+  background: rgba(255,255,255,.72);
+  color: #2a2c41;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-type-card strong {
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-type-card span {
+  font-size: 10px;
+  color: rgba(42,44,65,.56);
+  line-height: 1.25;
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-type-card.is-active {
+  border-color: rgba(255,114,76,.58);
+  background: linear-gradient(180deg, rgba(255,114,76,.16), rgba(255,255,255,.92));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 12px 24px rgba(255,114,76,.12);
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-type-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,114,76,.36);
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-number-input {
+  width: 84px;
+  min-height: 38px;
+  border: 1px solid rgba(42,44,65,.12);
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  color: #2a2c41;
+  font: inherit;
+  font-weight: 760;
+  text-align: center;
+  outline: none;
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-number-input:focus {
+  border-color: rgba(255,114,76,.56);
+  box-shadow: 0 0 0 4px rgba(255,114,76,.12);
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-inline-issue {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.rzm-3d-page[data-size-stage="STAGE08"] .rzm-3d-inline-fix {
+  min-height: 32px;
+  padding-inline: 12px;
+  font-size: 11px;
+}
+

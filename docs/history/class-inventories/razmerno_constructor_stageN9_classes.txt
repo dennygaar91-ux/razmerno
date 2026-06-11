@@ -1,0 +1,51 @@
+Stage N9 — Checkout integration in new 3D shell
+
+Изменённые / добавленные классы:
+
+1. rzm-3d-page[data-stage="N9"]
+   - Stage marker новой 3D-ветки после интеграции checkout.
+   - Используется на странице Constructor3DPage.
+
+2. rzm-3d-checkout
+   - Основной контейнер финального шага «Заявка» внутри нового 3D drawer.
+   - Используется в Checkout3DStep.
+
+3. rzm-3d-checkout-card
+   - Универсальная карточка checkout-блоков: контакты, условия, смета.
+   - Используется в Checkout3DStep.
+
+4. rzm-3d-field
+   - Единый стиль полей ввода внутри 3D checkout.
+   - Используется для имени, телефона, email и адреса доставки.
+
+5. rzm-3d-checkout-toggle
+   - Toggle-card для доставки и сборки.
+   - Используется в блоке «Условия».
+
+6. rzm-3d-checkout-price
+   - Карточка компактной сметы.
+   - Используется в checkout drawer.
+
+7. rzm-3d-checkout-price-list
+   - Список строк сметы: материалы, фурнитура, работы, доставка/сборка.
+   - Используется внутри rzm-3d-checkout-price.
+
+8. rzm-3d-checkout-details
+   - Раскрываемый блок деталей проекта/сметы.
+   - Используется внутри checkout price card.
+
+9. rzm-3d-consent
+   - Карточка согласия на обработку персональных данных.
+   - Используется перед submit-кнопкой.
+
+10. rzm-3d-checkout-submit
+    - Основная кнопка отправки заявки в новой 3D-ветке.
+    - Используется в Checkout3DStep.
+
+11. rzm-3d-submit-message
+    - Сообщение статуса отправки: idle/submitting/success/error.
+    - Используется после submit-кнопки.
+
+12. rzm-3d-validation-panel / rzm-3d-inline-validation / rzm-3d-inline-issue
+    - Перенесены в scope N9, чтобы validation продолжал работать после смены data-stage с N8 на N9.
+    - Используются во всех шагах нового Constructor3DPage.

@@ -1,0 +1,83 @@
+{
+  "wardrobe": {
+    "width": {
+      "min": 800,
+      "max": 3200
+    },
+    "height": {
+      "min": 1800,
+      "max": 2700
+    },
+    "depth": {
+      "min": 400,
+      "max": 700
+    },
+    "sections": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "dresser": {
+    "width": {
+      "min": 600,
+      "max": 1800
+    },
+    "height": {
+      "min": 700,
+      "max": 1100
+    },
+    "depth": {
+      "min": 350,
+      "max": 550
+    },
+    "sections": {
+      "min": 1,
+      "max": 2
+    }
+  },
+  "nightstand": {
+    "width": {
+      "min": 350,
+      "max": 800
+    },
+    "height": {
+      "min": 400,
+      "max": 750
+    },
+    "depth": {
+      "min": 300,
+      "max": 500
+    },
+    "sections": {
+      "min": 1,
+      "max": 1
+    }
+  },
+  "fallback": {
+    "width": {
+      "min": 300,
+      "max": 3200
+    },
+    "height": {
+      "min": 300,
+      "max": 2700
+    },
+    "depth": {
+      "min": 300,
+      "max": 700
+    },
+    "sections": {
+      "min": 1,
+      "max": 4
+    }
+  },
+  "rules": {
+    "minSectionWidth": 300,
+    "maxSectionWidthBeforeWarning": 900,
+    "minShelfGap": 200,
+    "minDrawerFacadeHeight": 200,
+    "minDrawerDepthRecommended": 400,
+    "minRodDepthRecommended": 500,
+    "minRodHeightRecommended": 1800
+  }
+}

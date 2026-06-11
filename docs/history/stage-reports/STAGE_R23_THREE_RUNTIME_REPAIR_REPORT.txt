@@ -1,0 +1,83 @@
+Stage R23 — Three.js Runtime Repair + честное состояние 3D
+
+Цель stage:
+1. Убрать ощущение сломанного продукта, когда WebGL/3D недоступен.
+2. Перенести сообщение о проблеме 3D из overlay поверх модели в компактный toolbar-status.
+3. Сделать 3D-кнопку честно disabled, если WebGL недоступен или Three.js viewer упал.
+4. Улучшить WebGL diagnostics, чтобы локальная проверка давала больше информации.
+5. Не трогать pricing/order/backend/API/Supabase/admin/export/mobile.
+
+Что сделано:
+1. Переписан useWebGLAvailable.ts:
+   - detectWebGL экспортируется отдельно;
+   - canvas probe получает размеры 16×16;
+   - проверяется webgl2, затем webgl/experimental-webgl;
+   - добавлен сбор vendor/rendererInfo через WEBGL_debug_renderer_info;
+   - loseContext перенесён в setTimeout, чтобы probe не мешал жизненному циклу текущего render;
+   - diagnostics остаётся безопасной и не ломает UI при ошибке.
+
+2. Добавлен компонент ConstructorSceneWebGLStatus.tsx:
+   - состояния: checking / ready / disabled / error;
+   - показывает краткий status в верхней панели;
+   - details вынесены в title/aria-label.
+
+3. Обновлён ConstructorScene.tsx:
+   - добавлен ConstructorSceneWebGLStatus;
+   - 3D-кнопка доступна только при webglAvailable && !threeFailed;
+   - price chip очищен от маленького em «проверка»;
+   - добавлен marker rzm-scene-r23-runtime.
+
+4. Обновлён ConstructorSceneCanvas.tsx:
+   - удалён fallback-note поверх сцены;
+   - удалены props fallbackReason/webglDiagnostics из canvas, потому что runtime-статус теперь в toolbar;
+   - 2D больше не выглядит как аварийный режим с большой плашкой.
+
+5. Обновлены ConstructorPage.tsx и CSS:
+   - добавлен stage-scope rzm-stage-r23-three-runtime-repair;
+   - добавлены стили WebGL status pill;
+   - 3D disabled state усилен;
+   - fallback-note скрыт.
+
+6. Обновлён scripts/browser-smoke-static.mjs:
+   - добавлены проверки наличия R23 stage-scope;
+   - добавлены проверки ConstructorSceneWebGLStatus;
+   - добавлена проверка отсутствия «3D недоступен» и «WebGL не создал контекст» внутри ConstructorSceneCanvas.
+
+Проверки:
+ПРОШЛИ:
+- npm run typecheck
+- npm run test:browser-smoke-static
+- npm run build
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-state
+- npm run test:compartment-ui
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+НЕ ПОДТВЕРЖДЕНО В SANDBOX:
+- npm run test:browser-smoke
+Причина: Playwright Chromium в sandbox не работает стабильно / запуск зависает в текущей среде. У пользователя локально Chromium установлен, поэтому нужно прогнать локально.
+
+Что не трогалось:
+- pricing engine;
+- расчёт стоимости;
+- заявки;
+- submit-flow;
+- checkout validation;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- mobile UX;
+- 2D geometry;
+- business logic Three.js.
+
+Открытый риск:
+R23 не гарантирует, что 3D заработает в конкретном локальном браузере, если сам браузер/драйвер/GPU не создаёт WebGL-контекст. Но теперь интерфейс честно показывает это состояние, не перекрывает чертёж и не выдаёт 3D за рабочий режим.
+
+Локальная проверка после распаковки:
+1. npm install
+2. npm run test:browser-smoke
+3. npm run dev
+4. открыть /configurator
+5. проверить статус 3D в toolbar и DevTools Console.

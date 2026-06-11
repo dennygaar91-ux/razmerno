@@ -1,0 +1,30 @@
+Stage Q6 — Materials Step Polish
+
+Scope:
+- Improve the Materials step in the new /configurator-3d branch.
+- Do not add material search yet.
+- Keep filters All / LDSP / MDF.
+- Make active materials clearer.
+- Keep body/facade materials visually connected to the 3D texture source.
+- Keep back panel as read-only automatic HDF material.
+
+Implemented:
+- Updated Constructor3DPage stage marker to Q6.
+- Added Q6 shell marker rzm-3d-shell--q6.
+- Added MaterialSelectionSummary for selected body/facade materials.
+- Added selected material strip inside each MaterialPicker.
+- Kept facade filters All / LDSP / MDF and added aria-pressed.
+- Added list/listitem semantics to material options.
+- Strengthened active state with orange ring and stronger check mark.
+- Added sticky material category headings.
+- Added dedicated Q6 CSS scope.
+- Added static guard check:stage-q6-materials-polish.
+
+Not changed:
+- pricing engine
+- backend/API/Supabase
+- order submit flow
+- old /configurator legacy route
+- 3D geometry
+- random preset logic
+- validation/autofix rules

@@ -1,0 +1,15 @@
+Stage Constructor 18 — classes
+
+CSS/HTML classes не добавлялись и не изменялись.
+
+Этап был архитектурным:
+- cleanup production preview source;
+- helper для production snapshot sync;
+- backlog по production-model pricing.
+
+Изменённые файлы без CSS-классов:
+- src/static-pages/ConstructorPage.tsx
+- src/static-pages/constructor/hooks/useProductionPreview.ts
+- src/static-pages/constructor/adapters/productionSnapshotSync.ts
+- src/static-pages/constructor/adapters/productionPreviewAdapter.test.ts
+- docs/pricing/production-model-pricing-backlog.md

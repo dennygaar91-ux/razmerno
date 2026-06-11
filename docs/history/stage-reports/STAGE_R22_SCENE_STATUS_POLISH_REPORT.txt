@@ -1,0 +1,68 @@
+Stage R22 — scene status bar and desktop clarity polish
+
+Цель этапа
+----------
+Сделать сцену более похожей на готовый продукт: убрать часть информации из overlay-плашек поверх модели и собрать ключевую сводку в отдельную стабильную нижнюю панель сцены.
+
+Что планировалось
+-----------------
+1. Не трогать pricing engine, заявки, checkout-submit, API, backend, Supabase, admin/export.
+2. Не трогать mobile UX.
+3. Уменьшить визуальный шум поверх 3D/2D-сцены.
+4. Вынести выбранную область, размеры, материалы и статус проверки в единый desktop-status-bar.
+5. Добавить scoped CSS, чтобы правки не влияли на остальные страницы.
+6. Обновить static smoke guard для проверки наличия R22-компонента.
+
+Что сделано
+-----------
+1. Добавлен компонент ConstructorSceneStatusBar.tsx.
+2. В ConstructorScene.tsx статусная панель добавлена сразу под ConstructorSceneCanvas.
+3. В ConstructorPage.tsx добавлен scope-класс rzm-stage-r22-scene-status-polish.
+4. В status bar вынесены:
+   - выбранная секция и отсек;
+   - ширина секции и высота отсека;
+   - общий размер мебели width × height × depth;
+   - материалы корпуса и фасадов;
+   - состояние проверки: ready / warning / error.
+5. В R22 скрыты старые overlay-плашки rzm-scene-material-stack и rzm-scene-active-target в webgl-сцене, чтобы 3D не был перегружен UI поверх модели.
+6. Добавлены стили R22 в constructor.css.
+7. Обновлён scripts/browser-smoke-static.mjs: теперь проверяется stage marker, наличие ConstructorSceneStatusBar и rzm-scene-status-bar.
+8. Добавлен файл razmerno_constructor_stageR22_classes.txt.
+
+Проверки
+--------
+Пройдены:
+- npm run typecheck
+- npm run test:browser-smoke-static
+- npm run build
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-state
+- npm run test:compartment-ui
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+Не подтверждено в sandbox:
+- npm run test:browser-smoke
+
+Причина: в sandbox по-прежнему нет рабочего Playwright Chromium binary. У пользователя локально Chromium установлен, поэтому browser smoke нужно прогнать локально.
+
+Что не трогалось
+----------------
+- pricing engine;
+- расчёт стоимости;
+- заявки;
+- submit-flow;
+- checkout validation;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- mobile UX;
+- 2D geometry;
+- Three.js geometry/business logic.
+
+Открытые риски
+--------------
+1. Нужна локальная визуальная проверка в браузере, потому что этот этап меняет компоновку сцены.
+2. Если нижняя статусная панель окажется слишком высокой на конкретной высоте экрана, следующий этап должен уменьшить её до 2–3 compact chips или сделать её collapsing.
+3. Реальный 3D runtime всё ещё нужно подтверждать локально через Playwright/Chrome, так как sandbox не даёт полноценный browser-smoke.

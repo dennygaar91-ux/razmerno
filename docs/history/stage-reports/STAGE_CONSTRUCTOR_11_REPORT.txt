@@ -1,0 +1,99 @@
+Stage Constructor 11 — production snapshot in store + debug sync
+
+1. Context
+Goal: move the production-preview synchronization result into the active constructor store, keep the production summary free of customer PII, and make the debug card read the centralized snapshot state instead of only local hook state.
+
+2. What was found
+Before this stage, production preview was built by useProductionPreview() and kept locally in the hook/component. The store did not know whether a production snapshot was idle/loading/ready/error, did not store the latest summary, and the debug card could only display the direct preview object passed from ConstructorPage.
+
+3. What could be changed
+Safe active-constructor files only:
+- src/static-pages/constructor/types.ts
+- src/static-pages/constructor/store/constructorStore.ts
+- src/static-pages/constructor/store/constructorSelectors.ts
+- src/static-pages/constructor/hooks/useProductionPreview.ts
+- src/static-pages/ConstructorPage.tsx
+- src/static-pages/constructor/components/ConstructorScene.tsx
+- src/static-pages/constructor/components/ConstructorSceneProductionDebug.tsx
+- src/static-pages/constructor/store/constructorStore.test.ts
+
+4. What was not changed
+Not touched:
+- checkout UI
+- submit hook
+- backend/API
+- Supabase
+- admin
+- pricing engine
+- current price integration
+- production export internals
+- delivery/assembly logic
+
+5. Plan
+- Add ConstructorProductionSnapshotState type.
+- Add productionSnapshot field to constructor store.
+- Add lifecycle actions: loading, ready, error, clear.
+- Sync useProductionPreview() with store after each preview build.
+- Keep only non-PII project metadata in store.
+- Update the debug card to display centralized snapshot state.
+- Add store test for production snapshot lifecycle and PII-free invariant.
+
+6. Implemented changes
+- Added ConstructorProductionSnapshotState with status, validationStatus, updatedAt, error, requiresTechnologistCheck, summary and project metadata.
+- Added productionSnapshot to constructorInitialState.
+- Added actions:
+  - setProductionSnapshotLoading()
+  - setProductionSnapshotReady(snapshot)
+  - setProductionSnapshotError(error)
+  - clearProductionSnapshot()
+- Added selectors for the production snapshot state and actions.
+- Updated useProductionPreview() so it:
+  - clears production snapshot when quote is unavailable;
+  - marks snapshot loading before build;
+  - writes ready summary/project metadata after successful build;
+  - writes error state on failure.
+- Updated ConstructorPage and ConstructorScene to pass centralized productionSnapshot to debug UI.
+- Updated ProductionDebugPreview to show:
+  - centralized status;
+  - updatedAt;
+  - panel/hardware/drilling/basis/edge-banding summary;
+  - section count;
+  - material id;
+  - technologist-check state.
+- Added constructor-store test that proves production snapshot lifecycle is centralized and does not store preview customer email.
+
+7. Plan vs fact
+Planned scope is complete. This stage did not create a new production export builder and did not change pricing; it synchronized the already-existing production preview result into the active constructor store.
+
+8. Risks
+Low risk:
+- pricing unchanged;
+- order payload unchanged;
+- backend untouched;
+- checkout untouched;
+- production export internals untouched.
+
+Known limitation:
+The production snapshot is still built after quote availability via useProductionPreview(). The store now owns the latest snapshot summary/status, but the production export itself is not stored in Zustand to avoid storing large technical payloads and to keep UI state lightweight.
+
+9. Checks run
+- npm install
+- npm run typecheck
+- npm run test:constructor-store
+- npm run test:production-preview
+- npm run test:constructor-payload
+- npm run test:constructor-draft
+- npm run test:constructor-flow
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run typecheck:api
+- npm run build
+
+Result: all listed checks passed. Build warnings about large chunks remain; they were present before and are unrelated to this stage.
+
+10. Next step
+Stage Constructor 12 — pricing/material integration audit before changing price.
+Recommended next scope:
+- map current pricing inputs vs real material ids/thicknesses;
+- prove what currently affects price and what does not;
+- do not change price until the pricing rules are explicit and accepted.

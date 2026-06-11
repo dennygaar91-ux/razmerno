@@ -1,0 +1,43 @@
+Stage R21 — классы и изменения
+
+Добавленные / изменённые классы:
+
+1. rzm-stage-r21-browser-and-desktop-polish
+   - Где используется: src/static-pages/ConstructorPage.tsx на корневом main конструктора.
+   - Назначение: scoped-контейнер для правок Stage R21, чтобы изменения не расползались по лендингу, checkout и старым веткам.
+   - Что изменилось: новый stage-scope для browser-backed desktop polish.
+
+2. rzm-furniture-type-switcher
+   - Где используется: FurnitureTypeSwitch, верх левой панели конструктора.
+   - Назначение: переключатель типа мебели Шкаф / Тумба / Комод.
+   - Что изменилось: получил более спокойную segmented-подложку, похожую на production-control, без ощущения трёх отдельных шумных кнопок.
+
+3. rzm-furniture-type-btn
+   - Где используется: кнопки типов мебели внутри FurnitureTypeSwitch.
+   - Назначение: выбор типа мебели.
+   - Что изменилось: добавлен aria-pressed, улучшены hover/focus/active состояния, active-вариант стал визуально читаемым.
+
+4. rzm-furniture-type-check
+   - Где используется: только внутри активной кнопки типа мебели.
+   - Назначение: маленький визуальный маркер выбранного типа.
+   - Что изменилось: теперь рендерится только для active-кнопки и aria-hidden, чтобы не загрязнять body-текст и browser-smoke.
+
+5. rzm-scene-render-switch button:disabled
+   - Где используется: 3D/2D переключатель над сценой.
+   - Назначение: честное состояние недоступного 3D.
+   - Что изменилось: добавлен более явный disabled-state без hover-transform.
+
+6. focus-visible rules
+   - Где используется: stepper, furniture type, scene render/view switch, action buttons.
+   - Назначение: keyboard/accessibility hardening.
+   - Что изменилось: добавлен единый orange outline для доступной навигации с клавиатуры.
+
+Файлы, связанные с тестовой инфраструктурой:
+
+7. PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH support
+   - Где используется: playwright.config.ts.
+   - Назначение: позволяет запускать browser smoke через внешний Chrome/Chromium, если штатный Playwright browser binary недоступен.
+
+8. test:browser-smoke:system
+   - Где используется: package.json + scripts/run-browser-smoke-system.mjs.
+   - Назначение: безопасная попытка запуска browser smoke через системный Chromium/Chrome.

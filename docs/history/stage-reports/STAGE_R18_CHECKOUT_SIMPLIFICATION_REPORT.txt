@@ -1,0 +1,31 @@
+Stage R18 — checkout simplification
+
+Planned scope:
+- Simplify the checkout/final request step visually.
+- Keep honest estimate, contact fields, delivery/assembly toggles, consent and final submit.
+- Compact “what will be sent to manager”.
+- Avoid pricing, order flow, backend, API, Supabase and mobile work.
+
+Completed:
+- Replaced oversized checkout hero with compact final-step topbar.
+- Added strong but compact total price chip in the checkout topbar.
+- Reordered checkout flow: contacts -> delivery/assembly -> estimate -> project review -> consent.
+- Simplified contact card text and preserved required fields.
+- Simplified delivery/assembly controls and shortened copy.
+- Simplified estimate card: total + four compact rows.
+- Simplified project review: compact rows and material strip, no long explanatory paragraph.
+- Added compact sticky action panel with final price, next steps and submit buttons.
+- Added scoped Stage R18 CSS layer.
+- Updated browser static smoke checks to guard R18 classes/components.
+
+Not touched:
+- Pricing engine.
+- Order submission payload or useConstructorSubmit.
+- Checkout validation rules.
+- Backend/API/Supabase/admin/export logic.
+- Mobile UX/CSS work.
+- 2D and Three.js renderers.
+
+Open risk:
+- Full browser smoke still depends on Playwright Chromium in the local environment.
+- Visual runtime should be checked locally after unpacking the archive.

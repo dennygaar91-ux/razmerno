@@ -1,0 +1,56 @@
+Stage N5 — Section / zone facade logic
+
+Scope:
+- Continue the new /configurator-3d branch, not old /configurator.
+- Add section-level facade controls in ordinary mode.
+- Add zone-level facade override only in precise/advanced fill mode.
+- Render open middle zones inside a section with facades.
+- Do not change pricing, order submit-flow, backend/API/Supabase, admin/export, mobile, real texture system, random preset logic.
+
+Planned tasks and completion:
+1. Section facade ordinary controls — 100%.
+2. Zone facade override in advanced mode — 100%.
+3. Store/state support for zone facade layout — 100%.
+4. Three.js renderer support for partial zone facades — 100%.
+5. Drawer UI for selected zone facade override — 100%.
+6. Tests/static guard for N5 — 100%.
+7. Keep legacy /configurator untouched — 100%.
+
+Changed files:
+- src/static-pages/Constructor3DPage.tsx
+- src/static-pages/constructor/types.ts
+- src/static-pages/constructor/rules/projectRules.ts
+- src/static-pages/constructor/store/constructorStore.ts
+- src/static-pages/constructor/store/constructorSelectors.ts
+- src/static-pages/constructor/hooks/useConstructorPageState.ts
+- src/static-pages/constructor/adapters/constructorPayload.ts
+- src/static-pages/constructor/three/threeTypes.ts
+- src/static-pages/constructor/three/threeSceneAdapter.ts
+- src/static-pages/constructor/three/threeSceneAdapter.test.ts
+- src/styles/constructor3d.css
+- scripts/check-stage-n5-zone-facades.mjs
+- package.json
+
+QA passed:
+- npm run check:stage-n5-zone-facades
+- npm run test:constructor-three
+- npm run test:zone-filling
+- npm run test:constructor-store
+- npm run test:browser-smoke-static
+
+QA not fully confirmed in sandbox:
+- npm run typecheck: timed out without TypeScript error output.
+- npm run build: timed out during Vite transform in sandbox.
+
+Local commands to run:
+- npm install
+- npm run typecheck
+- npm run build
+- npm run dev
+- open http://localhost:5173/configurator-3d
+
+Notes:
+- Zone override mode is "inherit" or "open".
+- Ordinary mode controls only the section facade: hinged/open.
+- Advanced fill mode allows selected zone to inherit section facade or remain open.
+- Three.js now creates zone-level facades when at least one zone in a hinged section is set to open.

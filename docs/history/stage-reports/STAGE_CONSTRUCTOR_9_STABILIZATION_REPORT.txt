@@ -1,0 +1,61 @@
+STAGE CONSTRUCTOR 9.1 — STABILIZATION BEFORE STAGE 10
+
+Контекст
+Перед переходом к Stage 10 исправлены расхождения, найденные контрольным аудитом Stage 1–9. Цель — не развивать новые production-функции, а стабилизировать уже заявленные этапы: draft restore, mapping материалов, централизованный view state и реальные проверки.
+
+Что изменено
+1. Draft restore
+- buildConstructorDraft теперь сохраняет materialId, facadeMaterialId и compartments.
+- restoreConstructorDraftToStore теперь восстанавливает facadeLayout и facadeMaterial.
+- restoreDraft в store больше не пересоздаёт секции только равномерно: ручной sectionLayout восстанавливается через normalizeSectionLayout.
+- restoreDraft восстанавливает compartmentLayout, fillingLayout и facadeLayout на основании сохранённого draft.
+- Добавлен тест, который проверяет восстановление ручных ширин секций, ручных высот отсеков, наполнения, фасадов и материала фасадов.
+
+2. Material mapping
+- backPanelByBodyMaterial очищен до строгого правила ЛДСП → ХДФ.
+- Убраны ключи MDF/HDF из mapping задней стенки.
+- Добавлен тест, который проверяет, что mapping задней стенки имеет только LDSP-ключи.
+
+3. Scene view state
+- sceneRenderMode и sceneViewMode перенесены в constructor store.
+- ConstructorScene больше не хранит 2D/3D и view mode как локальную конфигурацию, кроме технического флага threeFailed.
+- ConstructorPage и useConstructorPageState подключены к store actions.
+- ConstructorSceneRenderSwitch и ConstructorSceneViewSwitch типизированы через общие constructor types.
+- Добавлен store-test для централизованного хранения render/view modes.
+
+Что сознательно не изменено
+- checkout;
+- отправка заявки;
+- backend/API;
+- Supabase;
+- админка;
+- pricing engine;
+- production export internals;
+- текущая цена.
+
+Проверки
+Выполнено успешно:
+- npm install
+- npm run typecheck
+- node --no-warnings --import tsx src/shared/materials/materialCatalog.test.ts
+- node --no-warnings --import tsx src/shared/materials/materialPresentation.test.ts
+- node --no-warnings --import tsx src/static-pages/constructor/rules/projectRules.test.ts
+- npm run test:constructor-store
+- npm run test:constructor-draft
+- npm run test:constructor-payload
+- npm run test:constructor-flow
+- npm run test:production-preview
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:browser-smoke-static
+- npm run build
+
+Не выполнено из-за окружения:
+- npm run test:browser-smoke -- --reporter=line
+Причина: Playwright browser executable отсутствует в контейнере. Тесты не стартовали из-за отсутствия Chromium: /home/oai/.cache/ms-playwright/chromium_headless_shell-1223/...
+
+Ограничения после стабилизации
+- Store всё ещё остаётся переходной моделью с legacy-полями и новыми layout-полями. Полную FurnitureProject-модель перед Stage 10 не внедрял, чтобы не ломать checkout/pricing/order flow.
+- Production snapshot под новую структуру не создан. Это остаётся корректным scope для Stage 10.
+- Цена по-прежнему не пересчитывается по новым material ids/толщинам. Это отдельный будущий этап.
+- 2D views остаются preview, а не производственными чертежами.

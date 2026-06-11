@@ -1,0 +1,108 @@
+/* Stage N8 — validation and auto-fix */
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel {
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel > div {
+  display: grid;
+  gap: 4px;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel span {
+  color: rgba(42, 44, 65, 0.58);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel strong {
+  color: #2a2c41;
+  font-size: 14px;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel p {
+  margin: 0;
+  color: rgba(42, 44, 65, 0.66);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel button,
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-validation button {
+  border: 0;
+  border-radius: 999px;
+  background: #2a2c41;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 36px;
+  padding: 0 14px;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel.is-warning {
+  border-color: rgba(253, 191, 80, 0.42);
+  background: rgba(253, 191, 80, 0.12);
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel.is-error {
+  border-color: rgba(255, 114, 76, 0.42);
+  background: rgba(255, 114, 76, 0.1);
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-validation-panel.is-valid {
+  border-color: rgba(43, 142, 92, 0.18);
+  background: rgba(43, 142, 92, 0.08);
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-validation {
+  align-items: center;
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr auto;
+  padding: 12px;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-validation > div {
+  display: grid;
+  gap: 4px;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-validation strong {
+  color: #2a2c41;
+  font-size: 13px;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-validation span,
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-issue {
+  color: rgba(42, 44, 65, 0.62);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-validation.is-error,
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-issue.is-error {
+  color: #b64226;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-validation.is-warning,
+.rzm-3d-page[data-stage="N8"] .rzm-3d-inline-issue.is-warning {
+  color: #8a5b09;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-control-row {
+  overflow: hidden;
+}
+
+.rzm-3d-page[data-stage="N8"] .rzm-3d-drawer-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+

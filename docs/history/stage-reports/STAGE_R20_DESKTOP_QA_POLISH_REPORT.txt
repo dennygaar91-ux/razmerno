@@ -1,0 +1,62 @@
+Stage R20 — desktop QA polish and geometry hardening
+
+Перед стартом:
+Дополнительных вопросов пользователю не было. Направление уже зафиксировано: desktop first, mobile не трогать, pricing/order/backend/API/Supabase/admin/export не менять.
+
+Что планировалось:
+1. Продолжить стабилизацию desktop-конструктора после Stage R19.
+2. Убрать CSS-подмены текста, которые были временным патчем.
+3. Улучшить 2D-чертёж: active area должна соответствовать реальной высоте выбранного отсека.
+4. Убрать декоративные 3D-слои из ручного 2D-режима.
+5. Усилить desktop grid и toolbar против переполнений.
+6. Добавить тест на геометрию 2D-чертежа.
+
+Что сделано:
+1. В FillStep тексты «Выбрано» и «Наполнение» теперь заданы прямо в JSX, без CSS-хаков через content.
+2. Из CSS удалены R19-подмены текста через ::after.
+3. В ConstructorRealisticSvgModel добавлены pure helper-функции:
+   - getBlueprintCompartmentGeometry
+   - getBlueprintActiveArea
+4. Active area на 2D-чертёже теперь строится по реальной пропорциональной высоте выбранного отсека, а не по равному делению.
+5. Добавлен тест blueprintGeometry.test.ts.
+6. В package.json добавлен script test:blueprint-geometry.
+7. Добавлен scoped CSS R20:
+   - устойчивый desktop grid;
+   - защита scene toolbar от переполнения;
+   - скрытие декоративных orb/floor/model shadow в 2D fallback;
+   - non-scaling stroke для active area.
+8. scripts/browser-smoke-static.mjs обновлён, чтобы проверять R20 stage-scope и отсутствие старых CSS-подмен текста.
+
+Что не трогалось:
+- pricing engine;
+- расчет стоимости;
+- заявки;
+- submit-flow;
+- checkout validation;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- mobile UX;
+- глубокая 3D-логика.
+
+Проверки:
+- npm run typecheck — passed
+- npm run test:blueprint-geometry — passed
+- npm run test:browser-smoke-static — passed
+- npm run build — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:layout-state — passed
+- npm run test:compartment-ui — passed
+- npm run test:layout-validation — passed
+
+Не прошёл в sandbox:
+- npm run test:browser-smoke
+Причина: отсутствует Playwright Chromium binary в Linux sandbox:
+/home/oai/.cache/ms-playwright/chromium_headless_shell-1223/...
+Это ошибка окружения, не подтверждённая ошибка кода.
+
+Открытые риски:
+1. Реальный browser smoke нужно прогнать локально у пользователя, где Chromium уже установлен.
+2. Визуальный результат 3D всё ещё требует локальной проверки в Chrome/Edge.
+3. Следующий этап лучше посвятить финальной UX-инвентаризации desktop-конструктора по свежим скриншотам/локальному browser smoke.

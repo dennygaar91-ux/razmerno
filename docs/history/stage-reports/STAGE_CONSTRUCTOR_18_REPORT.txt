@@ -1,0 +1,82 @@
+Stage Constructor 18 — pricing/production hook cleanup + backlog
+
+1. Контекст этапа
+
+Цель: убрать оставшееся дублирование production preview между quote hook и debug hook, сделать quote-owned production preview единственным нормальным источником, а также зафиксировать backlog для будущего hardware/services pricing по production model.
+
+2. Что найдено
+
+После Stage 17 useConstructorQuote уже собирал productionPreview и productionPanelPricing. Но useProductionPreview всё ещё имел fallback-ветку, которая могла повторно собрать production preview, если quote.productionPreview отсутствовал. Это оставляло риск двойной сборки и расхождения quote/debug.
+
+3. Что можно менять
+
+Изменены только:
+- src/static-pages/ConstructorPage.tsx
+- src/static-pages/constructor/hooks/useProductionPreview.ts
+- src/static-pages/constructor/adapters/productionSnapshotSync.ts
+- src/static-pages/constructor/adapters/productionPreviewAdapter.test.ts
+- docs/pricing/production-model-pricing-backlog.md
+
+4. Что нельзя менять
+
+Не трогались checkout, submit flow, backend/API, Supabase, админка, delivery/assembly rules, production export internals, UI/CSS и числовая формула цены.
+
+5. План изменений
+
+- Убрать fallback-сборку production preview из useProductionPreview.
+- Сделать useProductionPreview зависимым только от quote.
+- Вынести формирование ready payload для store snapshot в чистый helper.
+- Добавить тест на sync helper и отсутствие PII.
+- Зафиксировать backlog для hardware/services pricing.
+
+6. Внесённые правки
+
+Добавлен helper:
+src/static-pages/constructor/adapters/productionSnapshotSync.ts
+
+Он формирует лёгкий store-ready production snapshot из quote-owned production preview и panelPricing.
+
+useProductionPreview теперь:
+- принимает только quote;
+- не принимает constructor snapshot;
+- не импортирует buildConstructorProductionPricingBundle;
+- не пересобирает production preview;
+- синхронизирует store snapshot только из quote.productionPreview;
+- показывает понятную ошибку, если quote есть, но productionPreview не собран.
+
+ConstructorPage обновлён под новый вызов:
+useProductionPreview(quote)
+
+Добавлен тест:
+production snapshot sync: creates ready store payload from quote-owned preview
+
+Добавлен backlog:
+docs/pricing/production-model-pricing-backlog.md
+
+7. Ревью: план vs факт
+
+План выполнен. Основной сценарий теперь имеет один источник production preview: quote.productionPreview. Debug/snapshot hook больше не строит production preview второй раз.
+
+8. Анализ рисков
+
+Риск низкий: логика цены, checkout, заявка и backend не менялись. Если quote по какой-то причине вернётся без productionPreview, UI покажет debug-ошибку вместо скрытой повторной сборки. Это лучше для диагностики и не влияет на checkout submit.
+
+9. Проверки
+
+Успешно выполнено:
+- npm install
+- npm run typecheck
+- npm run typecheck:api
+- node --no-warnings --import tsx src/static-pages/constructor/adapters/productionPreviewAdapter.test.ts
+- node --no-warnings --import tsx src/pricing/productionPanelPricing.test.ts
+- npm run test:constructor-store
+- npm run test:constructor-payload
+- npm run test:constructor-flow
+- npm run test:constructor-draft
+- npm run test:production-preview
+- npm run test:pricing-engine
+- npm run build
+
+10. Следующий шаг
+
+Stage 19 — hardware pricing audit. Сначала debug-only estimate по productionModel.hardware, без изменения live-price.

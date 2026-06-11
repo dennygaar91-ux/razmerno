@@ -1,0 +1,77 @@
+Stage R13 — список классов
+
+Новые классы:
+
+.rzm-stage-r13-desktop-shell
+- Root-marker на странице конструктора.
+- Используется в ConfiguratorPage.tsx на корневом div.
+- Нужен как безопасный scope для Stage R13.
+
+.rzm-r13-workspace
+- Основная desktop-сетка конструктора.
+- Используется в ConfiguratorPage.tsx вокруг sidebar и main scene.
+- Делит экран на левую панель и основную сцену.
+
+.rzm-r13-sidebar
+- Sticky-контейнер левой панели.
+- Используется для aside с настройками текущего шага.
+
+.rzm-r13-sidebar-card
+- Визуальная карточка левой панели.
+- Ограничивает высоту, включает внутренний scroll и удерживает action buttons внизу.
+
+.rzm-r13-main
+- Основная правая область конструктора.
+- Используется для сцены.
+
+.rzm-r13-scene-shell
+- Большая карточка рабочей сцены.
+- Содержит stepper, workbar, viewport и meta строку.
+
+.rzm-r13-stepper-shell
+- Верхний слой scene shell для HorizontalStepper.
+- Нормализует stepper, чтобы он не накладывался на toolbar/цену.
+
+.rzm-r13-workbar
+- Второй слой верхней области сцены.
+- Содержит mode note, scene status и price chip.
+
+.rzm-r13-mode-note
+- Компактный индикатор режима настройки.
+- Показывает обычный режим / точная настройка и контекст текущего процесса.
+
+.rzm-r13-scene-status
+- Компактный статус конфигурации.
+- Показывает «Конфигурация в порядке» или «Нужно исправить» и одну главную подсказку.
+
+.rzm-r13-price-chip
+- Сильный price chip справа в workbar.
+- Клик ведет на шаг «Заявка».
+
+.rzm-r13-scene-viewport
+- Контейнер визуализации.
+- Дает стабильный размер сцены, фон-сетку и clipping.
+
+.rzm-r13-scene-meta
+- Нижняя компактная строка сцены.
+- Показывает размеры и выбранные материалы без отдельной правой price card.
+
+.rzm-stage-r13-class-inventory
+- Marker-класс только для инвентаризации CSS.
+
+Измененные/затронутые существующие классы через scoped selectors:
+
+.rzm-r13-stepper-shell nav
+- Переопределена сетка HorizontalStepper внутри нового stepper shell.
+
+.rzm-r13-stepper-shell nav > button
+- Нормализована ширина, высота, radius и states stepper-кнопок внутри Stage R13.
+
+.rzm-r13-sidebar-card [data-configurator-step]
+- Активный шаг теперь получает стабильную высоту внутри sidebar.
+
+.rzm-r13-sidebar-card [data-configurator-step] > div:nth-child(2)
+- Контент шага скроллится внутри панели.
+
+.rzm-r13-sidebar-card [data-configurator-step] > div:nth-child(3)
+- Нижние actions шага закреплены визуально внизу панели.

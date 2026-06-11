@@ -1,0 +1,66 @@
+Stage R14 — Ordinary mode simplification
+Date: 2026-06-09
+
+Planned scope:
+1. Make the ordinary filling step much shorter and less technical.
+2. Keep advanced section/compartment editing only behind the precision mode toggle.
+3. Reduce duplicated validation messages in the sidebar.
+4. Keep pricing, order flow, checkout, API, backend, Supabase and admin untouched.
+5. Keep desktop-first scope; do not work on mobile UX.
+
+Done:
+1. Rebuilt FillingStep into a simpler ordinary-mode flow:
+   - current target summary;
+   - compact precision-mode toggle;
+   - section picker;
+   - compartment picker;
+   - shelves/drawers/rod controls;
+   - facade/handle controls;
+   - one primary issue block.
+2. Moved advanced filling presets, compartment count, layout preview and selected compartment editor behind precision mode.
+3. Reduced ordinary-mode validation output to the main blocking message; secondary messages are shown only in precision mode.
+4. Reworked AdvancedLayoutToggle into a compact mode row instead of a large explanatory card.
+5. Added Stage R14 CSS layer for compact cards, shorter controls, cleaner warning presentation and reduced sidebar text density.
+6. Added stage marker class rzm-stage-r14-simple-mode to ConfiguratorPage.
+
+Files changed:
+- src/configurator/steps/FillingStep.tsx
+- src/configurator/steps/AdvancedLayoutToggle.tsx
+- src/configurator/ConfiguratorPage.tsx
+- src/styles/constructor.css
+
+Not changed:
+- pricing engine;
+- order creation;
+- checkout flow;
+- API;
+- backend;
+- Supabase;
+- admin;
+- export logic;
+- core 2D renderer;
+- Three.js renderer.
+
+QA passed:
+- npm run typecheck
+- npm run build
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:browser-smoke-static
+- npm run test:layout-state
+- npm run test:compartment-ui
+- npm run test:layout-validation
+
+QA not passed:
+- npm run test:browser-smoke
+
+Reason:
+Playwright Chromium binary is missing in the sandbox environment:
+/home/oai/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+This is an environment limitation, not a confirmed application-code failure.
+
+Known risks / open items:
+1. Visual verification in a real desktop browser is still required, because the sandbox cannot run Chromium.
+2. 2D renderer still needs a dedicated Stage R15 rewrite to become a professional drawing renderer.
+3. Materials step still needs Stage R16 cleanup.
+4. Three.js runtime still needs local browser confirmation.

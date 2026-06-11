@@ -1,0 +1,325 @@
+/* Stage Q5 — Filling step polish */
+.rzm-3d-shell--q5 .rzm-q5-fill-polish {
+  gap: 14px;
+}
+
+.rzm-q5-empty-selection,
+.rzm-q5-active-target,
+.rzm-q5-panel-section {
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 22px;
+  padding: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.rzm-q5-empty-selection {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.rzm-q5-empty-selection__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 114, 76, 0.12);
+  color: #ff724c;
+  font-size: 24px;
+  font-weight: 760;
+}
+
+.rzm-q5-empty-selection span,
+.rzm-q5-active-target span,
+.rzm-q5-section-header span {
+  display: block;
+  color: rgba(42, 44, 65, 0.58);
+  font-size: 11px;
+  font-weight: 760;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.rzm-q5-empty-selection strong,
+.rzm-q5-active-target strong,
+.rzm-q5-section-header strong {
+  display: block;
+  margin-top: 3px;
+  color: #2a2c41;
+  font-size: 14px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.rzm-q5-empty-selection p,
+.rzm-q5-active-target small,
+.rzm-q5-section-header small,
+.rzm-q5-empty-zone {
+  margin: 6px 0 0;
+  color: rgba(42, 44, 65, 0.64);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.rzm-q5-active-target {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.rzm-q5-active-target small {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.rzm-q5-section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.rzm-q5-add-hint {
+  border: 1px dashed rgba(255, 114, 76, 0.34);
+  background: rgba(255, 114, 76, 0.08);
+  border-radius: 18px;
+  padding: 12px;
+  color: rgba(42, 44, 65, 0.68);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.rzm-q5-add-menu {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rzm-q5-counter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rzm-q5-counter-grid > div {
+  border: 1px solid rgba(42, 44, 65, 0.08);
+  border-radius: 16px;
+  padding: 10px;
+  background: rgba(244, 244, 248, 0.74);
+}
+
+.rzm-q5-counter-grid span {
+  display: block;
+  color: rgba(42, 44, 65, 0.56);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rzm-q5-counter-grid strong {
+  display: block;
+  margin-top: 3px;
+  color: #2a2c41;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.rzm-q5-zone-elements {
+  display: grid;
+  gap: 8px;
+}
+
+.rzm-q5-element-row {
+  padding: 10px 10px 10px 12px;
+  border-radius: 16px;
+}
+
+.rzm-q5-element-row button {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+}
+
+.rzm-q5-zone-buttons {
+  display: grid;
+  gap: 8px;
+}
+
+.rzm-q5-zone-buttons button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px 10px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid rgba(42, 44, 65, 0.09);
+  border-radius: 18px;
+  background: rgba(244, 244, 248, 0.66);
+  color: #2a2c41;
+  padding: 11px 12px;
+  cursor: pointer;
+}
+
+.rzm-q5-zone-buttons button.is-active {
+  border-color: rgba(255, 114, 76, 0.72);
+  box-shadow: 0 0 0 3px rgba(255, 114, 76, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.rzm-q5-zone-buttons button span {
+  justify-self: end;
+  color: rgba(42, 44, 65, 0.58);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rzm-q5-zone-buttons button small {
+  grid-column: 1 / -1;
+  color: rgba(42, 44, 65, 0.62);
+  font-size: 11px;
+}
+
+.rzm-q5-validation-block .rzm-3d-validation-assist {
+  margin-top: 8px;
+}
+
+.rzm-q5-advanced-toggle {
+  margin-top: 2px;
+}
+
+/* Stage Q5 — filling step polish */
+.rzm-3d-page[data-stage="Q5"] .rzm-3d-drawer-body.rzm-3d-fill-polish {
+  gap: 14px;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-empty-state,
+.rzm-3d-shell--q5 .rzm-3d-fill-section {
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-empty-state {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  background: linear-gradient(180deg, rgba(255, 244, 238, 0.82), rgba(255, 255, 255, 0.74));
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-empty-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #ff724c;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+  box-shadow: 0 14px 30px rgba(255, 114, 76, 0.26);
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-empty-state h2,
+.rzm-3d-shell--q5 .rzm-3d-fill-section h2 {
+  margin: 0;
+  color: #2a2c41;
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: -0.035em;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-empty-state p,
+.rzm-3d-shell--q5 .rzm-3d-fill-empty-state li,
+.rzm-3d-shell--q5 .rzm-3d-fill-empty-copy,
+.rzm-3d-shell--q5 .rzm-3d-fill-hint {
+  color: rgba(42, 44, 65, 0.62);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-empty-state ul {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-section-header span {
+  display: block;
+  margin-bottom: 3px;
+  color: rgba(42, 44, 65, 0.54);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-section-header strong,
+.rzm-3d-shell--q5 .rzm-3d-fill-section-header small {
+  color: rgba(42, 44, 65, 0.62);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-active-meta,
+.rzm-3d-shell--q5 .rzm-3d-fill-counters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-active-meta span,
+.rzm-3d-shell--q5 .rzm-3d-fill-counters span {
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 999px;
+  background: rgba(244, 244, 248, 0.76);
+  padding: 7px 10px;
+  color: rgba(42, 44, 65, 0.72);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-add-menu--q5 {
+  grid-template-columns: 1fr;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-add-menu--q5 button {
+  min-height: 58px;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-add-menu--q5 small {
+  text-align: right;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-zone-list,
+.rzm-3d-shell--q5 .rzm-3d-elements-list {
+  border: 1px solid rgba(42, 44, 65, 0.1);
+}
+
+.rzm-3d-shell--q5 .rzm-3d-elements-list .rzm-3d-element-row {
+  border-radius: 16px;
+  padding: 9px 10px 9px 12px;
+}
+
+.rzm-3d-shell--q5 .rzm-3d-fill-check .rzm-3d-validation-card {
+  margin-top: 8px;
+}
+
+/* Stage Q8.1 — cumulative visual scope repair
+   Q6/Q7/Q8 visual polish now targets stable component classes, not transient stage shell modifiers. */

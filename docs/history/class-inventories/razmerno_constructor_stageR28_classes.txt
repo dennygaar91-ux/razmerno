@@ -1,0 +1,52 @@
+Stage R28 — Checkout QA Polish: список классов
+
+Добавленные/изменённые stage scope:
+- rzm-stage-r28-checkout-qa-polish — общий scope Stage R28 на странице конструктора; ограничивает новые checkout-правки финальным шагом.
+- rzm-r28-checkout-shell — внешний контейнер финального шага заявки.
+- rzm-r28-checkout-topbar — верхняя панель checkout со stepper, заголовком и итоговой ценой.
+- rzm-r28-checkout-titlebar — строка заголовка и price chip в checkout.
+- rzm-r28-topbar-price — верхний price chip итоговой стоимости.
+- rzm-r28-checkout-grid — desktop-grid финального шага: форма + sticky action panel.
+
+Checkout flow:
+- rzm-r28-checkout-flow — основной поток карточек checkout.
+- rzm-r28-section-head — уплотнённый header карточек checkout.
+- rzm-r28-required — компактный индикатор заполненности обязательных контактных полей.
+
+Контакты:
+- rzm-r28-contact-card — карточка контактных данных.
+- rzm-r28-contact-grid — сетка полей имя/телефон/email.
+
+Доставка и сборка:
+- rzm-r28-options-card — карточка дополнительных услуг.
+- rzm-r28-options-grid — grid двух toggle-опций.
+- rzm-r28-option — единая строка услуги доставка/сборка.
+- rzm-r28-checkout-address — поле адреса доставки, раскрывается только при включённой доставке.
+
+Смета:
+- rzm-r28-price-card — карточка итоговой стоимости.
+- rzm-r28-price-summary — строка заголовка сметы и крупного итога.
+- rzm-r28-muted-line — короткое пояснение к смете.
+- rzm-r28-pricing-notice — компактное сообщение о режиме прайса.
+- rzm-r28-price-list — компактная разбивка материалов/фурнитуры/работ/доставки.
+
+Согласие:
+- rzm-r28-consent-card — карточка согласия.
+- rzm-r28-consent-row — строка чекбокса согласия с коротким пояснением.
+
+Сводка проекта:
+- rzm-r28-review-card — компактная карточка «Что отправится менеджеру».
+- rzm-r28-review-details — collapsible details/summary для сводки проекта.
+- rzm-r28-review-list — скрытая до раскрытия детальная сводка проекта.
+- rzm-r28-material-strip — скрытая до раскрытия сводка материалов.
+
+Правая action panel:
+- rzm-r28-action-panel — sticky-панель отправки заявки.
+- rzm-r28-final-price — блок состояния заявки и итоговой стоимости.
+- rzm-r28-next-list — короткий список «что будет после заявки».
+
+Инвентарь:
+- rzm-stage-r28-class-inventory — служебный marker для фиксации stage CSS.
+
+Изменённые общие компоненты:
+- ContactField получил необязательные props type/inputMode/autoComplete/aria-invalid для корректных checkout-полей.

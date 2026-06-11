@@ -1,0 +1,61 @@
+Stage Constructor 16 — pricing cleanup and single production preview source
+
+1. Context
+The stage cleans up the Stage 15 panel-based pricing integration before moving deeper into production pricing. The main issue was duplicated production preview construction: useConstructorQuote built a production export to calculate panel-based material/edge price, and useProductionPreview built another production export for debug/snapshot sync.
+
+2. Found
+- useConstructorQuote dynamically built production preview and panel pricing inside the hook.
+- useProductionPreview rebuilt the same production preview and panel pricing for debug/store sync.
+- QuoteState did not carry the production preview that was already needed for panel pricing.
+- Production panel pricing application was spread across hook code instead of one helper.
+
+3. Changed
+- Added src/static-pages/constructor/adapters/productionPricingPreview.ts.
+- Added buildConstructorProductionPricingBundle(), a shared helper that builds:
+  - production preview;
+  - panel pricing summary;
+  - controlled application of panel pricing to catalog price.
+- Extended QuoteState with productionPreview.
+- useConstructorQuote now uses the shared helper and stores quote.productionPreview + quote.productionPanelPricing.
+- useProductionPreview now prefers quote.productionPreview and only falls back to building through the shared helper if a legacy quote has no preview.
+- Added a test that checks the shared bundle returns preview, panel pricing and production-panel price application.
+
+4. Not changed
+- Checkout submit flow.
+- Backend/API.
+- Supabase.
+- Admin.
+- Delivery/assembly rules.
+- Production export internals.
+- Numeric pricing formula from Stage 15.
+- UI layout/CSS.
+
+5. Review plan vs fact
+Planned: remove duplicated quote/debug preview construction and centralize panel-pricing build.
+Done: one helper is now the shared source for preview + panel-pricing + panel-price application. Debug preview sync uses the quote-owned preview instead of rebuilding during the normal flow.
+
+6. Risks
+Low-to-medium. The stage touches quote/debug plumbing but not checkout submit or backend. There is still a fallback path in useProductionPreview for old QuoteState objects without productionPreview; this is intentional for compatibility.
+
+7. Checks run
+Passed:
+- node --no-warnings --import tsx src/static-pages/constructor/adapters/productionPreviewAdapter.test.ts
+- node --no-warnings --import tsx src/pricing/productionPanelPricing.test.ts
+- node --no-warnings --import tsx src/pricing/materialPricingTransparency.test.ts
+- node --no-warnings --import tsx src/pricing/materialPricing.test.ts
+- npm run test:constructor-store
+- npm run test:constructor-payload
+- npm run test:constructor-flow
+- npm run test:constructor-draft
+
+Partial TypeScript check:
+- tsc on changed files reached only the pre-existing import.meta.env errors in src/shared/lib/analytics.ts and src/shared/lib/order.ts.
+
+Not completed:
+- npm run build timed out in this container during Vite transform. No build error was emitted before timeout.
+- full npm run typecheck also did not complete in time in this container.
+
+8. Remaining backlog
+- Remove the old import.meta.env API typecheck issue separately.
+- Later: remove production preview fallback once QuoteState productionPreview is guaranteed everywhere.
+- Later: move services/hardware pricing to production model when manufacturing rules are more precise.

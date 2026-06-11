@@ -1,0 +1,25 @@
+Stage R14 class inventory
+
+Changed / added classes:
+- rzm-stage-r14-simple-mode: page-level marker for Stage R14 ordinary-mode simplification; attached to ConfiguratorPage root.
+- rzm-r14-filling-flow: vertical layout for the simplified Filling step.
+- rzm-r14-current-target: compact summary of selected section/compartment and filling totals.
+- rzm-r14-card: shared compact card surface for ordinary-mode Filling step groups.
+- rzm-r14-precision-toggle: compact ordinary/precision mode switch row.
+- rzm-r14-counter-list: compact wrapper for shelves/drawers counters.
+- rzm-r14-switch-row: compact toggle row for rod/handles.
+- rzm-r14-primary-issue: one-message validation block for the main blocking issue.
+- rzm-r14-muted-note: quiet note for non-critical explanation in ordinary mode.
+- rzm-r14-advanced-card: wrapper for advanced-only precise section/compartment editing.
+- rzm-stage-r14-class-inventory: CSS marker confirming Stage R14 class inventory.
+
+Existing classes affected by Stage R14 CSS:
+- rzm-r13-sidebar-card: slightly tighter padding and text-density rules inside the desktop sidebar.
+- rzm-r13-scene-status: long error text is constrained to avoid turning the top bar into an error wall.
+- rzm-status: reduced visual density inside the sidebar.
+- rzm-assembly-cue: hidden in Stage R14 simplified sidebar to reduce noise.
+
+Block usage:
+- Filling step ordinary mode: rzm-r14-filling-flow, rzm-r14-current-target, rzm-r14-card, rzm-r14-counter-list, rzm-r14-switch-row, rzm-r14-primary-issue, rzm-r14-muted-note.
+- Filling step precision mode: rzm-r14-advanced-card plus existing advanced layout components.
+- Global constructor page: rzm-stage-r14-simple-mode.

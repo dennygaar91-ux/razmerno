@@ -1,0 +1,33 @@
+Stage R29 — Desktop E2E Tests + Cleanup
+
+Scope:
+- Add final desktop E2E coverage for the stabilized constructor path.
+- Keep mobile outside current scope.
+- Remove safely unused checkout components.
+- Improve accessibility labels on shared +/- controls.
+- Do not touch pricing, order flow, API/backend/Supabase, admin/export, production logic, 2D geometry, or Three.js runtime.
+
+Planned tasks and completion:
+1. Add R29 stage scope marker — 100%.
+2. Add accessible labels to MiniControl controls — 100%.
+3. Expand Playwright desktop tests for dimensions/filling/materials/checkout — 100%.
+4. Add checkout options interaction coverage — 100%.
+5. Keep mobile smoke outside desktop scope — 100%.
+6. Remove unused checkout components — 100%.
+7. Add static guard for R29 changes — 100%.
+
+Changed files:
+- src/static-pages/ConstructorPage.tsx
+- src/static-pages/constructor/components/shared.tsx
+- tests/browser/configurator.spec.ts
+- scripts/browser-smoke-static.mjs
+- scripts/check-stage-r29-final.mjs
+- package.json
+
+Removed files:
+- src/static-pages/constructor/components/CheckoutNextCard.tsx
+- src/static-pages/constructor/components/CheckoutSummaryCard.tsx
+
+Notes:
+- Browser E2E remains intended for the user's local environment because the sandbox Playwright Chromium binary is unavailable/unstable.
+- Static/unit/build checks validate that the desktop test contract and cleanup were applied.

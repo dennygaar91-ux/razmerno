@@ -1,0 +1,24 @@
+Stage N2 — classes and affected selectors
+
+Added / changed in current stage:
+- .rzm-3d-page[data-stage="N2"] — stage scope for new 3D realistic model foundation; used on Constructor3DPage root.
+- .rzm-3d-page[data-stage="N2"] .rzm-3d-viewport — stronger studio scene background and larger viewport for product-preview perception.
+- .rzm-3d-page[data-stage="N2"] .rzm-three-viewer--product canvas — cursor treatment for 3D scene.
+- .rzm-3d-page[data-stage="N2"] .rzm-3d-toolbar strong — protects long dimension/title text from breaking toolbar.
+- .rzm-3d-page[data-stage="N2"] .rzm-3d-webgl-pill.is-ready::before — small ready-dot for WebGL status.
+- .rzm-3d-page[data-stage="N2"] .rzm-3d-random-chip — softened random-chip appearance inside scene.
+
+Existing classes reused:
+- .rzm-3d-page — root 3D-first page surface.
+- .rzm-3d-shell — main constructor shell.
+- .rzm-3d-stagebar — top stepper/status row.
+- .rzm-3d-stepper / .rzm-3d-step — 4-step constructor navigation.
+- .rzm-3d-workspace — drawer + scene grid.
+- .rzm-3d-drawer — floating settings drawer.
+- .rzm-3d-drawer-footer — sticky price/CTA zone.
+- .rzm-3d-scene-card — large 3D scene card.
+- .rzm-3d-toolbar — scene title + camera switch.
+- .rzm-3d-view-switch — camera controls: free/front/side/top.
+- .rzm-3d-viewport — 3D viewport container.
+- .rzm-3d-random-chip — future preset chip in lower-left viewport corner.
+- .rzm-three-viewer / .rzm-three-viewer--product — Three.js viewer wrapper.

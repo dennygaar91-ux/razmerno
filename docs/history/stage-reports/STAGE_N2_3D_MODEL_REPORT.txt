@@ -1,0 +1,41 @@
+Stage N2 — Stable 3D scene + realistic wardrobe base
+
+Planned scope:
+1. Improve the existing Three.js model used by the new Constructor3DPage.
+2. Make the wardrobe preview look closer to furniture/product render rather than a blocky schematic.
+3. Add visible furniture details: opened/offset facades, handles, hinges, drawer sides, drawer slides, rods, screw caps, legs and plinth.
+4. Keep the new Constructor3DPage route isolated from the old /configurator.
+5. Do not touch pricing, orders, API/backend/Supabase/admin/export, checkout submit-flow, or mobile UX.
+
+Implemented:
+1. Reworked threeSceneAdapter model generation.
+2. Added panel rotation support for facade leaves and hardware.
+3. Added hinged facade leaves with slight opening angle so internal filling remains readable.
+4. Added door hinges, handles, drawer side boxes, drawer slides, rod brackets, screw caps, four legs and front plinth.
+5. Updated ThreeFurniturePanels renderer to support rotated box panels and cylindrical parts for rods, handles, hinges, screws and legs.
+6. Added Stage N2 visual scope in constructor3d.css for a stronger studio viewport.
+7. Added Stage N2 static guard script.
+8. Added Stage N2 adapter test that checks facades, hinges, slides, drawer sides, screw caps and legs.
+
+Checks passed:
+- npm run check:stage-n2-3d-model
+- npm run check:stage-n1-3d-foundation
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:browser-smoke-static
+- targeted TypeScript check for Constructor3DPage and Three.js files
+- npm run test:layout-state
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+Checks not fully confirmed in sandbox:
+- npm run typecheck timed out without TypeScript error output.
+- npm run build transformed modules but timed out in sandbox before completion.
+
+Open risks:
+- Real browser visual/runtime verification is still required locally.
+- N2 improves model realism but does not yet add 3D click-selection; that belongs to N3.
+- The real material texture visual quality depends on available texture assets and browser GPU/WebGL state.
+
+Next stage:
+N3 — 3D selection system: raycasting, hover/selected states, numbered labels, and showing + only after the user selects a section/zone.

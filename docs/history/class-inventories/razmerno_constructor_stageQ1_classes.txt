@@ -1,0 +1,76 @@
+Stage Q1 — CTA, UI Kit Foundation, Accessibility Base
+
+Новые / изменённые классы:
+
+1. .rzm-3d-page[data-stage="Q1"]
+   Область новой 3D-first страницы после Q1. Задаёт stage marker и локальные UI-токены для конструктора.
+   Используется в: src/static-pages/Constructor3DPage.tsx, src/styles/constructor3d.css.
+   Статус: добавлен/изменён в Q1.
+
+2. .rzm-3d-shell--q1
+   Маркер оболочки Q1 для статических проверок и визуального scope новой 3D-ветки.
+   Используется в: корневой section Constructor3DPage.
+   Статус: добавлен в Q1.
+
+3. .rzm-ui-btn
+   Базовый UI Kit класс для интерактивных кнопок: transition, appearance reset, единая модель hover/focus.
+   Используется в: stepper, primary CTA, secondary CTA, icon controls, random chip.
+   Статус: добавлен в Q1.
+
+4. .rzm-ui-btn--primary
+   Primary CTA. Оранжевый брендовый стиль для главного действия: Далее / Отправить заявку.
+   Используется в: нижний CTA drawer и checkout submit.
+   Статус: добавлен в Q1.
+
+5. .rzm-ui-btn--secondary
+   Вторичное действие. Используется для кнопки Назад, чтобы она не конкурировала с primary CTA.
+   Используется в: нижний action bar drawer.
+   Статус: добавлен в Q1.
+
+6. .rzm-ui-btn--ghost
+   Нейтральная кнопка/chip поверх сцены.
+   Используется в: чип Рандомно.
+   Статус: добавлен в Q1.
+
+7. .rzm-ui-btn--icon
+   Единый стиль кнопок ± с hit-zone 44×44 px и доступными aria-label/title.
+   Используется в: NumberControl.
+   Статус: добавлен в Q1.
+
+8. .rzm-3d-action-help
+   Короткое пояснение под primary CTA: почему кнопка недоступна или что произойдёт при отправке.
+   Используется в: drawer footer.
+   Статус: добавлен в Q1.
+
+9. .rzm-3d-control-help
+   Дополнительная строка доступного описания диапазона значения для NumberControl.
+   Используется в: ширина, высота, глубина, секции и другие numeric controls.
+   Статус: добавлен в Q1.
+
+10. .rzm-3d-scene-legend
+    Небольшая подсказка поверх сцены «Вращайте модель мышкой».
+    Используется в: 3D viewport.
+    Статус: добавлен в Q1.
+
+11. :focus-visible правила внутри .rzm-3d-page[data-stage="Q1"]
+    Видимый focus ring для кнопок, полей, summary и ссылок.
+    Используется в: все интерактивные элементы 3D-конструктора.
+    Статус: добавлен в Q1.
+
+Изменённые существующие классы:
+
+12. .rzm-3d-drawer-actions button.is-primary
+    Усилен как настоящий primary CTA: оранжевый брендовый фон, shadow, hover, disabled.
+    Статус: изменён в Q1.
+
+13. .rzm-3d-checkout-submit
+    Приведён к тому же primary CTA стилю, что и нижняя кнопка drawer.
+    Статус: изменён в Q1.
+
+14. .rzm-3d-mini-control button
+    Увеличена hit-zone до 44 px, добавлены disabled states и единый focus.
+    Статус: изменён в Q1.
+
+15. .rzm-3d-step
+    Получил базовый UI button класс и более явный focus/active/done state через Q1 scope.
+    Статус: изменён в Q1.

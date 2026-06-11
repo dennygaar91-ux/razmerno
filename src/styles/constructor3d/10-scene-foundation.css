@@ -1,0 +1,32 @@
+/* Stage N2: stronger realistic 3D product preview foundation */
+.rzm-3d-page[data-stage="N2"] .rzm-3d-viewport {
+  min-height: 660px;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.98), rgba(246,243,238,.84) 46%, rgba(229,224,216,.95) 100%),
+    linear-gradient(180deg, #f8f5ef 0%, #eee9df 100%);
+}
+
+.rzm-3d-page[data-stage="N2"] .rzm-three-viewer--product canvas {
+  cursor: grab;
+}
+
+.rzm-3d-page[data-stage="N2"] .rzm-3d-toolbar strong {
+  max-width: 620px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rzm-3d-page[data-stage="N2"] .rzm-3d-webgl-pill.is-ready::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.rzm-3d-page[data-stage="N2"] .rzm-3d-random-chip {
+  background: rgba(255,255,255,.9);
+}
+

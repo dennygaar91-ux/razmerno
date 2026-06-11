@@ -1,0 +1,85 @@
+Stage R12 — desktop constructor emergency stabilization
+Дата: 2026-06-09
+
+Вопросы перед стартом Stage R12:
+- Блокирующих вопросов не было: пользователь уже утвердил направление — диагностика 3D, честный 2D fallback, desktop-first, без mobile, без изменения pricing/order/backend.
+- Решений пользователя на этом этапе не требовалось.
+
+Что планировалось:
+1. Начать с безопасного исправления критичных UX/layout-багов конструктора.
+2. Не трогать pricing, заявки, checkout-flow, API, backend, Supabase, order export.
+3. Сделать 3D/WebGL fallback честнее: убрать ложное состояние, где 2D выглядит как 3D.
+4. Сократить визуальную длину левой панели и убрать дублирование ошибок.
+5. Стабилизировать desktop layout: sidebar не должен растягивать всю страницу бесконечной колонкой.
+6. Уменьшить шум шага «Наполнение»: спрятать часть точной настройки и вторичных ошибок.
+
+Что сделано:
+1. Добавлена диагностика WebGL:
+   - новый тип WebGLDiagnostics;
+   - статус checking / available / unavailable;
+   - причина unavailable теперь сохраняется в reason;
+   - проверка WebGL больше не выглядит как финальная недоступность до окончания client-side detection.
+2. ConstructorScene теперь получает webglDiagnostics и отличает:
+   - проверку WebGL;
+   - ручной 2D;
+   - реальную недоступность WebGL;
+   - ошибку Three.js runtime.
+3. Fallback-note стал честнее:
+   - manual 2D больше не показывает тревожную плашку;
+   - при webgl-unavailable показывается причина;
+   - при checking показывается временный нейтральный статус.
+4. Упрощён ConstructorValidationPanel:
+   - вместо стены ошибок показывается одна главная ошибка текущего шага;
+   - остальные ошибки доступны через компактную кнопку «Ещё …»;
+   - valid-состояние стало компактным.
+5. Упрощён шаг «Наполнение»:
+   - «Отсеки по высоте» перенесены в точную настройку;
+   - список нескольких fill-ошибок скрыт из обычного режима;
+   - блок «Фасады» сокращён;
+   - карточки выбора секции/отсека стали компактнее через CSS.
+6. Добавлен emergency CSS-слой Stage R12:
+   - desktop shell шире и стабильнее;
+   - левая панель ограничена по высоте viewport;
+   - содержимое шага внутри sidebar скроллится, а кнопки действий остаются внизу панели;
+   - scene workbar разложен по сетке;
+   - 2D blueprint очищен от лишней декоративности;
+   - material-note вынесен визуально аккуратнее;
+   - validation compact styles добавлены отдельно.
+
+Что не сделано на этом Stage:
+1. Полностью не переписан 2D Drawing Renderer — сделан только emergency visual cleanup.
+2. Полностью не пересобран desktop shell в новую компонентную архитектуру — только стабилизация без риска для логики.
+3. Реальный браузерный runtime Three.js не подтверждён через Playwright, потому что в sandbox отсутствует Chromium binary.
+4. Checkout не трогался.
+5. Mobile не трогался.
+
+Файлы изменены:
+- src/static-pages/constructor/three/useWebGLAvailable.ts
+- src/static-pages/constructor/components/ConstructorScene.tsx
+- src/static-pages/constructor/components/ConstructorSceneCanvas.tsx
+- src/static-pages/constructor/components/ConstructorValidationPanel.tsx
+- src/static-pages/constructor/components/FillStep.tsx
+- src/styles/constructor.css
+- STAGE_R12_DESKTOP_STABILIZATION_REPORT.txt
+- razmerno_constructor_stageR12_classes.txt
+
+Проверки:
+- npm run typecheck — passed
+- npm run build — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:browser-smoke-static — passed
+- npm run test:browser-smoke — failed из-за окружения: Playwright Chromium binary отсутствует в sandbox.
+
+Отчёт по ошибкам:
+1. Browser smoke tests не запустились: отсутствует /home/oai/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell.
+2. Попытка установить Chromium через npx playwright install chromium не удалась из-за network/DNS ошибки EAI_AGAIN cdn.playwright.dev.
+3. Это не доказывает runtime-исправность 3D в реальном браузере. Нужно проверить локально в Chrome/Edge через DevTools Console.
+
+Риски:
+1. CSS-файл уже содержит много исторических override-слоёв. Stage R12 добавляет безопасный финальный слой, но долгосрочно нужен cleanup после стабилизации визуала.
+2. Если WebGL реально недоступен на устройстве пользователя, 3D не должен включаться — теперь это состояние честнее, но визуально надо довести 2D до полноценного чертежа на следующем Stage.
+3. Если Three.js падает из-за runtime-ошибки, в sandbox это нельзя подтвердить без браузера; нужно получить console error из локального запуска.
+
+Следующий рекомендуемый Stage:
+Stage R13 — полноценная пересборка desktop shell и верхней панели сцены без точечных патчей.

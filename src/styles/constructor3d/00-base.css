@@ -1,0 +1,556 @@
+.rzm-3d-page {
+  min-height: 100vh;
+  padding: 118px 24px 34px;
+  background:
+    radial-gradient(circle at 78% 10%, rgba(255, 114, 76, 0.13), transparent 30%),
+    linear-gradient(180deg, #f7f5f0 0%, #f4f4f8 100%);
+  color: var(--rzm-dark, #2a2c41);
+}
+
+.rzm-3d-shell {
+  width: min(1440px, calc(100vw - 48px));
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.rzm-3d-stagebar,
+.rzm-3d-drawer,
+.rzm-3d-scene-card {
+  border-radius: 34px;
+  background: rgba(255,255,255,.72);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.78), 0 24px 70px rgba(42,44,65,.08);
+  backdrop-filter: blur(24px) saturate(1.18);
+}
+
+.rzm-3d-stagebar {
+  min-height: 74px;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+}
+
+.rzm-3d-stepper,
+.rzm-3d-stagebar-meta,
+.rzm-3d-toolbar,
+.rzm-3d-view-switch,
+.rzm-3d-drawer-actions,
+.rzm-3d-type-grid,
+.rzm-3d-section-pills {
+  display: flex;
+  align-items: center;
+}
+
+.rzm-3d-stepper {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rzm-3d-step {
+  border: 0;
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 0 15px 0 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255,255,255,.56);
+  color: rgba(42,44,65,.64);
+  font-size: 13px;
+  font-weight: 760;
+  letter-spacing: -.02em;
+  cursor: pointer;
+}
+
+.rzm-3d-step span {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(42,44,65,.07);
+  font-size: 12px;
+}
+
+.rzm-3d-step.is-active {
+  background: #2a2c41;
+  color: #fff;
+}
+
+.rzm-3d-step.is-active span {
+  background: rgba(255,255,255,.16);
+}
+
+.rzm-3d-step.is-done {
+  color: #2a2c41;
+}
+
+.rzm-3d-stagebar-meta {
+  gap: 10px;
+}
+
+.rzm-3d-stagebar-meta strong,
+.rzm-3d-drawer-footer strong {
+  font-size: 22px;
+  letter-spacing: -.05em;
+}
+
+.rzm-3d-webgl-pill {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(42,44,65,.07);
+  color: rgba(42,44,65,.72);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.rzm-3d-webgl-pill.is-ready {
+  background: rgba(89, 148, 98, .13);
+  color: #315b38;
+}
+
+.rzm-3d-workspace {
+  min-height: calc(100vh - 226px);
+  display: grid;
+  grid-template-columns: minmax(300px, 350px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.rzm-3d-drawer {
+  position: sticky;
+  top: 116px;
+  height: calc(100vh - 152px);
+  padding: 16px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.rzm-3d-drawer-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 2px 4px 12px 2px;
+  display: grid;
+  gap: 13px;
+}
+
+.rzm-3d-step-intro span {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 28px;
+  align-items: center;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: rgba(255,114,76,.12);
+  color: #a9472d;
+  font-size: 10px;
+  font-weight: 830;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-step-intro h1 {
+  margin: 12px 0 0;
+  font-size: 31px;
+  line-height: .94;
+  letter-spacing: -.06em;
+}
+
+.rzm-3d-step-intro p {
+  margin: 9px 0 0;
+  color: rgba(42,44,65,.62);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.rzm-3d-type-grid {
+  gap: 8px;
+}
+
+.rzm-3d-type-grid button,
+.rzm-3d-section-pills button,
+.rzm-3d-view-switch button,
+.rzm-3d-drawer-actions button,
+.rzm-3d-random-chip {
+  border: 0;
+  border-radius: 999px;
+  background: rgba(42,44,65,.07);
+  color: #2a2c41;
+  font-weight: 780;
+  cursor: pointer;
+}
+
+.rzm-3d-type-grid button {
+  min-height: 42px;
+  padding: 0 14px;
+}
+
+.rzm-3d-type-grid button.is-active,
+.rzm-3d-section-pills button.is-active,
+.rzm-3d-view-switch button.is-active {
+  background: #2a2c41;
+  color: #fff;
+}
+
+.rzm-3d-control-row,
+.rzm-3d-selection-card,
+.rzm-3d-add-card,
+.rzm-3d-validation,
+.rzm-3d-material-picker,
+.rzm-3d-toggle-row,
+.rzm-3d-text-input {
+  border-radius: 22px;
+  background: rgba(255,255,255,.74);
+  box-shadow: inset 0 0 0 1px rgba(229,231,239,.78);
+}
+
+.rzm-3d-control-row {
+  min-height: 70px;
+  padding: 12px 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.rzm-3d-control-row span,
+.rzm-3d-selection-card span,
+.rzm-3d-drawer-footer span {
+  display: block;
+  color: rgba(42,44,65,.56);
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.rzm-3d-control-row strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 20px;
+  letter-spacing: -.05em;
+}
+
+.rzm-3d-mini-control {
+  display: flex;
+  gap: 6px;
+}
+
+.rzm-3d-mini-control button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: #2a2c41;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rzm-3d-selection-card,
+.rzm-3d-add-card {
+  padding: 14px;
+}
+
+.rzm-3d-selection-card strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 22px;
+  letter-spacing: -.05em;
+}
+
+.rzm-3d-selection-card small,
+.rzm-3d-add-card p {
+  color: rgba(42,44,65,.58);
+  font-size: 12px;
+  line-height: 1.42;
+}
+
+.rzm-3d-section-pills {
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.rzm-3d-section-pills button {
+  width: 40px;
+  height: 40px;
+}
+
+.rzm-3d-add-card {
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.rzm-3d-plus-preview {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ff724c, #fdbf50);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 820;
+}
+
+.rzm-3d-material-picker {
+  padding: 12px;
+}
+
+.rzm-3d-material-picker h2 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: -.02em;
+}
+
+.rzm-3d-material-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rzm-3d-material-list button {
+  border: 0;
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 28px minmax(0,1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 16px;
+  background: rgba(244,244,248,.78);
+  text-align: left;
+  cursor: pointer;
+}
+
+.rzm-3d-material-list button.is-active {
+  box-shadow: inset 0 0 0 1.5px rgba(255,114,76,.72);
+  background: #fff;
+}
+
+.rzm-3d-material-list button > span {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(42,44,65,.08);
+}
+
+.rzm-3d-material-list strong,
+.rzm-3d-material-list small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rzm-3d-material-list small {
+  color: rgba(42,44,65,.52);
+  font-size: 11px;
+  font-weight: 740;
+}
+
+.rzm-3d-toggle-row {
+  min-height: 56px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 760;
+}
+
+.rzm-3d-text-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 14px;
+  border: 0;
+  color: #2a2c41;
+}
+
+.rzm-3d-validation {
+  padding: 13px 14px;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.rzm-3d-drawer-footer {
+  border-radius: 26px;
+  padding: 13px;
+  background: #2a2c41;
+  color: #fff;
+}
+
+.rzm-3d-drawer-footer span {
+  color: rgba(255,255,255,.66);
+}
+
+.rzm-3d-drawer-actions {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.rzm-3d-drawer-actions button {
+  min-height: 44px;
+  padding: 0 15px;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+}
+
+.rzm-3d-drawer-actions button.is-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #ff724c, #fdbf50);
+}
+
+.rzm-3d-drawer-actions button:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.rzm-3d-scene-card {
+  min-height: 100%;
+  padding: 14px;
+  display: grid;
+  grid-template-rows: auto minmax(0,1fr);
+  overflow: hidden;
+}
+
+.rzm-3d-toolbar {
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 6px 14px;
+}
+
+.rzm-3d-toolbar span {
+  display: block;
+  color: rgba(42,44,65,.52);
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-toolbar strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 18px;
+  letter-spacing: -.045em;
+}
+
+.rzm-3d-view-switch {
+  gap: 6px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgba(42,44,65,.06);
+}
+
+.rzm-3d-view-switch button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.rzm-3d-viewport {
+  position: relative;
+  min-height: 620px;
+  border-radius: 28px;
+  background: radial-gradient(circle at 50% 44%, rgba(255,255,255,.92), rgba(242,238,231,.7) 48%, rgba(235,231,224,.92));
+  overflow: hidden;
+}
+
+.rzm-3d-viewport .rzm-three-viewer {
+  position: absolute;
+  inset: 0;
+  min-height: 100%;
+  border-radius: 0;
+}
+
+.rzm-3d-viewport canvas {
+  outline: none;
+}
+
+.rzm-3d-random-chip {
+  position: absolute;
+  z-index: 5;
+  left: 18px;
+  bottom: 18px;
+  min-height: 42px;
+  padding: 0 18px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(42,44,65,.12), inset 0 0 0 1px rgba(229,231,239,.9);
+}
+
+.rzm-3d-loading,
+.rzm-3d-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 30px;
+}
+
+.rzm-3d-fallback {
+  place-content: center;
+  gap: 10px;
+}
+
+.rzm-3d-fallback span {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  background: #2a2c41;
+  color: #fff;
+  font-weight: 820;
+}
+
+.rzm-3d-fallback h2 {
+  margin: 10px 0 0;
+  font-size: 34px;
+  letter-spacing: -.06em;
+}
+
+.rzm-3d-fallback p {
+  max-width: 480px;
+  margin: 0 auto;
+  color: rgba(42,44,65,.62);
+  line-height: 1.55;
+}
+
+.rzm-3d-fallback a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 44px;
+  padding: 0 18px;
+  margin: 8px auto 0;
+  border-radius: 999px;
+  background: #2a2c41;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 780;
+}
+
+.rzm-3d-loading strong {
+  font-size: 24px;
+  letter-spacing: -.04em;
+}
+
+.rzm-3d-loading span {
+  color: rgba(42,44,65,.58);
+}
+
+@media (max-width: 1100px) {
+  .rzm-3d-workspace {
+    grid-template-columns: 320px minmax(0, 1fr);
+  }
+}
+
+

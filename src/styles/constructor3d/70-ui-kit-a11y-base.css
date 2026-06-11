@@ -1,0 +1,149 @@
+/* Stage Q1 — CTA, UI Kit foundation and accessibility base */
+.rzm-3d-page[data-stage="Q2"] {
+  --rzm-ui-primary: #ff724c;
+  --rzm-ui-primary-hover: #f35f38;
+  --rzm-ui-primary-soft: rgba(255, 114, 76, 0.14);
+  --rzm-ui-text: #2a2c41;
+  --rzm-ui-muted: rgba(42, 44, 65, 0.62);
+  --rzm-ui-border: rgba(42, 44, 65, 0.12);
+  --rzm-ui-focus: rgba(255, 114, 76, 0.32);
+}
+
+.rzm-ui-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease, opacity .16s ease;
+}
+
+.rzm-ui-btn:focus-visible,
+.rzm-3d-page[data-stage="Q2"] button:focus-visible,
+.rzm-3d-page[data-stage="Q2"] input:focus-visible,
+.rzm-3d-page[data-stage="Q2"] summary:focus-visible,
+.rzm-3d-page[data-stage="Q2"] a:focus-visible {
+  outline: 3px solid var(--rzm-ui-primary);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--rzm-ui-focus);
+}
+
+.rzm-ui-btn--primary,
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-drawer-actions button.is-primary,
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-checkout-submit {
+  background: linear-gradient(180deg, #ff845f 0%, var(--rzm-ui-primary) 100%);
+  color: #fff;
+  box-shadow: 0 16px 36px rgba(255, 114, 76, 0.28), inset 0 0 0 1px rgba(255,255,255,.22);
+  text-shadow: 0 1px 0 rgba(42,44,65,.12);
+}
+
+.rzm-ui-btn--primary:hover:not(:disabled),
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-drawer-actions button.is-primary:hover:not(:disabled),
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-checkout-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: linear-gradient(180deg, #ff906f 0%, var(--rzm-ui-primary-hover) 100%);
+}
+
+.rzm-ui-btn--secondary,
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-drawer-actions .rzm-ui-btn--secondary {
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.86);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+}
+
+.rzm-ui-btn--ghost,
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-random-chip {
+  background: rgba(255,255,255,.92);
+  color: var(--rzm-ui-text);
+  box-shadow: 0 16px 36px rgba(42,44,65,.12), inset 0 0 0 1px rgba(229,231,239,.9);
+}
+
+.rzm-ui-btn--icon,
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-mini-control button {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.rzm-3d-page[data-stage="Q2"] button:disabled,
+.rzm-3d-page[data-stage="Q2"] .rzm-ui-btn:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+  transform: none;
+  box-shadow: none;
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-drawer-footer {
+  background: linear-gradient(180deg, #34364e 0%, #2a2c41 100%);
+  box-shadow: 0 18px 42px rgba(42,44,65,.18), inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+.rzm-3d-action-help {
+  margin: 9px 2px 0;
+  color: rgba(255,255,255,.58);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-step.is-active {
+  background: #2a2c41;
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(42,44,65,.14);
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-step.is-done {
+  background: rgba(255,255,255,.82);
+  color: #2a2c41;
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-control-row {
+  align-items: center;
+  min-height: 82px;
+}
+
+.rzm-3d-control-help {
+  display: block;
+  margin-top: 4px;
+  color: rgba(42,44,65,.48);
+  font-size: 11px;
+  font-weight: 680;
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-mini-control {
+  gap: 8px;
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-field span b {
+  color: var(--rzm-ui-primary);
+  font-weight: 900;
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-field input {
+  min-height: 46px;
+}
+
+.rzm-3d-scene-legend {
+  position: absolute;
+  z-index: 6;
+  left: 18px;
+  top: 18px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 13px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.82);
+  color: rgba(42,44,65,.72);
+  box-shadow: 0 14px 34px rgba(42,44,65,.10), inset 0 0 0 1px rgba(255,255,255,.74);
+  backdrop-filter: blur(14px);
+  font-size: 12px;
+  font-weight: 780;
+  pointer-events: none;
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-random-chip {
+  bottom: 18px;
+}
+
+

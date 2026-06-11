@@ -1,0 +1,53 @@
+Stage N1 — New Constructor3DPage foundation
+
+Цель этапа:
+Создать новую 3D-first ветку конструктора рядом со старым legacy-конструктором, не продолжая старые CSS-слои R12–R29 и не меняя pricing/order/backend.
+
+Что сделано:
+1. Создана новая страница src/static-pages/Constructor3DPage.tsx.
+2. Добавлены маршруты:
+   - /configurator-3d
+   - /constructor-3d
+   - /constructor3d
+3. Старый /configurator оставлен без замены как legacy/rollback.
+4. Добавлен новый CSS foundation src/styles/constructor3d.css.
+5. Новая структура экрана:
+   - stepper над рабочей областью;
+   - floating drawer слева;
+   - большая 3D-сцена справа;
+   - цена и CTA внизу drawer;
+   - камеры Свободно / Спереди / Сбоку / Сверху;
+   - чип Рандомно в левом нижнем углу сцены.
+6. 3D-сцена использует существующий LazyThreeFurnitureViewer и WebGL diagnostics.
+7. Если WebGL/3D недоступен, показывается спокойный fallback с ссылкой на legacy-конструктор.
+8. Сохранено подключение к текущему zustand-состоянию, quote/pricing hook и draft lifecycle.
+9. Добавлен static guard scripts/check-stage-n1-3d-foundation.mjs.
+10. Добавлен npm script check:stage-n1-3d-foundation.
+
+Что сознательно не делалось:
+- Не заменял /configurator на новый 3D-конструктор.
+- Не трогал pricing engine.
+- Не трогал отправку заявки.
+- Не трогал API/backend/Supabase/admin/export.
+- Не внедрял клики по 3D-модели — это Stage N3.
+- Не внедрял логику зон/полок/+ — это Stage N4.
+- Не внедрял реальные текстуры — это Stage N6.
+- Не удалял старый 2D/legacy-код.
+
+Проверки:
+- npm run check:stage-n1-3d-foundation — passed.
+- npm run test:browser-smoke-static — passed.
+- npm run build — passed.
+- npm run test:constructor-three — passed.
+- npm run test:constructor-three-safety — passed.
+- npm run test:layout-state — passed.
+- npm run test:layout-validation — passed.
+- npm run test:blueprint-geometry — passed.
+- Targeted TS check for src/static-pages/Constructor3DPage.tsx — passed.
+
+Открытое ограничение:
+- Полный npm run typecheck после установки зависимостей в sandbox не завершился в пределах timeout. До исправления был пойман и устранён один TS6133 unused prop. После этого targeted TS-check нового файла прошёл, build прошёл. Нужно дополнительно прогнать полный npm run typecheck локально у пользователя.
+
+Путь для проверки:
+- npm run dev
+- открыть http://localhost:5173/configurator-3d

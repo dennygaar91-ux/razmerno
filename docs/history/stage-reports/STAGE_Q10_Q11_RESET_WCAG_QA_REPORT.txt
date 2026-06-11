@@ -1,0 +1,45 @@
+Stage Q10 + Q11 — Reset / Undo + E2E / WCAG QA
+
+Scope:
+- Added project reset entry point in the new 3D configurator.
+- Added accessible confirmation dialog before destructive reset.
+- Added static and Playwright coverage for reset and accessibility markers.
+- Preserved pricing, submit flow, API/backend/Supabase, legacy /configurator and production/manufacturing logic.
+
+Completed:
+1. Constructor3DPage moved to data-stage="Q10-Q11".
+2. Added shell marker rzm-3d-shell--q10-q11.
+3. Added "Сбросить параметры" button in drawer footer as a secondary reset action.
+4. Added ResetProjectDialog with role="dialog", aria-modal="true", labelled/described content, Esc cancel, Enter confirm, and basic focus trap.
+5. Reset confirmation calls the central zustand reset action and clears local 3D add-menu/error/reduced-mode UI state.
+6. Exposed resetProject through useConstructorPageState via selectReset.
+7. Added Q10/Q11 CSS for reset trigger, danger button and modal.
+8. Updated browser static guard for Q10/Q11.
+9. Updated tests/browser/configurator3d.spec.ts with reset dialog and accessibility marker scenarios.
+10. Added check:stage-q10-q11-reset-wcag.
+
+Checks passed:
+- npm run check:stage-q10-q11-reset-wcag
+- npm run test:browser-smoke-static
+- npm run build
+- npm run test:validation-autofix
+- npm run test:random-preset
+- npm run test:zone-filling
+- npm run test:constructor-store
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+Not fully confirmed in sandbox:
+- npm run typecheck timed out without TypeScript errors after npm install. Build passed successfully.
+- npm run test:constructor3d-e2e timed out because Playwright browser execution is unstable in this environment. Run locally.
+
+Local verification recommended:
+- npm install
+- npm run typecheck
+- npm run build
+- npm run check:stage-q10-q11-reset-wcag
+- npm run test:constructor3d-e2e
+- npm run dev
+- open http://localhost:5173/configurator-3d

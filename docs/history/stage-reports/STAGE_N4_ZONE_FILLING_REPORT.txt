@@ -1,0 +1,54 @@
+Stage N4 — Zone-based filling logic
+
+Цель:
+Сделать первую рабочую механику наполнения через 3D: пользователь выбирает секцию/зону на модели, нажимает «+», получает меню действий, добавляет полку/ящик/штангу/фасад, а элементы можно удалять из drawer.
+
+Сделано:
+1. «+» на модели теперь открывает меню добавления, а не просто повторно выбирает цель.
+2. Добавлен callback onOpenAddMenu в ThreeSelectionLayer → ThreeFurnitureViewer → LazyThreeFurnitureViewer → Constructor3DPage.
+3. В drawer шага «Наполнение» добавлено меню действий выбранной зоны:
+   - Полка: делит выбранную зону на две зоны.
+   - Ящик: добавляет один ящик в выбранную зону.
+   - Штанга: добавляет одну штангу в выбранную зону.
+   - Фасад: переключает фасады выбранной секции.
+4. Добавлена zone-based логика в projectRules:
+   - splitCompartmentWithShelf;
+   - removeCompartmentShelfDivider;
+   - сохранение и remap filling при разделении/слиянии зон.
+5. Добавлены store actions:
+   - addShelfToCompartment;
+   - removeShelfDivider;
+   - removeCompartmentElement.
+6. Добавлен список зон выбранной секции в drawer.
+7. Добавлен список элементов с удалением:
+   - полки-разделители;
+   - ящики;
+   - штанги;
+   - legacy shelvesCount, если он остался из прежней модели.
+8. normalizeCompartmentLayout теперь сохраняет секционно-специфичное количество зон, если layout уже существует.
+9. Старый /configurator не изменялся как route; работа продолжалась в /configurator-3d.
+
+Не сделано:
+- Фасады по отдельным зонам — это Stage N5.
+- Реальные текстуры материалов — это Stage N6.
+- Логика «Рандомно» — это Stage N7.
+- Auto-fix и финальная validation-система — это Stage N8.
+- Checkout integration — это Stage N9.
+
+Проверки:
+- check:stage-n4-zone-filling — passed.
+- test:zone-filling — passed.
+- test:constructor-store — passed after fixing setCompartments regression.
+- test:constructor-draft — passed.
+- test:constructor-payload — passed.
+- test:constructor-three — passed.
+- test:constructor-three-safety — passed.
+- test:browser-smoke-static — passed.
+- test:layout-state — passed.
+- test:layout-validation — passed.
+- test:blueprint-geometry — passed.
+- targeted TypeScript check for changed files — passed.
+
+Ограничения:
+- npm run typecheck в sandbox завершился по timeout без вывода TypeScript-ошибок.
+- npm run build в sandbox зависает на этапе Vite transforming/Tailwind resolve и завершился по timeout. Это нужно подтвердить локально.

@@ -1,0 +1,53 @@
+Stage N8 — Validation and auto-fix
+
+Цель этапа:
+Сделать в новой 3D-first ветке понятную проверку проекта и первые auto-fix действия: не показывать стену предупреждений, подсвечивать главную проблему, давать кнопку «Исправить автоматически» для простых случаев и блокировать только финальную заявку, а не настройку шагов.
+
+Что сделано:
+1. Добавлен stage marker data-stage="N8" в Constructor3DPage.
+2. Добавлен общий компонент ValidationAssist для компактной проверки проекта.
+3. Добавлен InlineIssue для выбранной зоны/секции.
+4. NumberControl теперь умеет показывать маленькую ошибку под конкретным control.
+5. На checkout CTA блокируется, если validation.status !== "valid".
+6. Добавлен store action applyAutoFixForIssue(issueId).
+7. Auto-fix поддерживает базовые случаи:
+   - размеры вне диапазона — привести к допустимому диапазону;
+   - секции слишком узкие — выровнять/сократить до допустимого количества;
+   - широкий распашной фасад — открыть секцию;
+   - полки не помещаются — уменьшить количество полок по высоте зоны;
+   - ящики не помещаются — уменьшить количество ящиков по минимальной высоте фасада;
+   - штанга не помещается / недоступна — убрать штангу из зоны;
+   - зоны слишком низкие — пересобрать зоны по допустимому количеству;
+   - некорректный материал — вернуть дефолтный материал.
+8. Добавлен тест validationAutoFix.test.ts.
+9. Добавлен check:stage-n8-validation-autofix.
+
+Что не трогалось:
+- pricing engine;
+- расчёт стоимости;
+- отправка заявки;
+- checkout submit-flow;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- старый /configurator;
+- материалы/текстуры N6;
+- random preset N7;
+- checkout integration в новый 3D-shell.
+
+Проверки:
+- npm run check:stage-n8-validation-autofix — passed
+- npm run test:validation-autofix — passed
+- npm run test:zone-filling — passed
+- npm run test:random-preset — passed
+- npm run test:constructor-store — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:browser-smoke-static — passed
+- npm run test:layout-state — passed
+- npm run test:layout-validation — passed
+- npm run test:blueprint-geometry — passed
+- npm run build — passed
+
+Ограничение:
+- npm run typecheck в sandbox не завершился за 300 секунд и не вывел TypeScript-ошибок. Локально нужно прогнать отдельно.

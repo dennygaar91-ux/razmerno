@@ -1,0 +1,74 @@
+/* Stage N3: 3D model selection labels and selected-zone plus */
+.rzm-3d-page[data-stage="N3"] .rzm-3d-viewport {
+  min-height: 680px;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255,255,255,.98), rgba(246,243,238,.84) 48%, rgba(229,224,216,.96) 100%),
+    linear-gradient(180deg, #f8f5ef 0%, #eee9df 100%);
+}
+
+.rzm-3d-page[data-stage="N3"] .rzm-three-viewer--product canvas {
+  cursor: grab;
+}
+
+.rzm-3d-page[data-stage="N3"] .rzm-3d-toolbar strong {
+  max-width: 620px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rzm-3d-model-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .76);
+  color: rgba(42,44,65,.72);
+  border: 1px solid rgba(42,44,65,.12);
+  box-shadow: 0 10px 24px rgba(42,44,65,.08);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: -.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  backdrop-filter: blur(14px);
+}
+
+.rzm-3d-model-label.is-hovered,
+.rzm-3d-model-label.is-selected {
+  background: rgba(42,44,65,.92);
+  color: #fff;
+  border-color: rgba(255,255,255,.28);
+}
+
+.rzm-3d-model-label.is-selected {
+  box-shadow: 0 14px 32px rgba(255,114,76,.22), inset 0 0 0 1px rgba(255,114,76,.4);
+}
+
+.rzm-3d-model-plus {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #ff8968 0%, #ff724c 100%);
+  color: #fff;
+  font-size: 25px;
+  font-weight: 860;
+  line-height: 1;
+  box-shadow: 0 18px 42px rgba(255,114,76,.32), inset 0 0 0 1px rgba(255,255,255,.28);
+  cursor: pointer;
+}
+
+.rzm-3d-model-plus:hover {
+  transform: translateY(-1px);
+}
+
+.rzm-3d-page[data-stage="N3"] .rzm-3d-selection-card strong {
+  letter-spacing: -.04em;
+}
+

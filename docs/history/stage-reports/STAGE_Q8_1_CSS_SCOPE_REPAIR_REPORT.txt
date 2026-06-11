@@ -1,0 +1,60 @@
+Stage Q8.1 — CSS Scope Repair
+
+Goal
+- Repair accumulated visual scope issues after Q6/Q7/Q8.
+- Ensure material polish, checkout polish, and scene info styles apply in the current Q8.1 shell instead of depending on old transient stage classes.
+
+Planned
+1. Audit stage-scoped selectors from Q6/Q7/Q8.
+2. Remove obsolete .rzm-3d-shell--q7 dependency from active visual styles.
+3. Convert material and checkout polish styles to stable component-level selectors.
+4. Keep Q8 scene info simplification active in current shell.
+5. Add a static guard for the repair.
+6. Run typecheck, build, and profile tests.
+
+Done
+1. Updated Constructor3DPage stage marker to Q8.1.
+2. Added shell marker rzm-3d-shell--q8-1 while preserving rzm-3d-shell--q8 compatibility.
+3. Replaced obsolete .rzm-3d-shell--q7 selectors in constructor3d.css with stable .rzm-3d-shell / component selectors.
+4. Converted material polish selectors to rzm-3d-drawer-body.rzm-3d-materials-polish and stable component selectors.
+5. Converted checkout final polish selectors to stable component selectors.
+6. Converted Q8 scene card/toolbar scope from data-stage=Q8 to stable shell scope.
+7. Updated browser-smoke-static and Q8 check to the Q8.1 marker.
+8. Added check:stage-q8-1-css-scope-repair.
+
+Files changed
+- src/static-pages/Constructor3DPage.tsx
+- src/styles/constructor3d.css
+- scripts/browser-smoke-static.mjs
+- scripts/check-stage-q8-scene-info-simplification.mjs
+- scripts/check-stage-q8-1-css-scope-repair.mjs
+- package.json
+
+Checks passed
+- npm run check:stage-q8-1-css-scope-repair
+- npm run check:stage-q8-scene-info-simplification
+- npm run test:browser-smoke-static
+- npm run typecheck
+- npm run build
+- npm run test:validation-autofix
+- npm run test:random-preset
+- npm run test:zone-filling
+- npm run test:constructor-store
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+Error report
+- test:browser-smoke-static initially failed because it expected data-stage="Q8". Updated it to Q8.1 and preserved shell compatibility.
+- typecheck initially failed because node_modules did not include @types/node after unpacking. Ran npm install, then typecheck passed.
+- build first exceeded the combined command timeout, then passed when run separately.
+
+Not changed
+- pricing engine
+- submit/order flow
+- backend/API/Supabase
+- old legacy /configurator logic
+- 3D geometry
+- random preset logic
+- validation/auto-fix rules

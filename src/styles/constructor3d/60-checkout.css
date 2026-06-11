@@ -1,0 +1,322 @@
+/* Stage N9 — checkout integration in 3D shell */
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel {
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel > div {
+  display: grid;
+  gap: 4px;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel span {
+  color: rgba(42, 44, 65, 0.58);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel strong {
+  color: #2a2c41;
+  font-size: 14px;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel p {
+  margin: 0;
+  color: rgba(42, 44, 65, 0.66);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel button,
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-validation button {
+  border: 0;
+  border-radius: 999px;
+  background: #2a2c41;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 36px;
+  padding: 0 14px;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel.is-warning {
+  border-color: rgba(253, 191, 80, 0.42);
+  background: rgba(253, 191, 80, 0.12);
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel.is-error {
+  border-color: rgba(255, 114, 76, 0.42);
+  background: rgba(255, 114, 76, 0.1);
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-validation-panel.is-valid {
+  border-color: rgba(43, 142, 92, 0.18);
+  background: rgba(43, 142, 92, 0.08);
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-validation {
+  align-items: center;
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr auto;
+  padding: 12px;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-validation > div {
+  display: grid;
+  gap: 4px;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-validation strong {
+  color: #2a2c41;
+  font-size: 13px;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-validation span,
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-issue {
+  color: rgba(42, 44, 65, 0.62);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-validation.is-error,
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-issue.is-error {
+  color: #b64226;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-validation.is-warning,
+.rzm-3d-page[data-stage="N9"] .rzm-3d-inline-issue.is-warning {
+  color: #8a5b09;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-control-row {
+  overflow: hidden;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-drawer-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.rzm-3d-page[data-stage="N9"] .rzm-3d-checkout {
+  gap: 14px;
+}
+
+.rzm-3d-checkout-card {
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.rzm-3d-checkout-card > header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rzm-3d-checkout-card > header span {
+  color: rgba(42, 44, 65, 0.58);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-checkout-card > header strong {
+  color: #2a2c41;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.rzm-3d-field {
+  display: grid;
+  gap: 6px;
+}
+
+.rzm-3d-field span {
+  color: rgba(42, 44, 65, 0.66);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.rzm-3d-field input,
+.rzm-3d-text-input {
+  border: 1px solid rgba(42, 44, 65, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #2a2c41;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  min-height: 42px;
+  outline: none;
+  padding: 0 12px;
+}
+
+.rzm-3d-field input:focus,
+.rzm-3d-text-input:focus {
+  border-color: rgba(255, 114, 76, 0.55);
+  box-shadow: 0 0 0 4px rgba(255, 114, 76, 0.12);
+}
+
+.rzm-3d-field.is-error input {
+  border-color: rgba(255, 114, 76, 0.58);
+}
+
+.rzm-3d-field small,
+.rzm-3d-consent em,
+.rzm-3d-checkout-warning {
+  color: #b64226;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 750;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.rzm-3d-checkout-toggle {
+  align-items: flex-start;
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 18px;
+  background: rgba(244, 244, 248, 0.75);
+  padding: 12px;
+}
+
+.rzm-3d-checkout-toggle span {
+  display: grid;
+  gap: 3px;
+}
+
+.rzm-3d-checkout-toggle strong {
+  color: #2a2c41;
+  font-size: 13px;
+}
+
+.rzm-3d-checkout-toggle small {
+  color: rgba(42, 44, 65, 0.58);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.rzm-3d-checkout-price-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rzm-3d-checkout-price-list span {
+  align-items: center;
+  border-top: 1px solid rgba(42, 44, 65, 0.08);
+  color: rgba(42, 44, 65, 0.7);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.rzm-3d-checkout-price-list b {
+  font-size: 12px;
+}
+
+.rzm-3d-checkout-price-list strong {
+  color: #2a2c41;
+  font-size: 13px;
+}
+
+.rzm-3d-checkout-details {
+  border-top: 1px solid rgba(42, 44, 65, 0.08);
+  color: rgba(42, 44, 65, 0.62);
+  font-size: 12px;
+  line-height: 1.45;
+  padding-top: 10px;
+}
+
+.rzm-3d-checkout-details summary {
+  color: #2a2c41;
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.rzm-3d-consent {
+  align-items: flex-start;
+  border: 1px solid rgba(42, 44, 65, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+}
+
+.rzm-3d-consent.is-error {
+  border-color: rgba(255, 114, 76, 0.46);
+  background: rgba(255, 114, 76, 0.08);
+}
+
+.rzm-3d-consent span {
+  display: grid;
+  gap: 4px;
+}
+
+.rzm-3d-consent strong {
+  color: #2a2c41;
+  font-size: 13px;
+}
+
+.rzm-3d-consent small {
+  color: rgba(42, 44, 65, 0.6);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.rzm-3d-checkout-submit {
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff724c, #fdbf50);
+  color: #2a2c41;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 900;
+  min-height: 48px;
+  padding: 0 18px;
+  width: 100%;
+}
+
+.rzm-3d-checkout-submit:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+  opacity: 0.55;
+}
+
+.rzm-3d-submit-message {
+  border-radius: 16px;
+  background: rgba(42, 44, 65, 0.06);
+  color: rgba(42, 44, 65, 0.72);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.45;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.rzm-3d-submit-message.is-success {
+  background: rgba(43, 142, 92, 0.1);
+  color: #236c48;
+}
+
+.rzm-3d-submit-message.is-error {
+  background: rgba(255, 114, 76, 0.1);
+  color: #b64226;
+}
+

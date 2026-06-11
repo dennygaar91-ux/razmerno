@@ -1,0 +1,22 @@
+STAGE 9.1 CLASSES REPORT
+
+Новые CSS-классы не добавлялись.
+Существующие классы не переименовывались.
+CSS-файлы не изменялись.
+
+Изменения Stage 9.1 касаются store/rules/types/draft/view-state и тестов:
+- src/static-pages/constructor/store/constructorStore.ts
+- src/static-pages/constructor/store/constructorSelectors.ts
+- src/static-pages/constructor/store/constructorDraft.ts
+- src/static-pages/constructor/store/constructorDraft.test.ts
+- src/static-pages/constructor/store/constructorStore.test.ts
+- src/static-pages/constructor/types.ts
+- src/static-pages/constructor/three/threeTypes.ts
+- src/static-pages/constructor/components/ConstructorScene.tsx
+- src/static-pages/constructor/components/ConstructorSceneRenderSwitch.tsx
+- src/static-pages/constructor/components/ConstructorSceneViewSwitch.tsx
+- src/static-pages/constructor/hooks/useConstructorPageState.ts
+- src/static-pages/ConstructorPage.tsx
+- src/static-pages/constructor/adapters/constructorPayload.ts
+- src/shared/materials/materialMapping.ts
+- src/shared/materials/materialCatalog.test.ts

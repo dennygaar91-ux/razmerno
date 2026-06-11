@@ -1,0 +1,28 @@
+Stage Q10/Q11 classes added/used
+
+rzm-3d-shell--q10-q11
+- Stage marker class on the new 3D shell.
+- Used to scope reset / WCAG hardening styles without relying on old stage-specific selectors.
+
+rzm-3d-reset-row
+- Small utility row in the drawer footer that keeps reset separate from the primary CTA group.
+
+rzm-3d-reset-trigger
+- Secondary reset button: "Сбросить параметры".
+- Uses ghost button base plus a destructive hover/focus tone.
+
+rzm-3d-reset-dialog-backdrop
+- Fixed overlay backdrop for the confirmation dialog.
+
+rzm-3d-reset-dialog
+- Accessible modal body for reset confirmation.
+- Uses role="dialog" and aria-modal="true" in JSX.
+
+rzm-3d-reset-dialog-kicker
+- Small label above the dialog heading.
+
+rzm-3d-reset-dialog-actions
+- Two-button action row: "Отмена" and "Сбросить".
+
+rzm-ui-btn--danger
+- Destructive action button style for confirmed reset.

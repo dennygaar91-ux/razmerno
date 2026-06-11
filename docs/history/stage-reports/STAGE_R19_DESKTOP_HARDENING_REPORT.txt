@@ -1,0 +1,32 @@
+Stage R19 — desktop hardening and real-shell consistency
+
+Planned:
+1. Continue desktop-only constructor refinement after R18.
+2. Fix remaining shell/test inconsistency: browser tests referenced R13 shell markers, while the active static constructor page still rendered the older simple shell class structure.
+3. Remove constructor mobile/burger navigation from desktop constructor header scope.
+4. Reduce 2D viewport overlays: active target badge and checking/manual fallback notes were still creating visual noise.
+5. Keep pricing, order submit, API, backend, Supabase and admin untouched.
+
+Done:
+1. Added rzm-stage-r19-desktop-hardening scope to the active static ConstructorPage.
+2. Added rzm-r19-workspace to the actual rendered constructor shell and updated browser smoke tests/static checks to use that active shell marker.
+3. Simplified ConstructorHeader for the constructor page: removed checkbox/burger/mobile panel markup from this desktop-first constructor header. This also removes duplicate hidden mobile navigation text from body text in browser checks.
+4. Updated ConstructorSceneCanvas:
+   - active target overlay is rendered only for real 3D mode;
+   - 2D manual mode no longer shows a fallback note;
+   - checking state no longer shows a large note;
+   - only real WebGL unavailable / Three.js runtime error states show a concise fallback note.
+5. Added clearer disabled title for the 3D button when WebGL is unavailable.
+6. Added R19 CSS layer for actual static constructor shell: stable desktop grid, bounded sticky sidebar, scrollable step content, sticky action area, compact stepper, separated toolbar and stronger price chip.
+7. Added class inventory file.
+
+Untouched:
+- pricing engine;
+- order submit flow;
+- checkout validation logic;
+- API/backend/Supabase/admin/export;
+- mobile UX/CSS as a separate product task;
+- production/manufacturing logic.
+
+Known limitation:
+The sandbox still cannot run Playwright browser smoke because Chromium binary is not available here. Static checks, typecheck and build should be used in sandbox; full browser smoke should be run locally by the user.

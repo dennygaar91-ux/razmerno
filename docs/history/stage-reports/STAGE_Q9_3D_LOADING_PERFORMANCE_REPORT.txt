@@ -1,0 +1,46 @@
+Stage Q9 — 3D Loading / Recalculation / Performance
+
+Planned:
+- Add explicit 3D loading state and skeleton.
+- Add aria-live/runtime status for 3D and price recalculation.
+- Add debounce before quote recalculation.
+- Show recalculation status without changing pricing logic.
+- Add weak GPU / reduced model action in fallback.
+- Keep pricing/order/backend/Supabase/legacy route untouched.
+
+Done:
+- Constructor3DPage moved to data-stage="Q9" and shell marker rzm-3d-shell--q9.
+- Added SceneRuntimeStatus with aria-live="polite".
+- Added scene aria-busy state while WebGL/3D or price recalculation is active.
+- Enhanced ThreeSceneLoading with skeleton, clearer copy, and quality mode text.
+- Added quoteStatus to useConstructorQuote: idle/calculating/ready/error.
+- Added 220ms debounce before quote recalculation.
+- Added price chip status: recalculating/updated/error.
+- Added fallback action "Упростить модель" to force reduced 3D quality.
+- Added Q9 CSS layer for skeleton/loading/runtime status/recalculation UI.
+- Added check:stage-q9-loading-performance.
+
+Checks passed:
+- npm run check:stage-q9-loading-performance
+- npm run test:browser-smoke-static
+- npm run build
+- npm run test:validation-autofix
+- npm run test:random-preset
+- npm run test:zone-filling
+- npm run test:constructor-store
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+Errors / notes:
+- Full npm run typecheck initially reported an unused prop; fixed by removing the unused quoteStatus prop from DrawerContent.
+- After the fix, full typecheck did not print TypeScript errors but exceeded the sandbox timeout. Build and profile checks passed.
+
+Not touched:
+- pricing formulas and multiplier logic
+- order submit flow
+- API/backend/Supabase
+- admin/export
+- legacy /configurator
+- zone filling, random preset, facade logic

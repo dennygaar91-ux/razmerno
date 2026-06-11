@@ -1,0 +1,75 @@
+Stage R17 — Three.js product preview polish
+
+Что планировалось:
+1. Не трогать pricing, заявки, checkout-flow, API, backend, Supabase, admin и export logic.
+2. Улучшить реальный 3D-режим без изменения расчётной модели.
+3. Сделать 3D визуально ближе к продуктовой сцене: спокойный studio-background, свет, пол, тени, читаемость панелей.
+4. Уменьшить декоративный шум в webgl-сцене.
+5. Сохранить 2D Drawing Renderer из Stage R15 без изменений.
+
+Что сделано:
+1. Обновлён src/static-pages/constructor/three/ThreeFurnitureViewer.tsx:
+   - добавлен product-viewer слой rzm-three-viewer--product;
+   - настроен более спокойный Three.js background/fog;
+   - улучшен свет: ambient + hemisphere + key/fill directional;
+   - добавлена более аккуратная shadow setup;
+   - добавлена компактная HUD-плашка с текущим видом и габаритами;
+   - сохранён frameloop="demand".
+
+2. Обновлён src/static-pages/constructor/three/ThreeFurnitureModel.tsx:
+   - улучшена студийная плоскость под мебелью;
+   - добавлен мягкий световой ring на полу;
+   - размеры пола зависят от габаритов модели.
+
+3. Обновлён src/static-pages/constructor/three/ThreeFurniturePanels.tsx:
+   - добавлены тонкие edges/контуры на корпусных панелях;
+   - hardware/legs/selection не перегружены лишними линиями;
+   - цилиндры ручек/штанг получили чуть более гладкую геометрию.
+
+4. Обновлён src/static-pages/constructor/three/threeMaterials.ts:
+   - корпус/фасады переведены на MeshPhysicalMaterial;
+   - добавлены мягкий clearcoat/sheen для более мебельного вида;
+   - усилена, но не перегружена, фурнитура;
+   - selection/accent получил лёгкий emissive;
+   - добавлен общий edge-material.
+
+5. Обновлён src/styles/constructor.css:
+   - добавлен scoped CSS Stage R17;
+   - webgl-сцена получила отдельный visual polish;
+   - декоративные fallback-элементы скрыты в webgl;
+   - material stack и active target размещены аккуратнее.
+
+6. Обновлён src/static-pages/ConstructorPage.tsx:
+   - добавлен stage scope class rzm-stage-r17-three-product-polish.
+
+Проверки:
+- npm run typecheck — passed
+- npm run test:browser-smoke-static — passed
+- npm run build — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:layout-state — passed
+- npm run test:compartment-ui — passed
+- npm run test:layout-validation — passed
+
+Не прошло в sandbox:
+- npm run test:browser-smoke — не подтвердился из-за отсутствующего Playwright Chromium binary в Linux sandbox.
+  Ошибка окружения: Executable doesn't exist at /home/oai/.cache/ms-playwright/chromium_headless_shell-1223/...
+  У пользователя Chromium установлен локально, поэтому browser-smoke нужно прогнать локально.
+
+Что не трогалось:
+- pricing engine;
+- заявки;
+- checkout-flow;
+- API;
+- backend;
+- Supabase;
+- admin;
+- export logic;
+- mobile UX/CSS;
+- 2D Drawing Renderer core.
+
+Риски:
+1. Визуальный результат 3D нужно обязательно проверить локально через Chrome/Edge, потому что sandbox не запускает Playwright Chromium.
+2. Three.js bundle всё ещё крупный; глубокая оптимизация bundle/performance остаётся отдельным этапом.
+3. Если в локальном браузере WebGL продолжит падать, нужно прислать DevTools console/runtime log — Stage R17 улучшает визуал рабочего 3D, но не может подтвердить runtime без браузера.

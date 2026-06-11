@@ -1,0 +1,16 @@
+import {
+  CONSTRUCTOR_COMPARTMENT_RULES,
+  CONSTRUCTOR_SECTION_RULES,
+} from "../rules/projectRules";
+
+export const CONSTRUCTOR_SECTION_LIMITS = {
+  min: CONSTRUCTOR_SECTION_RULES.minCount,
+  max: CONSTRUCTOR_SECTION_RULES.maxCount,
+  minWidthMm: CONSTRUCTOR_SECTION_RULES.minWidthMm,
+} as const;
+
+export const CONSTRUCTOR_COMPARTMENT_LIMITS = {
+  min: CONSTRUCTOR_COMPARTMENT_RULES.minCount,
+  max: CONSTRUCTOR_COMPARTMENT_RULES.maxCount,
+  minHeightMm: CONSTRUCTOR_COMPARTMENT_RULES.minHeightMm,
+} as const;

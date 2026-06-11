@@ -1,0 +1,31 @@
+Stage Q3 — Stepper + Layout Hierarchy classes
+
+Added/changed classes:
+- .rzm-3d-shell--q3 — stage marker for the Q3 3D constructor shell.
+- .rzm-3d-stagebar--q3 — refined stagebar layout separating workflow navigation from scene/price status.
+- .rzm-3d-stepper-block — semantic wrapper for the workflow title and stepper.
+- .rzm-3d-stagebar-eyebrow — small label above the stepper: “Шаги конструктора”.
+- .rzm-3d-step-wrap — listitem wrapper for each stepper button.
+- .rzm-3d-step-index — circular index/check marker inside each step.
+- .rzm-3d-step-copy — text wrapper for step title and description.
+- .rzm-3d-step-title — visible step title.
+- .rzm-3d-step-issue — compact issue count badge for steps with warnings/errors.
+- .rzm-3d-price-chip — dedicated top price chip for exact price, separated from stepper and WebGL status.
+
+Changed state classes:
+- .rzm-3d-step.is-active — current step, now primary orange and visually strongest.
+- .rzm-3d-step.is-completed — completed step with check state.
+- .rzm-3d-step.is-warning — step has non-blocking warning.
+- .rzm-3d-step.is-error — step has blocking error.
+- .rzm-3d-step.is-future — future step, muted and secondary.
+- .rzm-3d-step.has-issues — step has validation issues and shows issue badge.
+
+Existing classes affected by Q3 overrides:
+- .rzm-3d-stagebar
+- .rzm-3d-stepper
+- .rzm-3d-step
+- .rzm-3d-stagebar-meta
+- .rzm-3d-workspace
+- .rzm-3d-drawer
+- .rzm-3d-scene-card
+- .rzm-3d-toolbar

@@ -1,0 +1,27 @@
+Stage R19 — desktop hardening and real-shell consistency classes
+
+ADDED / CHANGED
+- rzm-stage-r19-desktop-hardening: stage scope on ConstructorPage main; limits all visual hardening to the constructor.
+- rzm-r19-workspace: added to the active static-page constructor shell; provides a stable desktop grid target for browser tests and layout CSS.
+- rzm-constructor-header-shell: constructor-only header scope; removes mobile/burger markup from the constructor desktop header.
+- rzm-stage-r19-class-inventory: marker class for class inventory and QA.
+
+USED / POLISHED EXISTING CLASSES
+- rzm-constructor-shell--simple: desktop grid width, columns and spacing stabilized.
+- rzm-constructor-sidebar--simple: sticky bounded sidebar card; prevents infinite panel height.
+- rzm-constructor-panel--simple: internal flex layout; keeps step content and actions stable.
+- rzm-constructor-step-panel: internal scroll area for long step content.
+- rzm-constructor-submit--simple: sticky bottom action area inside sidebar.
+- rzm-constructor-scene--simple: scene shell height, radius, background and rows stabilized.
+- rzm-scene-workbar: top scene controls split into stepper and toolbar levels.
+- rzm-constructor-stepper--horizontal / rzm-constructor-step / rzm-constructor-step-index / rzm-constructor-step-title: compact readable stepper.
+- rzm-scene-workbar-actions: toolbar grid for advanced toggle, 2D/3D, camera views and price chip.
+- rzm-scene-advanced-toggle: compact mode switch.
+- rzm-scene-render-switch: 2D/3D segmented control; disabled 3D state is visually clear.
+- rzm-scene-view-switch: camera view segmented control.
+- rzm-constructor-price-chip: stronger separate price chip.
+- rzm-constructor-canvas--clean: cleaner viewport background.
+- rzm-constructor-canvas--svg-fallback / rzm-constructor-model--blueprint: larger 2D drawing presentation.
+- rzm-scene-active-target: hidden in 2D; visible only in real 3D.
+- rzm-scene-fallback-note: shown only for real WebGL/Three runtime problems.
+- rzm-fill-target-head / rzm-fill-action-head: shorter ordinary-mode labels.

@@ -1,0 +1,53 @@
+Stage R26 — Materials Final Polish
+
+Цель этапа:
+Довести шаг «Материалы» до более финального product-level состояния: меньше табличности, более читаемые короткие названия, аккуратные swatches, мягкий active-state, read-only задняя стенка, без влияния на pricing/order/backend/mobile.
+
+Запланированные задачи и выполнение:
+1. Использовать короткие названия материалов в UI — 100%.
+2. Оставить полные названия Egger/Kronospan в title/details — 100%.
+3. Сделать swatch крупнее и аккуратнее — 100%.
+4. Сделать active state мягче: тонкая рамка + check — 100%.
+5. Сделать tabs ЛДСП/МДФ визуально увереннее — 100%.
+6. Оставить заднюю стенку read-only строкой — 100%.
+7. Уменьшить обрезание названий в sidebar/status bar — 100%.
+8. Не трогать pricing/order/backend/mobile — 100%.
+
+Изменённые файлы:
+- src/static-pages/ConstructorPage.tsx
+- src/static-pages/constructor/types.ts
+- src/static-pages/constructor/components/MaterialsStep.tsx
+- src/static-pages/constructor/components/ConstructorSceneStatusBar.tsx
+- src/styles/constructor.css
+- scripts/browser-smoke-static.mjs
+
+Добавленные файлы:
+- razmerno_constructor_stageR26_classes.txt
+- STAGE_R26_MATERIALS_FINAL_POLISH_REPORT.txt
+
+Проверки:
+- npm run typecheck — passed
+- npm run test:browser-smoke-static — passed
+- npm run build — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:layout-state — passed
+- npm run test:compartment-ui — passed
+- npm run test:layout-validation — passed
+- npm run test:blueprint-geometry — passed
+
+Ошибки/ограничения:
+- Полный набор проверок сначала был запущен одной длинной командой и завершился timeout на последней проверке из-за общего лимита выполнения. npm run test:blueprint-geometry был затем запущен отдельно и успешно прошёл.
+- npm run test:browser-smoke не подтверждён в sandbox из-за отсутствия стабильного Playwright Chromium; проверку нужно прогнать локально у пользователя.
+
+Что не трогалось:
+- pricing engine
+- расчёт стоимости
+- заявки
+- checkout submit-flow
+- API/backend/Supabase
+- admin/export
+- production/manufacturing logic
+- mobile UX
+- 2D geometry
+- Three.js runtime

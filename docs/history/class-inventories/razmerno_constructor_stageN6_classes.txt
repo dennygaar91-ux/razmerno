@@ -1,0 +1,41 @@
+Stage N6 — Materials and real textures: классы и назначение
+
+Добавленные / изменённые классы:
+
+1. .rzm-3d-material-picker
+   Блок выбора материала внутри drawer шага «Материалы». Используется для корпуса и фасадов.
+
+2. .rzm-3d-material-heading
+   Верхняя строка блока материала: заголовок, краткое описание и tabs для фасадов.
+
+3. .rzm-3d-material-tabs
+   Segmented-control для фильтрации фасадных материалов: Все / LDSP / MDF.
+
+4. .rzm-3d-material-preview
+   Крупное preview выбранного/кликнутого материала с реальной textureUrl. Используется как click zoom-preview и позволяет применить материал.
+
+5. .rzm-3d-material-swatch
+   Реальный swatch материала на основе PNG/JPEG textureUrl и fallbackHex. Используется в списке материалов и preview задней стенки.
+
+6. .rzm-3d-material-copy
+   Текстовый контейнер строки материала: короткое название + бренд/код/тип/толщина.
+
+7. .rzm-3d-back-panel-preview
+   Read-only строка задней стенки: автоматически подобранный HDF-декор с реальной текстурой.
+
+Переиспользуемые классы:
+
+1. .rzm-3d-drawer-body
+   Scrollable body floating drawer.
+
+2. .rzm-3d-step-intro
+   Заголовок активного шага конструктора.
+
+3. .rzm-3d-page
+   Корневой контейнер новой 3D-first страницы.
+
+4. .rzm-3d-shell / .rzm-3d-workspace / .rzm-3d-scene-card
+   Основной 3D layout: stagebar, drawer, сцена.
+
+Принцип Stage N6:
+Материалы должны выглядеть как реальные декоры, а не цветовые точки. Для UI используются реальные textureUrl из materialCatalog, а 3D renderer продолжает применять те же textureUrl через threeMaterials.ts.

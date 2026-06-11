@@ -1,0 +1,23 @@
+/* Stage Q2 — price clarity */
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-stagebar-meta strong,
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-drawer-footer strong {
+  letter-spacing: -0.035em;
+}
+
+.rzm-3d-price-note {
+  margin-top: 12px;
+  padding: 12px 13px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.76);
+  color: rgba(42,44,65,.68);
+  box-shadow: inset 0 0 0 1px rgba(229,231,239,.82);
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 650;
+}
+
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-validation-panel strong,
+.rzm-3d-page[data-stage="Q2"] .rzm-3d-inline-validation strong {
+  color: #2a2c41;
+}
+

@@ -1,0 +1,28 @@
+Stage R15 — классы 2D Drawing Renderer
+
+Добавлены / изменены в Stage R15:
+- .rzm-stage-r15-2d-drawing — marker-класс этапа на странице конструктора; нужен для фиксации версии визуального слоя.
+- .rzm-blueprint-svg--r15 — новая версия SVG-чертежа с широким viewBox 680×460.
+- .rzm-blueprint-view-title — подписи видов внутри чертежа: вид спереди / глубина.
+- .rzm-blueprint-sheet-note — нижняя техническая строка чертежа: габариты и пометка 2D без декоров.
+- .rzm-blueprint-model--front-r15 — основной фронтальный чертёж шкафа в новом масштабе.
+- .rzm-blueprint-side-mini — мини-вид сбоку рядом с фронтальным чертежом для отображения глубины.
+- .rzm-blueprint-warning-marker — компактный warning-маркер внутри проблемного отсека.
+- .rzm-blueprint-shelf — условная линия полки в 2D.
+- .rzm-blueprint-drawer — условный блок ящика в 2D.
+- .rzm-blueprint-depth-line — размерная линия глубины в mini side view.
+- .rzm-blueprint-depth-arrow — стрелки размерной линии глубины.
+
+Переиспользуются:
+- .rzm-constructor-canvas--svg-fallback — общий контейнер 2D/fallback режима.
+- .rzm-constructor-model--blueprint — контейнер SVG-чертежа.
+- .rzm-blueprint-paper — лист/поле чертежа.
+- .rzm-blueprint-grid — тихая чертёжная сетка.
+- .rzm-blueprint-corpus — внешний корпус мебели.
+- .rzm-blueprint-inner — внутренняя рабочая зона корпуса.
+- .rzm-blueprint-section — секция шкафа.
+- .rzm-blueprint-compartment — отсек внутри секции.
+- .rzm-blueprint-facade — условное обозначение фасада.
+- .rzm-blueprint-active-area — активная секция/отсек.
+- .rzm-blueprint-dimensions — размерные линии ширины/высоты.
+- .rzm-blueprint-material-note — компактная строка материалов за пределами чертежа.

@@ -1,0 +1,48 @@
+Stage N8 — классы, добавленные/изменённые для Validation and auto-fix
+
+Добавлены / изменены в src/styles/constructor3d.css:
+
+1. .rzm-3d-page[data-stage="N8"]
+   Назначение: stage-scope для новой 3D-first ветки после N8.
+   Используется: корневой контейнер Constructor3DPage.
+
+2. .rzm-3d-validation-panel
+   Назначение: общий компактный блок проверки проекта в drawer.
+   Используется: шаги Размеры / Наполнение / Материалы / Заявка.
+
+3. .rzm-3d-validation-panel.is-valid
+   Назначение: спокойное состояние «Готово».
+   Используется: ValidationAssist при отсутствии issues.
+
+4. .rzm-3d-validation-panel.is-warning
+   Назначение: состояние предупреждения без тревожного визуала.
+   Используется: ValidationAssist для warning issues.
+
+5. .rzm-3d-validation-panel.is-error
+   Назначение: состояние ошибки, которую нужно исправить.
+   Используется: ValidationAssist для error issues.
+
+6. .rzm-3d-validation-panel.is-checkout
+   Назначение: режим проверки перед заявкой.
+   Используется: финальный шаг «Заявка».
+
+7. .rzm-3d-inline-validation
+   Назначение: компактная строка ошибки/предупреждения для выбранной зоны.
+   Используется: шаг «Наполнение» под выбранной зоной.
+
+8. .rzm-3d-inline-validation.is-warning / .is-error
+   Назначение: цветовая дифференциация warning/error.
+   Используется: InlineIssue.
+
+9. .rzm-3d-inline-issue
+   Назначение: маленькое сообщение под проблемным control.
+   Используется: NumberControl для ширины/высоты/глубины/секций.
+
+10. .rzm-3d-drawer-actions button:disabled
+    Назначение: disabled-состояние CTA, когда заявка заблокирована validation.
+    Используется: drawer footer на шаге «Заявка».
+
+Существующие классы, которые используются N8:
+- .rzm-3d-control-row — теперь может показывать inline issue.
+- .rzm-3d-drawer-body — содержит ValidationAssist в конце шагов.
+- .rzm-3d-drawer-actions — CTA получает disabled state при checkout validation.

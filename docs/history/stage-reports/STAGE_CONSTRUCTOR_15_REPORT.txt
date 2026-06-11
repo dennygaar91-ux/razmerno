@@ -1,0 +1,86 @@
+Stage Constructor 15 — controlled integration pricing through production panels
+
+1. Контекст этапа
+Цель этапа: безопасно перевести material live-price с укрупнённой catalog-формулы на фактические production panels, не трогая checkout submit, backend/API, Supabase, админку, delivery/assembly и production export internals.
+
+2. Что найдено в проекте
+После Stage 14 productionPanelPricing умел считать audit-сводку по фактическим панелям, но live quote всё ещё использовал catalog price как source of truth. В UI debug можно было видеть дельту, но цена заявки не переходила на panel-based materials.
+
+3. Что можно менять
+Изменены только pricing foundation и quote hook:
+- src/pricing/engine.ts
+- src/pricing/productionPanelPricing.ts
+- src/pricing/productionPanelPricing.test.ts
+- src/pricing/materialPricingTransparency.ts
+- src/static-pages/constructor/hooks/useConstructorQuote.ts
+- src/static-pages/constructor/types.ts
+- src/static-pages/ConstructorPage.tsx
+
+4. Что нельзя менять
+Не трогались:
+- checkout submit flow;
+- backend/API;
+- Supabase;
+- админка;
+- production export internals;
+- delivery/assembly rules;
+- UI layout/CSS.
+
+5. План изменений
+- Добавить controlled helper, который применяет production panel pricing к CatalogPriceBreakdown.
+- Разделить panel estimate на body/facade/backPanel/edge.
+- Пересчитывать quote materials по фактическим production panels.
+- Сохранять delivery/assembly через существующие rules.
+- Сохранить debug delta и источник цены.
+- Не менять order submit и backend contract.
+
+6. Внесённые правки
+- ProductionPanelPricingSummary получил поля bodyEstimate, facadeEstimate, backPanelEstimate.
+- Добавлен applyProductionPanelPricingToCatalogPrice().
+- CatalogPriceBreakdown.source расширен до catalog | production-panels.
+- useConstructorQuote теперь:
+  1) считает базовый catalog quote;
+  2) строит production preview по текущему constructor snapshot без реальной PII;
+  3) считает production panel pricing;
+  4) применяет panel-based materials/edgeBanding к live quote;
+  5) пересчитывает сборку от обновлённой стоимости мебели.
+- QuoteState получил productionPanelPricing и pricingMode.
+- PricingTransparencyNotice получил calculationBasis.
+- Добавлен withProductionPanelPricingNotice(), чтобы клиентская подсказка честно говорила о расчёте по фактическим деталям.
+- ConstructorPage передаёт constructorSnapshot в useConstructorQuote.
+
+7. Ревью: план vs факт
+План выполнен. Live quote теперь использует production panels как source of truth для материалов и кромки. При этом checkout submit, API и backend не менялись: заявка получает уже обновлённый quote через прежний payload adapter.
+
+8. Анализ рисков
+Риск средний, потому что изменился live total. Ограничения:
+- services пока остаются от существующей catalog formula;
+- hardware/filling остаются от существующей formula;
+- HDF по-прежнему использует MVP fixed rate;
+- production preview строится внутри quote hook, поэтому ConstructorPage может строить preview повторно для debug-card. Это безопасно функционально, но позже можно оптимизировать.
+
+9. Проверки
+Успешно выполнено:
+- npm install
+- npm run typecheck
+- node --no-warnings --import tsx src/pricing/productionPanelPricing.test.ts
+- node --no-warnings --import tsx src/pricing/materialPricingTransparency.test.ts
+- npm run test:pricing-engine
+- npm run test:production-preview
+- npm run test:constructor-payload
+- npm run test:constructor-store
+- npm run test:constructor-flow
+- npm run test:constructor-draft
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run build
+
+Не пройдено и не относится к этому этапу:
+- npm run typecheck:api — старая проблема import.meta.env в src/shared/lib/analytics.ts и src/shared/lib/order.ts.
+
+10. Следующий шаг
+Stage 16 — pricing cleanup and single production preview source:
+- убрать двойную сборку production preview между quote hook и debug hook;
+- вынести panel-based pricing build в общий helper;
+- подготовить дальнейший перенос services/hardware на production model;
+- не трогать backend/API без отдельного решения.

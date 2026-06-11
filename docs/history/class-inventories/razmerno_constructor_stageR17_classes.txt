@@ -1,0 +1,37 @@
+Stage R17 — список классов
+
+Добавлены/изменены в Stage R17:
+
+1. rzm-stage-r17-three-product-polish
+   Где используется: src/static-pages/ConstructorPage.tsx, корневой <main> конструктора.
+   Назначение: scoped-флаг Stage R17 для всех CSS-правок 3D product preview. Нужен, чтобы правки не ломали остальные страницы и старые состояния конструктора.
+
+2. rzm-three-viewer--product
+   Где используется: src/static-pages/constructor/three/ThreeFurnitureViewer.tsx.
+   Назначение: production-обёртка реального Three.js viewer; задаёт абсолютное позиционирование, изоляцию слоя, border-radius и корректное заполнение сцены.
+
+3. rzm-three-product-hud
+   Где используется: src/static-pages/constructor/three/ThreeFurnitureViewer.tsx.
+   Назначение: компактная HUD-плашка 3D-сцены с текущим видом и габаритами модели. Не заменяет расчёт и не влияет на состояние конструктора.
+
+Существующие классы, затронутые scoped-правками:
+
+4. rzm-constructor-canvas--webgl
+   Блок: сцена конструктора.
+   Что изменилось: в Stage R17 получил более спокойный studio-background только внутри rzm-stage-r17-three-product-polish.
+
+5. rzm-scene-material-stack
+   Блок: 3D-сцена, стек материалов.
+   Что изменилось: в Stage R17 стек материалов в 3D перенесён в верхний правый угол, стал компактнее и визуально легче.
+
+6. rzm-scene-material-chip
+   Блок: 3D-сцена, chip материала.
+   Что изменилось: в Stage R17 получил мягкий glass-card вид внутри 3D-сцены.
+
+7. rzm-scene-active-target
+   Блок: 3D-сцена, выбранная область.
+   Что изменилось: в Stage R17 для webgl-режима перенесён вниз справа, чтобы не мешать основной модели.
+
+8. rzm-scene-orb / rzm-scene-floor-shadow / rzm-scene-model-shadow
+   Блок: декоративные элементы сцены.
+   Что изменилось: в webgl-режиме Stage R17 скрыты, потому что реальный Three.js уже содержит свет, пол и контактную тень.

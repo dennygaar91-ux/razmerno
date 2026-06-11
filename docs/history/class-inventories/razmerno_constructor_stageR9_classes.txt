@@ -1,0 +1,14 @@
+Stage R9 — список классов
+
+Новые CSS-классы не добавлялись.
+
+Изменённые классы:
+- .rzm-constructor-price-chip — используется в ConstructorScene.tsx для price chip в верхней панели сцены. CSS не менялся, но логика modifier-класса стала честнее: теперь состояние может быть exact/fallback/unknown/error/pending в зависимости от quote/quoteError.
+- .rzm-constructor-price-chip--fallback — существующее состояние fallback-сметы, продолжает показывать «проверка».
+- .rzm-constructor-price-chip--error — потенциальное состояние ошибки расчёта. Отдельный CSS не добавлялся, сейчас работает через базовый стиль chip.
+- .rzm-constructor-price-chip--pending — потенциальное состояние ожидания расчёта. Отдельный CSS не добавлялся, сейчас работает через базовый стиль chip.
+
+Добавленные/изменённые файлы с логикой:
+- src/static-pages/constructor/components/ConstructorScene.tsx — убрана фейковая fallback-цена 42 800 ₽, добавлены состояния «Считаем» и «Ошибка расчёта».
+- src/static-pages/ConstructorPage.tsx — quoteError передаётся в ConstructorScene.
+- src/static-pages/constructor/components/ConstructorScenePriceState.test.ts — статический тест против возврата hardcoded fallback-цен.

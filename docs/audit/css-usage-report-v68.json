@@ -1,0 +1,818 @@
+{
+  "summary": {
+    "cssFiles": 5,
+    "sourceFiles": 466,
+    "uniqueClasses": 453,
+    "used": 343,
+    "likelyDynamic": 21,
+    "potentialUnused": 89,
+    "duplicates": 32
+  },
+  "cssFileSizes": [
+    {
+      "file": "src/styles/constructor.css",
+      "kb": 132.1,
+      "classes": 390
+    },
+    {
+      "file": "src/index.css",
+      "kb": 13.36,
+      "classes": 56
+    },
+    {
+      "file": "src/styles/header.css",
+      "kb": 7.15,
+      "classes": 19
+    },
+    {
+      "file": "src/styles/info-pages.css",
+      "kb": 3.22,
+      "classes": 28
+    },
+    {
+      "file": "src/styles/base.css",
+      "kb": 1.04,
+      "classes": 1
+    }
+  ],
+  "versionClasses": {
+    "v53": [
+      "rzm-home-hero--v53",
+      "rzm-home-kit-v53",
+      "rzm-home-products-v53"
+    ],
+    "v54": [
+      "rzm-measurements-basics-v54",
+      "rzm-measurements-checklist-v54",
+      "rzm-measurements-hard-v54",
+      "rzm-measurements-hero-v54",
+      "rzm-measurements-mistakes-v54",
+      "rzm-measurements-steps-v54"
+    ],
+    "v55": [
+      "rzm-material-swatches--v55",
+      "rzm-materials-choice-v55",
+      "rzm-materials-hero-v55",
+      "rzm-materials-palette-v55",
+      "rzm-materials-structure-v55"
+    ],
+    "v56": [
+      "rzm-assembly-hero-v56",
+      "rzm-assembly-kit-v56",
+      "rzm-assembly-support-v56",
+      "rzm-assembly-timeline-v56",
+      "rzm-assembly-tools-v56"
+    ],
+    "v57": [],
+    "v58": [
+      "rzm-checkout-step-v58"
+    ],
+    "v59": [
+      "rzm-constructor-topline--v59"
+    ],
+    "v60": [],
+    "v66": [],
+    "v67": []
+  },
+  "likelyDynamic": [
+    "rzm-assembly-part--bottom",
+    "rzm-assembly-part--left",
+    "rzm-assembly-part--right",
+    "rzm-assembly-part--shelf",
+    "rzm-assembly-part--top",
+    "rzm-client-validation-status--warning",
+    "rzm-constructor-canvas--front",
+    "rzm-constructor-canvas--iso",
+    "rzm-constructor-canvas--side",
+    "rzm-constructor-canvas--top",
+    "rzm-constructor-topline--v59",
+    "rzm-fill-structure--compact",
+    "rzm-fill-structure--inline",
+    "rzm-home-float-card--module",
+    "rzm-home-hero--v53",
+    "rzm-home-hero-photo--module",
+    "rzm-info-grid--three",
+    "rzm-info-grid--two",
+    "rzm-production-status--blocked",
+    "rzm-production-status--loading",
+    "rzm-production-status--ready-for-review"
+  ],
+  "potentialUnused": [
+    "is-done",
+    "is-pressed",
+    "is-warning",
+    "rzm-assembly-actions",
+    "rzm-assembly-card",
+    "rzm-assembly-final-shell",
+    "rzm-assembly-sheet",
+    "rzm-btn-primary",
+    "rzm-checkout-row",
+    "rzm-constructor-context-note",
+    "rzm-constructor-dimension",
+    "rzm-constructor-dimension--depth",
+    "rzm-constructor-dimension--height",
+    "rzm-constructor-dimension--width",
+    "rzm-constructor-material-grid",
+    "rzm-constructor-scene-footer",
+    "rzm-constructor-scene-footer--chips",
+    "rzm-constructor-scene-header",
+    "rzm-constructor-scene-header--simple",
+    "rzm-constructor-step-check",
+    "rzm-constructor-step-kicker",
+    "rzm-constructor-submit-note",
+    "rzm-constructor-warning",
+    "rzm-custom-copy",
+    "rzm-custom-point",
+    "rzm-custom-point-icon",
+    "rzm-diagram-wall",
+    "rzm-faq-answer",
+    "rzm-faq-contact-icon",
+    "rzm-faq-head",
+    "rzm-faq-side",
+    "rzm-fill-card-head",
+    "rzm-fill-handle",
+    "rzm-fill-handle-grid",
+    "rzm-fill-handle-grid--compact",
+    "rzm-fill-inline-head",
+    "rzm-fill-option",
+    "rzm-fill-option-check",
+    "rzm-fill-option-title",
+    "rzm-fill-quick-actions",
+    "rzm-fill-selected-badge",
+    "rzm-final",
+    "rzm-final-actions",
+    "rzm-final-card",
+    "rzm-final-cta",
+    "rzm-final-grid",
+    "rzm-final-link",
+    "rzm-final-mini-icon",
+    "rzm-footer-logo",
+    "rzm-hero-product",
+    "rzm-hero-product--cabinet",
+    "rzm-hero-product--dresser",
+    "rzm-hero-product--wardrobe",
+    "rzm-home-flow-line",
+    "rzm-home-hero-img",
+    "rzm-home-hero-products",
+    "rzm-home-kit-box",
+    "rzm-home-kit-panel",
+    "rzm-home-kit-panel--dark",
+    "rzm-home-kit-panel--light",
+    "rzm-home-kit-panel--wood",
+    "rzm-home-status",
+    "rzm-home-status--main",
+    "rzm-how-head",
+    "rzm-how-step-card",
+    "rzm-info-cabinet",
+    "rzm-inline-advanced",
+    "rzm-kit-head",
+    "rzm-kit-item",
+    "rzm-kit-item-icon",
+    "rzm-kit-list",
+    "rzm-material-actions",
+    "rzm-material-card",
+    "rzm-material-final-shell",
+    "rzm-material-preview-cabinet",
+    "rzm-measure-actions",
+    "rzm-measure-final-shell",
+    "rzm-model-fill-badge",
+    "rzm-play",
+    "rzm-products",
+    "rzm-products-head",
+    "rzm-scene-header-actions",
+    "rzm-scene-header-actions--simple",
+    "rzm-scene-meta-chip",
+    "rzm-scene-title",
+    "rzm-section-lead",
+    "rzm-sidebar-current-step",
+    "rzm-sidebar-mini-status",
+    "rzm-toggle-card"
+  ],
+  "duplicates": [
+    {
+      "className": "css",
+      "files": [
+        "src/styles/base.css",
+        "src/styles/constructor.css",
+        "src/styles/header.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "is-active",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-action",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-assembly-part",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-assembly-path",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-burger",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-chip",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css"
+      ]
+    },
+    {
+      "className": "rzm-chips",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css"
+      ]
+    },
+    {
+      "className": "rzm-cta",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css",
+        "src/styles/header.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-header",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-header-shell",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-hero-lead",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-how-chip-title",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css"
+      ]
+    },
+    {
+      "className": "rzm-how-step-number",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css"
+      ]
+    },
+    {
+      "className": "rzm-logo",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-logo-image",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-logo-image-wrap",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-logo-word",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-material-swatch",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-material-swatch--black",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-material-swatch--graphite",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-material-swatch--gray",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-material-swatch--lightwood",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-material-swatch--oak",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-material-swatch--sand",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-material-swatch--white",
+      "files": [
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-menu-toggle",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-mobile-panel",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-nav",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-nav-link",
+      "files": [
+        "src/index.css",
+        "src/styles/header.css"
+      ]
+    },
+    {
+      "className": "rzm-secondary-cta",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    },
+    {
+      "className": "rzm-step-text",
+      "files": [
+        "src/index.css",
+        "src/styles/constructor.css",
+        "src/styles/info-pages.css"
+      ]
+    }
+  ],
+  "stageMarkers": [
+    {
+      "file": "src/styles/constructor.css",
+      "line": 1847,
+      "text": "/* ===== Home redesign v53: equal furniture formats + reference visuals ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 1848,
+      "text": ".rzm-home-hero--v53{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 1870,
+      "text": ".rzm-home-hero--v53 .rzm-home-hero-title{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 1876,
+      "text": ".rzm-home-hero--v53 .rzm-home-hero-title em{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 1880,
+      "text": ".rzm-home-hero--v53 .rzm-home-hero-lead{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 1994,
+      "text": ".rzm-home-hero--v53 .rzm-home-float-card--module{left:auto;right:8%;top:21%}"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 1995,
+      "text": ".rzm-home-hero--v53 .rzm-home-float-card--ok{right:auto;left:10%;top:34%}"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2096,
+      "text": ".rzm-home-products-v53 .rzm-home-status{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2101,
+      "text": ".rzm-home-products-v53 .rzm-home-product-card{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2104,
+      "text": ".rzm-home-products-v53 .rzm-home-mini-cabinet{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2109,
+      "text": ".rzm-home-hero--v53{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2126,
+      "text": ".rzm-home-hero--v53 .rzm-home-hero-title{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2162,
+      "text": ".rzm-home-hero--v53 .rzm-home-float-card--module{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2166,
+      "text": ".rzm-home-hero--v53 .rzm-home-float-card--ok{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2185,
+      "text": "/* ===== Measurements redesign v54: stronger visual guidance ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2186,
+      "text": ".rzm-measurements-hero-v54{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2189,
+      "text": ".rzm-measurements-hero-v54 .rzm-info-title{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2263,
+      "text": ".rzm-measurements-basics-v54 .rzm-info-card,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2264,
+      "text": ".rzm-measurements-steps-v54 .rzm-info-card,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2265,
+      "text": ".rzm-measurements-mistakes-v54 .rzm-info-card{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2268,
+      "text": ".rzm-measurements-basics-v54 .rzm-info-card::after,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2269,
+      "text": ".rzm-measurements-steps-v54 .rzm-info-card::after,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2270,
+      "text": ".rzm-measurements-mistakes-v54 .rzm-info-card::after{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2283,
+      "text": ".rzm-measurements-steps-v54 .rzm-how-step-number{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2288,
+      "text": ".rzm-measurements-hard-v54{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2331,
+      "text": ".rzm-measurements-checklist-v54{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2337,
+      "text": ".rzm-measurements-checklist-v54 h2{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2377,
+      "text": ".rzm-measurements-checklist-v54 .rzm-info-checks{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2380,
+      "text": ".rzm-measurements-checklist-v54 .rzm-info-checks label{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2386,
+      "text": ".rzm-measurements-hero-v54,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2387,
+      "text": ".rzm-measurements-hard-v54,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2388,
+      "text": ".rzm-measurements-checklist-v54{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2414,
+      "text": "/* ===== Materials redesign v55: more tactile material presentation ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2415,
+      "text": ".rzm-materials-hero-v55{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2418,
+      "text": ".rzm-materials-hero-v55 .rzm-info-title{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2517,
+      "text": ".rzm-material-swatches--v55{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2521,
+      "text": ".rzm-material-swatches--v55 .rzm-material-swatch-card{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2524,
+      "text": ".rzm-material-swatches--v55 .rzm-material-swatch{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2528,
+      "text": ".rzm-material-swatches--v55 .rzm-material-swatch::after{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2537,
+      "text": ".rzm-materials-choice-v55 .rzm-info-card{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2540,
+      "text": ".rzm-materials-choice-v55 .rzm-info-card::after{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2553,
+      "text": ".rzm-materials-structure-v55{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2581,
+      "text": ".rzm-materials-hero-v55,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2583,
+      "text": ".rzm-materials-structure-v55{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2603,
+      "text": ".rzm-material-swatches--v55{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2609,
+      "text": "/* ===== Assembly redesign v56: clearer kit and step-by-step assembly ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2610,
+      "text": ".rzm-assembly-hero-v56{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2613,
+      "text": ".rzm-assembly-hero-v56 .rzm-info-title{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2662,
+      "text": ".rzm-assembly-hero-v56 .rzm-assembly-part{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2668,
+      "text": ".rzm-assembly-hero-v56 .rzm-assembly-path{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2732,
+      "text": ".rzm-assembly-kit-v56 .rzm-info-card{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2735,
+      "text": ".rzm-assembly-kit-v56 .rzm-info-card::after,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2736,
+      "text": ".rzm-assembly-support-v56 .rzm-info-card::after{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2749,
+      "text": ".rzm-assembly-tools-v56 .rzm-assembly-tools article{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2756,
+      "text": ".rzm-assembly-tools-v56 .rzm-line-icon{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2761,
+      "text": ".rzm-assembly-timeline-v56{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2767,
+      "text": ".rzm-assembly-timeline-v56 h2{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2774,
+      "text": ".rzm-assembly-timeline-v56 .rzm-timeline{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2787,
+      "text": ".rzm-assembly-support-v56 .rzm-info-card{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2792,
+      "text": ".rzm-assembly-hero-v56,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2794,
+      "text": ".rzm-assembly-timeline-v56{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2824,
+      "text": "/* ===== Constructor visual fixes v57: scene density, meta chips, section clamps ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2984,
+      "text": "/* ===== Constructor checkout + mobile polish v58 ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 2985,
+      "text": ".rzm-checkout-step-v58{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 3203,
+      "text": "/* ===== Constructor scene labels + sidebar hierarchy v59 ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 3204,
+      "text": ".rzm-constructor-topline--v59{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 3344,
+      "text": "/* ===== Constructor realistic rotatable scene v60 ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 3522,
+      "text": "/* ===== Three.js viewer stages 61-65: isolated WebGL scene with SVG fallback ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 3626,
+      "text": "/* ===== Three.js safety hardening v66: lazy, boundary, reduced quality ===== */"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 3875,
+      "text": ".rzm-checkout-layout-grid .rzm-checkout-step-v58{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 4073,
+      "text": ".rzm-home-products-v53 .rzm-home-product-card{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 4076,
+      "text": ".rzm-home-products-v53 .rzm-home-product-card .rzm-home-status{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 4079,
+      "text": ".rzm-home-kit-v53 .rzm-home-kit-list{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 4091,
+      "text": ".rzm-assembly-support-v56 .rzm-info-card,"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 4092,
+      "text": ".rzm-measurements-mistakes-v54 .rzm-info-card{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 4095,
+      "text": ".rzm-materials-palette-v55 .rzm-material-swatch-card small{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 4099,
+      "text": ".rzm-home-kit-v53 .rzm-home-kit-list{"
+    },
+    {
+      "file": "src/styles/constructor.css",
+      "line": 4688,
+      "text": ".rzm-home-products-v53 .rzm-home-mini-cabinet{"
+    }
+  ]
+}

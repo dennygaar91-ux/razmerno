@@ -1,0 +1,13 @@
+Stage N7 CSS classes
+
+Added / changed:
+- .rzm-3d-page[data-stage="N7"] .rzm-3d-random-chip — active stage styling for the scene random preset chip.
+- .rzm-3d-random-drawer-action — drawer-level button that applies the same quick preset to the selected section.
+- .rzm-3d-random-drawer-action:hover — hover state for the drawer action.
+- .rzm-3d-random-drawer-action strong — title styling for the drawer action.
+- .rzm-3d-random-drawer-action span — description styling for the drawer action.
+
+Existing reused:
+- .rzm-3d-random-chip — floating chip in the lower-left area of the 3D scene.
+- .rzm-3d-drawer-body — drawer content stack where the additional preset action is rendered.
+- .rzm-3d-zone-list — zone list below the new preset action.

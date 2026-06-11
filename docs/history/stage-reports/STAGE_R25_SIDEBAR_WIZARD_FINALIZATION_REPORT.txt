@@ -1,0 +1,44 @@
+Stage R25 — Sidebar Wizard Finalization
+
+Цель:
+Довести левую панель конструктора до более финального desktop wizard-состояния: меньше визуального шума, меньше дублирующих предупреждений, без горизонтального скролла, с более компактной ordinary/advanced-структурой.
+
+Что сделано:
+1. Убраны повторяющиеся question-mark подсказки у каждого размерного поля.
+2. Убран help-dot из заголовков шагов «Размеры» и «Наполнение».
+3. Убран дублирующий fix-card внутри SizesStep: теперь активная ошибка показывается через общий validation panel.
+4. Убран дублирующий fix-card внутри FillStep.
+5. Убран дополнительный список fill validation chips внутри advanced-fill, чтобы warnings/errors не дублировались в нескольких местах.
+6. Сокращены labels выбора фасадов: «Распашные» / «Открытые».
+7. Смягчены тексты warning по широким секциям/фасадам: «Нужна проверка фасада» вместо более пугающих формулировок.
+8. Добавлен scope-класс rzm-stage-r25-sidebar-wizard-finalization.
+9. Добавлен CSS-слой R25 для защиты sidebar от горизонтального скролла.
+10. Уплотнены controls размеров, секций, наполнения, фасадов и точной настройки.
+11. Advanced-строки ширины секций и высоты отсеков переведены на безопасную grid-структуру.
+12. Длинный chip наполнения в строках высоты отсеков скрыт, чтобы не ломать ширину.
+
+Что не трогалось:
+- pricing engine;
+- расчёт стоимости;
+- заявки;
+- checkout submit-flow;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- mobile UX;
+- 2D geometry;
+- Three.js runtime.
+
+Проверки:
+- npm run typecheck — passed
+- npm run test:browser-smoke-static — passed
+- npm run build — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:layout-state — passed
+- npm run test:compartment-ui — passed
+- npm run test:layout-validation — passed
+- npm run test:blueprint-geometry — passed
+
+Ограничение:
+Полный npm run test:browser-smoke в sandbox не подтверждён из-за отсутствия стабильного Playwright Chromium в среде. Локально у пользователя Chromium установлен, поэтому browser smoke нужно прогнать после распаковки архива.

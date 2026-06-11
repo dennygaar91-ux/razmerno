@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "configVersion": "2026-05-24-stage11",
+  "updatedAt": "2026-05-24",
+  "source": "frontend-json",
+  "files": {
+    "materials.json": {
+      "sha256": "77acb70b6b63f9843a5f95bf694d7cd618210e52ad0e352b5c2c8d95fee249f5",
+      "bytes": 1939
+    },
+    "facade-styles.json": {
+      "sha256": "4b13fa04e08e0533a3fcf6eefe000ebbdf9fad7b0b74804df6b0397b834bfae2",
+      "bytes": 733
+    },
+    "hardware.json": {
+      "sha256": "19d3b08fa7fc56b3f1a3cece0088d893b226824247ca08f4c43c065a5ddb4f81",
+      "bytes": 1045
+    },
+    "furniture-presets.json": {
+      "sha256": "da8eeb8e7b113ebf1ae9261b2094b542bad4b0e73335a86ada4c5ada0daf0f05",
+      "bytes": 622
+    },
+    "filling-presets.json": {
+      "sha256": "0c97dcdbd52c291b56eb4cff87dd33e8cffc2c798582c9ff7fdbe5d3e9ca52f8",
+      "bytes": 721
+    },
+    "limits.json": {
+      "sha256": "ce513c62ee427ec8b38e5bf87dcbe31f1f29735f59d6c88e40f1063ff173c86a",
+      "bytes": 1257
+    },
+    "pricing.json": {
+      "sha256": "804414c227c504411ac7705a32f616a067f29f34d9341c40a4c39d3bb707b8bf",
+      "bytes": 248
+    }
+  }
+}

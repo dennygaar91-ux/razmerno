@@ -1,0 +1,26 @@
+Stage R27 — классы сцены и toolbar
+
+Добавлены / изменены в текущем этапе:
+- rzm-stage-r27-scene-toolbar-status-simplification — scope текущего этапа на странице конструктора.
+- rzm-scene-workbar--r27 — новая упрощённая структура верхней зоны сцены: stepper отдельно, toolbar отдельно.
+- rzm-r27-scene-toolbar — единая панель управления сценой: режим, 2D/3D, виды, статус 3D, цена.
+- rzm-r27-toolbar-group — базовая группа элементов toolbar.
+- rzm-r27-toolbar-group--mode — группа обычный/точная настройка.
+- rzm-r27-toolbar-group--view — группа 2D/3D и видов сцены.
+- rzm-r27-toolbar-group--result — группа статуса 3D и цены.
+- rzm-scene-status-bar--r27 — компактная нижняя строка сцены вместо набора карточек.
+- rzm-r27-status-main — выбранная секция/отсек + общий размер.
+- rzm-r27-status-materials — компактная строка материалов корпуса/фасадов.
+- rzm-r27-status-check — компактный validation indicator.
+- rzm-r27-status-check--ready — состояние без ошибок.
+- rzm-r27-status-check--warning — состояние предупреждения.
+- rzm-r27-status-check--error — состояние блокирующей ошибки.
+- rzm-stage-r27-class-inventory — marker-класс для инвентаризации stage.
+
+Переиспользуются:
+- rzm-constructor-stepper — stepper шагов конструктора.
+- rzm-scene-advanced-toggle — toggle точной настройки.
+- rzm-scene-render-switch — переключатель 2D/3D.
+- rzm-scene-view-switch — переключатель вида сцены.
+- rzm-scene-webgl-status — компактный статус WebGL/3D.
+- rzm-constructor-price-chip — chip стоимости.

@@ -1,0 +1,22 @@
+Stage Q7 — classes added/changed
+
+Changed / active shell:
+- rzm-3d-shell--q7 — актуальный shell marker новой 3D-ветки после Q7.
+- rzm-3d-stagebar--q7 — marker верхней панели этапа Q7.
+- rzm-3d-checkout--q7 — scope финального шага заявки после Q7.
+
+Checkout / submit:
+- rzm-3d-drawer-footer is-checkout — sticky footer финального шага с точной ценой, consent и CTA.
+- rzm-3d-consent--footer — consent-блок, перенесённый рядом с кнопкой отправки.
+- rzm-3d-checkout-submit-note — note в body checkout, объясняющий, что согласие и отправка закреплены внизу панели.
+
+Existing classes reused:
+- rzm-ui-btn
+- rzm-ui-btn--primary
+- rzm-ui-btn--secondary
+- rzm-3d-checkout-card
+- rzm-3d-checkout-price
+- rzm-3d-checkout-price-list
+- rzm-3d-checkout-details
+- rzm-3d-price-note
+- rzm-3d-submit-message

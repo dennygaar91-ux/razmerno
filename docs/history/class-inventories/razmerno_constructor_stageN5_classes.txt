@@ -1,0 +1,23 @@
+Stage N5 CSS classes
+
+New/changed classes:
+- .rzm-3d-page[data-stage="N5"]: stage marker for the new 3D constructor branch.
+- .rzm-3d-advanced-toggle: compact toggle for "Точная настройка зон" in the fill drawer.
+- .rzm-3d-facade-panel: section and selected-zone facade control panel in the drawer.
+- .rzm-3d-facade-buttons: segmented controls for facade modes.
+- .rzm-3d-zone-facade-override: advanced zone facade override block.
+
+Existing classes used in N5:
+- .rzm-3d-page: full page shell for the new 3D configurator.
+- .rzm-3d-shell: main constructor shell.
+- .rzm-3d-stagebar: stepper + meta top area.
+- .rzm-3d-workspace: floating drawer + scene workspace.
+- .rzm-3d-drawer: settings drawer.
+- .rzm-3d-drawer-body: scrollable drawer content.
+- .rzm-3d-scene-card: scene container.
+- .rzm-3d-viewport: Three.js viewport.
+- .rzm-3d-zone-panel: selected zone add-menu area.
+- .rzm-3d-zone-list: selected section zone list.
+- .rzm-3d-elements-list: selected zone/section element list.
+- .rzm-3d-model-label: 3D Html label for section/zone numbering.
+- .rzm-3d-model-plus: 3D Html plus button shown only for selected section/zone.

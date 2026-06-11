@@ -1,0 +1,23 @@
+Stage Q8 — Status Bar / Scene Info Simplification
+
+Scope:
+- simplify scene-level information in the new 3D constructor branch;
+- keep only selected section/zone and dimensions near the scene;
+- avoid duplicating price, materials and validation state around the viewport;
+- do not change pricing, order flow, backend, legacy configurator or 3D geometry.
+
+Changed:
+- src/static-pages/Constructor3DPage.tsx
+- src/styles/constructor3d.css
+- scripts/browser-smoke-static.mjs
+- package.json
+
+Added:
+- scripts/check-stage-q8-scene-info-simplification.mjs
+- razmerno_constructor_stageQ8_classes.txt
+
+Result:
+- Constructor3DPage now uses data-stage="Q8" and rzm-3d-shell--q8.
+- Added a compact SceneInfoBar below the viewport.
+- SceneInfoBar shows only selected section/zone and size.
+- Materials, price and validation are intentionally not duplicated in scene info.

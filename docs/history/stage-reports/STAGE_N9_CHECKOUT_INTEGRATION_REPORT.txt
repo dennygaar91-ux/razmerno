@@ -1,0 +1,48 @@
+Stage N9 — Checkout integration
+
+Цель:
+Интегрировать финальный шаг заявки в новый 3D-first shell без изменения pricing engine, submit-flow, API/backend/Supabase и legacy /configurator.
+
+Сделано:
+- Constructor3DPage переведён на data-stage="N9".
+- Подключён useConstructorSubmit в новой 3D-ветке.
+- Добавлена реальная checkout-форма внутри 3D drawer.
+- Добавлены поля: имя, телефон, email.
+- Добавлены delivery/assembly toggles.
+- Адрес доставки раскрывается только при включенной доставке.
+- Добавлена компактная смета: материалы, фурнитура, работы, доставка/сборка.
+- Добавлен details-блок с сообщением сметы/проекта.
+- Добавлено согласие на обработку персональных данных.
+- Кнопка в drawer footer на шаге checkout теперь отправляет заявку, а не просто "проверяет".
+- Добавлена отдельная submit-кнопка внутри checkout body.
+- Сохранена логика блокировки финальной заявки при blocking validation issues.
+- Сохранена существующая логика валидации клиента через useConstructorSubmit.
+- Добавлен static guard scripts/check-stage-n9-checkout-integration.mjs.
+- Добавлены CSS-классы N9 для checkout в constructor3d.css.
+
+Не трогалось:
+- pricing engine;
+- расчёт стоимости;
+- submitOrder / payload adapter;
+- API/backend/Supabase;
+- admin/export;
+- production/manufacturing logic;
+- legacy /configurator;
+- 3D geometry;
+- материалы/текстуры;
+- random preset;
+- auto-fix rules.
+
+Проверки:
+- npm run check:stage-n9-checkout-integration — passed
+- npm run test:browser-smoke-static — passed
+- npm run test:validation-autofix — passed
+- npm run test:random-preset — passed
+- npm run test:zone-filling — passed
+- npm run test:constructor-store — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run build — passed
+
+Ограничение:
+- npm run typecheck в sandbox не завершился за 300 секунд и не вывел TypeScript-ошибок. npm run build прошёл успешно.

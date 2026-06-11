@@ -1,0 +1,32 @@
+Stage N7 — Random preset chip
+
+Scope:
+- Make the scene chip "Рандомно" apply a real simple preset.
+- Add a drawer action for the same preset in the filling step.
+- Preserve old /configurator as legacy.
+- Do not touch pricing/order/backend/Supabase/admin/export/mobile.
+
+Implemented:
+- Added store action applyRandomPresetToSection(sectionId?).
+- Wardrobe preset creates 3 zones in the selected section: lower drawer zone, middle rod zone, top free shelf zone.
+- Dresser/nightstand preset creates one drawer zone.
+- The scene chip "Рандомно" now applies the preset to the selected section.
+- The filling drawer includes a visible preset action with explanatory copy.
+- Added randomPreset.test.ts.
+- Added check:stage-n7-random-preset guard.
+
+Checks:
+- npm run check:stage-n7-random-preset — passed.
+- npm run test:random-preset — passed.
+- npm run test:zone-filling — passed.
+- npm run test:constructor-store — passed.
+- npm run test:constructor-three — passed.
+- npm run test:constructor-three-safety — passed.
+- npm run test:browser-smoke-static — passed.
+- npm run test:layout-state — passed.
+- npm run test:layout-validation — passed.
+- npm run test:blueprint-geometry — passed.
+- npm run build — passed.
+
+Open limitation:
+- npm run typecheck timed out in sandbox after 300 seconds without TypeScript error output. Build and targeted feature tests passed.

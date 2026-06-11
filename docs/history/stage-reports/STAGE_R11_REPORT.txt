@@ -1,0 +1,30 @@
+Stage R11 — desktop constructor visual simplification + 2D/3D split
+
+Scope выполнен частично в рамках безопасного прохода без изменения pricing/order/API/backend:
+1. Упрощён основной desktop UI конструктора: сокращены длинные пояснения в шагах «Размеры», «Наполнение», «Материалы».
+2. Верхняя панель сцены разделена визуально: stepper занимает отдельный верхний уровень, controls/режимы/стоимость собраны ниже в toolbar.
+3. 2D-режим отделён от декоративной модели: вместо псевдо-3D с текстурами используется SVG-чертёж без декоров, с секциями, отсеками, наполнением, размерными линиями и активной областью.
+4. 2D теперь не показывает texture chips поверх сцены; материалы выводятся компактной технической подписью.
+5. Шаг «Материалы» пересобран: убран горизонтальный слайдер, добавлена компактная grid-сетка swatch + tabs ЛДСП/МДФ для фасадов; задняя стенка стала read-only строкой.
+6. Видимые mobile-пояснения в боковой панели убраны. Mobile CSS/адаптив специально не перерабатывался.
+
+Затронутые файлы:
+- src/static-pages/constructor/components/ConstructorRealisticSvgModel.tsx
+- src/static-pages/constructor/components/ConstructorSceneCanvas.tsx
+- src/static-pages/constructor/components/ConstructorSidebar.tsx
+- src/static-pages/constructor/components/SizesStep.tsx
+- src/static-pages/constructor/components/FillStep.tsx
+- src/static-pages/constructor/components/MaterialsStep.tsx
+- src/styles/constructor.css
+
+QA:
+- npm run typecheck — passed
+- npm run build — passed
+- npm run test:constructor-three — passed
+- npm run test:browser-smoke-static — passed
+- npm run test:browser-smoke — not passed due environment: Playwright Chromium binary is missing in sandbox (/home/oai/.cache/ms-playwright/...). This is not a code failure from the project.
+
+Known limitations / next:
+- 3D runtime still needs verification in a real browser with DevTools console. In this sandbox Chromium screenshot did not complete reliably, so I did not claim visual browser QA.
+- The 3D viewer code was not deeply rewritten in this stage; this pass primarily makes fallback honest and turns 2D into a true drawing mode.
+- Checkout was intentionally not redesigned in this pass.

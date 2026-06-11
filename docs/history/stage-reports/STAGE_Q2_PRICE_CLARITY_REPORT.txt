@@ -1,0 +1,72 @@
+Stage Q2 — Price Clarity + Pricing Source Preparation
+
+Цель:
+- Зафиксировать в коде продуктовую позицию: цена точная, не предварительная.
+- Разделить цену и технологические предупреждения.
+- Подготовить pricing source policy под загруженный дилерский прайс-лист.
+- Закрепить коэффициент клиентской цены ×1.3.
+
+Что сделано:
+1. Добавлен src/pricing/pricingPolicy.ts:
+   - CLIENT_PRICE_MULTIPLIER = 1.3;
+   - source file: Прайс-лист для дилеров до 01.04.26(3).xlsx;
+   - листы источника: Kronospan, Кромка, Eterno, Egger, AGT, Кедр столешницы, Услуги;
+   - правила: ЛДСП/МДФ за 1 кв.м включает распил и присадку; кромка, кромление и упаковка считаются отдельно.
+
+2. Обновлён pricing engine:
+   - isPreliminary теперь false;
+   - распил не добавляется отдельной строкой;
+   - присадка не добавляется отдельной строкой;
+   - упаковка считается отдельной service-строкой;
+   - production buffer в catalog price отключён, потому что клиентская маржа уже задана коэффициентом ×1.3.
+
+3. Обновлены клиентские формулировки:
+   - «Стоимость» → «Точная стоимость»;
+   - «Смета» → «Точная смета»;
+   - предупреждения теперь относятся к технической проверке исполнения, а не к точности цены.
+
+4. Обновлена transparency-логика:
+   - fallback по артикулу больше не называет цену предварительной;
+   - message объясняет, что предупреждение относится к проверке комплектации.
+
+5. Производственная оценка услуг приведена к правилам прайса:
+   - распил/обработка панелей: включено в ЛДСП/МДФ;
+   - присадка/отверстия: включено в ЛДСП/МДФ;
+   - кромление и упаковка остаются отдельными строками.
+
+6. Загруженный прайс-лист добавлен в docs/pricing/dealer-price-list-until-2026-04-01.xlsx для трассируемости источника.
+
+Проверки:
+- npm run check:stage-q2-price-clarity — passed
+- npm run test:pricing-engine — passed
+- npm run test:pricing-breakdown — passed
+- npm run test:pricing-final — passed
+- node --no-warnings --import tsx src/pricing/productionServicesPricing.test.ts — passed
+- node --no-warnings --import tsx src/pricing/productionServicesPricingDecision.test.ts — passed
+- npm run check:price-integrity — passed
+- npm run test:pricing-catalog — passed
+- npm run test:constructor-three — passed
+- npm run test:browser-smoke-static — passed
+- npm run typecheck — passed
+- npm run build — passed
+- npm run test:validation-autofix — passed
+- npm run test:random-preset — passed
+- npm run test:zone-filling — passed
+- npm run test:constructor-store — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:layout-validation — passed
+- npm run test:blueprint-geometry — passed
+
+Ошибки и исправления:
+1. check:stage-q2-price-clarity сначала не прошёл из-за слишком точной проверки текста transparency notice. Исправлено: fallback-сообщение обновлено на новую формулировку о технической проверке.
+2. typecheck сначала не прошёл из-за обязательного поля packagingPriceM2 в debug fixtures старых тестов. Исправлено: packagingPriceM2 сделан optional в debug type, runtime значение в engine сохраняется.
+
+Не трогалось:
+- submitOrder;
+- API/backend/Supabase;
+- admin/export;
+- старый /configurator;
+- 3D geometry;
+- random preset logic;
+- zone filling/facade logic;
+- checkout submit-flow.

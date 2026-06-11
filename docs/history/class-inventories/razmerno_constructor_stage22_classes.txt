@@ -1,0 +1,18 @@
+Stage Constructor 22 — classes report
+
+CSS/classes changed: none.
+
+Reason:
+- Stage 22 is pricing/debug logic only.
+- No visual layout or design-system classes were added or modified.
+
+Existing UI surface affected:
+- ConstructorSceneProductionDebug renders additional debug text using existing class .rzm-production-preview-meta.
+
+New/changed TypeScript entities:
+- ProductionHardwarePricingDecision
+- ProductionHardwarePricingDecisionStatus
+- ProductionHardwarePricingDecisionReason
+- buildProductionHardwarePricingDecision()
+- QuoteState.productionHardwareDecision
+- ConstructorProductionSnapshotState.hardwareDecision

@@ -1,0 +1,200 @@
+/* Stage Q4 — Sizes Step Polish */
+.rzm-3d-page[data-stage="Q4"] {
+  --rzm-q4-surface: rgba(255, 255, 255, .78);
+  --rzm-q4-border: rgba(42, 44, 65, .12);
+  --rzm-q4-muted: rgba(42, 44, 65, .58);
+  --rzm-q4-strong: #2a2c41;
+  --rzm-q4-accent: #ff724c;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-stagebar--q4 {
+  min-height: 96px;
+  padding: 14px 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, auto);
+  align-items: stretch;
+  gap: 18px;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-stepper-block {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+  align-content: center;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(132px, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-step {
+  position: relative;
+  width: 100%;
+  min-height: 58px;
+  padding: 8px 10px;
+  justify-content: flex-start;
+  border: 1px solid rgba(42, 44, 65, .12);
+  background: rgba(255,255,255,.55);
+  color: rgba(42,44,65,.54);
+  box-shadow: none;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-step.is-active {
+  border-color: rgba(255, 114, 76, .56);
+  background: linear-gradient(180deg, #ff724c 0%, #e65f39 100%);
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(255, 114, 76, .22);
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-step.is-completed {
+  border-color: rgba(89, 148, 98, .22);
+  background: rgba(255,255,255,.84);
+  color: #2a2c41;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-step.is-warning {
+  border-color: rgba(253, 191, 80, .55);
+  background: rgba(255,247,230,.88);
+  color: #6d4b13;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-step.is-error {
+  border-color: rgba(199, 64, 44, .34);
+  background: rgba(255,241,238,.9);
+  color: #8a2f21;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-step.is-future {
+  background: rgba(255,255,255,.48);
+  color: rgba(42,44,65,.48);
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-price-chip {
+  min-height: 56px;
+  padding: 8px 16px;
+  border-radius: 22px;
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  background: #2a2c41;
+  color: #fff;
+  box-shadow: 0 14px 34px rgba(42,44,65,.18);
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-size-block {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--rzm-q4-border);
+  border-radius: 24px;
+  background: var(--rzm-q4-surface);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.68);
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 2px;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-header span {
+  display: block;
+  color: rgba(255, 114, 76, .92);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-header h2 {
+  margin: 2px 0 0;
+  color: var(--rzm-q4-strong);
+  font-size: 15px;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-header small {
+  color: var(--rzm-q4-muted);
+  font-size: 11px;
+  font-weight: 760;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-widths {
+  gap: 12px;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-equalize-button {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-formula {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: rgba(42,44,65,.055);
+  color: var(--rzm-q4-strong);
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-formula strong {
+  font-size: 12px;
+  font-weight: 860;
+  line-height: 1.25;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-formula small {
+  color: var(--rzm-q4-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-advanced-toggle--sizes {
+  margin-top: -2px;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-width-list {
+  display: grid;
+  gap: 8px;
+  padding-top: 2px;
+  overflow: hidden;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-width-row {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-section-width-row > span {
+  color: var(--rzm-q4-muted);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-control-row.is-compact {
+  min-width: 0;
+  padding: 8px;
+  border-radius: 18px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-control-row.is-compact .rzm-3d-control-help,
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-control-row.is-compact > div:first-child > span {
+  display: none;
+}
+
+.rzm-3d-page[data-stage="Q4"] .rzm-3d-control-row.is-compact strong {
+  font-size: 13px;
+}
+

@@ -1,0 +1,5235 @@
+{
+  "generatedAt": "2026-06-11T05:30:08.283Z",
+  "note": "Static class inventory. maybeUnused is a candidate list only; dynamic class composition can create false positives.",
+  "summary": {
+    "src/styles/constructor.css": {
+      "lines": 10805,
+      "classCount": 762,
+      "maybeUnusedCount": 147
+    },
+    "src/styles/constructor3d.css": {
+      "lines": 27,
+      "classCount": 1,
+      "maybeUnusedCount": 0
+    },
+    "src/index.css": {
+      "lines": 843,
+      "classCount": 86,
+      "maybeUnusedCount": 13
+    },
+    "src/styles/constructor3d/00-base.css": {
+      "lines": 557,
+      "classCount": 37,
+      "maybeUnusedCount": 6
+    },
+    "src/styles/constructor3d/10-scene-foundation.css": {
+      "lines": 33,
+      "classCount": 7,
+      "maybeUnusedCount": 2
+    },
+    "src/styles/constructor3d/11-scene-selection-markers.css": {
+      "lines": 75,
+      "classCount": 9,
+      "maybeUnusedCount": 1
+    },
+    "src/styles/constructor3d/20-filling-controls.css": {
+      "lines": 157,
+      "classCount": 7,
+      "maybeUnusedCount": 2
+    },
+    "src/styles/constructor3d/21-facade-controls.css": {
+      "lines": 98,
+      "classCount": 7,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/30-materials.css": {
+      "lines": 197,
+      "classCount": 13,
+      "maybeUnusedCount": 1
+    },
+    "src/styles/constructor3d/40-random-preset.css": {
+      "lines": 42,
+      "classCount": 3,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/50-validation.css": {
+      "lines": 109,
+      "classCount": 9,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/60-checkout.css": {
+      "lines": 323,
+      "classCount": 21,
+      "maybeUnusedCount": 2
+    },
+    "src/styles/constructor3d/70-ui-kit-a11y-base.css": {
+      "lines": 150,
+      "classCount": 20,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/71-price-clarity.css": {
+      "lines": 24,
+      "classCount": 6,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/72-layout-hierarchy.css": {
+      "lines": 217,
+      "classCount": 22,
+      "maybeUnusedCount": 3
+    },
+    "src/styles/constructor3d/80-sizes-step.css": {
+      "lines": 201,
+      "classCount": 22,
+      "maybeUnusedCount": 4
+    },
+    "src/styles/constructor3d/81-filling-step-polish.css": {
+      "lines": 326,
+      "classCount": 35,
+      "maybeUnusedCount": 17
+    },
+    "src/styles/constructor3d/82-materials-step-polish.css": {
+      "lines": 167,
+      "classCount": 15,
+      "maybeUnusedCount": 1
+    },
+    "src/styles/constructor3d/83-checkout-final-polish.css": {
+      "lines": 75,
+      "classCount": 11,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/84-scene-info-simplification.css": {
+      "lines": 48,
+      "classCount": 4,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/85-loading-performance-states.css": {
+      "lines": 111,
+      "classCount": 8,
+      "maybeUnusedCount": 3
+    },
+    "src/styles/constructor3d/86-reset-wcag-hardening.css": {
+      "lines": 105,
+      "classCount": 9,
+      "maybeUnusedCount": 2
+    },
+    "src/styles/constructor3d/90-working-2d-fallback.css": {
+      "lines": 141,
+      "classCount": 10,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/91-compact-constructor-shell.css": {
+      "lines": 197,
+      "classCount": 20,
+      "maybeUnusedCount": 1
+    },
+    "src/styles/constructor3d/92-ui-role-system.css": {
+      "lines": 365,
+      "classCount": 45,
+      "maybeUnusedCount": 7
+    },
+    "src/styles/constructor3d/93-sizes-product-logic.css": {
+      "lines": 87,
+      "classCount": 11,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/94-filling-facade-exact-mode.css": {
+      "lines": 124,
+      "classCount": 17,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/95-real-materials-preview.css": {
+      "lines": 61,
+      "classCount": 5,
+      "maybeUnusedCount": 0
+    },
+    "src/styles/constructor3d/96-product-scene-composition.css": {
+      "lines": 18,
+      "classCount": 5,
+      "maybeUnusedCount": 2
+    }
+  },
+  "inventory": {
+    "src/styles/constructor.css": {
+      "lines": 10805,
+      "classCount": 762,
+      "classes": [
+        {
+          "name": "absolute",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "control-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "control-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "css",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "has-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "has-issue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "has-warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-done",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-flat",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-focused",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-open",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-pressed",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-selected",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "js",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "md",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "right-3",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-cue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-hero-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-hero-v56",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-hero-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-kit-layout",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-kit-photo",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-kit-v56",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-part",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-part--one",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-part--three",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-part--two",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-path",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-support-v56",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-timeline-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-timeline-v56",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-timeline-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-tools",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-tools-v56",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-assembly-trust-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-active-area",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-back-line",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-compartment",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-corpus",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-depth-arrow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-depth-line",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-dimensions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-divider",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-drawer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-facade",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-facade-line",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-fill",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-blueprint-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-inner",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-material-note",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-blueprint-paper",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-plan-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-rod",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-section-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-sheet-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-shelf",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-svg",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-svg--r15",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-svg--r24",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-top-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-view-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-view-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-warning-marker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-burger",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-number",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-text",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-action-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-address",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-consent-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-contact-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-eyebrow",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-checkout-final-price",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-hero-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-layout-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-next-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-checkout-option",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-options-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-options-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-price-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-required",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-review-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-review-grid",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-checkout-review-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-review-status--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-checkout-review-status--valid",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-checkout-review-status--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-checkout-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-section-head",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-checkout-step--simple",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-step-v58",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-checkout-summary-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-checkout-total",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-chip-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-chips",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-chips--quiet",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-client-validation-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-client-validation-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-client-validation-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-client-validation-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-client-validation-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-client-validation-status--warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-compartment-editor",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-compartment-editor-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-compartment-filling-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-compartment-height-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-compartment-height-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-compartment-section-tab",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-compartment-section-tabs",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-consent-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-action-btn",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-actions",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-advanced-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-advanced-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-back-btn",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-breakdown-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas--clean",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas--free",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-canvas--front",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas--iso",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas--premium",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas--side",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas--svg-fallback",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas--top",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-canvas--webgl",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-card--compact",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-card-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-checkout-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-context-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-dimension",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-dimension--depth",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-dimension--height",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-dimension--width",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-draft-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-field",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-field-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-field-grid--compact",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-flow-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-header-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-help",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-input",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-input--text",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-input-btn",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-input-btn--minus",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-input-btn--plus",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-input-control",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-dot",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-dot--black",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-dot--graphite",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-dot--gray",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-dot--lightwood",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-dot--oak",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-dot--sand",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-dot--white",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-material-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-model",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-model--blueprint",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-model--blueprint-r24",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-model--premium",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-model--side-plan",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-model--svg",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-model--top-plan",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-next-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-next-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-next-list--compact",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-panel--simple",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-price-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-price-chip--fallback",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-scene",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-scene--simple",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-scene-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-scene-footer--chips",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-scene-header",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-scene-header--simple",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell--simple",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-sidebar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-sidebar--simple",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step--active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step--default",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step--done",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step--error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step--warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step-check",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step-index",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step-kicker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-step-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-stepper",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-stepper--horizontal",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-submit",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-submit--simple",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-submit-btn",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-submit-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-success",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-svg-model",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-toggle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-toggle-input",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-toggle-thumb",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-toggle-track",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-topline",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-topline--simple",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-topline--v59",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-badge",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-eyebrow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-item",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-item--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-validation-item--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-validation-list",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-validation-more",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-panel--compact",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-panel--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-validation-panel--valid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-validation-panel--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-constructor-warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-counter-row",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-cta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-delivery-address",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-diagram-measure",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-diagram-measure--bottom",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-diagram-measure--middle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-diagram-measure--top",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-diagram-wall",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-dimension-field-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-facade-mode-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-facade-mode-button",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-facade-mode-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-facade-mode-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-facade-section-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-facade-section-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-faq-item",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-feature-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-feature-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-field-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-field-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-action-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-action-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-card-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-compartment-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-compartment-chips",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-counter-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-handle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-handle-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-handle-grid--compact",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-inline-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-mini-control",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-mode-pill",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-fill-option",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-option-check",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-option-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-picker-block",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-picker-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-precision-editor",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-quick-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-section-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-section-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-selected-badge",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-step-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-step-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-structure",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-structure--compact",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-structure--inline",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-structure-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-structure-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-structure-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-target-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-target-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-target-picker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-fill-validation-chip",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-fill-validation-chip--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-fill-validation-chip--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-fill-validation-list",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-final-lead",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-furniture-type-btn",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-furniture-type-check",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-furniture-type-switcher",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-handle-toggle-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-help-dot",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-hero-lead",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-hero-product",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-hero-product--cabinet",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-hero-product--dresser",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-hero-product--wardrobe",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-card-arrow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-custom",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-custom-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-faq-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-final",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-float-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-float-card--module",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-float-card--ok",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-flow-line",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero--v53",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero--v75",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-home-hero-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-img",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-kicker",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-home-hero-lead",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-photo",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-photo--main",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-home-hero-photo--module",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-photo-stack",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-home-hero-products",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-scene",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-home-hero-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-info-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-box",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-panel--dark",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-panel--light",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-panel--wood",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-photo",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-home-kit-v53",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-kit-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-main",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-measure-line",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-home-mini-cabinet",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-mini-cabinet--dark",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-mini-cabinet--light",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-mini-cabinet--wood",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-price-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-price-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-product-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-product-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-products-showcase",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-home-products-v53",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-section-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-section-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-status--main",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-step-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-step-number",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-steps",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-steps--illustrated",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-honeypot",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-how-chip-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-how-step-number",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-cabinet",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-card-top",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-checklist",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-checks",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-diagram",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-diagram--parts",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-final",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-footer-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-footer-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-grid--three",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-grid--two",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-hero",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-line",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-line--d",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-line--h",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-line--w",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-main",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-section-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-split",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-timeline",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-info-visual--assembly",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-inline-advanced",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-kit-photo-label",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-line-icon",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-logo",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-back-panel",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-back-panel--compact",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-chip--a",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-chip--b",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-chip--c",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-choice-block",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-choice-head",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-name",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-preview-cabinet",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-pricing-hint",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-pricing-hint--exact",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-pricing-hint--fallback",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-slide",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-slide--texture",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-slide-text",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-slider",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-slider-block",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-slider-head",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-surface",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch--black",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch--graphite",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch--gray",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch--lightwood",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch--oak",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch--sand",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch--white",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatch-grid",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-swatch-row",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-swatches",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-swatches--v55",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-tabs",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-texture",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-materials-choice-v55",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-hero-v55",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-hero-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-palette-layout",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-palette-photo",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-palette-v55",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-step-card--compact",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-materials-step-card--r11",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-materials-step-card--sliders",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-materials-structure-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-structure-photo",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-structure-v55",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-materials-trust-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measure-action-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measure-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measure-tags",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measure-teaser",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-basics-v54",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-checklist-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-checklist-v54",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-checklist-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-hard-v54",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-hero-v54",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-hero-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-mistakes-v54",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-photo-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-photo-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-plus",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-plus--one",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-plus--two",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-steps-v54",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-measurements-trust-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-media-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-menu-toggle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-mobile-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-mobile-sheet-handle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-mobile-sheet-title",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-model-fill-badge",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-module-surface",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-module-surface-quiet",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-part",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-part--back",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-part--body",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-part--front",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-precision-editor",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-precision-hint-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-precision-section-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-precision-section-map",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-precision-summary-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-price-breakdown",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-pricing-notice",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-pricing-notice--exact",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-pricing-notice--fallback",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-process-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-product-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-product-swatch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-preview-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-preview-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-preview-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-preview-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-preview-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-preview-summary",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-status--blocked",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-status--loading",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-production-status--ready-for-review",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-main",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-mode-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-price-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-scene-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-scene-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-scene-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-scene-viewport",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-sidebar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-sidebar-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-stepper-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-workbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r13-workspace",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-advanced-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-counter-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-current-target",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-filling-flow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-muted-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-precision-toggle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-primary-issue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r14-switch-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-back-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-current-materials",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-issue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-kind-tabs",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-option",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-section-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-material-spec",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-materials-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-materials-step",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r16-step-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-action-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-checkout-address",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-checkout-flow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-checkout-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-checkout-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-checkout-titlebar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-checkout-topbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-consent-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-consent-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-contact-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-final-price",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-inline-total",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-r18-material-strip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-muted-line",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-next-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-option",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-options-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-price-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-pricing-notice",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-review-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-review-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-section-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-section-kicker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r18-topbar-price",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r19-workspace",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-back-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-current-materials",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-check",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-issue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-kind-tabs",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-option",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-section-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-material-swatch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-materials-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-selected-material",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r26-step-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r27-scene-toolbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r27-status-check",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r27-status-check--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-r27-status-check--ready",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-r27-status-check--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-r27-status-main",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r27-status-materials",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r27-toolbar-group",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r27-toolbar-group--mode",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r27-toolbar-group--result",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r27-toolbar-group--view",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-action-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-checkout-address",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-checkout-flow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-checkout-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-checkout-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-checkout-titlebar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-checkout-topbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-consent-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-consent-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-contact-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-final-price",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-material-strip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-muted-line",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-next-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-option",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-options-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-price-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-price-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-price-summary",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-pricing-notice",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-required",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-review-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-review-details",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-review-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-section-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-r28-topbar-price",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-reveal",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-active-target",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-advanced-toggle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-depth-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-fallback-note",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-fallback-note--checking",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-fallback-note--manual",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-fallback-note--three-error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-fallback-note--webgl-unavailable",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-floor-shadow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-header-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-header-actions--simple",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-material-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-material-chip--backPanel",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-material-stack",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-meta-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-model-shadow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-orb",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-orb--orange",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-orb--yellow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-render-switch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-status-bar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-status-bar--r27",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-status-check",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-status-check--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-status-check--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-status-item",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-status-material",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-status-materials",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-view-switch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-webgl-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-webgl-status--checking",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-webgl-status--disabled",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-webgl-status--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-webgl-status--ready",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-scene-workbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-workbar--r27",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-scene-workbar-actions",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-secondary-cta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-control-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-lead",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-width-editor",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-width-editor-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-width-equalize",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-width-index",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-width-input",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-width-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-width-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-section-width-unit",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-showcase-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-sidebar-current-step",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-sidebar-mini-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-split-block",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r12-desktop-stabilized",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r13-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r13-desktop-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r14-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r14-simple-mode",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r15-2d-drawing",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r16-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r16-sidebar-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r17-three-product-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r18-checkout-simplification",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r19-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r19-desktop-hardening",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r20-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r20-desktop-qa-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r21-browser-and-desktop-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r22-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r22-scene-status-material",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r22-scene-status-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r23-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r23-three-runtime-repair",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r24-blueprint-finalization",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r24-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r25-sidebar-wizard-finalization",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r26-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r26-materials-final-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r27-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-stage-r27-scene-toolbar-status-simplification",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r28-checkout-qa-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-stage-r28-class-inventory",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-card--quiet",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-card--single",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-fix-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-fix-card--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-step-fix-card--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-step-illustration",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-illustration--materials",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-step-illustration--measure",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-step-illustration--modules",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-illustration--request",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-step-mode-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-mode-head--compact",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-mode-pill",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-step-text",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-text--micro",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-active-dot",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-active-dot-pulse",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-active-target-dot",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-back-panel",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-compartment-divider",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-corpus",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-drawer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-drill-hole",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-edge-band",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-edge-highlight",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-facade-panel",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-facade-side-gap",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-facades",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-feet",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-fill-group",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-handle",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-handles",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-hanger",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-hardware-group",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-inner-shadow",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-line",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-line--soft",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-rod",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-section-divider",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-selection-compartment",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-selection-layer",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-selection-section",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-shelf",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-side",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-side-plan-back",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-side-plan-body",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-side-plan-depth",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-side-plan-inner",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-side-plan-line",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-side-plan-shadow",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-side-selected-compartment",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-storage-box",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-top",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-svg-top-plan-back",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-top-plan-body",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-top-plan-inner",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-top-plan-line",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-top-plan-section",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-top-plan-shadow",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-validation-marker",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-svg-validation-marker--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-three-loading",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-three-product-hud",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-three-viewer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-three-viewer--product",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-timeline",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-toggle-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-validation-focus-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-validation-focus-card--error",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-validation-focus-card--warning",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "top-3",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d.css": {
+      "lines": 27,
+      "classCount": 1,
+      "classes": [
+        {
+          "name": "css",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/index.css": {
+      "lines": 843,
+      "classCount": 86,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-actions--dark",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-arrow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-grid--four",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-grid--three",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-number",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-text",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-card-visual--materials",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-card-visual--measure",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-card-visual--request",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-chip-dot",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-chip-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-chips",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-cta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-faq-item",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-faq-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-feature-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-feature-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer-bottom",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer-brand",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer-col-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer-link",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer-links",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-footer-text",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-hero-lead",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-card-arrow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-final",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-photo",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-hero-visual",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-main",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-section-head",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-section-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-home-step-number",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-how-chip-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-how-step-number",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-kicker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-kicker--dark",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-name",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-slider",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-surface",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-surface--ash",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-surface--black",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-surface--graphite",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-surface--grey",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-surface--oak",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-surface--sand",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-material-surface--texture",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-material-surface--white",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-measure-teaser",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-media-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-process-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-product-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-product-swatch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-product-swatch--dark",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-product-swatch--light",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-product-swatch--wood",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-reveal",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-secondary-cta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-showcase-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-split-block",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-illustration",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-step-text",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-dot",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-dot--a",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-dot--b",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-dot--c",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-marker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-marker--bottom",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-marker--dark",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-marker--hero",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-marker--top",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-visual-glow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "three-plus-marker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "three-plus-marker--small",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/00-base.css": {
+      "lines": 557,
+      "classCount": 37,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-done",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-primary",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-ready",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-add-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-control-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-body",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fallback",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-loading",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-picker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-mini-control",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-plus-preview",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-random-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-scene-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-section-pills",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-selection-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step-intro",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stepper",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-text-input",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-toggle-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-toolbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-type-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-validation",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-view-switch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-viewport",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-webgl-pill",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-workspace",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-three-viewer",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/10-scene-foundation.css": {
+      "lines": 33,
+      "classCount": 7,
+      "classes": [
+        {
+          "name": "is-ready",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-random-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-toolbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-viewport",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-webgl-pill",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-three-viewer--product",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/11-scene-selection-markers.css": {
+      "lines": 75,
+      "classCount": 9,
+      "classes": [
+        {
+          "name": "is-hovered",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-selected",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-model-label",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-model-plus",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-selection-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-toolbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-viewport",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-three-viewer--product",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/20-filling-controls.css": {
+      "lines": 157,
+      "classCount": 7,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-add-menu",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-add-open",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-element-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-elements-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-zone-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-zone-panel",
+          "referencedOutsideCss": false
+        }
+      ]
+    },
+    "src/styles/constructor3d/21-facade-controls.css": {
+      "lines": 98,
+      "classCount": 7,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-advanced-toggle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-facade-buttons",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-facade-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-zone-facade-override",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/30-materials.css": {
+      "lines": 197,
+      "classCount": 13,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-back-panel-preview",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-heading",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-picker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-preview",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-material-swatch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-tabs",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-toolbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-viewport",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-three-viewer--product",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/40-random-preset.css": {
+      "lines": 42,
+      "classCount": 3,
+      "classes": [
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-random-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-random-drawer-action",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/50-validation.css": {
+      "lines": 109,
+      "classCount": 9,
+      "classes": [
+        {
+          "name": "is-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-valid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-control-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-inline-issue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-inline-validation",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-validation-panel",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/60-checkout.css": {
+      "lines": 323,
+      "classCount": 21,
+      "classes": [
+        {
+          "name": "is-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-success",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-valid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-details",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-price-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-submit",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-toggle",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-consent",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-control-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-field",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-inline-issue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-inline-validation",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-submit-message",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-text-input",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-validation-panel",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/70-ui-kit-a11y-base.css": {
+      "lines": 150,
+      "classCount": 20,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-done",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-primary",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-action-help",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-submit",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-control-help",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-control-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-field",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-mini-control",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-random-chip",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-scene-legend",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--ghost",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--icon",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--primary",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--secondary",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/71-price-clarity.css": {
+      "lines": 24,
+      "classCount": 6,
+      "classes": [
+        {
+          "name": "rzm-3d-drawer-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-inline-validation",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-price-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-validation-panel",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/72-layout-hierarchy.css": {
+      "lines": 217,
+      "classCount": 22,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-completed",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-future",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-price-chip",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-scene-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar--q3",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-eyebrow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step-index",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step-issue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step-title",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step-wrap",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stepper",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stepper-block",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-toolbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-workspace",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/80-sizes-step.css": {
+      "lines": 201,
+      "classCount": 22,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-compact",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-completed",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-future",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-advanced-toggle--sizes",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-control-help",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-control-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-equalize-button",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-price-chip",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-section-formula",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-section-header",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-section-width-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-section-width-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-section-widths",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-size-block",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar--q4",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-step",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stepper",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stepper-block",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/81-filling-step-polish.css": {
+      "lines": 326,
+      "classCount": 35,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-add-menu--q5",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-body",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-element-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-elements-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-active-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-check",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-counters",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-empty-copy",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-empty-icon",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-empty-state",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-hint",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-section-header",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-shell--q5",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-validation-assist",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-validation-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-zone-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-q5-active-target",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-add-hint",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-add-menu",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-advanced-toggle",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-counter-grid",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-element-row",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-empty-selection",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-empty-selection__icon",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-empty-zone",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-fill-polish",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-panel-section",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-section-header",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-validation-block",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-zone-buttons",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-q5-zone-elements",
+          "referencedOutsideCss": false
+        }
+      ]
+    },
+    "src/styles/constructor3d/82-materials-step-polish.css": {
+      "lines": 167,
+      "classCount": 15,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-back-panel-preview",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-body",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-current",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-heading",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-kicker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-picker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-preview",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-material-summary",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-summary-item",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-swatch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-tabs",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-materials-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-shell",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/83-checkout-final-polish.css": {
+      "lines": 75,
+      "classCount": 11,
+      "classes": [
+        {
+          "name": "is-checkout",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-action-help",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout--q7",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-details",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-price",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-price-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-submit-note",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-consent--footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step-intro",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/84-scene-info-simplification.css": {
+      "lines": 48,
+      "classCount": 4,
+      "classes": [
+        {
+          "name": "rzm-3d-scene-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-scene-info",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-toolbar",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/85-loading-performance-states.css": {
+      "lines": 111,
+      "classCount": 8,
+      "classes": [
+        {
+          "name": "is-calculating",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-fallback-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-loading",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-loading-skeleton",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-price-chip",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-price-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-runtime-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-shell--q9",
+          "referencedOutsideCss": false
+        }
+      ]
+    },
+    "src/styles/constructor3d/86-reset-wcag-hardening.css": {
+      "lines": 105,
+      "classCount": 9,
+      "classes": [
+        {
+          "name": "rzm-3d-reset-dialog",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-reset-dialog-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-reset-dialog-backdrop",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-reset-dialog-kicker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-reset-row",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-reset-trigger",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-shell--q10-q11",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--danger",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/90-working-2d-fallback.css": {
+      "lines": 141,
+      "classCount": 10,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-blueprint-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-blueprint-fallback",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-blueprint-status",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-render-switch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-grid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-paper",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-blueprint-svg",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-model",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-svg-model",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/91-compact-constructor-shell.css": {
+      "lines": 197,
+      "classCount": 20,
+      "classes": [
+        {
+          "name": "rzm-3d-drawer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-price-chip",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-scene-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-scene-info",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-eyebrow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-toolbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-workspace",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell-exit",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell-header",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell-header-wrap",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell-logo",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell-reset",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell-status",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/92-ui-role-system.css": {
+      "lines": 365,
+      "classCount": 45,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-completed",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "is-fallback",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-loading",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-ready",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "is-warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-checkout-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-consent--footer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-control-group",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-actions",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-field",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-inline-validation",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-picker",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-mode-switch",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-price-block",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-price-chip",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-scene-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-scene-info",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-selection-card",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-shell",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-eyebrow",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-stagebar-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-status-badge",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-status-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-status-card--error",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-status-card--valid",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-status-card--warning",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-step",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-text-input",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-3d-toolbar",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-workspace",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-constructor-shell-header",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--autofix",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--danger",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--ghost",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--icon",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--mode",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--primary",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-ui-btn--secondary",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/93-sizes-product-logic.css": {
+      "lines": 87,
+      "classCount": 11,
+      "classes": [
+        {
+          "name": "is-active",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-dimensions-block",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-furniture-type-block",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-inline-fix",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-inline-issue",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-number-input",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-section-widths",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-sizes-step--stage08",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-type-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-type-grid--stage08",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/94-filling-facade-exact-mode.css": {
+      "lines": 124,
+      "classCount": 17,
+      "classes": [
+        {
+          "name": "rzm-3d-add-menu--q5",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-add-menu-clear",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-drawer-body",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-element-row",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-elements-list",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-facade-panel",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-active-meta",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-counters",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-empty-icon",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-empty-state",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-polish",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-section",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-fill-section-header",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-handle-control",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-shell--stage09",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-zone-list",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/95-real-materials-preview.css": {
+      "lines": 61,
+      "classCount": 5,
+      "classes": [
+        {
+          "name": "rzm-3d-material-zoom-apply",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-zoom-card",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-material-zoom-preview",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-materials-polish--stage11",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        }
+      ]
+    },
+    "src/styles/constructor3d/96-product-scene-composition.css": {
+      "lines": 18,
+      "classCount": 5,
+      "classes": [
+        {
+          "name": "rzm-3d-page",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-three-product-hud",
+          "referencedOutsideCss": true
+        },
+        {
+          "name": "rzm-three-viewer--checkout",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-three-viewer--materials",
+          "referencedOutsideCss": false
+        },
+        {
+          "name": "rzm-three-viewer--product",
+          "referencedOutsideCss": true
+        }
+      ]
+    }
+  }
+}

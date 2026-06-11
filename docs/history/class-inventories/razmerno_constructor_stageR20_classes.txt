@@ -1,0 +1,33 @@
+Stage R20 — список классов
+
+Добавлены/изменены в текущем этапе:
+- rzm-stage-r20-desktop-qa-polish — stage-scope на главной странице конструктора; ограничивает все R20 CSS-правки и не влияет на checkout/backend/order-flow.
+- rzm-stage-r20-desktop-qa-polish .rzm-r19-workspace.rzm-constructor-shell--simple — desktop grid конструктора; исправлена устойчивость колонок, чтобы сцена не выдавливала sidebar.
+- rzm-stage-r20-desktop-qa-polish .rzm-scene-workbar-actions — верхний toolbar сцены; уточнена сетка для режима, 2D/3D, видов камеры и price chip.
+- rzm-stage-r20-desktop-qa-polish .rzm-scene-view-switch — переключатель видов камеры; добавлена защита от переполнения.
+- rzm-stage-r20-desktop-qa-polish .rzm-constructor-canvas--svg-fallback — 2D canvas; очищен от декоративных 3D-слоёв.
+- rzm-stage-r20-desktop-qa-polish .rzm-blueprint-active-area — active selection на 2D-чертёже; зафиксирован non-scaling stroke.
+- rzm-stage-r20-class-inventory — marker-класс для инвентаризации этапа.
+
+Изменены в JSX/TSX:
+- rzm-fill-target-head — теперь текст «Выбрано» задан прямо в компоненте FillStep, без CSS-подмены.
+- rzm-fill-action-head — теперь текст «Наполнение» задан прямо в компоненте FillStep, без CSS-подмены.
+- rzm-blueprint-active-area — теперь использует точную геометрию выбранного отсека по высоте, а не равное деление.
+
+Удалены/исключены из подхода:
+- CSS-подмена текста через content:"Выбрано".
+- CSS-подмена текста через content:"Наполнение".
+- Декоративные orb/floor/model shadow в 2D fallback.
+
+Существующие классы, которые продолжили использоваться:
+- rzm-r19-workspace — основной desktop workspace.
+- rzm-constructor-shell--simple — grid shell конструктора.
+- rzm-constructor-sidebar--simple — левая панель конструктора.
+- rzm-constructor-scene--simple — правая область сцены.
+- rzm-scene-workbar — верхний блок сцены.
+- rzm-constructor-stepper — stepper Размеры / Наполнение / Материалы / Заявка.
+- rzm-constructor-price-chip — price chip.
+- rzm-constructor-canvas--svg-fallback — 2D renderer state.
+- rzm-constructor-canvas--webgl — 3D renderer state.
+- rzm-blueprint-svg — SVG-чертёж.
+- rzm-blueprint-section / rzm-blueprint-compartment — секции и отсеки на чертеже.

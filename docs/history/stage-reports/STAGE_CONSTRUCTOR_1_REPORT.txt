@@ -1,0 +1,48 @@
+Stage Constructor 1 — Materials Foundation
+
+1. Контекст этапа
+Цель этапа — подключить реальные декоры из архива, создать единый каталог материалов и использовать его на главной, в конструкторе и в сцене без изменения pricing engine, checkout, API, backend, Supabase, админки и production export.
+
+2. Что найдено в проекте
+Активный конструктор находится в src/static-pages/constructor. Материалы ранее были набором UI-токенов white/lightwood/oak/sand/graphite/black/gray. Эти токены использовались в store, MaterialsStep, SVG/Three preview, payload adapter и домашнем слайдере. Реальных декоров, толщин и разделения ЛДСП/МДФ/ХДФ не было.
+
+3. Что можно менять
+В рамках этапа изменены только каталог материалов, выбор материалов, визуальные текстуры сцены и home materials slider. Store обновлён только в части нормализации material id. Payload adapter обновлён только для корректной передачи materialId/facadeKind из выбранного материала.
+
+4. Что нельзя менять
+Не менялись checkout, submit hook, backend/API, Supabase, admin, pricing engine, delivery/assembly logic, production export internals.
+
+5. План изменений
+- Перенести изображения декоров в public/decors.
+- Создать единый каталог материалов.
+- Описать ЛДСП 16 мм, МДФ 18 мм, ХДФ 3 мм.
+- Добавить mapping ЛДСП -> ХДФ.
+- Обновить MaterialsStep: корпус только ЛДСП, фасады ЛДСП/МДФ, задняя стенка read-only.
+- Перевести home materials slider на общий каталог.
+- Обновить SVG/Three preview, чтобы использовались реальные textureUrl/fallbackHex.
+- Добавить тесты каталога.
+- Прогнать typecheck/build и профильные тесты.
+
+6. Внесённые правки
+- Добавлены реальные изображения декоров в public/decors/ldsp, public/decors/mdf, public/decors/hdf.
+- Добавлены src/shared/materials/materialTypes.ts, materialCatalog.ts, materialMapping.ts, materialCatalog.test.ts.
+- Обновлён src/static-pages/constructor/options.ts: materialOptions теперь берёт только ЛДСП для корпуса, facadeOptions — ЛДСП+МДФ.
+- Обновлён src/static-pages/constructor/types.ts: MaterialToken теперь связан с общим каталогом и legacy aliases.
+- Обновлён constructorStore: старые UI-токены нормализуются в реальные material id, initial material — реальный ЛДСП W960.
+- Обновлён MaterialsStep: два слайдера с реальными texture preview и read-only блок задней стенки ХДФ.
+- Обновлён HomeMaterialsSlider: данные берутся из общего каталога, используются реальные изображения ЛДСП.
+- Обновлён ConstructorRealisticSvgModel: SVG fallback использует pattern с textureUrl для корпуса и ХДФ задней стенки.
+- Обновлён threeMaterials: Three.js materials используют реальные textureUrl и fallbackHex.
+- Обновлён constructorPayload adapter: selected material/facade material резолвятся через общий каталог; facadeKind берётся из выбранного фасадного материала.
+- Обновлены тесты, где старый token graphite теперь нормализуется в реальный material id.
+
+7. Ревью: план vs факт
+План выполнен. Материалы подключены как единый источник данных. Главная, UI конструктора, SVG fallback и Three preview больше не используют отдельные захардкоженные псевдодекоры. Цена не пересобиралась и pricing engine не менялся.
+
+8. Анализ рисков
+- Цена пока не учитывает реальные material id и толщины: это намеренно оставлено на отдельный этап, чтобы не сломать текущую интеграцию заявки.
+- Store пока хранит плоские material/facadeMaterial id, а не полноценную ProjectMaterials-модель с backPanelMaterialId. Back panel вычисляется helper-ом. Полную ProjectMaterials-модель нужно делать на следующем этапе.
+- В payload теперь facadeKind может быть mdf. Это корректно по данным, но производственный расчёт цены всё ещё не пересобран под МДФ.
+
+9. Следующий шаг
+Stage Constructor 2 — Project model + store foundation: ввести ProjectMaterials, backPanelMaterialId в state/rules, подготовить normalizeProject/validateProject skeleton и дефолты для шкаф/тумба/комод без изменения checkout/backend/pricing.

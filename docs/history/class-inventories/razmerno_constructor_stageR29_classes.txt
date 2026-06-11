@@ -1,0 +1,17 @@
+Stage R29 — Desktop E2E Tests + Cleanup: classes and touched UI hooks
+
+Added / changed in this stage:
+- rzm-stage-r29-e2e-cleanup
+  Scope class on src/static-pages/ConstructorPage.tsx for the final desktop E2E/cleanup pass.
+  Purpose: marks the active constructor build after R23–R29 stabilization and allows static guards to verify the correct shell is active.
+
+Accessibility hooks changed:
+- rzm-constructor-input-btn
+  Existing shared control button class.
+  Stage R29 adds aria-labels to MiniControl +/- buttons, so browser tests and users with assistive technology can target controls by action: "Увеличить секции", "Увеличить полки", etc.
+
+Removed unused components:
+- CheckoutNextCard.tsx
+  Removed because the current checkout action panel in ConstructorCheckoutLayout already renders the next-step list.
+- CheckoutSummaryCard.tsx
+  Removed because the current R18/R28 checkout topbar and final action panel replaced it.

@@ -1,0 +1,17 @@
+{
+  "schema": "razmerno.normalized-price-list.v1",
+  "sourceFile": "Прайс-лист для дилеров до 01.04.26.xlsx",
+  "markupMultiplier": 1.3,
+  "generatedMode": "manual-mvp-seed",
+  "items": [
+    { "id": "sonoma", "kind": "decor", "sourceSheet": "Kronospan", "sourceRow": null, "producer": "Kronospan", "article": "3025 PR", "title": "Дуб Сонома Светлый", "unit": "m2", "sourcePrice": 1420.28, "priceWithMarkup": 1846 },
+    { "id": "white", "kind": "decor", "sourceSheet": "Egger", "sourceRow": null, "producer": "Egger", "article": "W960 SM", "title": "Белый классический", "unit": "m2", "sourcePrice": 1709.45, "priceWithMarkup": 2222 },
+    { "id": "stone", "kind": "decor", "sourceSheet": "Egger", "sourceRow": null, "producer": "Egger", "article": "F186 ST9", "title": "Бетон Чикаго светло-серый", "unit": "m2", "sourcePrice": 2227.93, "priceWithMarkup": 2896 },
+    { "id": "oak", "kind": "decor", "sourceSheet": "Egger", "sourceRow": null, "producer": "Egger", "article": "H1318 ST10", "title": "Дикий дуб натуральный", "unit": "m2", "sourcePrice": 2021.79, "priceWithMarkup": 2628 },
+    { "id": "abs-19x1-plain", "kind": "edge", "sourceSheet": "Кромка", "sourceRow": null, "title": "ABS 19×1 мм однотонная", "unit": "lm", "sourcePrice": 61, "priceWithMarkup": 79 },
+    { "id": "abs-19x1-wood", "kind": "edge", "sourceSheet": "Кромка", "sourceRow": null, "title": "ABS 19×1 мм древесная", "unit": "lm", "sourcePrice": 72, "priceWithMarkup": 94 },
+    { "id": "customPanelProcessing", "kind": "service", "sourceSheet": "Услуги", "sourceRow": null, "title": "Обработка заказного ЛДСП", "unit": "m2", "sourcePrice": 1500, "priceWithMarkup": 1950 },
+    { "id": "cardboardPackaging", "kind": "service", "sourceSheet": "Услуги", "sourceRow": null, "title": "Упаковка заказа в гофрокартон", "unit": "m2", "sourcePrice": 120, "priceWithMarkup": 156 },
+    { "id": "stretchPackaging", "kind": "service", "sourceSheet": "Услуги", "sourceRow": null, "title": "Упаковка заказа в стрейч", "unit": "m2", "sourcePrice": 20, "priceWithMarkup": 26 }
+  ]
+}

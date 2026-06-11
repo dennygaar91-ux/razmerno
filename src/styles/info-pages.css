@@ -1,0 +1,196 @@
+/* Info pages CSS split v24: moved from src/index.css without selector changes. */
+
+
+.rzm-measure-final-shell .rzm-hero-lead {
+  color: rgba(255,255,255,.72);
+}
+
+.rzm-measure-final-shell .rzm-secondary-cta {
+  background: rgba(255,255,255,.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+  color: rgba(255,255,255,.92);
+}
+
+
+@media (max-width: 620px) {
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  .rzm-measure-actions .rzm-cta,
+  .rzm-measure-actions .rzm-secondary-cta {
+    width: 100%;
+  }
+}
+
+  
+
+
+.rzm-material-swatch {
+  height: 104px;
+  border-radius: 22px;
+  box-shadow: inset 0 0 0 1px rgba(42,44,65,.07);
+  position: relative;
+  overflow: hidden;
+}
+
+.rzm-material-swatch--white { background: linear-gradient(135deg, #FFFFFF, #F1F0EA); }
+.rzm-material-swatch--lightwood {
+  background:
+    repeating-linear-gradient(90deg, rgba(130,92,52,.09) 0 2px, transparent 2px 16px),
+    linear-gradient(135deg, #F1DFC1, #D8BD8E);
+}
+.rzm-material-swatch--oak {
+  background:
+    repeating-linear-gradient(90deg, rgba(86,55,27,.13) 0 2px, transparent 2px 15px),
+    linear-gradient(135deg, #DDBB82, #AD7844);
+}
+.rzm-material-swatch--sand { background: linear-gradient(135deg, #E7D3B2, #C7AA7E); }
+.rzm-material-swatch--graphite { background: linear-gradient(135deg, #5C6074, #34364E); }
+.rzm-material-swatch--black { background: linear-gradient(135deg, #2A2C41, #12131E); }
+.rzm-material-swatch--gray { background: linear-gradient(135deg, #C9CDD8, #8B91A3); }
+
+
+.rzm-material-card .rzm-step-text {
+  margin-top: 7px;
+}
+
+
+.rzm-material-final-shell .rzm-hero-lead {
+  color: rgba(255,255,255,.72);
+}
+
+.rzm-material-final-shell .rzm-secondary-cta {
+  background: rgba(255,255,255,.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+  color: rgba(255,255,255,.92);
+}
+
+
+@media (max-width: 620px) {
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  .rzm-material-actions .rzm-cta,
+  .rzm-material-actions .rzm-secondary-cta {
+    width: 100%;
+  }
+}
+
+  
+
+
+.rzm-assembly-part {
+  position: absolute;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #34364E, var(--rzm-dark));
+  box-shadow: 0 22px 42px rgba(42,44,65,.14);
+}
+
+.rzm-assembly-part--left {
+  left: 88px;
+  top: 86px;
+  width: 36px;
+  height: 210px;
+}
+
+.rzm-assembly-part--right {
+  right: 88px;
+  top: 86px;
+  width: 36px;
+  height: 210px;
+}
+
+.rzm-assembly-part--top {
+  left: 150px;
+  top: 70px;
+  width: 150px;
+  height: 34px;
+}
+
+.rzm-assembly-part--bottom {
+  left: 150px;
+  bottom: 68px;
+  width: 150px;
+  height: 34px;
+}
+
+.rzm-assembly-part--shelf {
+  left: 170px;
+  top: 178px;
+  width: 112px;
+  height: 24px;
+  background: linear-gradient(135deg, #FDBF50, #FF724C);
+}
+
+.rzm-assembly-path {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 220px;
+  height: 220px;
+  border: 1.5px dashed rgba(42,44,65,.22);
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+}
+
+
+.rzm-assembly-card .rzm-step-text {
+  margin-top: 12px;
+}
+
+
+.rzm-assembly-final-shell .rzm-hero-lead {
+  color: rgba(255,255,255,.72);
+}
+
+.rzm-assembly-final-shell .rzm-secondary-cta {
+  background: rgba(255,255,255,.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+  color: rgba(255,255,255,.92);
+}
+
+
+@media (max-width: 620px) {
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  .rzm-assembly-actions .rzm-cta,
+  .rzm-assembly-actions .rzm-secondary-cta {
+    width: 100%;
+  }
+}

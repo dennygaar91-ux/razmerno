@@ -1,0 +1,59 @@
+Stage Constructor 10 — Production snapshot foundation
+
+Scope:
+- Production preview / production export foundation for the new constructor structures.
+- Panels, materials, thicknesses, manual section widths, per-section open/hinged facade modes, HDF back panel.
+- No checkout UI, submit hook, backend API handlers, Supabase, admin, pricing engine or delivery/assembly logic changes.
+
+Files changed:
+- api/_shared/order-types.ts
+- src/shared/lib/order.ts
+- src/static-pages/constructor/adapters/constructorPayload.ts
+- src/static-pages/constructor/adapters/constructorPayload.test.ts
+- src/static-pages/constructor/adapters/productionPreviewAdapter.test.ts
+- src/constructor/production/orderExportPackage.ts
+- src/constructor/geometry/types.ts
+- src/constructor/geometry/layoutMetrics.ts
+- src/constructor/geometry/buildPanels.ts
+- src/constructor/geometry/buildFacades.ts
+- src/constructor/geometry/buildDrawers.ts
+- src/constructor/geometry/buildHardware.ts
+- src/constructor/geometry/buildBackPanel.ts
+
+Implemented:
+1. Added a geometry layout metrics helper that converts constructor section widths into production inner section metrics.
+2. Geometry builder now uses manual section width proportions for partitions, shelves, drawer targets, facade targets and rod targets.
+3. Geometry sections can carry per-section facadeMode: open / hinged.
+4. Facade builder skips open sections and builds doors only for hinged sections.
+5. MDF facade panels are now marked as materialType mdf when facade thickness is 18 mm; LDSP facades stay ldsp when thickness is 16 mm.
+6. Drawer fronts also use mdf/ldsp materialType based on facade thickness.
+7. Order payload and order types now carry optional backPanelId/backPanelKind without changing checkout flow.
+8. Constructor payload derives backPanelId centrally from the body LDSP mapping.
+9. Production export from order uses backPanelId and HDF 3 mm thickness.
+10. Production preview tests now cover real HDF mapping, MDF thickness and open-section facade behavior.
+
+Known limitations:
+- Pricing still does not use the new material/thickness model. This is intentionally untouched.
+- Hardware/drilling remains MVP/skeleton and still requires technologist check for many operations.
+- Drawer slide and rod-holder drilling is still simplified and not a final factory drilling map.
+- Production snapshot is available through preview/export generation, not yet persisted as a separate store field after each action.
+
+Checks passed:
+- npm install
+- npm run typecheck
+- npm run typecheck:api
+- npm run test:production-preview
+- npm run test:constructor-payload
+- npm run test:constructor-store
+- npm run test:constructor-draft
+- npm run test:constructor-flow
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:geometry-build-context
+- npm run test:layout-geometry
+- npm run test:layout-drawers-geometry
+- npm run test:layout-rod-geometry
+- npm run build
+
+Build note:
+- Existing large chunk warnings for price-catalog and three-core remain. They are not caused by this stage.

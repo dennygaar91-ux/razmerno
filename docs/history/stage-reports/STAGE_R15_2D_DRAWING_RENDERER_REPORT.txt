@@ -1,0 +1,60 @@
+Stage R15 — professional 2D Drawing Renderer
+
+Вопросы перед стартом:
+- Дополнительных вопросов не было. Направление уже согласовано: desktop first, 2D должен быть чертежом без декоров, mobile не трогаем, pricing/order/backend/API/Supabase не трогаем.
+
+Что планировалось:
+1. Синхронизировать браузерные smoke-тесты с новым desktop UI после Stage R13/R14.
+2. Убрать mobile smoke из текущего desktop-first scope.
+3. Пересобрать 2D SVG так, чтобы это был чертёж, а не декоративная модель.
+4. Добавить front view + mini side view для глубины.
+5. Сделать размерные линии ширины, высоты и глубины.
+6. Оставить материалы за пределами чертежа.
+7. Не трогать расчёт, заявки, checkout-flow, backend, API, Supabase, admin, export.
+
+Что сделано:
+1. Обновлён tests/browser/configurator.spec.ts под актуальные тексты и классы desktop-shell:
+   - Размеры / Наполнение / Выберите внешний вид / Проверьте контакты.
+   - Проверка .rzm-r13-workspace и .rzm-constructor-stepper.
+   - Проверка 2D/3D, view modes, price chip.
+2. Удалён mobile smoke из основного браузерного теста, потому что mobile временно вне scope.
+3. Обновлён scripts/browser-smoke-static.mjs:
+   - теперь проверяет отсутствие старых текстов и mobile smoke;
+   - проверяет новые desktop-shell selectors.
+4. Переписан front 2D blueprint в ConstructorRealisticSvgModel.tsx:
+   - новый широкий viewBox 680×460;
+   - фронтальный чертёж вынесен как главный вид;
+   - рядом добавлен mini side view для глубины;
+   - добавлены размерные линии ширины, высоты, глубины;
+   - полки/ящики/штанга отображаются условными чертёжными элементами;
+   - active area сделана тонкой оранжевой рамкой;
+   - warning marker стал компактным маркером внутри проблемного отсека.
+5. Добавлен CSS-слой Stage R15 в src/styles/constructor.css.
+6. Добавлен файл razmerno_constructor_stageR15_classes.txt.
+
+Проверки:
+- npm run typecheck — пройдено.
+- npm run build — пройдено после npm install в sandbox, потому что node_modules из Windows-архива не содержал Linux optional dependency Rollup.
+- npm run test:constructor-three — пройдено.
+- npm run test:constructor-three-safety — пройдено.
+- npm run test:browser-smoke-static — пройдено.
+
+Ошибки / ограничения:
+1. npm run test:browser-smoke в sandbox не может быть подтверждён, потому что в Linux sandbox отсутствует Playwright Chromium binary.
+2. npx playwright install chromium в sandbox не смог скачать браузер из-за DNS/network EAI_AGAIN cdn.playwright.dev.
+3. У пользователя локально Chromium установлен, поэтому финальный browser-smoke нужно прогнать локально.
+4. Визуальное качество 3D этим этапом не улучшалось — это отдельный Stage R17 после подтверждения runtime.
+
+Что не трогалось:
+- pricing engine;
+- заявки;
+- checkout-flow;
+- API;
+- backend;
+- Supabase;
+- admin;
+- export logic;
+- mobile UX/CSS.
+
+Следующий рекомендуемый этап:
+Stage R16 — materials and sidebar visual polish: компактные swatches, упрощение tabs ЛДСП/МДФ, read-only строка задней стенки, финальное выравнивание spacing в левой панели.

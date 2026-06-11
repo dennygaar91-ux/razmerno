@@ -1,0 +1,22 @@
+Stage Q8.1 class notes
+
+Added / changed:
+- rzm-3d-shell--q8-1: current shell marker for Q8.1 CSS scope repair.
+- rzm-3d-stagebar--q8-1: current stagebar marker for Q8.1.
+
+Repaired scope:
+- rzm-3d-materials-polish: material step polish now applies through stable component-level selector, not through old .rzm-3d-shell--q7.
+- rzm-3d-material-summary: selected material summary styling now applies in Q8.1 shell.
+- rzm-3d-material-picker: material list container styling now applies in Q8.1 shell.
+- rzm-3d-material-heading: sticky category header styling now applies in Q8.1 shell.
+- rzm-3d-material-current: selected material panel styling now applies in Q8.1 shell.
+- rzm-3d-material-preview: click-preview styling now applies in Q8.1 shell.
+- rzm-3d-material-list: material list styling and active states now apply in Q8.1 shell.
+- rzm-3d-back-panel-preview: read-only HDF panel preview styling now applies in Q8.1 shell.
+- rzm-3d-drawer-footer.is-checkout: checkout sticky footer styling now applies in Q8.1 shell.
+- rzm-3d-consent--footer: consent near submit styling now applies in Q8.1 shell.
+- rzm-3d-checkout--q7: kept as semantic checkout final polish marker, but CSS now scopes through stable shell class.
+- rzm-3d-scene-info: Q8 scene info bar remains active and stable.
+
+No longer used for active visual polish:
+- .rzm-3d-shell--q7 dependency was removed from active Q6/Q7 polish selectors.

@@ -1,0 +1,68 @@
+Stage R13 — Desktop constructor shell rebuild
+
+Вопросы перед стартом:
+- Дополнительных решений пользователя не требовалось. Направление уже зафиксировано: desktop first, без mobile-этапа, не трогать pricing/order/backend/Supabase/API.
+
+Что планировалось:
+1. Пересобрать композицию desktop-конструктора: sidebar + основная сцена вместо разрозненных блоков.
+2. Убрать правый price rail, который конкурировал со сценой и ломал баланс.
+3. Сделать верхнюю область сцены двухуровневой: stepper отдельно, рабочий статус/цена отдельно.
+4. Зафиксировать высоту sidebar и сцены, чтобы панель больше не растягивала весь экран.
+5. Закрепить нижние actions внутри sidebar и оставить scroll только у содержимого шага.
+6. Не трогать расчет стоимости, заявки, checkout-flow, API, backend, Supabase и order/export logic.
+
+Что сделано:
+1. src/configurator/ConfiguratorPage.tsx:
+   - Удалена прежняя guided-layout композиция с отдельным right PriceCard rail.
+   - Добавлен новый desktop workspace: .rzm-r13-workspace.
+   - Добавлена левая колонка настроек: .rzm-r13-sidebar и .rzm-r13-sidebar-card.
+   - Добавлена основная рабочая область: .rzm-r13-main и .rzm-r13-scene-shell.
+   - Stepper перенесен внутрь scene shell как отдельный верхний уровень.
+   - Добавлен workbar под stepper: режим, статус конфигурации, price chip.
+   - Price chip теперь ведет на шаг заявки, не открывая checkout напрямую.
+   - MobileBottomBar удален из рендера конструктора, так как mobile сейчас не в scope.
+   - CheckoutDrawer оставлен без изменений.
+
+2. src/styles/constructor.css:
+   - Добавлен CSS-блок Stage R13.
+   - Создана фиксированная desktop-сетка 356px + scene.
+   - Sidebar получил sticky-позицию и управляемую высоту.
+   - Содержимое активного шага теперь скроллится внутри sidebar.
+   - Actions шага закреплены внизу панели.
+   - Scene shell получил единую карточную поверхность и стабильную сетку.
+   - HorizontalStepper стилизован внутри нового верхнего блока.
+   - Добавлены scene status и price chip в едином стиле.
+   - Scene viewport получил стабильную высоту, фон-сетку и нормальный контейнер.
+
+Что не делалось:
+- Не переписывался 2D drawing renderer.
+- Не полировался Three.js visual.
+- Не менялась логика pricing.
+- Не менялась логика заявки.
+- Не менялся checkout-flow.
+- Не трогались API, backend, Supabase, admin, export logic.
+- Не выполнялась mobile-разработка.
+
+Проверки:
+PASSED npm run typecheck
+PASSED npm run build
+PASSED npm run test:constructor-three
+PASSED npm run test:constructor-three-safety
+PASSED npm run test:browser-smoke-static
+PASSED npm run test:layout-state
+PASSED npm run test:compartment-ui
+PASSED npm run test:layout-validation
+
+Не прошла проверка:
+FAILED npm run test:browser-smoke
+Причина: отсутствует Playwright Chromium binary в sandbox:
+/home/oai/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+Это ограничение окружения, а не подтвержденная ошибка кода. Ранее скачать браузер не удалось из-за network/DNS.
+
+Риски:
+1. Визуальный результат Stage R13 нужно обязательно проверить локально в браузере скриншотом.
+2. Верхний workbar пока не управляет внутренним ThreeViewer toolbar напрямую; это сделано намеренно, чтобы не ломать 3D state до отдельного этапа.
+3. 2D renderer пока остается прежним по логике, только помещен в более стабильный scene shell.
+
+Следующий рекомендуемый Stage:
+Stage R14 — реальное упрощение обычного режима, особенно шага «Наполнение»: убрать advanced-сущности из обычного режима, оставить только секция / отсек / добавить / фасады / ручки / одна главная ошибка.

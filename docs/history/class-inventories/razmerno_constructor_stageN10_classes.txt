@@ -1,0 +1,13 @@
+Stage N10 — новые/изменённые классы и атрибуты
+
+Добавлено/изменено в src/static-pages/Constructor3DPage.tsx:
+- .rzm-3d-page — основной контейнер новой 3D-first страницы; stage marker обновлён до data-stage="N10".
+- .rzm-3d-shell--n10 — маркер финального N10 shell для E2E/static-проверок; используется вместе с базовым .rzm-3d-shell.
+- [data-testid="constructor-3d-viewport"] — стабильный тестовый маркер viewport 3D-сцены.
+- .rzm-3d-random-chip — существующий чип «Рандомно»; добавлен aria-label «Применить случайный пресет к выбранной секции».
+- .rzm-3d-checkout[data-stage="N10"] — marker финального checkout-состояния внутри нового 3D shell.
+
+Доступность controls:
+- NumberControl: кнопки +/- получили aria-label «Уменьшить ...» / «Увеличить ...» для E2E-тестов и screen readers.
+
+Новых визуальных CSS-правил в Stage N10 не добавлялось: этап фокусировался на E2E, QA-маркерах и безопасном cleanup без изменения визуала.

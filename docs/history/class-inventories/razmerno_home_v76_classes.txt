@@ -1,0 +1,177 @@
+Размерно — главная страница v76: список классов
+
+Принцип этапа
+- Повторяющиеся элементы вынесены в общие классы: карточки, сетки, кнопки, chips, section header, FAQ, footer, material cards.
+- Старые неиспользуемые секции HomePrice и HomeCustomProject удалены из src/static-pages/home, чтобы не оставлять дублирующие блоки главной.
+- Расчёт, заявки, backend/API, Supabase, админка и логика конструктора не трогались.
+
+1. Общая структура главной
+- .rzm-home-main — общий контейнер main главной страницы; задаёт ширину var(--rzm-container), вертикальный rhythm и отступ от header.
+- .rzm-home-section — единая оболочка светлого блока главной: padding, radius, glass-background, inset border, soft shadow.
+- .rzm-home-section-head — единый layout заголовка секции: title слева, lead справа.
+- .rzm-home-section-title — единый крупный заголовок секций.
+- .rzm-reveal — единая reveal-анимация для блоков.
+
+Добавлено/изменено в текущем этапе:
+- .rzm-home-main изменён под финальную структуру.
+- .rzm-home-section полностью стандартизирован.
+- .rzm-home-section-head и .rzm-home-section-title используются как базовые классы для всех секций.
+
+2. Текст, chips, маркеры
+- .rzm-hero-lead — общий lead-текст для Hero и секций.
+- .rzm-kicker — общий chip-заголовок блока.
+- .rzm-kicker--dark — dark-context вариант chip в финальном CTA.
+- .rzm-how-chip-title — сохранён как совместимый alias для shared SectionHeader и info pages.
+- .rzm-chip-dot — единая оранжевая точка внутри chips/kicker.
+- .rzm-chip-row — общий ряд chips.
+- .rzm-chip — общий pill-chip для преимуществ.
+- .rzm-card-text — общий текст внутри карточек.
+- .rzm-step-text — сохранён как совместимый alias для старых/shared компонентов.
+
+Добавлено/изменено в текущем этапе:
+- .rzm-kicker добавлен как новый системный класс.
+- .rzm-card-text добавлен как базовый класс текста карточек.
+- .rzm-step-text стандартизирован, чтобы не было нескольких разных определений.
+
+3. Кнопки и actions
+- .rzm-actions — общий flex-контейнер CTA-кнопок.
+- .rzm-home-actions — совместимый alias для старых компонентов, использует ту же систему.
+- .rzm-secondary-cta — единая вторичная кнопка.
+- .rzm-actions--dark — dark-context вариант для кнопок в тёмном CTA.
+- .rzm-cta — primary CTA берётся из src/styles/header.css и переиспользуется без локальных копий.
+
+Добавлено/изменено в текущем этапе:
+- .rzm-actions добавлен как основной класс для рядов кнопок.
+- .rzm-secondary-cta приведён к единому размеру, radius, hover и dark-варианту.
+
+4. Сетки и карточки
+- .rzm-card-grid — общий grid для карточек.
+- .rzm-card-grid--four — grid на 4 карточки для блока «От размера до заявки».
+- .rzm-card-grid--three — grid на 3 карточки для блока типов мебели.
+- .rzm-process-card — карточка шага процесса.
+- .rzm-product-card — карточка типа мебели.
+- .rzm-feature-card — карточка пункта комплекта.
+- .rzm-card-number — единый номер/маркер в карточках.
+- .rzm-home-step-number и .rzm-how-step-number — совместимые aliases для существующих компонентов.
+- .rzm-card-arrow — единая стрелка карточки.
+- .rzm-home-card-arrow — совместимый alias для старых компонентов.
+- .rzm-card-visual — общий mini-visual внутри карточки.
+- .rzm-step-illustration — совместимый alias.
+- .rzm-card-visual--measure — variant визуала для размеров.
+- .rzm-card-visual--modules — variant визуала для наполнения.
+- .rzm-card-visual--materials — variant визуала для декора.
+- .rzm-card-visual--request — variant визуала для заявки.
+
+Добавлено/изменено в текущем этапе:
+- Карточки процесса, продукта, комплекта и материалов теперь используют общую базовую геометрию: radius, background, inset border, hover.
+- Визуальные variants сведены к одной системе .rzm-card-visual--*.
+
+5. Hero
+- .rzm-home-hero — сетка первого экрана.
+- .rzm-home-hero-copy — текстовая колонка Hero.
+- .rzm-home-hero-title — главный заголовок Hero.
+- .rzm-home-hero-lead — уточняющий modifier для lead в Hero.
+- .rzm-home-hero-visual — visual-карточка Hero.
+- .rzm-home-hero-photo — изображение внутри Hero.
+- .rzm-visual-glow — мягкая тень/свечение под visual.
+- .rzm-ui-marker — общий floating marker.
+- .rzm-ui-marker--hero — variant marker в Hero.
+- .rzm-ui-marker--top — позиция top/right.
+- .rzm-ui-marker--bottom — позиция bottom/left.
+
+Добавлено/изменено в текущем этапе:
+- Hero переписан под финальную концепцию «Соберите мебель под свой размер — как понятный конструктор».
+- Старые форматы chips «шкаф/тумба/комод» заменены на trust chips.
+- UI-метки приведены к общему классу .rzm-ui-marker.
+
+6. Блок комплекта
+- .rzm-split-block — общий двухколоночный split-layout.
+- .rzm-media-card — карточка с изображением.
+- .rzm-feature-list — сетка пунктов комплекта.
+- .rzm-feature-card — пункт комплекта.
+- .rzm-ui-marker--dark — dark marker поверх изображения.
+
+Добавлено/изменено в текущем этапе:
+- Блок «Что приезжает в комплекте» переписан в смысл «готовый комплект для сборки».
+- Карточки справа унифицированы через .rzm-feature-card.
+
+7. Блок типов мебели
+- .rzm-showcase-card — крупный visual-блок ассортимента/модульности.
+- .rzm-ui-dot — общий оранжевый marker-точка на visual.
+- .rzm-ui-dot--a / --b / --c — позиции точек на visual.
+- .rzm-product-swatch — цветовая плашка внутри карточки типа мебели.
+- .rzm-product-swatch--dark — тёмный вариант.
+- .rzm-product-swatch--light — светлый вариант.
+- .rzm-product-swatch--wood — древесный вариант.
+
+Добавлено/изменено в текущем этапе:
+- Блок перестроен как модульная система, а не просто каталог.
+- Карточки шкаф/комод/тумба используют единый .rzm-product-card.
+
+8. Слайдер материалов
+- .rzm-material-slider — горизонтальный слайдер/scroll-container материалов.
+- .rzm-material-card — карточка материала.
+- .rzm-material-card.is-active — active-состояние выбранного материала.
+- .rzm-material-surface — поверхность образца материала.
+- .rzm-material-surface--white — белый.
+- .rzm-material-surface--ash — светлое дерево.
+- .rzm-material-surface--oak — тёплый дуб.
+- .rzm-material-surface--sand — песочный.
+- .rzm-material-surface--graphite — графит.
+- .rzm-material-surface--black — чёрный.
+- .rzm-material-surface--grey — серый.
+- .rzm-material-name — название декора.
+- .rzm-material-note — короткое описание декора.
+
+Добавлено/изменено в текущем этапе:
+- Добавлен новый компонент HomeMaterialsSlider.tsx.
+- Добавлен компактный горизонтальный слайдер из 7 декоров.
+- Оранжевый не используется как материал, только как UI accent.
+
+9. Teaser замеров
+- .rzm-measure-teaser — компактный блок-переход на страницу «Замеры».
+
+Добавлено/изменено в текущем этапе:
+- Добавлен HomeMeasurementsTeaser.tsx.
+- Блок закрывает страх ошибки в размерах без раздувания главной.
+
+10. FAQ
+- .rzm-faq-list — список accordion items.
+- .rzm-faq-item — единый details/summary item FAQ.
+- .rzm-faq-item summary — строка вопроса.
+- .rzm-faq-item[open] — состояние открытого вопроса.
+
+Добавлено/изменено в текущем этапе:
+- FAQ расширен до 8 вопросов.
+- Все FAQ items используют один класс .rzm-faq-item.
+
+11. Финальный CTA
+- .rzm-home-final — тёмный финальный CTA-блок.
+- .rzm-actions--dark — dark variant для кнопок внутри CTA.
+
+Добавлено/изменено в текущем этапе:
+- Заголовок зафиксирован: «Соберите первый проект».
+- Основная кнопка: «Начать с размеров».
+- Вторичная кнопка: «Посмотреть замеры».
+
+12. Footer
+- .rzm-footer — общий контейнер footer.
+- .rzm-footer-shell — grid footer.
+- .rzm-footer-brand — колонка бренда.
+- .rzm-footer-text — описание бренда.
+- .rzm-footer-col — колонка footer.
+- .rzm-footer-col-title — заголовок колонки.
+- .rzm-footer-links — список ссылок.
+- .rzm-footer-link — ссылка footer.
+- .rzm-footer-bottom — нижняя юридическая строка.
+
+Добавлено/изменено в текущем этапе:
+- Footer расширен до варианта B: разделы, контакты, документы, юридическая строка.
+- Юридические данные оставлены честной заглушкой до публичного запуска.
+
+13. Адаптив
+- @media (max-width: 1120px) — переход главных сеток в одну колонку, карточки процесса в 2 колонки, footer 2 колонки.
+- @media (max-width: 720px) — mobile-layout: один столбец, full-width CTA, горизонтальный слайдер материалов, уменьшенные радиусы и типографика.
+
+Добавлено/изменено в текущем этапе:
+- Проверена адаптивная логика CSS для Hero, карточек, материалов, FAQ, CTA и footer.

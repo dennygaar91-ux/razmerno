@@ -1,0 +1,35 @@
+Stage R24 — 2D Blueprint Finalization
+
+Goal:
+Turn the 2D mode into a stronger technical blueprint rather than a fallback-looking decorative drawing.
+
+Planned scope:
+1. Enlarge the 2D drawing inside the scene.
+2. Remove material chips from the SVG/canvas layer.
+3. Keep materials in the scene status bar only.
+4. Rebuild top view so it shows facade plane, back panel, depth, and selected section more clearly.
+5. Improve side view depth communication.
+6. Make active outline thinner and less decorative.
+7. Reduce decorative facade fills in 2D.
+8. Keep pricing/order/backend/API/Supabase/mobile untouched.
+
+Done:
+1. Rebuilt ConstructorRealisticSvgModel around a larger 760×500 SVG sheet.
+2. Enlarged front-view drawing proportions and gave the cabinet more visual priority.
+3. Removed MaterialNote render from 2D blueprint; material names no longer appear inside the drawing layer.
+4. Rebuilt top view with dedicated facade line, back-panel line, width/depth dimension lines, and selected section highlight.
+5. Rebuilt side view with clearer depth line, facade plane, back-panel plane, and height dimension.
+6. Added a scoped Stage R24 CSS layer.
+7. Reduced active outline weight and made it more technical.
+8. Made facade visualization transparent/dashed instead of decorative material-like fill.
+9. Updated static smoke checks so Stage R24 cannot be accidentally omitted.
+
+Not changed:
+- Pricing engine.
+- Order/checkout submit flow.
+- API/backend/Supabase/admin/export.
+- Mobile UX/CSS.
+- Three.js runtime logic.
+
+Known limitation:
+Browser visual verification still needs local Playwright/Chrome run on the user's machine because the assistant sandbox cannot run the Playwright Chromium browser reliably.

@@ -1,0 +1,18 @@
+Stage Q9 classes / components
+
+Added / changed:
+- .rzm-3d-shell--q9 — Q9 shell marker for loading/performance layer.
+- .rzm-3d-stagebar--q9 — Q9 stagebar marker.
+- .rzm-3d-runtime-status — compact aria-live runtime/recalculation status line.
+- .rzm-3d-price-chip.is-calculating — visual state while price recalculates.
+- .rzm-3d-price-status — compact price recalculation status text in drawer footer.
+- .rzm-3d-loading-skeleton — skeleton preview while 3D model loads.
+- .rzm-3d-fallback-actions — fallback actions wrapper.
+
+Existing reused:
+- .rzm-3d-page — constructor page wrapper.
+- .rzm-3d-shell — main constructor shell.
+- .rzm-3d-viewport — scene viewport.
+- .rzm-3d-loading — 3D loading container.
+- .rzm-3d-fallback — WebGL fallback container.
+- .rzm-ui-btn / .rzm-ui-btn--primary — shared UI buttons.

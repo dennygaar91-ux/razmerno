@@ -1,0 +1,18 @@
+Stage Constructor 11 — classes report
+
+No new CSS classes were added in this stage.
+
+Existing classes touched through markup only:
+- rzm-production-preview-card — debug details wrapper for production snapshot.
+- rzm-production-preview-summary — summary row in debug details.
+- rzm-production-preview-head — header row inside debug card.
+- rzm-production-status — production validation status pill.
+- rzm-production-preview-grid — compact debug metrics grid.
+- rzm-production-preview-meta — metadata row for technologist check, warnings/errors, sync time and material id.
+- rzm-production-preview-error — error text inside production debug card.
+- rzm-step-text — existing supporting text style.
+- rzm-how-chip-title — existing chip title style.
+- rzm-chip-dot — existing chip dot marker.
+
+Added classes: none.
+Changed CSS: none.

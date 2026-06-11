@@ -1,0 +1,79 @@
+Размерно — главная страница v77 repair: карта классов
+
+Принцип этапа
+- Повторяющиеся элементы остаются на общих классах: rzm-home-section, rzm-home-section-head, rzm-home-section-title, rzm-hero-lead, rzm-card-grid, rzm-process-card, rzm-product-card, rzm-feature-card, rzm-material-card, rzm-chip, rzm-secondary-cta.
+- Для исправления визуальных проблем добавлен финальный слой переопределений в src/styles/constructor.css: блок "Home page v77 repair". Он находится после legacy-стилей, поэтому перекрывает старые правила без переименования компонентов.
+
+Основной layout
+- .rzm-home-main — общий контейнер главной; изменён gap между блоками и верхний margin.
+- .rzm-home-section — единая секционная карточка для основных блоков; изменены padding/radius.
+- .rzm-home-section-head — общий header секции; уменьшены gap и нижний отступ.
+- .rzm-home-section-title — общий стиль заголовков секций; уточнён размер и line-height.
+- .rzm-hero-lead — общий стиль подзаголовков/описаний; выровнен размер и межстрочный интервал.
+
+Hero
+- .rzm-home-hero — первый экран; увеличены внутренние отступы, уменьшена общая высота, выровнен grid.
+- .rzm-home-hero-copy — текстовая колонка Hero; добавлен небольшой внутренний баланс.
+- .rzm-home-hero-title — главный заголовок Hero; уточнены размер, line-height и letter-spacing.
+- .rzm-home-hero-lead — описание Hero; выровнен размер, ширина и верхний отступ.
+- .rzm-home-hero-visual — визуальная зона Hero; уменьшена высота, сохранены radius и clipping.
+- .rzm-actions / .rzm-home-actions — общий ряд CTA; уменьшен верхний отступ в Hero.
+- .rzm-chip-row / .rzm-chips — общий ряд chips; уменьшен верхний отступ в Hero.
+
+Карточки процесса
+- .rzm-card-grid — общий grid карточек; уменьшен gap.
+- .rzm-card-grid--four — сетка для 4 шагов.
+- .rzm-process-card — карточка шага; уменьшены высота и padding.
+- .rzm-card-visual / .rzm-step-illustration — общая мини-иллюстрация внутри карточек; уменьшена высота.
+- .rzm-card-number — общий номер карточки.
+- .rzm-card-arrow — общий arrow-marker карточки.
+- .rzm-card-text — общий текст карточек.
+
+Блок комплекта
+- .rzm-split-block — двухколоночная сетка изображения и списка преимуществ; выровнена по start.
+- .rzm-media-card — визуальная карточка блока комплекта; уменьшена высота.
+- .rzm-feature-list — список карточек комплекта; теперь не растягивает карточки по высоте изображения.
+- .rzm-feature-card — карточка пункта комплекта; уменьшена высота, padding и типографика.
+
+Блок ассортимента
+- .rzm-showcase-card — крупный визуальный блок шкаф/тумба/комод; уменьшена высота.
+- .rzm-product-card — карточка типа мебели; уменьшена высота.
+- .rzm-product-swatch — цветовая плашка в карточке типа мебели; уменьшена высота.
+
+Материалы
+- .rzm-material-slider — горизонтальный слайдер декоров; переведён на flex вместо тяжёлой grid-раскладки.
+- .rzm-material-card — карточка декора; уменьшена до компактного слайдерного формата.
+- .rzm-material-card.is-active — активный декор; сохранён border/ring, убрана тяжёлая текстовая плашка.
+- .rzm-material-surface — цветовая/текстурная поверхность декора; уменьшена высота.
+- .rzm-material-name — название декора; уменьшен размер.
+- .rzm-material-note — короткое описание декора; уменьшен размер.
+
+Замеры
+- .rzm-measure-teaser — teaser-блок замеров; перестроен в понятную двухколоночную структуру.
+- .rzm-measure-copy — текстовая часть блока замеров.
+- .rzm-measure-action-card — правая карточка с объяснением пользы блока и CTA.
+- .rzm-measure-tags — ряд chips "Ширина / Высота / Глубина".
+
+FAQ
+- .rzm-faq-list — список FAQ.
+- .rzm-faq-item — единая строка accordion.
+- .rzm-faq-item summary — заголовок вопроса; уменьшена высота строки.
+
+Финальный CTA
+- .rzm-home-final — тёмный финальный CTA-блок; выровнены padding/radius.
+- .rzm-home-final h2 — заголовок CTA; выровнена типографика.
+- .rzm-final-lead — отдельный унифицированный стиль подзаголовка финального CTA, чтобы убрать разнобой шрифтов.
+- .rzm-actions--dark — ряд кнопок на тёмном фоне.
+
+Footer
+- .rzm-footer — общий footer; уменьшен верхний отступ после CTA.
+- .rzm-footer-shell — сетка расширенного footer.
+- .rzm-footer-brand — брендовая колонка.
+- .rzm-footer-col — колонка ссылок.
+- .rzm-footer-link — единый стиль footer-ссылок.
+- .rzm-footer-bottom — юридическая нижняя строка.
+
+Изменённые файлы
+- src/static-pages/home/HomeMeasurementsTeaser.tsx — блок замеров переписан: теперь ясно объясняет зачем он нужен.
+- src/static-pages/home/HomeFinalCTA.tsx — подзаголовок переведён на .rzm-final-lead.
+- src/styles/constructor.css — добавлен финальный слой .v77 repair с исправлениями отступов, материалов, комплекта, замеров и CTA.

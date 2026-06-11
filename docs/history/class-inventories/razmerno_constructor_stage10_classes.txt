@@ -1,0 +1,15 @@
+Stage Constructor 10 — classes inventory
+
+CSS/HTML classes changed in this stage: none.
+
+Reason:
+Stage 10 was a production/geometry/data foundation stage. It changed TypeScript adapters, order payload typing and geometry builders, but did not add, remove or modify visual CSS classes.
+
+Existing production/debug UI classes still used but not changed:
+- .rzm-production-preview-card — technical preview card in ConstructorSceneProductionDebug.tsx.
+- .rzm-production-preview-summary — summary row inside production preview details.
+- .rzm-production-preview-head — header layout in production preview.
+- .rzm-production-status — production preview status badge.
+- .rzm-production-preview-grid — production summary metrics grid.
+- .rzm-production-preview-meta — small meta row with technologist/warning/error state.
+- .rzm-production-preview-error — error text for preview build failure.

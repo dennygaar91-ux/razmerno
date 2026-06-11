@@ -1,0 +1,18 @@
+Stage N3 — новые/изменённые классы конструктора 3D
+
+Новые классы:
+- .rzm-3d-model-label — HTML-label внутри 3D-сцены для секций и зон; показывает номер по умолчанию и полный текст при hover/selection.
+- .rzm-3d-model-label.is-hovered — состояние label при наведении на интерактивную область модели.
+- .rzm-3d-model-label.is-selected — состояние label выбранной секции/зоны.
+- .rzm-3d-model-plus — круглая кнопка «+» в выбранной секции/зоне; на N3 является visual affordance, на N4 откроет меню наполнения.
+
+Изменённые классы:
+- .rzm-3d-page[data-stage="N3"] .rzm-3d-viewport — отдельный stage-scope для новой системы выбора в 3D.
+- .rzm-3d-page[data-stage="N3"] .rzm-three-viewer--product canvas — курсор/поведение canvas для интерактивной 3D-модели.
+- .rzm-3d-page[data-stage="N3"] .rzm-3d-toolbar strong — защита от переполнения текста в toolbar.
+- .rzm-3d-page[data-stage="N3"] .rzm-3d-selection-card strong — уточнение типографики выбранной области в drawer.
+
+Связанные TS-сущности:
+- ThreeInteractionTarget — модель интерактивной области 3D: section/compartment, position, size, label, selected.
+- ThreeSelectionLayer — слой raycast/hover/click/labels/+ поверх 3D-модели.
+- ThreeSelectionPayload — payload выбора секции или зоны из 3D-сцены.

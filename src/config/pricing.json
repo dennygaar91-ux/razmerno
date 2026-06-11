@@ -1,0 +1,14 @@
+{
+  "deliveryMoscow": 4500,
+  "productionMarkup": 0.18,
+  "quickEstimate": {
+    "bodyPricePerLiter": 12,
+    "facadePricePerLiter": 22,
+    "defaultFillingCost": 3400
+  },
+  "filling": {
+    "shelf": 850,
+    "drawer": 3200,
+    "rod": 2400
+  }
+}

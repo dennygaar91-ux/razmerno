@@ -1,0 +1,19 @@
+Stage Q6 — Materials Step Polish classes
+
+ADDED / CHANGED
+- rzm-3d-shell--q6: active shell marker for Q6 visual QA scope.
+- rzm-3d-materials-polish: drawer body scope for the polished Materials step.
+- rzm-3d-material-summary: compact selected body/facade material summary.
+- rzm-3d-material-summary-item: one selected material summary row.
+- rzm-3d-material-current: current selected material strip inside each material section.
+- rzm-3d-material-kicker: compact category label above material section title.
+
+EXISTING, REUSED / HARDENED
+- rzm-3d-material-picker: material category card.
+- rzm-3d-material-heading: now sticky in Q6 scope.
+- rzm-3d-material-tabs: facade material filters, now with aria-pressed.
+- rzm-3d-material-preview: large click preview of selected/previewed material.
+- rzm-3d-material-list: scrollable list of material options.
+- rzm-3d-material-swatch: real texture swatch.
+- rzm-3d-material-copy: material option text block.
+- rzm-3d-back-panel-preview: read-only automatically selected HDF back panel material.

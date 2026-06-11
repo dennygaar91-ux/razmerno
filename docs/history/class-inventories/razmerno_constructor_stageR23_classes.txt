@@ -1,0 +1,44 @@
+Stage R23 — классы, добавленные/изменённые
+
+ДОБАВЛЕНЫ
+
+1. rzm-stage-r23-three-runtime-repair
+Глобальный stage-scope для правок R23. Используется на main .rzm-constructor-page. Ограничивает правки текущим desktop-конструктором.
+
+2. rzm-scene-r23-runtime
+Дополнительный marker на секции сцены ConstructorScene. Нужен для диагностики и возможного точечного CSS/QA вокруг runtime-состояния 3D.
+
+3. rzm-scene-webgl-status
+Компактный статус WebGL/3D в верхнем toolbar сцены. Заменяет крупную плашку поверх чертежа.
+
+4. rzm-scene-webgl-status--ready
+Состояние: WebGL доступен, 3D можно открыть.
+
+5. rzm-scene-webgl-status--checking
+Состояние: браузерный WebGL probe ещё выполняется.
+
+6. rzm-scene-webgl-status--disabled
+Состояние: WebGL недоступен, 3D выключен, основной режим — 2D-чертёж.
+
+7. rzm-scene-webgl-status--error
+Состояние: WebGL был доступен, но Three.js viewer упал в runtime и сцена переключена в 2D.
+
+8. rzm-stage-r23-class-inventory
+Технический marker наличия CSS-инвентаря R23.
+
+ИЗМЕНЕНЫ / ДОПОЛНЕНЫ
+
+1. rzm-scene-workbar-actions
+В R23 расширена grid-структура: добавлен отдельный слот под WebGL/3D status между точной настройкой и переключателем 2D/3D.
+
+2. rzm-scene-render-switch button:disabled
+В R23 усилено disabled-состояние 3D-кнопки: если WebGL недоступен или Three.js упал, кнопка выглядит недоступной, а не как рабочий режим.
+
+3. rzm-constructor-price-chip em
+Скрыт fallback-бейдж «проверка» внутри price chip. Статус расчёта/проверки не должен конкурировать с ценой.
+
+4. rzm-scene-fallback-note
+Скрыта как визуальный слой поверх сцены. Runtime-состояние 3D теперь показывается в toolbar, не поверх 2D-чертежа.
+
+5. rzm-constructor-canvas--svg-fallback .rzm-scene-depth-grid
+Немного смягчена сетка в 2D fallback, чтобы 2D не выглядел как аварийный экран.

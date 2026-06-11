@@ -1,0 +1,40 @@
+Stage Q4 — Sizes Step Polish
+
+Goal:
+Improve the Sizes step hierarchy and usability in the new 3D-first constructor without changing pricing, order flow, backend, or legacy /configurator.
+
+Completed:
+1. Split the Sizes step into two clear groups:
+   - “Общий размер мебели” for width/height/depth.
+   - “Ширина секций” for section count and section width logic.
+2. Added an accessible section width formula:
+   - Example: 1800 мм = 600 мм + 600 мм + 600 мм.
+3. Added visible section minimum copy before errors occur:
+   - “Минимальная ширина секции: 200 мм”.
+4. Added disabled behavior for increasing sections when the next section would be below the minimum width.
+5. Added explanatory disabled title for section increment:
+   - “Следующая секция станет меньше 200 мм”.
+6. Renamed/elevated equalize action:
+   - “Выровнять секции”.
+   - tooltip/title: “Распределить секции равномерно”.
+7. Added advanced section width editing behind “Точная ширина секций”.
+8. Manual section width controls use compact NumberControl rows to avoid horizontal overflow.
+9. Added Stage Q4 static guard script.
+10. Preserved old /configurator as legacy and did not touch pricing/order/backend/Supabase/admin/export.
+
+Validation:
+- check:stage-q4-sizes-polish passed.
+- test:browser-smoke-static passed.
+- typecheck passed.
+- build passed.
+- validation-autofix passed.
+- random-preset passed.
+- zone-filling passed.
+- constructor-store passed.
+- constructor-three passed.
+- constructor-three-safety passed.
+- layout-validation passed.
+- blueprint-geometry passed.
+
+Open notes:
+- Browser Playwright E2E was not run in this environment. It should be run locally where Playwright Chromium is installed.

@@ -1,0 +1,34 @@
+Stage R25 — классы, добавленные/изменённые
+
+Добавлены / задействованы:
+- rzm-stage-r25-sidebar-wizard-finalization — scope-класс этапа R25 на странице конструктора; ограничивает правки текущим desktop-конструктором.
+
+Изменены через R25 scope:
+- rzm-constructor-sidebar — левый сайдбар; ограничение ширины/overflow, защита от горизонтального скролла.
+- rzm-constructor-panel — внутренняя панель шагов; уменьшение плотности и защита от overflow-x.
+- rzm-constructor-step-panel — контейнер активного шага; компактнее, без горизонтального переполнения.
+- rzm-constructor-card / rzm-step-card--single — карточки шагов; уменьшены отступы, стабилизированы радиусы.
+- rzm-step-mode-head--compact / rzm-fill-step-head — заголовки шагов; выравнивание без лишних help-dot.
+- rzm-constructor-label — подписи полей; убраны повторяющиеся question-mark подсказки у размеров.
+- rzm-constructor-input-control / rzm-constructor-input / rzm-constructor-input-btn — numeric controls; уменьшены высоты/размеры, унифицировано поведение.
+- rzm-section-control-card — блок количества секций; компактнее и без лишнего визуального веса.
+- rzm-section-width-editor / rzm-fill-precision-editor — advanced-блоки точной настройки; ограничены по ширине и overflow.
+- rzm-precision-summary-grid — сводка точной настройки; переведена в безопасную одно-колоночную структуру, чтобы не создавать горизонтальный скролл.
+- rzm-section-width-row / rzm-compartment-height-row — строки ширин секций и высот отсеков; стабилизированы grid-колонки.
+- rzm-section-width-input — input точной настройки; компактнее.
+- rzm-compartment-filling-chip — скрыт в R25, чтобы строки высот отсеков не ломали ширину панели.
+- rzm-fill-section-list / rzm-precision-section-map — выбор секций; переведён в компактную двухколоночную сетку.
+- rzm-fill-section-card / rzm-precision-section-card — карточки секций; компактнее, с ellipsis для длинных подписей.
+- rzm-fill-compartment-chips / rzm-fill-compartment-chip — выбор отсеков; двухколоночная компактная сетка.
+- rzm-fill-counter-list / rzm-fill-structure-row / rzm-fill-mini-control — controls полок/ящиков/штанги; компактнее.
+- rzm-facade-mode-actions / rzm-facade-section-actions / rzm-facade-mode-button — выбор фасадов; короткие labels и безопасная сетка без overflow.
+- rzm-handle-toggle-row — блок ручек; компактнее.
+- rzm-constructor-validation-panel--compact / rzm-constructor-validation-item — validation в sidebar; меньше высота, меньше визуальная агрессия.
+- rzm-constructor-actions — нижняя action-зона; сохранена компактность.
+
+JSX/логика UI:
+- shared.tsx / DimensionField — удалены повторяющиеся question-mark подсказки из каждого размерного поля.
+- SizesStep.tsx — убран дублирующий локальный fix-card; теперь основной validation показывается через общий ConstructorValidationPanel.
+- FillStep.tsx — убран дублирующий локальный fix-card и список fill validation chips; validation больше не дублируется внутри шага и в общей панели одновременно.
+- FillStep.tsx — labels фасадов сокращены: «Распашные» / «Открытые».
+- projectRules.ts — warning-тексты фасада смягчены: вместо пугающих формулировок используется «Нужна проверка фасада».

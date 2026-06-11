@@ -1,0 +1,48 @@
+Stage R18 — checkout simplification classes
+
+Changed / added classes:
+
+- rzm-stage-r18-checkout-simplification
+  Scope class on ConstructorPage main. Limits Stage R18 checkout polish to the final step.
+
+- rzm-r18-checkout-shell
+  Checkout page shell with a calmer desktop width and vertical rhythm.
+
+- rzm-r18-checkout-topbar
+  Compact final-step topbar replacing the previous oversized checkout hero.
+
+- rzm-r18-checkout-titlebar
+  Title/price row inside the checkout topbar.
+
+- rzm-r18-topbar-price
+  Strong but compact total price chip in the checkout topbar.
+
+- rzm-r18-checkout-grid
+  Desktop checkout grid: main flow + sticky action panel.
+
+- rzm-r18-checkout-flow
+  Main checkout content column. Removes excessive card stacking visual weight.
+
+- rzm-r18-section-head
+  Unified header row for checkout cards.
+
+- rzm-r18-section-kicker
+  Small technical label for checkout card category.
+
+- rzm-r18-contact-card / rzm-r18-contact-grid
+  Compact contact block and three-field desktop grid.
+
+- rzm-r18-options-card / rzm-r18-options-grid / rzm-r18-option / rzm-r18-checkout-address
+  Compact delivery/assembly controls with delivery address revealed only when enabled.
+
+- rzm-r18-price-card / rzm-r18-inline-total / rzm-r18-muted-line / rzm-r18-pricing-notice / rzm-r18-price-list
+  Simplified estimate card with total, short note and four compact breakdown rows.
+
+- rzm-r18-review-card / rzm-r18-review-list / rzm-r18-material-strip
+  Compact project review. Keeps useful “what will be sent” content but removes long explanatory copy.
+
+- rzm-r18-consent-card / rzm-r18-consent-row
+  Compact consent block.
+
+- rzm-r18-action-panel / rzm-r18-final-price / rzm-r18-next-list
+  Right sticky panel with final price, next steps and submit actions.

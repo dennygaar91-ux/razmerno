@@ -1,0 +1,24 @@
+Stage R10 — классы не изменялись.
+
+Этап был контрольным аудитом без правок CSS/HTML/TSX.
+Новые классы не добавлялись.
+Существующие классы не изменялись.
+
+Проверенные группы классов из предыдущих этапов:
+- rzm-constructor-page — корневой контейнер страницы конструктора.
+- rzm-constructor-shell — desktop/mobile shell конструктора.
+- rzm-constructor-sidebar — левая desktop-панель / mobile bottom sheet.
+- rzm-mobile-sheet-handle — визуальный handle mobile bottom sheet.
+- rzm-mobile-sheet-title — краткий заголовок mobile-панели.
+- rzm-constructor-card — базовая карточка панели.
+- rzm-step-mode-head — header режима обычный/точная настройка.
+- rzm-fill-target-card — карточка выбранной области секция/отсек.
+- rzm-fill-section-card — карточка секции на шаге наполнения.
+- rzm-fill-compartment-chip — чип выбранного отсека.
+- rzm-fill-action-card — карточка быстрых действий наполнения.
+- rzm-precision-editor — общий контейнер точной настройки.
+- rzm-step-fix-card — карточка активной validation-проблемы.
+- rzm-constructor-price-chip — price chip сцены.
+- rzm-constructor-canvas — контейнер SVG/Three preview.
+- rzm-scene-target-overlay — подпись выбранной области на сцене.
+- rzm-checkout-project-card — карточка “Что отправится менеджеру”.

@@ -1,0 +1,41 @@
+/* Stage N7 — random preset chip */
+.rzm-3d-page[data-stage="N7"] .rzm-3d-random-chip {
+  min-height: 46px;
+  padding: 0 18px;
+  background: linear-gradient(135deg, #ff724c 0%, #fdbf50 100%);
+  color: #2a2c41;
+  box-shadow: 0 18px 42px rgba(255, 114, 76, 0.24), inset 0 0 0 1px rgba(255, 255, 255, 0.34);
+}
+
+.rzm-3d-random-drawer-action {
+  border: 1px solid rgba(255, 114, 76, 0.26);
+  border-radius: 22px;
+  padding: 13px 14px;
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  background: linear-gradient(135deg, rgba(255, 114, 76, 0.12), rgba(253, 191, 80, 0.16));
+  color: #2a2c41;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.rzm-3d-random-drawer-action:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 114, 76, 0.48);
+  box-shadow: 0 14px 34px rgba(255, 114, 76, 0.14);
+}
+
+.rzm-3d-random-drawer-action strong {
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.rzm-3d-random-drawer-action span {
+  color: rgba(42, 44, 65, 0.62);
+  font-size: 12px;
+  font-weight: 720;
+  line-height: 1.28;
+}
+

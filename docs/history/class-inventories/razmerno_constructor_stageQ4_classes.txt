@@ -1,0 +1,27 @@
+Stage Q4 — Sizes Step Polish: CSS/classes map
+
+Added / changed in this stage:
+- rzm-3d-shell--q4: stage marker class for the new Q4 3D constructor shell.
+- rzm-3d-stagebar--q4: stage marker class for the Q4 top workflow bar.
+- rzm-3d-size-block: card-like group for size-related controls inside the drawer; used on the Sizes step.
+- rzm-3d-section-header: shared header for size cards; used for “Общий размер мебели” and “Ширина секций”.
+- rzm-3d-section-widths: section-width block containing section count, width formula, equalize action, and advanced section widths.
+- rzm-3d-equalize-button: explicit equalize sections action; tooltip explains “Распределить секции равномерно”.
+- rzm-3d-section-formula: accessible note showing the relationship between total width and section widths, e.g. 1800 мм = 600 мм + 600 мм + 600 мм.
+- rzm-3d-advanced-toggle--sizes: modifier for the advanced sizes toggle.
+- rzm-3d-section-width-list: advanced list of manually editable section widths.
+- rzm-3d-section-width-row: row for each manual section width control.
+- rzm-3d-control-row.is-compact: compact NumberControl variant used inside manual section-width rows.
+
+Existing classes reused:
+- rzm-3d-page: main 3D constructor page wrapper.
+- rzm-3d-drawer-body: drawer content container.
+- rzm-3d-type-grid: furniture type selector.
+- rzm-3d-control-row: accessible numeric control wrapper.
+- rzm-3d-mini-control: +/- control group.
+- rzm-ui-btn / rzm-ui-btn--ghost / rzm-ui-btn--icon: shared UI button classes from Q1.
+- rzm-3d-validation-panel: validation summary block.
+
+Notes:
+- Q4 preserves Q3 stepper hierarchy and price chip behavior, but updates the active stage marker from Q3 to Q4.
+- Q4 does not change pricing, checkout submit-flow, backend, Supabase, admin, legacy /configurator, 3D geometry, random preset, or validation logic.

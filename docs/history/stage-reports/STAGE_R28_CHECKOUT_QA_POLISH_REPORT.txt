@@ -1,0 +1,51 @@
+Stage R28 — Checkout QA Polish
+
+Цель этапа:
+Довести финальный шаг заявки до более спокойного, компактного и product-ready состояния без изменения pricing engine, submit-flow, backend/API/Supabase, admin/export и mobile UX.
+
+Запланированные задачи R28 и выполнение:
+1. Проверить и улучшить validation полей контактов — 100%.
+2. Уплотнить карточку контактов и добавить понятный индикатор заполненности — 100%.
+3. Улучшить delivery/assembly toggles и поле адреса доставки — 100%.
+4. Сделать смету менее бухгалтерской и сохранить честную разбивку — 100%.
+5. Сделать сводку проекта компактной через раскрываемый блок details — 100%.
+6. Сделать consent-блок понятнее и спокойнее — 100%.
+7. Связать правую sticky action panel с общим checkout layout — 100%.
+8. Не трогать pricing/order/backend/mobile — 100%.
+
+Что изменено:
+- src/static-pages/ConstructorPage.tsx
+- src/static-pages/constructor/components/shared.tsx
+- src/static-pages/constructor/components/ConstructorCheckoutLayout.tsx
+- src/static-pages/constructor/components/CheckoutStep.tsx
+- src/static-pages/constructor/components/CheckoutContactCard.tsx
+- src/static-pages/constructor/components/CheckoutOptionsCard.tsx
+- src/static-pages/constructor/components/CheckoutPriceCard.tsx
+- src/static-pages/constructor/components/CheckoutProjectReviewCard.tsx
+- src/static-pages/constructor/components/CheckoutConsentCard.tsx
+- src/styles/constructor.css
+- scripts/browser-smoke-static.mjs
+
+Добавлено:
+- razmerno_constructor_stageR28_classes.txt
+- STAGE_R28_CHECKOUT_QA_POLISH_REPORT.txt
+
+Проверки:
+- npm run typecheck — passed
+- npm run test:browser-smoke-static — passed
+- npm run build — passed
+- npm run test:constructor-three — passed
+- npm run test:constructor-three-safety — passed
+- npm run test:layout-state — passed
+- npm run test:compartment-ui — passed
+- npm run test:layout-validation — passed
+- npm run test:blueprint-geometry — passed
+
+Неподтверждённая проверка:
+- npm run test:browser-smoke — не подтверждён в sandbox из-за ограничений Playwright Chromium. Локально у пользователя Chromium установлен, поэтому тест нужно прогнать на Windows после распаковки архива.
+
+Отчёт по ошибкам:
+Критичных ошибок сборки, типизации и unit/static-проверок нет. На этапе правок ошибок typecheck/build не осталось.
+
+Ограничения:
+Визуальный runtime checkout в реальном браузере нужно подтвердить локально через npm run dev и npm run test:browser-smoke.

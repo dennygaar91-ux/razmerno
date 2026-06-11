@@ -1,0 +1,53 @@
+Stage Q7 — Checkout Final Polish
+
+Цель:
+- Убрать дублирование цены на финальном шаге.
+- Связать согласие с кнопкой отправки заявки.
+- Сделать финальную заявку более понятной и менее шумной.
+- Не менять pricing engine, submitOrder, API/backend/Supabase, legacy /configurator.
+
+Сделано:
+- Constructor3DPage переведён на data-stage="Q7".
+- Shell marker обновлён на rzm-3d-shell--q7.
+- Checkout body получил класс rzm-3d-checkout--q7.
+- Цена оставлена главным образом в sticky footer drawer: "Точная стоимость".
+- В checkout-карточке сметы удалён крупный дубль итоговой цены; вместо него показывается "Смета / Детали расчёта" и строки breakdown.
+- Consent перенесён в sticky footer рядом с CTA.
+- Дублирующая body-кнопка "Отправить заявку" удалена.
+- CTA в footer теперь блокируется при blocking validation issues, незаполненных обязательных контактах или отсутствии consent.
+- Добавлен helper-text для disabled checkout CTA: "Заполните имя, телефон, email и подтвердите согласие".
+- "Детали проекта" переименованы в "Состав заявки".
+- Добавлен note, что согласие и отправка закреплены внизу рядом с точной стоимостью.
+- Добавлен CSS-слой Stage Q7.
+- Добавлен static guard check:stage-q7-checkout-final-polish.
+
+Проверки:
+- npm run check:stage-q7-checkout-final-polish
+- npm run test:browser-smoke-static
+- npm run typecheck
+- npm run build
+- npm run test:validation-autofix
+- npm run test:random-preset
+- npm run test:zone-filling
+- npm run test:constructor-store
+- npm run test:constructor-three
+- npm run test:constructor-three-safety
+- npm run test:layout-validation
+- npm run test:blueprint-geometry
+
+Ошибки и исправления:
+1. test:browser-smoke-static упал на устаревшей brittle-проверке форматирования title для "Увеличить". Исправил проверку на более устойчивую строку.
+2. test:browser-smoke-static упал на старом ожидании "Точная смета" после Q7. Обновил guard на "Детали расчёта".
+3. typecheck упал из-за неиспользуемых props после удаления body-submit и переноса consent в footer. Удалил consent/submitMessage/submitStatus/onSubmit/onConsentChange из лишних props.
+
+Что не трогал:
+- pricing engine
+- submitOrder
+- API/backend/Supabase
+- admin/export
+- production/manufacturing logic
+- старый /configurator
+- 3D geometry
+- material texture logic
+- random preset logic
+- validation/auto-fix rules

@@ -1,0 +1,9 @@
+Stage Q8 classes
+
+Added:
+- .rzm-3d-shell--q8 — stage marker for the Q8 3D constructor shell.
+- .rzm-3d-scene-info — compact scene info bar below the viewport.
+
+Changed:
+- .rzm-3d-page[data-stage="Q8"] .rzm-3d-scene-card — adds a third row for compact scene info.
+- .rzm-3d-page[data-stage="Q8"] .rzm-3d-toolbar — slightly tighter toolbar spacing.

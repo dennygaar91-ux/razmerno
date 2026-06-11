@@ -1,0 +1,32 @@
+[
+  {
+    "id": "clothes",
+    "name": "Хранение одежды",
+    "description": "Штанга + 2 полки сверху и снизу",
+    "config": {
+      "shelves": 4,
+      "drawers": 0,
+      "hangingRod": true
+    }
+  },
+  {
+    "id": "drawers-shelves",
+    "name": "Ящики + полки",
+    "description": "3 ящика снизу, полки сверху",
+    "config": {
+      "shelves": 4,
+      "drawers": 3,
+      "hangingRod": false
+    }
+  },
+  {
+    "id": "universal",
+    "name": "Универсальный",
+    "description": "Равномерные полки во всю высоту",
+    "config": {
+      "shelves": 6,
+      "drawers": 0,
+      "hangingRod": false
+    }
+  }
+]

@@ -1,0 +1,43 @@
+Stage N1 — Constructor3DPage foundation: список классов
+
+Новые классы:
+- rzm-3d-page — общий фон и внешние отступы новой 3D-first страницы.
+- rzm-3d-shell — основной контейнер нового конструктора.
+- rzm-3d-stagebar — верхняя панель со stepper и ценой.
+- rzm-3d-stepper — группа шагов Размеры / Наполнение / Материалы / Заявка.
+- rzm-3d-step — отдельная кнопка шага; состояния is-active / is-done / is-idle.
+- rzm-3d-stagebar-meta — правая часть верхней панели: WebGL/3D статус + цена.
+- rzm-3d-webgl-pill — компактный статус готовности 3D.
+- rzm-3d-workspace — desktop-сетка: floating drawer + 3D-сцена.
+- rzm-3d-drawer — новая левая floating-панель настроек.
+- rzm-3d-drawer-body — скроллируемая область текущего шага.
+- rzm-3d-drawer-footer — нижняя закреплённая зона цены и CTA.
+- rzm-3d-drawer-actions — кнопки Назад / Далее.
+- rzm-3d-step-intro — заголовок и краткое пояснение текущего шага.
+- rzm-3d-type-grid — выбор типа мебели в шаге Размеры.
+- rzm-3d-control-row — строка числового параметра.
+- rzm-3d-mini-control — кнопки − / +.
+- rzm-3d-selection-card — карточка текущего выбора в шаге Наполнение.
+- rzm-3d-section-pills — временный выбор секции до подключения клика по 3D на N3.
+- rzm-3d-add-card — preview будущей логики добавления через +.
+- rzm-3d-plus-preview — визуальный маркер + в drawer.
+- rzm-3d-material-picker — блок выбора материала.
+- rzm-3d-material-list — список swatches материалов.
+- rzm-3d-toggle-row — строка toggle в заявке.
+- rzm-3d-text-input — input адреса доставки в foundation checkout-заглушке.
+- rzm-3d-validation — компактный статус проекта.
+- rzm-3d-scene-card — большая карточка 3D-сцены.
+- rzm-3d-toolbar — верхняя панель сцены с подписью модели и камерами.
+- rzm-3d-view-switch — переключатель камер Свободно / Спереди / Сбоку / Сверху.
+- rzm-3d-viewport — область 3D Canvas / fallback.
+- rzm-3d-random-chip — чип Рандомно в левом нижнем углу сцены.
+- rzm-3d-loading — loader 3D-сцены.
+- rzm-3d-fallback — fallback-состояние, если WebGL/3D недоступен.
+
+Изменённые места:
+- src/main.tsx — подключён новый stylesheet constructor3d.css.
+- src/App.tsx — добавлен route /configurator-3d, /constructor-3d, /constructor3d.
+
+Не изменялись старые R12–R29 классы:
+- rzm-stage-r15-2d-drawing … rzm-stage-r29-e2e-cleanup сохранены только в legacy-конструкторе /configurator.
+- новый 3D-конструктор не использует старую визуальную сетку R12–R29.
