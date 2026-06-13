@@ -112,8 +112,10 @@ export async function fetchPriceItems(query: StoreQuery): Promise<{ source: 'sup
 
   if (error) throw new Error(error.message)
 
+  const rows = (data ?? []) as DbPriceItem[]
+
   return {
     source: 'supabase',
-    items: (data ?? []).map((row) => mapDbItem(row as DbPriceItem)),
+    items: rows.map((row) => mapDbItem(row)),
   }
 }
