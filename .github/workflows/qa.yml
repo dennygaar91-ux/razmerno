@@ -35,8 +35,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Infrastructure inventory
+      - name: Infrastructure inventory check
         run: node scripts/infrastructure-audit-report.mjs --check
+
+      - name: Generate infrastructure inventory artifact
+        run: node scripts/infrastructure-audit-report.mjs
+
+      - name: Upload infrastructure inventory artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-infrastructure-inventory
+          path: docs/audits/generated/
+          retention-days: 14
 
       - name: Typecheck frontend
         run: npm run typecheck
