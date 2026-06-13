@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Infrastructure inventory
+        run: node scripts/infrastructure-audit-report.mjs --check
+
       - name: Typecheck frontend
         run: npm run typecheck
 
