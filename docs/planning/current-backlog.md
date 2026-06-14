@@ -109,6 +109,62 @@
 
 Независимо: частично.
 
+### P0-09 QA Fast CI Gate
+
+Зачем: сделать тесты обязательной частью CI.
+
+Риск: регрессии проходят в main несмотря на существующие тесты.
+
+Объём: M.
+
+### P0-10 Coverage & Thresholds
+
+Зачем: измеряемое качество тестов.
+
+Риск: невозможно понимать реальное покрытие.
+
+Объём: M.
+
+### P0-11 API Order Flow Tests
+
+Зачем: защитить критический сценарий создания заявки.
+
+Риск: поломка заказов в production.
+
+Объём: L.
+
+### P0-12 Checkout Submit Tests
+
+Зачем: проверить success/error/cooldown сценарии.
+
+Риск: потеря заявок и конверсии.
+
+Объём: M.
+
+### P0-13 Pricing Golden Fixtures & Parity
+
+Зачем: гарантировать точную цену на клиенте и сервере.
+
+Риск: расхождение стоимости.
+
+Объём: L.
+
+### P0-14 Supabase Contract Tests
+
+Зачем: защитить схему БД, миграции и политики.
+
+Риск: скрытые ошибки данных и безопасности.
+
+Объём: M.
+
+### P0-15 CI/CD & Vercel Failure Investigation
+
+Зачем: устранить текущие сбои пайплайна.
+
+Риск: невозможность доверять релизам.
+
+Объём: M.
+
 ---
 
 ## P1 — MVP Quality
@@ -177,6 +233,26 @@
 
 Зависимости: актуальный UI scope.
 
+### P1-09 Constructor3D Submit E2E
+
+Задачи: полноценные Playwright сценарии оформления заявки.
+
+### P1-10 WebGL Fallback E2E
+
+Задачи: принудительная проверка fallback при отказе WebGL.
+
+### P1-11 Production Golden Snapshots
+
+Задачи: детерминированные снапшоты production model/export.
+
+### P1-12 Admin API & Integration Tests
+
+Задачи: прямое тестирование admin API и статусов.
+
+### P1-13 Material / Texture Parity Tests
+
+Задачи: соответствие материалов UI, pricing и 3D.
+
 ---
 
 ## P2 — Production-Ready Depth
@@ -189,6 +265,9 @@
 6. Production Revisions.
 7. Operation editor for hinges/guides/drilling.
 8. Detailed production warnings.
+9. Visual regression testing.
+10. Cross-browser testing matrix.
+11. Property-based state testing.
 
 ---
 
@@ -203,3 +282,5 @@
 7. CRM/logistics integration.
 8. Full PDF binary generation.
 9. Real email attachments.
+10. Full mobile E2E matrix.
+11. Automated performance budgets.
