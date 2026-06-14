@@ -1,46 +1,62 @@
 # Testing Audit v1 — Размерно
 
-Статус: audit-only.  
+Статус: COMPLETED / audit-only.  
 Дата: 2026-06-14.  
 Роль: QA Lead.  
-Scope: аудит качества, тестовой инфраструктуры и CI/CD без изменения runtime-кода.
+Итерация: v1 full completion after `qa-command-map-v1` and `legacy-test-ownership-v1`.
 
-## 0. Ограничения этапа
+## 0. Scope and constraints
 
-На этом этапе не менялись:
+Этот документ завершает полный QA-аудит проекта в рамках роли QA Lead.
 
-- функционал;
-- pricing;
-- constructor;
+Не изменялись:
+
+- runtime code;
+- UI;
+- Constructor / Constructor3D;
+- Pricing;
 - Three.js;
-- production layer;
-- checkout;
-- admin;
-- API/Supabase runtime.
+- Checkout;
+- Production;
+- Admin;
+- API/Supabase;
+- tests;
+- package scripts;
+- CI workflow.
 
-Изменение выполнено только в документации: создан этот QA-аудит.
+Разрешённое действие: чтение кода, тестов, npm scripts, CI/CD конфигурации и создание/обновление audit-документов.
 
-Фактический локальный запуск `npm`/Playwright/Supabase/deploy smoke в этой среде не выполнялся. Аудит основан на чтении репозитория, package scripts, тестов, GitHub Actions workflow, плановых документов и архитектурных аудитов.
+Важно: фактический локальный запуск `npm`, Playwright, Supabase и deploy smoke из этой среды не выполнялся. Проверки выполнены как repository audit через GitHub: чтение файлов, scripts, workflow, статусов commit и code search.
 
 ## 1. Executive Summary
 
-Проект имеет заметную тестовую базу: unit/smoke tests на Node/tsx, Playwright browser specs, static guard scripts, typecheck/build scripts и production/deploy checks. Однако тестовая инфраструктура сейчас фрагментирована и перегружена историческими stage-командами.
+Проект имеет широкую тестовую базу, но она фрагментирована между active Constructor3D, legacy quarantine, pricing, production, browser smoke, admin/deploy checks и historical stage guards.
 
-Ключевой вывод: тесты есть, но quality gate пока слабый. GitHub Actions workflow `QA` запускает install, infrastructure inventory, frontend/API typecheck, build, CSS architecture check и production geometry architecture check, но не запускает основной набор unit/integration/e2e/smoke тестов. Это не соответствует целевому Stage 09 Testing & CI/CD, где должны быть typecheck, build, unit tests, smoke tests и CI quality gate.
+Сильные стороны:
 
-Главные риски:
+- есть active tests для `constructorStore`, constructor payload, production preview, draft, flow, Three adapter/safety;
+- есть pricing tests для catalog, engine, delivery, runtime catalog и final smoke;
+- есть production tests для geometry, production export, manufacturing rules, BASIS JSON и email attachments;
+- есть Playwright specs для legacy/current configurator и active Constructor3D;
+- есть отдельный `typecheck:api`;
+- есть GitHub Actions workflow с `npm ci`, typecheck, API typecheck, build и архитектурными checks.
 
-1. Нет единого coverage report и coverage thresholds.
-2. CI не запускает основной набор тестов.
-3. Legacy test ownership не классифицирован.
-4. API и Supabase почти не покрыты интеграционными тестами.
-5. Pricing нуждается в golden fixtures и server/client parity tests.
-6. Checkout не имеет полноценного e2e submit-flow с mocked API branches.
-7. Static guard scripts полезны, но хрупки: многие проверки основаны на поиске строк и stage-маркеров.
+Критические проблемы:
 
-## 2. Проверенные источники
+1. GitHub Actions workflow не запускает основной набор unit/integration/E2E/smoke tests.
+2. Нет coverage tool, coverage report и coverage thresholds.
+3. Нет required test quality gate для active MVP.
+4. Vercel status на последнем проверенном commit — failure, при этом GitHub workflow-runs для commit не обнаружены.
+5. API/Supabase/order flow покрыты в основном source/type/static checks, а не direct handler/integration tests.
+6. Checkout active submit flow не имеет dedicated mocked success/error tests.
+7. Pricing lacks golden fixtures and server/client parity tests.
+8. Legacy tests ещё нельзя удалять: они являются test-backed quarantine.
 
-Перед аудитом изучены:
+Итоговая оценка QA readiness: **частично готово для контролируемой разработки, не готово как production-grade quality gate**.
+
+## 2. Sources reviewed
+
+Изучены обязательные документы:
 
 - `docs/planning/README.md`;
 - `docs/planning/master-development-plan-v1.md`;
@@ -52,478 +68,373 @@ Scope: аудит качества, тестовой инфраструктур�
 - `docs/planning/release-roadmap.md`;
 - `docs/audit/documentation-audit-v1.md`;
 - `docs/audit/architecture-audit-v1.md`;
-- `docs/audit/architecture-blockers-v1.md`;
+- `docs/audit/legacy-inventory-v1.md`;
+- `docs/audit/guard-audit-v1.md`;
+- `docs/qa/qa-command-map-v1.md`;
+- `docs/qa/legacy-test-ownership-v1.md`.
+
+Изучены технические источники:
+
 - `package.json`;
 - `.github/workflows/qa.yml`;
 - `playwright.config.ts`;
-- ключевые test/spec файлы;
-- ключевые source files для Constructor3D, store, pricing, checkout, production, API и Supabase.
-
-## 3. Состояние тестовой инфраструктуры
-
-### 3.1 Test runner landscape
-
-В проекте одновременно используются:
-
-- custom Node/tsx tests с ручными `assert`/`test` wrappers;
-- `node:test` в части Three.js safety/adapter tests;
-- Playwright specs в `tests/browser/**`;
-- static guard scripts в `scripts/check-*.mjs`;
-- deploy smoke script;
-- infrastructure inventory scripts.
-
-Проблема: нет единого test runner standard, нет единой команды `test`, нет coverage tool, нет thresholds.
-
-### 3.2 TypeScript checks
-
-Есть два ключевых уровня:
-
-- `npm run typecheck` — frontend/source typecheck;
-- `npm run typecheck:api` — отдельная проверка API/serverless и связанных production/pricing/shared модулей.
-
-Риск: основной `tsconfig.json` включает только `src` и `vite.config.ts`, поэтому API обязательно должен проверяться отдельной командой `typecheck:api`. Если CI пропустит `typecheck:api`, API может выпасть из типовой защиты.
-
-### 3.3 Build pipeline
-
-Есть:
-
-- `npm run build` → `vite build`;
-- Playwright web server: `npm run build && npm run preview -- --host 127.0.0.1 --port 4173`;
-- bundle-related scripts: `report:bundle`, `check:bundle-budget`.
-
-Риск: build проверяет сборку, но не гарантирует корректность pricing/order/API/Supabase branches.
-
-### 3.4 GitHub Actions / CI
-
-Есть workflow `.github/workflows/qa.yml`:
-
-- trigger: push/pull_request на `main`, manual dispatch;
-- Node 20;
-- `npm ci`;
-- infrastructure inventory;
-- frontend typecheck;
-- API typecheck;
-- frontend build;
-- CSS architecture check;
-- production geometry architecture check.
-
-Пробел: workflow не запускает unit tests, integration tests, Playwright tests, deploy smoke, production tests и normalized QA suite.
-
-### 3.5 Coverage
-
-Coverage-инфраструктура не обнаружена:
-
-- нет отдельного coverage script;
-- нет threshold config;
-- нет CI upload coverage artifact;
-- нет coverage matrix по доменам.
-
-Это главный QA-пробел для долгосрочной агентской разработки.
-
-## 4. Coverage Matrix
-
-| Зона | Риск | Текущее покрытие | Основные пробелы | Рекомендуемые тесты | Priority |
-|---|---:|---|---|---|---|
-| Test infrastructure | High | Много npm scripts, Node/tsx tests, Playwright, static guards | Нет coverage, нет единого runner, нет test ownership map | Ввести command map, coverage tool, thresholds, разделить fast/slow suites | P0 |
-| CI/CD | Critical | GitHub Actions запускает typecheck/build/2 architecture checks | CI не запускает tests/e2e/smoke; нет required quality gate | Добавить jobs: unit, integration, browser-smoke, production-smoke manual/env-gated | P0 |
-| TypeScript | Medium | `typecheck` + `typecheck:api` | API зависит от отдельной команды | Оставить оба checks обязательными в CI | P0 |
-| Build | Medium | Vite build, Playwright preview build | Build не ловит runtime API/Supabase branches | Build + smoke route checks + browser smoke | P0 |
-| Constructor3D | High | Playwright `configurator3d.spec.ts`, static guards, Three runtime guard | Нет real WebGL failure simulation, visual regression, successful submit mock, cross-browser | Browser e2e with mocked API, fallback tests, visual/a11y checks | P0/P1 |
-| constructorStore | High | Store unit tests: dimensions, layout, filling, validation, production snapshot, draft/random/autofix | Нет property/invariant/fuzz tests, нет selector ownership map | Invariant matrix: dimensions/sections/zones/filling/facades/checkout/validation | P0 |
-| Pricing | Critical | Catalog, engine, delivery, breakdown, runtime catalog, final smoke | Нет golden price fixtures, нет client/server parity, нет full boundary matrix | Golden snapshots по дилерскому прайсу, server/client parity, delivery/assembly matrix | P0 |
-| Checkout | Critical | Payload tests, browser required-fields tests, submit hook boundary in legacy, active `useConstructorSubmit` code | Нет mocked submit success/failure e2e, cooldown/idempotency tests, API branch coverage | Mocked API Playwright, hook-level tests, API error branch tests | P0 |
-| Production model | High | Geometry, production export, manufacturing rules, BASIS JSON, email attachments, production preview | Матрица изделий/размеров неполная; мало invalid-layout tests | Production golden snapshots, invalid layout rejection, revision/warnings classification tests | P1 |
-| API | Critical | `typecheck:api`, static guards, source validation exists | Нет direct handler integration tests с mocked req/res/Supabase/email/rate-limit | Handler tests for orders/health/admin: method/origin/env/rate/validation/db/email branches | P0 |
-| Supabase | Critical | SQL/migration/static deploy guards, runtime fallback to seed for price items | Нет local Supabase migration/RLS/schema tests | Migration smoke, RLS/policy tests, schema drift check, seeded integration tests | P0/P1 |
-| E2E | High | Playwright desktop/mobile projects, configurator and configurator3d specs | Не подключено к CI; мало API/network assertions | CI browser smoke desktop, nightly mobile/cross-browser, network mocks | P1 |
-| Smoke tests | Medium | Static browser smoke, deploy smoke script, UI logic smoke | Deploy smoke не в обязательном CI; static smoke хрупкий | Smoke split: static fast, browser smoke, deploy smoke manual/production | P1 |
-| Admin | High | Stage guards and API contract static checks | Нет browser/admin e2e и real mocked API integration | Admin API handler tests + admin page smoke with mocked endpoints | P2 |
-
-## 5. Детальный аудит зон
-
-### 5.1 Constructor3D
-
-Уровень риска: High.
-
-Текущее покрытие:
-
-- browser spec открывает `/configurator-3d`, проверяет shell, stepper, viewport, random preset action;
-- browser spec проходит scenario: sizes → filling → materials → checkout validation;
-- checkout controls проверяются в browser spec;
-- reset dialog и basic WCAG markers проверяются в browser spec;
-- static guards проверяют stage markers, наличие reset dialog, primary CTA, WCAG tokens;
-- Three runtime stability guard проверяет fallback/error boundary/retry/context loss tokens.
-
-Отсутствующие тесты:
-
-- реальный WebGL context lost test в браузере;
-- forced fallback e2e без WebGL;
-- successful submit e2e с mocked `/api/orders`;
-- error submit branches: 400/429/502/network timeout;
-- visual regression для 3D/2D scene states;
-- accessibility audit через axe или аналог;
-- mobile Constructor3D smoke в CI.
-
-Рекомендуемые тесты:
-
-1. `tests/browser/configurator3d-submit.spec.ts` — mocked API success/error.
-2. `tests/browser/configurator3d-fallback.spec.ts` — forced WebGL unavailable/fallback path.
-3. `tests/browser/configurator3d-a11y.spec.ts` — keyboard/focus/aria smoke.
-4. Visual smoke screenshots для sizes/fill/materials/checkout.
-
-### 5.2 constructorStore
-
-Уровень риска: High.
-
-Текущее покрытие:
-
-- clamp размеров, секций и зон;
-- reset behavior;
-- derived materials/validation;
-- furniture safe defaults;
-- manual/equalized section widths;
-- manual/equalized zone heights;
-- selected compartment filling;
-- rods blocked for non-wardrobe;
-- validation targets selected compartment;
-- facade layout modes;
-- scene view/render modes;
-- production snapshot lifecycle and PII-free state;
-- draft save/load/restore PII-free;
-- random preset;
-- validation autofix.
-
-Отсутствующие тесты:
-
-- property-based invariants: сумма ширин = total width, сумма высот = total height после любой последовательности actions;
-- action sequence tests для конфликтов selection/filling/facade/materials;
-- selector ownership tests после будущей декомпозиции slices;
-- edge cases для минимальных/максимальных размеров и множественных auto-fix подряд;
-- explicit tests на отсутствие PII в любых draft/snapshot/log-like states.
-
-Рекомендуемые тесты:
-
-1. Store invariant matrix.
-2. Random action sequence smoke без внешних зависимостей.
-3. Selector map tests после декомпозиции.
-4. PII regression test across draft/order/production snapshot boundaries.
-
-### 5.3 Pricing
-
-Уровень риска: Critical.
-
-Текущее покрытие:
-
-- catalog seed counts and selected known prices;
-- +30% markup check на Kronospan item;
-- basic engine tests: non-zero breakdown and drawers increase total;
-- delivery tests: no delivery, Moscow/MKAD, outside MKAD 50 ₽/км, address validation;
-- final pricing smoke: realistic total bounds;
-- breakdown rows positive;
-- runtime catalog fallback to seed without Supabase env;
-- pricing policy фиксирует `CLIENT_PRICE_MULTIPLIER = 1.3` and exact-price rules.
-
-Отсутствующие тесты:
-
-- golden price fixtures для 5–10 типовых конфигураций;
-- client/server parity: quote in Constructor3D vs `calculateServerPrice`;
-- delivery + assembly combined total matrix;
-- materials matrix by body/facade/back panel;
-- edge banding/package exact regression;
-- negative tests на недоступные/битые price items;
-- tests that prevent accidental return to `isPreliminary: true`.
-
-Рекомендуемые тесты:
-
-1. `pricing-golden.test.ts` — fixed fixtures with exact totals.
-2. `pricing-server-client-parity.test.ts` — same payload, same total.
-3. `pricing-policy.test.ts` — coefficient, cutting/drilling inclusion, exact price invariant.
-4. `pricing-boundaries.test.ts` — min/max dimensions and sections.
-
-### 5.4 Checkout
-
-Уровень риска: Critical.
-
-Текущее покрытие:
-
-- browser specs check required fields and interact with delivery/assembly toggles;
-- constructor payload tests check layout/materials/total/delivery/assembly/consent;
-- active submit hook validates customer/delivery/consent, blocks submit if quote missing, sends payload through `submitOrder`, has 30s cooldown;
-- client submit layer sends POST to `/api/orders` or configured API URL and mock mode avoids localStorage PII.
-
-Отсутствующие тесты:
-
-- active `useConstructorSubmit` hook unit/integration test;
-- successful submit with mocked API;
-- server validation error branch;
-- rate limit branch;
-- manager email failure branch;
-- customer email failure still success branch;
-- cooldown branch after success;
-- no-reset-model invariant after successful submit;
-- idempotency key assertion.
-
-Рекомендуемые тесты:
-
-1. `constructor-submit-hook.test.ts` for active hook.
-2. Playwright route mock for `/api/orders` success/error.
-3. API handler integration tests for order branches.
-4. No-reset and cooldown regression tests.
-
-### 5.5 Production model
-
-Уровень риска: High.
-
-Текущее покрытие:
-
-- geometry tests cover wardrobe/dresser/nightstand basics, panels, hardware, drilling, totals, Basis plan;
-- production export package test checks schema, units, source, panels, edge banding, Basis plan and validation;
-- manufacturing rules test checks factory profile, rules schema, auto repairs, validation status, manual review, revisions;
-- BASIS JSON/documents test checks JSON, serialized output, production document bundle and email attachments;
-- production preview adapter checks PII-free preview, materials/thicknesses, section facade modes, production pricing bundle.
-
-Отсутствующие тесты:
-
-- golden production snapshots by product/size/filling/facade mode;
-- invalid layout rejection matrix;
-- warnings classification: client-visible vs manager-only;
-- revision lifecycle tests;
-- production pricing coupling tests with current pricing source of truth;
-- detailed hardware/drilling coordinate invariants.
-
-Рекомендуемые тесты:
-
-1. `production-golden-snapshots.test.ts`.
-2. `production-invalid-layout.test.ts`.
-3. `production-warning-visibility.test.ts`.
-4. `production-pricing-boundary.test.ts`.
-
-### 5.6 API
-
-Уровень риска: Critical.
-
-Текущее покрытие:
-
-- API typecheck script exists;
-- `api/orders.ts` validates origin, method, env, rate limit, honeypot, payload, server price recalculation, production export, Supabase insert and email branches;
-- `api/_shared/order-validation.ts` validates name, RU phone, email, dimensions, layout, delivery, assembly and consent;
-- deploy smoke can call `/api/health` and admin orders endpoint;
-- admin API contract checks are static token checks.
-
-Отсутствующие тесты:
-
-- direct handler tests for `api/orders.ts`;
-- mocked Supabase success/failure;
-- mocked email manager/customer success/failure;
-- mocked rate limit;
-- CORS/origin matrix;
-- honeypot branch;
-- 405/403/400/429/502/503 status matrix;
-- API response schema snapshots.
-
-Рекомендуемые тесты:
-
-1. `api-orders-handler.test.ts` with mocked req/res and dependency seams.
-2. `api-health-handler.test.ts`.
-3. `api-admin-orders-handler.test.ts`.
-4. Contract snapshots for success/error payloads.
-
-### 5.7 Supabase integration
-
-Уровень риска: Critical.
-
-Текущее покрытие:
-
-- Supabase client wrapper exists;
-- missing Supabase env returns skipped success for order insert/update helpers;
-- stage checks verify presence of deploy SQL and docs;
-- predeploy guard checks migrations/docs/env examples;
-- runtime catalog test checks price seed fallback when Supabase env is missing.
-
-Отсутствующие тесты:
-
-- local Supabase migration apply test;
-- schema drift check against expected `orders`, `order_status_events`, price items tables;
-- RLS/policy tests;
-- service role vs anonymous access tests;
-- insert/update integration tests against local Supabase;
-- production env mode check in CI.
-
-Рекомендуемые тесты:
-
-1. `supabase:migration-smoke` in CI/manual job.
-2. `supabase-schema-contract.test.ts`.
-3. `supabase-orders-integration.test.ts` with local/test DB.
-4. RLS and permissions tests.
-
-## 6. Критические пробелы
-
-### P0-01 — CI не запускает тесты
-
-Сейчас GitHub Actions workflow не запускает основной набор unit/integration/e2e tests. Это главный blocker для безопасной работы следующих агентов.
-
-Минимальный следующий шаг:
-
-```bash
-npm run typecheck
-npm run typecheck:api
-npm run build
-npm run test:constructor-store
-npm run test:constructor-payload
-npm run test:production-preview
-npm run test:constructor-flow
-npm run test:constructor-three
-npm run test:pricing-catalog
-npm run test:pricing-engine
-npm run test:delivery
-npm run test:pricing-breakdown
-npm run test:pricing-final
-npm run test:production-export
-npm run test:manufacturing-rules
-npm run test:basis-documents
-npm run test:email-attachments
-```
-
-### P0-02 — Нет coverage thresholds
-
-Без coverage report нельзя объективно понять текущее покрытие. Нужно ввести хотя бы минимальные thresholds по critical modules.
-
-Рекомендуемый минимум:
-
-- pricing: branches/statements >= 80%;
-- constructor store/actions: statements >= 75%;
-- API shared validation/server-price/order-db: statements >= 75%;
-- production model/export: statements >= 70%;
-- checkout payload/submit: statements >= 75%.
-
-### P0-03 — Legacy test ownership unknown
-
-В проекте есть legacy `src/configurator/**` tests и active `src/static-pages/constructor/**` tests. До классификации нельзя удалять legacy-тесты или считать покрытие нового Constructor3D достаточным.
-
-Нужно создать test ownership map:
-
-- active Constructor3D coverage;
-- legacy coverage still required;
-- duplicate tests;
-- tests to migrate;
-- tests safe to archive later.
-
-### P0-04 — API/Supabase без интеграционных тестов
-
-API содержит критичный order flow, но тесты на реальные handler branches не обнаружены. Supabase покрыт в основном статическими deploy guards, а не интеграционными проверками.
-
-### P0-05 — Pricing без golden source-of-truth matrix
-
-Есть хорошие базовые tests, но нет набора эталонных конфигураций с фиксированной ценой. Для продукта с точной ценой это критично.
-
-## 7. Рекомендуемый CI/CD target
-
-### Fast required checks для Pull Request
-
-```bash
-npm ci
-npm run typecheck
-npm run typecheck:api
-npm run build
-npm run test:constructor-store
-npm run test:constructor-payload
-npm run test:production-preview
-npm run test:constructor-flow
-npm run test:constructor-three
-npm run test:pricing-catalog
-npm run test:pricing-engine
-npm run test:delivery
-npm run test:pricing-breakdown
-npm run test:pricing-final
-npm run test:production-export
-npm run test:manufacturing-rules
-npm run test:basis-documents
-npm run test:email-attachments
-```
-
-### Browser smoke job
-
-```bash
-npm run test:constructor3d-e2e
-npm run test:desktop-e2e
-```
-
-Можно сначала сделать non-blocking/manual, затем required после стабилизации Playwright в CI.
-
-### Deploy smoke job
-
-```bash
-SMOKE_BASE_URL=https://razmerno.ru npm run smoke:deploy
-```
-
-Только manual или post-deploy job, потому что требует live environment.
-
-### Nightly / full QA
-
-`qa:all` сейчас перегружен историческими проверками. Его лучше не делать первым обязательным PR gate. Правильнее создать нормализованный `qa:required`, а `qa:all`/legacy stage checks запускать nightly или вручную до cleanup.
-
-## 8. Приоритеты внедрения тестов
-
-### P0 — немедленно
-
-1. Подключить в GitHub Actions fast unit/integration scripts.
-2. Создать QA command map и test ownership map.
-3. Добавить API handler tests для `api/orders.ts`.
-4. Добавить pricing golden fixtures.
-5. Добавить checkout submit mocked success/failure tests.
-6. Добавить coverage tool + минимальные thresholds.
-
-### P1 — после P0
-
-1. Подключить Playwright browser smoke к CI.
-2. Добавить WebGL fallback browser tests.
-3. Добавить Supabase migration/schema smoke.
-4. Добавить production golden snapshots.
-5. Добавить accessibility smoke для Constructor3D.
-
-### P2 — hardening
+- `tests/browser/configurator.spec.ts`;
+- `tests/browser/configurator3d.spec.ts`;
+- `tests/*.test.ts` key tests;
+- `src/static-pages/constructor/**/*.test.ts`;
+- `src/pricing/**/*.test.ts`;
+- `src/configurator/**/*.test.ts` legacy tests;
+- `api/orders.ts`;
+- `api/health.ts`;
+- `api/_shared/**` relevant files;
+- Supabase helper/deploy guard scripts;
+- production geometry/export tests.
+
+## 3. Test Inventory
+
+### 3.1 Active Constructor / Constructor3D tests
+
+| File / command | Type | Covers | Status |
+|---|---|---|---|
+| `src/static-pages/constructor/store/constructorStore.test.ts` / `test:constructor-store` | Unit / state integration | dimensions clamp, sections, compartments, reset, materials, validation, furniture defaults, layout widths/heights, filling, facade modes, scene modes, production snapshot | Active / keep |
+| `src/static-pages/constructor/store/constructorDraft.test.ts` / `test:constructor-draft` | Unit | PII-free draft save/load/restore/clear | Active / keep |
+| `src/static-pages/constructor/store/randomPreset.test.ts` / `test:random-preset` | Unit | random preset for wardrobe/dresser, selected section/zone, rods/drawers | Active / keep |
+| `src/static-pages/constructor/store/validationAutoFix.test.ts` / `test:validation-autofix` | Unit / smoke | drawer height, wide facade, rod height autofix | Active / keep |
+| `src/static-pages/constructor/adapters/constructorPayload.test.ts` / `test:constructor-payload` | Integration | constructor snapshot → layout/order payload, materials, HDF, PII-free draft | Active / keep |
+| `src/static-pages/constructor/adapters/productionPreviewAdapter.test.ts` / `test:production-preview` | Integration | production preview, PII-safe preview order, materials/thicknesses, facade modes, pricing bundle, snapshot sync | Active / keep |
+| `src/static-pages/constructor/constructorFlowSmoke.test.ts` / `test:constructor-flow` | Smoke / integration | step order, wizard state, checkout snapshot, order payload, draft PII exclusion, reset | Active / keep |
+| `src/static-pages/constructor/constructorPiiOrderInvariants.test.ts` / `test:constructor-pii-order` | Unit / security invariant | PII/order invariants | Active / keep, not fully inspected in this pass |
+| `src/static-pages/constructor/rules/zoneFilling.test.ts` / `test:zone-filling` | Unit | zone filling rules | Active / keep, not fully inspected in this pass |
+| `src/static-pages/constructor/components/blueprintGeometry.test.ts` / `test:blueprint-geometry` | Unit | blueprint/2D geometry helpers | Active / keep, not fully inspected in this pass |
+| `tests/browser/configurator3d.spec.ts` / `test:constructor3d-e2e` | E2E / browser smoke | active `/configurator-3d`, shell, route aliases, sizes/fill/materials/checkout validation, reset dialog, basic WCAG markers | Active / keep |
+| `tests/browser/configurator3d.spec.ts` / `test:constructor3d-wcag-e2e` | E2E / WCAG smoke | same active Constructor3D spec under WCAG command name | Active but should become dedicated a11y spec later |
+
+### 3.2 Three.js / scene tests
+
+| File / command | Type | Covers | Status |
+|---|---|---|---|
+| `src/static-pages/constructor/three/threeSceneAdapter.test.ts` / `test:constructor-three` | Unit | Three model adapter: panels, drawers, rods, selected panels, facades, hardware, interaction targets, zone facades, scene mode behavior | Active / keep |
+| `src/static-pages/constructor/three/threeSceneSafety.test.ts` / `test:constructor-three-safety` | Static unit / safety | lazy viewer, error boundary, quality guard, reduced motion/device hints | Active / keep |
+| `src/configurator/three/threePerformance.test.ts` / `test:three-performance` | Unit / legacy performance | legacy Three performance | Legacy quarantine |
+| `src/configurator/three/textureCache.test.ts` / `test:texture-cache` | Unit / legacy | legacy texture cache | Legacy quarantine |
+| `src/configurator/three/threeLayoutMarkers.test.ts` / `test:three-layout-markers` | Unit / legacy | legacy layout markers | Legacy quarantine |
+| `src/configurator/three/selectedCompartmentHighlight.test.ts` / `test:selected-compartment-highlight` | Unit / legacy | legacy selected compartment highlight | Legacy quarantine |
+| `src/configurator/three/deferredGeometry.test.ts` / `test:deferred-geometry` | Unit / legacy | legacy deferred geometry | Legacy quarantine |
+
+### 3.3 Pricing tests
+
+| File / command | Type | Covers | Status |
+|---|---|---|---|
+| `src/pricing/catalog.test.ts` / `test:pricing-catalog` | Unit | catalog seed counts, price item lookup, +30% markup, service price, cheapest edge item | Active / keep |
+| `src/pricing/engine.test.ts` / `test:pricing-engine` | Unit | catalog price non-zero breakdown, drawers increase total | Active / keep |
+| `src/pricing/delivery.test.ts` / `test:delivery` | Unit | no delivery, MKAD 6000, outside MKAD +50 ₽/км, address validation | Active / keep |
+| `src/pricing/breakdown.test.ts` / `test:pricing-breakdown` | Unit | extended price rows positive | Active / keep |
+| `src/pricing/runtimeCatalog.test.ts` / `test:runtime-catalog` | Integration / fallback | runtime price store seed fallback without Supabase env | Active / keep |
+| `src/pricing/finalPricingSmoke.test.ts` / `test:pricing-final` | Smoke | catalog size, realistic total, delivery total, no delivery zero | Active / keep |
+| `scripts/check-price-integrity.mjs` / `check:price-integrity` | Static/data guard | price seed integrity | Active guard |
+| `scripts/build-price-seed.mjs` / `build:price-seed` | Utility | builds price seed | Utility, not a test assertion by itself |
+
+Missing: pricing golden fixtures, server/client parity, policy-specific regression test for exact-price rules.
+
+### 3.4 Checkout / order tests
+
+| File / command | Type | Covers | Status |
+|---|---|---|---|
+| `tests/checkout-payload.test.ts` / `test:checkout-payload` | Integration | legacy checkout payload total/delivery/assembly/source | Legacy/transitional, keep until active replacement |
+| `tests/checkout-submit-hook.test.ts` / `test:checkout-submit-hook` | Static unit | legacy submit hook exists, delegates payload, validates customer/delivery/assembly | Legacy/transitional, active replacement missing |
+| `src/static-pages/constructor/adapters/constructorPayload.test.ts` | Integration | active constructor order payload | Active partial coverage |
+| `src/static-pages/constructor/constructorFlowSmoke.test.ts` | Smoke / integration | active checkout snapshot to order payload | Active partial coverage |
+| `tests/browser/configurator3d.spec.ts` | E2E | checkout controls and required-field validation | Active partial coverage |
+
+Missing: active `useConstructorSubmit` tests, mocked API success/error E2E, API handler branch tests.
+
+### 3.5 Production / geometry tests
+
+| File / command | Type | Covers | Status |
+|---|---|---|---|
+| `tests/geometry.test.ts` / `test:geometry` | Unit / production integration | wardrobe/dresser/nightstand panels, hardware, drilling, totals, Basis plan | Active / keep |
+| `src/constructor/geometry/buildContext.test.ts` / `test:geometry-build-context` | Unit | geometry build context | Active / keep, not fully inspected |
+| `src/constructor/geometry/layoutGeometry.test.ts` / `test:layout-geometry` | Unit | layout geometry | Active / keep, not fully inspected |
+| `src/constructor/geometry/layoutDrawersGeometry.test.ts` / `test:layout-drawers-geometry` | Unit | drawer geometry | Active / keep, not fully inspected |
+| `src/constructor/geometry/layoutRodGeometry.test.ts` / `test:layout-rod-geometry` | Unit | rod geometry | Active / keep, not fully inspected |
+| `src/constructor/geometry/finalThreeLayoutSmoke.test.ts` / `test:three-final` | Smoke | final Three layout geometry | Active / keep, not fully inspected |
+| `tests/production-export.test.ts` / `test:production-export` | Integration | production export schema, panels, edge banding, Basis plan, validation | Active / keep |
+| `tests/manufacturing-rules.test.ts` / `test:manufacturing-rules` | Integration | factory profile, rules, auto repairs, validation, revisions, hidden client complexity | Active / keep |
+| `tests/basis-json-documents.test.ts` / `test:basis-documents` | Integration | Basis JSON, production documents, attachments | Active / keep |
+| `tests/email-attachments.test.ts` / `test:email-attachments` | Integration | production email attachments foundation | Active / keep |
+
+Missing: golden production snapshots, invalid-layout matrix, hardware/drilling coordinate invariants, warning visibility matrix.
+
+### 3.6 Legacy configurator tests
+
+| File / command family | Type | Covers | Status |
+|---|---|---|---|
+| `src/configurator/model/*.test.ts` / `test:compartments`, `test:layout-state`, `test:compartment-ui`, `test:advanced-layout`, `test:compartment-editor`, `test:compartment-counts`, `test:add-layout-parts`, `test:layout-payload`, `test:layout-validation`, `test:layout-final` | Unit / integration / smoke | legacy model/layout/filling/validation | Legacy quarantine; do not remove |
+| `src/configurator/store/*.test.ts` / `test:zustand-foundation`, `test:zustand-bridge`, `test:provider-store-sync`, read tests | Unit / bridge integration | legacy context → Zustand transitional bridge | Transitional quarantine; do not remove |
+| `tests/config-actions-coverage.test.ts` | Static/unit | legacy action facade | Transitional quarantine |
+| `tests/config-layout-sync.test.ts` | Unit | legacy reducer/layout sync | Transitional quarantine |
+| `tests/config-actions-reset.test.ts` | Unit | legacy action reset | Transitional quarantine |
+| `tests/pure-config-state-engine.test.ts` | Unit | pure config state engine | Transitional/needs later classification |
+
+### 3.7 Browser / E2E / smoke tests
+
+| File / command | Type | Covers | Status |
+|---|---|---|---|
+| `tests/browser/configurator.spec.ts` / `test:desktop-e2e`, `test:browser-smoke` | E2E / browser smoke | home, old `/configurator`, info pages, 2D blueprint modes, dimensions/filling/materials/checkout validation | Mixed active/legacy risk; keep until routes clarified |
+| `tests/browser/configurator3d.spec.ts` / `test:constructor3d-e2e` | E2E / browser smoke | active Constructor3D | Active / keep |
+| `scripts/browser-smoke-static.mjs` / `test:browser-smoke-static` | Static smoke | route/spec/source tokens, 2D/3D markers, checkout/source markers | Useful but string-based / brittle |
+| `scripts/run-browser-smoke-system.mjs` / `test:browser-smoke:system` | Browser utility | system Chromium runner for browser smoke | Utility |
+| `test:browser-smoke:mobile` | E2E | mobile viewport on `configurator.spec.ts` | Non-blocking until mobile priority returns |
+| `test:browser` | E2E | all Playwright tests | Too broad for default PR gate until stabilized |
+
+### 3.8 API/Admin/Supabase/deploy checks
+
+| File / command | Type | Covers | Status |
+|---|---|---|---|
+| `typecheck:api` | Typecheck | API/serverless/shared/pricing/production modules | Active / required |
+| `scripts/deploy-smoke.mjs` / `smoke:deploy` | Deploy smoke | `/api/health`, admin orders unauthorized/authenticated branch | Manual/post-deploy only |
+| `scripts/predeploy-guard.mjs` / `predeploy:guard` | Static/deploy guard | env example, migrations/docs/API health presence, script presence | Active guard |
+| `scripts/check-production-env.mjs` / `check:production-env` | Env guard | required production env and allowed origin | Active guard |
+| `check:stage3-*`, `check:stage4-*`, `check:stage5-*` | Static/API/Supabase/admin/deploy guards | admin/API/Supabase/deploy docs/status | Useful but historical/stage-specific |
+
+Missing: direct API handler tests, local Supabase integration tests, RLS/schema drift checks.
+
+### 3.9 Test utilities, mocks, snapshots, skipped tests
+
+| Category | Inventory result | Status |
+|---|---|---|
+| Test utilities | Inline custom test wrappers in many `.test.ts`; Playwright helper functions inside specs; `run-browser-smoke-system.mjs` utility | Present but not centralized |
+| Mocks | Code search for `__mocks__`, `mock`, `mocked`, `vi.fn`, `jest.fn`, `msw` found no dedicated mock framework/files | Dedicated mocks absent |
+| Snapshot tests | No `.snap` or snapshot framework found in reviewed scripts/search | Snapshot tests absent |
+| Skipped/todo tests | Search for `skip`, `todo`, `test.skip`, `test.todo`, `describe.skip`, `it.skip` returned no results | No skipped/todo tests found by code search |
+
+## 4. Coverage Matrix by system
+
+| System / zone | Tests exist? | Coverage level | Risk if unchanged | Notes |
+|---|---:|---|---:|---|
+| Constructor3DPage | Partial | Medium-low | High | Browser smoke exists; no unit tests for page orchestration, no API submit mocked success/failure. |
+| constructorStore | Yes | Medium-high | Medium | Good state coverage; missing property/invariant/fuzz matrix. |
+| Zones | Yes | Medium | Medium | Covered through store, zone filling, Three adapter; missing deeper edge cases. |
+| Sections | Yes | Medium-high | Medium | Section width/equalize and layout payload covered. |
+| Filling | Yes | Medium | Medium | Filling layout and random preset covered; missing full editor/E2E matrix. |
+| Materials | Partial | Medium-low | High | Payload/pricing/material visual coverage exists; material UI/texture parity not enough. |
+| Validation | Yes | Medium | High | Store validation/autofix and order validation exist; missing full warning/error classification and API branch tests. |
+| Pricing engine | Yes | Medium | Critical | Basic calculations covered; no golden fixtures/parity. |
+| Pricing calculators | Partial | Medium-low | High | Delivery covered; assembly not separately identified as dedicated test. |
+| Delivery | Yes | Medium-high | Medium | MKAD/outside/address validation covered. |
+| Assembly | Partial | Low | High | Validated through checkout/order path; no dedicated assembly unit test found. |
+| Catalogs | Yes | Medium-high | High | Seed counts and +30% sample covered; still needs more golden data fixtures. |
+| Checkout flow | Partial | Medium-low | Critical | Required fields and payload covered; active submit success/error missing. |
+| Order flow | Partial | Low | Critical | Client submit source exists; API handler branches not tested. |
+| Three scene | Partial | Medium-low | High | Adapter/safety tests exist; real WebGL/fallback runtime e2e missing. |
+| Three adapters | Yes | Medium-high | Medium | Good model adapter unit coverage. |
+| Three fallback | Partial | Low | High | Source/static guards exist; browser forced fallback missing. |
+| Production model | Yes | Medium | High | Geometry/export/manufacturing tests exist; golden snapshots missing. |
+| Geometry | Yes | Medium-high | Medium | Good base coverage; needs more edge-case matrix. |
+| Hardware | Partial | Medium | High | Hardware exists through geometry/model tests; coordinate-level tests missing. |
+| Drilling | Partial | Medium-low | High | Drilling presence checked; detailed coordinate/operation invariants missing. |
+| Admin orders | Partial | Low | High | Static/API contract checks; direct handler/browser admin tests missing. |
+| Dashboards | Partial | Low | Medium | Static guards only. |
+| Management | Partial | Low | Medium | No robust integration tests found. |
+| Supabase integration | Partial | Low | Critical | Env fallback/static SQL checks; no local Supabase integration/RLS tests. |
+| CI/CD | Partial | Low | Critical | Workflow exists but does not run tests. |
+
+## 5. Build & CI/CD Audit
+
+| Area | Exists | Works / observed | Status | Required improvement |
+|---|---:|---|---|---|
+| `npm run typecheck` | Yes | Present in package scripts and CI | Needs actual run confirmation | Keep required |
+| `npm run typecheck:api` | Yes | Present in package scripts and CI | Needs actual run confirmation | Keep required |
+| `npm run build` | Yes | Present in package scripts and CI | Needs actual run confirmation | Keep required |
+| Unit test scripts | Yes | Many scripts exist | Not in CI required gate | Add fast test job |
+| Integration test scripts | Yes | Many scripts exist | Not in CI required gate | Add fast integration job |
+| E2E scripts | Yes | Playwright scripts exist | Not in CI required gate | Add browser-smoke job after stabilization |
+| Smoke scripts | Yes | static/browser/deploy smoke scripts exist | Not consistently gated | Split static/browser/deploy smoke |
+| Coverage | No | No coverage config found | Missing | Add coverage tool/thresholds |
+| CI workflow | Yes | `.github/workflows/qa.yml` exists | Incomplete | Add test jobs |
+| GitHub Actions runs | Not observed for checked commit | `workflow_runs: []` for latest checked commit | Critical gap | Ensure workflow triggers and checks visible |
+| Vercel status | Yes | Latest checked status: failure | Critical gap | Investigate deployment failure separately |
+| Required checks | Not confirmed | No evidence of branch protection/required checks from available data | Unknown/critical | Configure required checks after CI stable |
+
+## 6. Risk Matrix
+
+### P0 — Critical
+
+- CI does not run unit/integration/E2E/smoke tests.
+- No coverage reporting or thresholds.
+- Vercel status failure on latest checked commit.
+- No GitHub workflow runs observed for latest checked commit.
+- API orders handler lacks direct integration tests.
+- Supabase integration lacks local/schema/RLS tests.
+- Active checkout submit success/error/cooldown/idempotency tests missing.
+- Pricing lacks golden fixtures and server/client parity tests.
+
+### P1 — High
+
+- Constructor3D lacks forced WebGL fallback E2E.
+- Three.js runtime behavior is mostly source/static + adapter tested, not real browser failure tested.
+- Production model lacks golden snapshots and invalid-layout matrix.
+- Materials/texture parity lacks robust coverage.
+- Assembly pricing/validation lacks dedicated unit coverage.
+- Admin API/UI mostly static-guarded, not integration tested.
+
+### P2 — Medium
+
+- Browser smoke not yet connected to CI.
+- Legacy tests are still needed and make QA command surface noisy.
+- Historical stage guards can confuse agents.
+- Visual regression tests absent.
+- Test utilities/mocks are not centralized.
+
+### P3 — Low / post-MVP
+
+- Cross-browser full matrix.
+- Full mobile E2E matrix.
+- Snapshot/visual diff expansion.
+- Performance budget automation beyond existing bundle/Three checks.
+
+## 7. Missing Tests
+
+### P0 missing tests
+
+1. `test:api-orders-handler` — mocked handler tests for origin, method, env, rate limit, honeypot, validation, server price, db insert, manager email fail, customer email fail-success.
+2. `test:constructor-submit-hook` — active `useConstructorSubmit` validation, quote missing, success, failure, cooldown.
+3. `test:constructor3d-submit-e2e` — Playwright with mocked `/api/orders` success/error.
+4. `test:pricing-golden` — 5–10 fixed furniture configurations with exact totals.
+5. `test:pricing-parity` — client quote vs server price on same payload.
+6. `test:supabase-schema-contract` — expected tables/columns/policies.
+7. `coverage` command and thresholds.
+
+### P1 missing tests
+
+1. `test:three-fallback-e2e` — forced WebGL unavailable/context lost.
+2. `test:production-golden-snapshots` — deterministic production export snapshots.
+3. `test:production-invalid-layout` — bad layouts reject/repair/warn correctly.
+4. `test:assembly` — assembly enabled/disabled/base/rate boundary tests.
+5. `test:materials-texture-parity` — material selection maps to expected preview/render IDs.
+6. `test:admin-api-handlers` — admin orders/status direct handler tests.
+
+### P2 missing tests
+
+1. `test:visual-regression-smoke`.
+2. `test:store-action-sequences`.
+3. `test:constructor-a11y` with dedicated axe-like audit.
+4. `test:legacy-replacement-equivalence` during migration.
+
+## 8. Test Roadmap
+
+### Wave 1 — immediate / before next behavior-changing work
+
+Goal: make quality gate real.
+
+1. Create CI required fast test job from `qa-command-map-v1` Tier 2.
+2. Add coverage tooling and thresholds.
+3. Add API orders handler tests.
+4. Add active constructor submit hook tests.
+5. Add pricing golden fixtures.
+6. Add pricing client/server parity tests.
+7. Add Supabase schema/migration contract test.
+8. Investigate Vercel failure and missing workflow-runs.
+
+### Wave 2 — after CI fast gate stabilizes
+
+Goal: cover runtime/browser risks.
+
+1. Add Playwright browser smoke job.
+2. Add Constructor3D mocked submit e2e.
+3. Add WebGL fallback/context-loss e2e.
+4. Add production golden snapshots.
+5. Add admin handler tests.
+6. Add assembly dedicated tests.
+7. Add material/texture parity tests.
+
+### Wave 3 — after MVP / hardening
+
+Goal: long-term confidence.
 
 1. Visual regression screenshots.
-2. Property-based store/layout invariants.
-3. Cross-browser matrix.
-4. Admin e2e/API integration.
-5. Performance budgets for Three.js and bundle.
+2. Cross-browser matrix.
+3. Full mobile matrix.
+4. Property-based store invariant tests.
+5. Performance budgets for 3D and bundle.
+6. Legacy test replacement/removal migration.
 
-## 9. Что проверено
+## 9. Recommendations
 
-Проверено:
+1. Do not start major Constructor3D, pricing, checkout or production behavior changes until Wave 1 is done.
+2. Treat `qa:all` as historical mega-suite, not current required gate.
+3. Introduce `qa:required` in a separate implementation task only after verifying commands pass.
+4. Keep legacy tests until active replacements are confirmed.
+5. Add direct API/Supabase integration tests before production launch.
+6. Make Vercel failure investigation a P0 release-readiness task.
+7. Require both `typecheck` and `typecheck:api` in every runtime PR.
+8. Do not rely on static string guards as substitutes for behavioral tests.
 
-- planning/audit документация;
+## 10. What was checked
+
+Checked by repository audit:
+
+- planning docs;
+- audit docs;
+- existing QA docs;
 - package scripts;
 - GitHub Actions workflow;
-- Playwright config;
-- browser specs;
-- Constructor3D coverage;
-- constructorStore tests;
+- Playwright config and specs;
+- active constructor tests;
+- legacy configurator tests inventory;
 - pricing tests;
-- checkout payload/submit boundaries;
-- production model/export tests;
-- API source and validation layer;
-- Supabase helper and deploy guard scripts;
-- smoke/deploy scripts.
+- checkout/order tests;
+- production tests;
+- API/Supabase/deploy scripts;
+- code search for skipped/todo tests;
+- code search for mocks/snapshots;
+- commit status and workflow runs for latest checked commit.
 
-## 10. Что не проверено
+## 11. What was not executed
 
-Не проверено фактическим запуском в этой среде:
+Not executed in this environment:
 
 - `npm ci`;
 - `npm run typecheck`;
 - `npm run typecheck:api`;
 - `npm run build`;
+- unit/integration test scripts;
 - Playwright browser tests;
-- deploy smoke на live URL;
-- Supabase migrations against live/local DB;
-- Vercel deployment logs.
+- deploy smoke;
+- Supabase migration/RLS checks.
 
-Причина: текущий этап выполнен как GitHub repository audit без локального runtime execution.
+Reason: this iteration was performed as repository audit via GitHub connector, without local runtime execution environment.
 
-## 11. Финальное QA-заключение
+## 12. Backlog tasks to add
 
-Проект имеет сильную начальную тестовую базу для отдельных доменов, особенно для constructor store, production export, pricing catalog и 3D adapter. Но текущий уровень качества нельзя считать production-ready, потому что тесты не собраны в обязательный CI quality gate, нет coverage thresholds, а самые критичные runtime boundaries — API, Supabase, checkout submit и pricing parity — покрыты недостаточно.
+P0:
 
-Следующий безопасный шаг: не писать новый функционал, а стабилизировать QA foundation — подключить fast tests в CI, создать test ownership map, добавить API/Supabase/pricing golden/checkout submit tests и только после этого продолжать behavior-changing работы в Constructor3D, pricing, checkout или production.
+- QA-P0-01: Add CI required fast test job.
+- QA-P0-02: Add coverage tooling and thresholds.
+- QA-P0-03: Add API orders handler integration tests.
+- QA-P0-04: Add active constructor submit hook tests.
+- QA-P0-05: Add pricing golden fixtures.
+- QA-P0-06: Add pricing client/server parity tests.
+- QA-P0-07: Add Supabase schema/migration contract checks.
+- QA-P0-08: Investigate Vercel failure and missing GitHub workflow-runs.
+
+P1:
+
+- QA-P1-01: Add Constructor3D mocked submit E2E.
+- QA-P1-02: Add WebGL fallback/context-loss E2E.
+- QA-P1-03: Add production golden snapshots.
+- QA-P1-04: Add admin handler tests.
+- QA-P1-05: Add assembly dedicated tests.
+- QA-P1-06: Add materials/texture parity tests.
+
+P2/P3:
+
+- Visual regression;
+- cross-browser matrix;
+- mobile E2E matrix;
+- property-based state tests;
+- legacy test replacement/removal migration.
+
+## 13. Final QA conclusion
+
+The project has meaningful tests, but the tests are not yet a system. The main QA problem is not absence of tests; it is absence of an enforceable, current, reliable quality gate. The next QA work must convert the existing inventory into CI-enforced fast checks, then fill the critical gaps around API, checkout submit, pricing parity and Supabase before any major runtime work continues.
