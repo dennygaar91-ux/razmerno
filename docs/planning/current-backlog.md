@@ -111,19 +111,31 @@
 
 ### P0-09 QA Fast CI Gate
 
+Статус: закрыто инфраструктурно — `.github/workflows/qa.yml` теперь содержит blocking fast CI gate для PR/push в `main`.
+
 Зачем: сделать тесты обязательной частью CI.
 
 Риск: регрессии проходят в main несмотря на существующие тесты.
 
 Объём: M.
 
+Итог: blocking gate включает `npm ci`, `npm run typecheck`, `npm run typecheck:api`, `npm run build`, active constructor/pricing/production fast tests, coverage snapshot и architecture guards.
+
+Документ: `docs/qa/test-infrastructure-report-v1.md`.
+
 ### P0-10 Coverage & Thresholds
+
+Статус: закрыто как baseline — добавлен dependency-free V8 coverage snapshot с минимальным threshold; требуется будущий переход на Istanbul/LCOV для production-grade line/branch coverage.
 
 Зачем: измеряемое качество тестов.
 
 Риск: невозможно понимать реальное покрытие.
 
 Объём: M.
+
+Итог: добавлен `scripts/coverage-report.mjs`, GitHub Actions публикует artifact `coverage-summary`, baseline threshold `COVERAGE_MIN_BYTES=15`.
+
+Документ: `docs/qa/test-infrastructure-report-v1.md`.
 
 ### P0-11 API Order Flow Tests
 
@@ -159,11 +171,17 @@
 
 ### P0-15 CI/CD & Vercel Failure Investigation
 
+Статус: закрыто как investigation + preventive CI controls; точная Vercel build error не подтверждена, потому что Vercel logs недоступны из текущего GitHub-only интерфейса.
+
 Зачем: устранить текущие сбои пайплайна.
 
 Риск: невозможность доверять релизам.
 
 Объём: M.
+
+Итог: зафиксировано, что у проверенного commit был `Vercel: failure`, при этом GitHub workflow runs для commit отсутствовали; усилен GitHub QA gate, чтобы больше ошибок ловилось до деплоя.
+
+Документ: `docs/qa/test-infrastructure-report-v1.md`.
 
 ---
 
@@ -253,6 +271,30 @@
 
 Задачи: соответствие материалов UI, pricing и 3D.
 
+### P1-14 Nightly QA Workflow
+
+Задачи: отдельный nightly pipeline для medium tests, Playwright smoke, bundle report и расширенной coverage публикации.
+
+Источник: `docs/qa/test-infrastructure-report-v1.md`.
+
+### P1-15 Release QA Workflow
+
+Задачи: отдельный release pipeline для full Playwright matrix, Vercel preview smoke, Supabase validation, production snapshots и release readiness checks.
+
+Источник: `docs/qa/test-infrastructure-report-v1.md`.
+
+### P1-16 Package Scripts Ownership
+
+Задачи: разделить scripts на `test:fast`, `test:medium`, `test:heavy`, `qa:release`; зафиксировать ownership и legacy deprecation plan.
+
+Источник: `docs/qa/test-infrastructure-report-v1.md`.
+
+### P1-17 Istanbul / LCOV Coverage Upgrade
+
+Задачи: заменить baseline V8 byte coverage на production-grade Istanbul/LCOV line/branch/function coverage и PR summary comment.
+
+Источник: `docs/qa/test-infrastructure-report-v1.md`.
+
 ---
 
 ## P2 — Production-Ready Depth
@@ -268,6 +310,7 @@
 9. Visual regression testing.
 10. Cross-browser testing matrix.
 11. Property-based state testing.
+12. Vercel preview deployment smoke after deployment status.
 
 ---
 
