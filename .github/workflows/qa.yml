@@ -12,15 +12,11 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: qa-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   qa:
-    name: Typecheck and build
+    name: Fast CI gate
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -56,6 +52,35 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+      - name: Fast active tests
+        run: |
+          npm run test:constructor-store
+          npm run test:constructor-payload
+          npm run test:production-preview
+          npm run test:constructor-flow
+          npm run test:constructor-pii-order
+          npm run test:constructor-three
+          npm run test:constructor-three-safety
+          npm run test:pricing-catalog
+          npm run test:pricing-engine
+          npm run test:delivery
+          npm run test:pricing-final
+          npm run test:geometry
+          npm run test:production-export
+
+      - name: Coverage snapshot
+        env:
+          COVERAGE_MIN_BYTES: 15
+        run: node scripts/coverage-report.mjs
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-summary
+          path: coverage/
+          retention-days: 14
 
       - name: Check CSS architecture
         run: npm run check:css-architecture
