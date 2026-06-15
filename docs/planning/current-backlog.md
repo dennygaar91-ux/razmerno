@@ -1,6 +1,8 @@
 # Current Backlog — Размерно
 
-Статус: единый backlog для агентов.
+Статус: единый operational backlog для агентов.
+
+Этот документ является **единственным источником истины по активным backlog-задачам**. Временные backlog-followup документы после переноса задач должны архивироваться или удаляться из active planning layer.
 
 Формат приоритета:
 
@@ -17,13 +19,9 @@
 
 Зачем: зафиксировать Constructor3D как активную ветку, а legacy Constructor — как quarantine.
 
-Риск невыполнения: агенты будут менять старый код или дублировать логику.
+Риск: агенты будут менять старый код или дублировать логику.
 
-Объём: XL.
-
-Зависимости: architecture audit.
-
-Независимо: нет.
+Объём: XL. Зависимости: architecture audit. Независимо: нет.
 
 ### P0-02 Constructor State Model Stabilization
 
@@ -31,11 +29,7 @@
 
 Риск: ломается связь UI, 3D, fallback, pricing и checkout.
 
-Объём: L.
-
-Зависимости: P0-01.
-
-Независимо: нет.
+Объём: L. Зависимости: P0-01. Независимо: нет.
 
 ### P0-03 Pricing Engine Validation
 
@@ -43,11 +37,7 @@
 
 Риск: расхождение цены ломает доверие и заявку.
 
-Объём: M.
-
-Зависимости: price sources, delivery, assembly.
-
-Независимо: частично.
+Объём: M. Зависимости: price sources, delivery, assembly. Независимо: частично.
 
 ### P0-04 Checkout Reliability
 
@@ -55,11 +45,7 @@
 
 Риск: потеря конверсии и заявок.
 
-Объём: M.
-
-Зависимости: pricing, validation, order API.
-
-Независимо: частично.
+Объём: M. Зависимости: pricing, validation, order API. Независимо: частично.
 
 ### P0-05 Three.js Stability
 
@@ -67,11 +53,7 @@
 
 Риск: пользователь видит сломанный продукт.
 
-Объём: XL.
-
-Зависимости: scene adapter, state model.
-
-Независимо: нет.
+Объём: XL. Зависимости: scene adapter, state model. Независимо: нет.
 
 ### P0-06 WebGL / 2D Fallback
 
@@ -79,11 +61,7 @@
 
 Риск: часть пользователей не сможет отправить заявку.
 
-Объём: M.
-
-Зависимости: P0-05.
-
-Независимо: нет.
+Объём: M. Зависимости: P0-05. Независимо: нет.
 
 ### P0-07 Documentation Sync
 
@@ -91,11 +69,7 @@
 
 Риск: агенты читают устаревшие документы.
 
-Объём: M.
-
-Зависимости: audits, backlog.
-
-Независимо: да.
+Объём: M. Зависимости: audits, backlog. Независимо: да.
 
 ### P0-08 Testing Foundation
 
@@ -103,37 +77,29 @@
 
 Риск: крупная декомпозиция станет небезопасной.
 
-Объём: L.
-
-Зависимости: стабильные границы модулей.
-
-Независимо: частично.
+Объём: L. Зависимости: стабильные границы модулей. Независимо: частично.
 
 ### P0-09 QA Fast CI Gate
 
-Статус: закрыто инфраструктурно — `.github/workflows/qa.yml` теперь содержит blocking fast CI gate для PR/push в `main`.
+Статус: закрыто инфраструктурно.
 
 Зачем: сделать тесты обязательной частью CI.
 
 Риск: регрессии проходят в main несмотря на существующие тесты.
 
-Объём: M.
-
-Итог: blocking gate включает `npm ci`, `npm run typecheck`, `npm run typecheck:api`, `npm run build`, active constructor/pricing/production fast tests, coverage snapshot и architecture guards.
+Итог: GitHub QA gate включает install, typecheck, build, active constructor/pricing/production fast tests, coverage snapshot и architecture guards.
 
 Документ: `docs/qa/test-infrastructure-report-v1.md`.
 
 ### P0-10 Coverage & Thresholds
 
-Статус: закрыто как baseline — добавлен dependency-free V8 coverage snapshot с минимальным threshold; требуется будущий переход на Istanbul/LCOV для production-grade line/branch coverage.
+Статус: закрыто как baseline.
 
 Зачем: измеряемое качество тестов.
 
 Риск: невозможно понимать реальное покрытие.
 
-Объём: M.
-
-Итог: добавлен `scripts/coverage-report.mjs`, GitHub Actions публикует artifact `coverage-summary`, baseline threshold `COVERAGE_MIN_BYTES=15`.
+Итог: добавлен dependency-free V8 coverage snapshot; будущий upgrade — Istanbul/LCOV.
 
 Документ: `docs/qa/test-infrastructure-report-v1.md`.
 
@@ -177,11 +143,31 @@
 
 Риск: невозможность доверять релизам.
 
-Объём: M.
-
-Итог: зафиксировано, что у проверенного commit был `Vercel: failure`, при этом GitHub workflow runs для commit отсутствовали; усилен GitHub QA gate, чтобы больше ошибок ловилось до деплоя.
-
 Документ: `docs/qa/test-infrastructure-report-v1.md`.
+
+### P0-16 Constructor Reset Contract Resolution
+
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`.
+
+Ответственный: Constructor Core Agent.
+
+Зачем: определить целевое поведение `reset()` и зафиксировать единый reset contract для constructor state.
+
+Риск: `constructorStore.test.ts` и `constructorFlowSmoke.test.ts` будут проверять разные ожидания, что сделает smoke-тесты нестабильными.
+
+Объём: M. Зависимости: P0-02, P0-08. Независимо: частично.
+
+### P0-17 Constructor Smoke Test Stabilization
+
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`.
+
+Ответственный: Constructor Core Agent.
+
+Зачем: привести `constructorFlowSmoke.test.ts` к текущему поведению constructor state/reset contract после решения P0-16.
+
+Риск: smoke test будет либо падать без продуктовой причины, либо перестанет защищать critical constructor flow.
+
+Объём: M. Зависимости: P0-16. Независимо: нет.
 
 ---
 
@@ -189,67 +175,35 @@
 
 ### P1-01 Constructor3D UX Completion
 
-Задачи: выбор зон, локальное меню, наполнение, фасады, random preset.
-
-Объём: XL.
-
-Зависимости: P0-02, P0-05.
+Задачи: выбор зон, локальное меню, наполнение, фасады, random preset. Объём: XL. Зависимости: P0-02, P0-05.
 
 ### P1-02 Material System
 
-Задачи: реальные текстуры, категории, swatches, zoom-preview.
-
-Объём: L.
-
-Зависимости: Three.js material pipeline.
+Задачи: реальные текстуры, категории, swatches, zoom-preview. Объём: L. Зависимости: Three.js material pipeline.
 
 ### P1-03 3D Furniture Details
 
-Задачи: петли, направляющие, ручки, штанги, базовая фурнитура.
-
-Объём: XL.
-
-Зависимости: hardware model, scene architecture.
+Задачи: петли, направляющие, ручки, штанги, базовая фурнитура. Объём: XL. Зависимости: hardware model, scene architecture.
 
 ### P1-04 Warning / Error System
 
-Задачи: warning, blocking warning, error, auto-fix для простых случаев.
-
-Объём: M.
-
-Зависимости: validation model.
+Задачи: warning, blocking warning, error, auto-fix для простых случаев. Объём: M. Зависимости: validation model.
 
 ### P1-05 Checkout UX Completion
 
-Задачи: итоговая смета, доставка, сборка, контакты, согласие, success state.
-
-Объём: M.
-
-Зависимости: pricing, order flow.
+Задачи: итоговая смета, доставка, сборка, контакты, согласие, success state. Объём: M. Зависимости: pricing, order flow.
 
 ### P1-06 Legacy Constructor Cleanup Plan
 
-Задачи: миграция тестов, quarantine, безопасное удаление после подтверждения.
-
-Объём: L.
-
-Зависимости: tests.
+Задачи: миграция тестов, quarantine, безопасное удаление после подтверждения. Объём: L. Зависимости: tests.
 
 ### P1-07 CI/CD Quality Gates
 
-Задачи: typecheck, build, tests as required checks.
-
-Объём: M.
-
-Зависимости: package scripts.
+Задачи: typecheck, build, tests as required checks. Объём: M. Зависимости: package scripts.
 
 ### P1-08 Design System Stabilization
 
-Задачи: tokens, buttons, forms, cards, focus states, spacing.
-
-Объём: L.
-
-Зависимости: актуальный UI scope.
+Задачи: tokens, buttons, forms, cards, focus states, spacing. Объём: L. Зависимости: актуальный UI scope.
 
 ### P1-09 Constructor3D Submit E2E
 
@@ -275,25 +229,49 @@
 
 Задачи: отдельный nightly pipeline для medium tests, Playwright smoke, bundle report и расширенной coverage публикации.
 
-Источник: `docs/qa/test-infrastructure-report-v1.md`.
+Источник: `docs/qa/test-infrastructure-report-v1.md`; подтверждено временным follow-up backlog. Приоритет сохранён как P1, а не P2, чтобы не понижать QA-критичность.
 
 ### P1-15 Release QA Workflow
 
 Задачи: отдельный release pipeline для full Playwright matrix, Vercel preview smoke, Supabase validation, production snapshots и release readiness checks.
 
-Источник: `docs/qa/test-infrastructure-report-v1.md`.
+Источник: `docs/qa/test-infrastructure-report-v1.md`; подтверждено временным follow-up backlog. Приоритет сохранён как P1, а не P2, чтобы не понижать release-критичность.
 
-### P1-16 Package Scripts Ownership
+### P1-16 Package Scripts Ownership / Fast-Medium-Heavy Test Separation
 
-Задачи: разделить scripts на `test:fast`, `test:medium`, `test:heavy`, `qa:release`; зафиксировать ownership и legacy deprecation plan.
+Источник: `docs/qa/test-infrastructure-report-v1.md` + `docs/planning/backlog-followups-test-infrastructure-v1.md`.
 
-Источник: `docs/qa/test-infrastructure-report-v1.md`.
+Задачи: разделить scripts на `test:fast`, `test:medium`, `test:heavy`, `qa:release`; зафиксировать ownership и legacy deprecation plan; финализировать разделение тестов на Fast, Medium и Heavy и использовать это разделение в CI.
 
 ### P1-17 Istanbul / LCOV Coverage Upgrade
 
 Задачи: заменить baseline V8 byte coverage на production-grade Istanbul/LCOV line/branch/function coverage и PR summary comment.
 
 Источник: `docs/qa/test-infrastructure-report-v1.md`.
+
+### P1-18 Deployment Validation Layer
+
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`.
+
+Ответственный: Infrastructure Agent.
+
+Задачи: добавить слой deployment validation между GitHub Actions и Vercel, чтобы typecheck/build/fast tests выполнялись до деплоя и были явно связаны с release/deploy readiness.
+
+Риск: Vercel deployment может падать или расходиться с GitHub QA без раннего blocking-сигнала.
+
+Зависимости: P0-09, P1-07, P1-15.
+
+### P1-19 Test Quarantine System
+
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`.
+
+Ответственный: Infrastructure Agent.
+
+Задачи: добавить официальный quarantine-механизм для unstable/flaky tests, чтобы они не скрывались, не удалялись без решения и не ломали весь pipeline без маркировки.
+
+Риск: flaky tests будут либо блокировать разработку, либо неформально отключаться без следа в документации.
+
+Зависимости: P0-08, P1-16.
 
 ---
 
@@ -327,3 +305,11 @@
 9. Real email attachments.
 10. Full mobile E2E matrix.
 11. Automated performance budgets.
+
+---
+
+## Consolidated temporary backlog files
+
+Следующие временные backlog-файлы были перенесены в этот документ и не должны использоваться как active backlog:
+
+- `docs/planning/backlog-followups-test-infrastructure-v1.md` → archived as `docs/archive/planning/backlog-followups-test-infrastructure-v1.md`.
