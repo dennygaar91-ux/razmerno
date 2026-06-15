@@ -181,4 +181,7 @@ test("constructor flow: reset returns to initial wizard state", () => {
   assert(state.depth === 600, "Reset should restore initial depth");
   assert(state.contact.email === "", "Reset should clear contact email");
   assert(state.deliveryAddress === "", "Reset should clear delivery address");
+  assert(state.consent === false, "Reset should clear consent");
+  assert(state.deliveryEnabled === false, "Reset should clear delivery toggle");
+  assert(state.assemblyEnabled === false, "Reset should clear assembly toggle");
 });
