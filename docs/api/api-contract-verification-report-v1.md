@@ -1,102 +1,95 @@
 # API Contract Verification Report v1 — Размерно
 
 Дата: 2026-06-15  
-Роль: API Contract Verification Agent  
-Статус: verification-only / P0 closure not confirmed
+Роль: API Contract Verification Agent / updated by API Contract Completion Agent  
+Статус: verification completed / P0 closure confirmed
 
 ## 1. Executive Summary
 
-Цель проверки — подтвердить или опровергнуть возможность реального закрытия задач:
+Цель проверки — подтвердить возможность закрытия задач:
 
 - P0-11 API Order Flow Tests;
 - P0-12 Checkout Submit Tests;
 - P0-14 Supabase Contract Tests.
 
-Проверка выполнялась только как verification-задача. Runtime code, constructor, pricing, checkout business logic, API implementation, Supabase implementation, production layer, Three.js, UI и дизайн не изменялись.
+Первичная verification установила, что implementation для contract test layer присутствует, но не было passing GitHub Actions evidence. Completion Agent довёл блок до закрытия: runtime mismatch устранён, получен passing GitHub Actions QA run `27574321147`, после чего P0-11, P0-12 и P0-14 закрыты в `docs/planning/current-backlog.md`.
 
-Ключевой вывод: implementation для contract test layer присутствует в `main`, тестовая команда подключена к QA workflow, но реального passing GitHub Actions workflow run после `38ac4f95c51439486c257d3a66ea2b1827f96b4f` не найдено. Поэтому P0-11, P0-12 и P0-14 нельзя считать закрытыми.
+Runtime code, constructor, pricing, checkout business logic, API implementation, Supabase production logic, production layer, Three.js, UI и дизайн не изменялись.
 
 ## 2. Commit Verification
 
-Проверялись commits:
+Проверялись commits API contract implementation chain:
 
 1. `06047eeca8cf33f65b3727365886bbd2d5711f04`
    - Сообщение: `test: add order contract fixture`.
    - Изменение: создан `tests/fixtures/order-contract-fixture.ts`.
-   - Commit существует в репозитории.
-   - Compare `06047eeca8cf33f65b3727365886bbd2d5711f04..main` показал, что `main` ahead by 2 и merge base равен этому commit. Это означает, что commit входит в историю `main`.
 
 2. `09e49895bc7d45ab60a4fca3a7603066801db326`
    - Сообщение: `test: cover API checkout and Supabase order contracts`.
    - Изменение: расширен `tests/checkout-submit-hook.test.ts` до API / checkout / Supabase contract suite.
-   - Commit существует в репозитории.
-   - Compare `09e49895bc7d45ab60a4fca3a7603066801db326..main` показал, что `main` ahead by 1 и merge base равен этому commit. Это означает, что commit входит в историю `main`.
 
 3. `38ac4f95c51439486c257d3a66ea2b1827f96b4f`
    - Сообщение: `ci: run checkout API contract tests in fast gate`.
    - Изменение: `.github/workflows/qa.yml` запускает `npm run test:checkout-submit-hook` внутри Fast active tests.
-   - Commit существует в репозитории.
-   - Compare `38ac4f95c51439486c257d3a66ea2b1827f96b4f..main` на момент проверки был `identical`. Это означает, что `main` указывал на этот commit до создания данного verification report.
+
+4. `b5e0e5e3413c563305143685dc9ac42726084668`
+   - Сообщение: `ci: use Node 22 for API contract workflow runtime`.
+   - Изменение: QA workflow переведён с Node 20 на Node 22.
+   - Причина: устранение Supabase Realtime/WebSocket runtime mismatch в GitHub Actions.
 
 ## 3. Document Verification
 
-Проверялся документ:
+Обязательные API contract документы приведены в active branch:
 
-- `docs/api/api-contract-testing-report-v1.md`.
+- `docs/api/api-contract-testing-report-v1.md`;
+- `docs/api/api-contract-verification-report-v1.md`;
+- `docs/api/api-contract-ci-verification-report-v1.md`;
+- `docs/api/api-contract-completion-report-v1.md`.
 
-Результат:
-
-- В `main` документ отсутствует.
-- Ветка `api-contract-testing-report-v1` существует как ref, потому что файл успешно читается по этому ref.
-- В ветке `api-contract-testing-report-v1` документ `docs/api/api-contract-testing-report-v1.md` найден.
-- Статус документа в этой ветке: `implementation + verification in progress`.
-- Документ сам фиксирует, что P0-11, P0-12 и P0-14 можно закрывать только после GitHub Actions verification.
+`api-contract-testing-report-v1.md`, ранее отсутствовавший в текущей active branch, перенесён/создан в `docs/api/`.
 
 ## 4. Workflow Verification
 
 Проверялся workflow:
 
-- `.github/workflows/qa.yml` в `main`.
+- `.github/workflows/qa.yml`.
 
-Найдено:
+Финальная конфигурация:
 
-- Workflow называется `QA`.
-- Triggers: `push` в `main`, `pull_request` в `main`, `workflow_dispatch`.
-- Job: `Fast CI gate` на `ubuntu-latest`.
-- Workflow содержит шаги:
+- Workflow: `QA`.
+- Job: `Fast CI gate`.
+- Runtime: Node 22.
+- Required commands:
   - `npm ci`;
   - `npm run typecheck`;
   - `npm run typecheck:api`;
   - `npm run build`;
-  - `npm run test:checkout-submit-hook` внутри `Fast active tests`;
-  - coverage snapshot;
-  - CSS architecture check;
-  - production geometry architecture check.
+  - `npm run test:checkout-submit-hook` внутри `Fast active tests`.
 
-Однако GitHub Actions run evidence:
+Passing evidence:
 
-- `fetch_commit_workflow_runs` для `06047eeca8cf33f65b3727365886bbd2d5711f04` вернул `workflow_runs: []`.
-- `fetch_commit_workflow_runs` для `09e49895bc7d45ab60a4fca3a7603066801db326` вернул `workflow_runs: []`.
-- `fetch_commit_workflow_runs` для `38ac4f95c51439486c257d3a66ea2b1827f96b4f` вернул `workflow_runs: []`.
-- Combined status для `38ac4f95c51439486c257d3a66ea2b1827f96b4f` показал только `Vercel: failure`; passing GitHub Actions status/check не подтверждён.
-
-Вывод: workflow file настроен на запуск нужной команды, но реальный passing workflow run после `38ac4f95c51439486c257d3a66ea2b1827f96b4f` не найден. Этого недостаточно для закрытия P0-11 / P0-12 / P0-14.
+- Workflow run: `27574321147`.
+- Run number: `148`.
+- Status: `completed`.
+- Conclusion: `success`.
+- Job `Fast CI gate`: `success`.
+- Steps `Install dependencies`, `Typecheck frontend`, `Typecheck API`, `Build frontend`, `Fast active tests`: `success`.
 
 ## 5. Test Verification
 
-Проверялась команда:
+Команда:
 
 ```bash
 npm run test:checkout-submit-hook
 ```
 
-В `package.json` команда существует:
+Script:
 
 ```bash
 node --no-warnings --import tsx tests/checkout-submit-hook.test.ts
 ```
 
-Файл `tests/checkout-submit-hook.test.ts` в `main` присутствует и включает группы проверок:
+Coverage в `tests/checkout-submit-hook.test.ts` включает:
 
 - active Constructor3D submit source contract;
 - customer validation: missing email, invalid RU phone;
@@ -114,73 +107,94 @@ node --no-warnings --import tsx tests/checkout-submit-hook.test.ts
 - invalid payload and unsupported method;
 - deterministic request cooldown / rate-limit branch.
 
-Важно: чтение тестового файла подтверждает наличие coverage intent, но не подтверждает успешное выполнение. Реальный запуск `npm ci`, `typecheck`, `build` и `npm run test:checkout-submit-hook` не найден в GitHub Actions logs/runs. Поэтому тесты нельзя считать passing на основании чтения кода.
+The command is included in the successful `Fast active tests` step of QA run `27574321147`; therefore it is confirmed as passing in GitHub Actions.
 
-## 6. P0 Status Review
+## 6. Root Cause Verification
+
+Failed runs before fix:
+
+- `27572949276` — `Fast active tests` failed.
+- `27573862283` — `Fast active tests` failed.
+
+Observed failure:
+
+- failing file: `tests/checkout-submit-hook.test.ts`;
+- failing test: `API order flow creates order, persists it and sends manager/customer notifications`;
+- expected status: `200`;
+- actual status: `502`;
+- runtime: Node.js `v20.20.2`;
+- error message: Supabase Realtime required native WebSocket support or explicit transport for Node < 22.
+
+Classification:
+
+- test infrastructure / runtime mismatch;
+- not confirmed as product bug;
+- resolved by Node 22 workflow runtime.
+
+## 7. P0 Status Review
 
 ### P0-11 API Order Flow Tests
 
-Статус: remains open / not verified.
+Статус: closed.
 
-Причина:
+Reason:
 
-- API order flow contract tests присутствуют в `tests/checkout-submit-hook.test.ts`.
-- Но нет найденного passing GitHub Actions run, где эти tests реально выполнялись и прошли.
-
-Closure condition not met.
+- API order flow contract tests are present and were proven passing through QA run `27574321147`.
 
 ### P0-12 Checkout Submit Tests
 
-Статус: remains open / not verified.
+Статус: closed.
 
-Причина:
+Reason:
 
-- Checkout submit contract tests присутствуют и подключены через `test:checkout-submit-hook`.
-- Но нет найденного passing GitHub Actions run, где `npm run test:checkout-submit-hook` реально выполнился и прошёл.
-
-Closure condition not met.
+- `npm run test:checkout-submit-hook` is wired into the successful `Fast active tests` step.
 
 ### P0-14 Supabase Contract Tests
 
-Статус: remains open / not verified.
+Статус: closed.
 
-Причина:
+Reason:
 
-- Supabase deterministic contract tests присутствуют в `tests/checkout-submit-hook.test.ts`.
-- Но нет найденного passing GitHub Actions run, где Supabase contract checks реально выполнились и прошли.
+- Supabase deterministic contract checks were proven passing through the same test command in the successful QA run.
 
-Closure condition not met.
+### P0-19 Dependency Layer Recovery Verification
 
-## 7. Backlog Updates
+Статус: closed.
 
-Файл `docs/planning/current-backlog.md` был проверен.
+Reason:
 
-Найдено:
+- dependency/runtime recovery is confirmed by successful `npm ci`, typechecks, build, Fast active tests and checkout contract suite on Node 22.
 
-- P0-11 присутствует.
-- P0-12 присутствует.
-- P0-14 присутствует.
-- P1-21 присутствует.
+### P1-21 Reset Action Separation
 
-Backlog не обновлялся, потому что verification неуспешна: закрывать P0-11 / P0-12 / P0-14 без реального passing workflow запрещено. Текущие записи остаются открытыми.
+Статус: present / not duplicated.
 
-## 8. Remaining Risks
+Reason:
 
-1. Нет подтверждённого GitHub Actions run после commit `38ac4f95c51439486c257d3a66ea2b1827f96b4f`.
-2. Combined status для указанного commit показывает `Vercel: failure`, а не passing QA.
-3. `api-contract-testing-report-v1.md` отсутствует в `main` и найден только в отдельной ветке.
-4. Supabase coverage остаётся deterministic/static contract layer, не live Supabase/RLS integration.
-5. Checkout cooldown частично проверяется source/API contract способом; полноценная React hook behavioral проверка остаётся вне текущего contract suite.
-6. P0-13 Pricing Golden Fixtures & Parity остаётся открытой отдельной задачей и не закрывается этой verification-задачей.
+- P1-21 exists in `docs/planning/current-backlog.md`; no duplicate was created.
+
+## 8. Backlog Updates
+
+`docs/planning/current-backlog.md` updated after passing workflow evidence:
+
+- P0-11 marked closed;
+- P0-12 marked closed;
+- P0-14 marked closed;
+- P0-19 marked closed;
+- P1-21 preserved.
+
+## 9. Remaining Risks
+
+1. Supabase tests remain deterministic/static contract checks, not live Supabase/RLS integration tests.
+2. Full browser-level Constructor3D submit E2E remains outside this API contract block.
+3. P0-13 Pricing Golden Fixtures & Parity is not closed by this work and remains separate.
+4. Vercel deployment status is separate from GitHub Actions API contract completion.
 
 ## Final Status
 
-- P0-11: open / not verified.
-- P0-12: open / not verified.
-- P0-14: open / not verified.
-- P1-21: present in `current-backlog.md`.
-- API contract layer: implementation appears present, but cannot be considered completed until a real passing GitHub Actions workflow run confirms install, typecheck, build and `npm run test:checkout-submit-hook`.
-
-## Next Agent Instruction
-
-Следующий агент должен работать как GitHub Actions / CI Verification Agent, не меняя тесты и runtime code. Его задача — получить реальный QA workflow run после `38ac4f95c51439486c257d3a66ea2b1827f96b4f`, открыть jobs/logs, подтвердить шаги `npm ci`, `typecheck`, `typecheck:api`, `build`, `Fast active tests` и отдельно факт прохождения `npm run test:checkout-submit-hook`. Только после этого можно обновлять `docs/planning/current-backlog.md` и закрывать P0-11 / P0-12 / P0-14.
+- P0-11: closed.
+- P0-12: closed.
+- P0-14: closed.
+- P0-19: closed.
+- P1-21: present.
+- API Contract Layer: completed by the criteria of this block, because a real passing GitHub Actions QA workflow run exists after the runtime fix.
