@@ -16,6 +16,7 @@ interface UseConstructorSubmitArgs {
 }
 
 const RESUBMIT_COOLDOWN_MS = 30_000;
+const INITIAL_SUBMIT_MESSAGE = "Перед отправкой менеджер всё равно проверит конфигурацию и уточнит детали.";
 
 export function useConstructorSubmit({
   snapshot,
@@ -25,7 +26,7 @@ export function useConstructorSubmit({
 }: UseConstructorSubmitArgs) {
   const [errors, setErrors] = useState<ConstructorFormErrors>({});
   const [submitStatus, setSubmitStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-  const [submitMessage, setSubmitMessage] = useState("Перед отправкой менеджер всё равно проверит конфигурацию и уточнит детали.");
+  const [submitMessage, setSubmitMessage] = useState(INITIAL_SUBMIT_MESSAGE);
   const [lastSuccessAt, setLastSuccessAt] = useState<number | null>(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
 
@@ -39,6 +40,14 @@ export function useConstructorSubmit({
     ? Math.max(0, RESUBMIT_COOLDOWN_MS - (nowMs - lastSuccessAt))
     : 0;
   const isCooldownActive = cooldownRemainingMs > 0;
+
+  const resetSubmitState = useCallback(() => {
+    setErrors({});
+    setSubmitStatus("idle");
+    setSubmitMessage(INITIAL_SUBMIT_MESSAGE);
+    setLastSuccessAt(null);
+    setNowMs(Date.now());
+  }, []);
 
   const submit = useCallback(async () => {
     if (isCooldownActive) {
@@ -110,6 +119,7 @@ export function useConstructorSubmit({
     submitStatus,
     submitMessage,
     submit,
+    resetSubmitState,
     isCooldownActive,
     cooldownRemainingMs,
   };
