@@ -59,6 +59,7 @@ jobs:
           npm run test:constructor-payload
           npm run test:production-preview
           npm run test:constructor-flow
+          npm run test:checkout-submit-hook
           npm run test:constructor-pii-order
           npm run test:constructor-three
           npm run test:constructor-three-safety
