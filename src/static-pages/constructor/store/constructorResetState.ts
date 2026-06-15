@@ -6,4 +6,9 @@ export const createResetPreservingCheckoutPatch = (
 ): Partial<ConstructorStoreState> => ({
   ...constructorInitialState,
   step: state.step,
+  contact: state.contact,
+  consent: state.consent,
+  deliveryEnabled: state.deliveryEnabled,
+  assemblyEnabled: state.assemblyEnabled,
+  deliveryAddress: state.deliveryAddress,
 });
