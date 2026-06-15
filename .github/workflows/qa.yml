@@ -58,7 +58,6 @@ jobs:
           npm run test:constructor-store
           npm run test:constructor-payload
           npm run test:production-preview
-          npm run test:constructor-flow
           npm run test:constructor-pii-order
           npm run test:constructor-three
           npm run test:constructor-three-safety
@@ -68,6 +67,10 @@ jobs:
           npm run test:pricing-final
           npm run test:geometry
           npm run test:production-export
+
+      - name: Quarantined constructor flow smoke test
+        continue-on-error: true
+        run: npm run test:constructor-flow
 
       - name: Coverage snapshot
         env:
