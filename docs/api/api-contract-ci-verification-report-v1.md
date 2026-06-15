@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-API contract CI verification завершена. Предыдущие runs `27572949276` и `27573862283` падали на `Fast active tests` из-за Node 20 runtime mismatch с Supabase Realtime/WebSocket layer. QA workflow переведён на Node 22. Финальный main run `27574702631` завершился `success`.
+API contract CI verification завершена. Предыдущие runs `27572949276` и `27573862283` падали на `Fast active tests` из-за Node 20 runtime mismatch с Supabase Realtime/WebSocket layer. QA workflow переведён на Node 22. Финальный PR/head run `27574702631` завершился `success`.
 
 ## Root Cause
 
