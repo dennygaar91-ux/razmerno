@@ -1,11 +1,9 @@
 # API Contract Verification Report v1 — Размерно
 
-Дата: 2026-06-15  
-Роль: API Contract Verification Agent  
-Статус: completed
+Дата: 2026-06-15
 
-Финальное подтверждение перенесено в `docs/api/api-contract-completion-report-v1.md`.
+Статус: completed.
 
-Main QA run: `27574702631` — success.
+Подробности: `docs/api/api-contract-completion-report-v1.md`.
 
-P0-11, P0-12, P0-14 and P0-19 are closed in `docs/planning/current-backlog.md`.
+QA run `27574702631` completed successfully.
