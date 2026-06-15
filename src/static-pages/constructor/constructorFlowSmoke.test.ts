@@ -171,11 +171,11 @@ test("constructor flow: draft from checkout snapshot excludes PII", () => {
   assert(!draftText.includes("Москва"), "Draft must not include delivery address");
 });
 
-test("constructor flow: reset returns to initial wizard state", () => {
+test("constructor flow: reset restores configuration and preserves current step", () => {
   useConstructorStore.getState().reset();
   const state = useConstructorStore.getState();
 
-  assert(state.step === "sizes", "Reset should return to sizes");
+  assert(state.step === "checkout", "Reset should preserve current step");
   assert(state.width === 1800, "Reset should restore initial width");
   assert(state.height === 2400, "Reset should restore initial height");
   assert(state.depth === 600, "Reset should restore initial depth");
