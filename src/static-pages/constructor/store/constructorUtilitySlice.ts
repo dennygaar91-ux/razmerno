@@ -27,5 +27,5 @@ export const createConstructorUtilityActions = (
   setRodsCount: (rodsCount) =>
     set((state) => createFillingCounterPatch(state, "rodsCount", rodsCount)),
   restoreDraft: (draft) => set((state) => createRestoreDraftPatch(state, draft)),
-  reset: () => set((state) => createResetPreservingCheckoutPatch(state)),
+  reset: () => set(() => createResetPreservingCheckoutPatch()),
 });
