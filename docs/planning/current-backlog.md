@@ -147,27 +147,27 @@
 
 ### P0-16 Constructor Reset Contract Resolution
 
-Статус: не закрыта — verification failed.
+Статус: implementation applied; closure pending real `typecheck`, `build` and constructor test evidence.
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`; повторно проверено в `docs/constructor/reset-contract-verification-report-v1.md`.
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`; повторно проверено в `docs/constructor/reset-contract-verification-report-v1.md`; исправление описано в `docs/constructor/reset-contract-fix-report-v2.md`.
 
 Ответственный: Constructor Core Agent.
 
 Зачем: определить целевое поведение `reset()` и зафиксировать единый reset contract для constructor state.
 
-Риск: `constructorStore.test.ts` и `constructorFlowSmoke.test.ts` проверяют разные ожидания, что делает smoke-тесты нестабильными.
+Риск: `constructorStore.test.ts` и `constructorFlowSmoke.test.ts` проверяли разные ожидания, что делало smoke-тесты нестабильными.
 
-Audit finding: текущий `reset()` реализован как configuration reset preserving checkout/step: сохраняются `step`, `contact`, `consent`, `deliveryEnabled`, `assemblyEnabled`, `deliveryAddress`. Это конфликтует с `constructorFlowSmoke.test.ts`, который ожидает возврат на `sizes` и очистку checkout/contact fields.
+Implementation finding: `reset()` переведён на full project reset по `constructorInitialState`: сбрасываются размеры, секции, зоны, наполнение, материалы, validation, checkout/contact/service fields, step и store-level transient state.
 
-Verification finding: обязательные `typecheck`, `build` и constructor tests не подтверждены фактическим успешным запуском; GitHub workflow run для проверенного commit не найден; Vercel status остаётся failure. Задачу нельзя считать закрытой.
+Closure condition: закрыть P0-16 можно только после подтверждённого успешного запуска `npm run typecheck`, `npm run build` и релевантных constructor tests.
 
 Объём: M. Зависимости: P0-02, P0-08. Независимо: частично.
 
 ### P0-17 Constructor Smoke Test Stabilization
 
-Статус: не закрыта — verification failed.
+Статус: implementation applied; closure pending real `typecheck`, `build` and constructor test evidence.
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`; повторно проверено в `docs/constructor/reset-contract-verification-report-v1.md`.
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`; повторно проверено в `docs/constructor/reset-contract-verification-report-v1.md`; исправление описано в `docs/constructor/reset-contract-fix-report-v2.md`.
 
 Ответственный: Constructor Core Agent.
 
@@ -175,9 +175,9 @@ Verification finding: обязательные `typecheck`, `build` и construct
 
 Риск: smoke test будет либо падать без продуктовой причины, либо перестанет защищать critical constructor flow.
 
-Audit finding: smoke test нельзя просто подогнать под текущую реализацию без решения P0-16. Сначала нужно назвать и зафиксировать продуктовый contract: full manual project reset или configuration reset preserving checkout.
+Implementation finding: `constructorFlowSmoke.test.ts` синхронизирован с full project reset и дополнительно проверяет очистку consent, deliveryEnabled и assemblyEnabled.
 
-Verification finding: `constructorFlowSmoke.test.ts` всё ещё ожидает full wizard reset, тогда как реализация сохраняет `step`, contact и checkout/service fields. Успешный запуск `test:constructor-flow` не подтверждён. Задачу нельзя считать закрытой.
+Closure condition: закрыть P0-17 можно только после подтверждённого успешного запуска constructor smoke/store tests.
 
 Объём: M. Зависимости: P0-16. Независимо: нет.
 
@@ -308,6 +308,16 @@ Verification finding: `constructorFlowSmoke.test.ts` всё ещё ожидае�
 Риск: будущие агенты могут принять mirrored flags или local/store scene mode за независимые источники истины и создать расхождение состояния.
 
 Зависимости: P0-02, P0-16.
+
+### P1-21 Reset Action Separation
+
+Источник: `docs/constructor/reset-contract-fix-report-v2.md`.
+
+Ответственный агент: Constructor Core Agent.
+
+Описание: разделить именование reset-действий, чтобы ручной `reset()` всегда означал full project reset, а возможный будущий сценарий configuration reset preserving checkout был доступен только как отдельное явно названное действие.
+
+Зависимости: P0-16, P0-17.
 
 ---
 
