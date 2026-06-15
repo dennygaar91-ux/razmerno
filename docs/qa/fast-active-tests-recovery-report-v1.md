@@ -246,12 +246,13 @@ Reason:
 
 ### P0-19 Dependency Layer Recovery Verification
 
-Status: should exist in `docs/planning/current-backlog.md`.
+Status: added to `docs/planning/current-backlog.md`, open / verification pending.
 
 Finding:
 
-- P0-11, P0-12, P0-14 and P1-21 exist;
-- P0-19 was not found in the checked backlog snapshot and must be added as a dependency/runtime verification item.
+- P0-11, P0-12, P0-14 and P1-21 existed already;
+- P0-19 was missing and was added as dependency/runtime recovery verification item;
+- P0-19 closure condition requires a real passing GitHub Actions workflow run with install, typecheck, API typecheck, build, Fast active tests and `npm run test:checkout-submit-hook`.
 
 ### P1-21 Reset Action Separation
 
@@ -259,17 +260,22 @@ Status: present in `docs/planning/current-backlog.md`.
 
 ## 8. Backlog Updates
 
-Required backlog update:
+Updated:
 
-- add missing P0-19 to `docs/planning/current-backlog.md` if absent;
-- do not duplicate existing P0-11, P0-12, P0-14 or P1-21;
-- do not close P0-11/P0-12/P0-14 without passing GitHub Actions evidence.
+- `docs/planning/current-backlog.md` — added missing `P0-19 Dependency Layer Recovery Verification`.
 
-Actual backlog update status:
+Not changed:
 
-```text
-Pending. Source/test/workflow write attempts were blocked; this report records the required update, but closure statuses were not changed.
-```
+- P0-11 remains open;
+- P0-12 remains open;
+- P0-14 remains open;
+- P1-21 was not duplicated.
+
+Reason:
+
+- P0-11, P0-12 and P0-14 can be closed only after a passing workflow run;
+- run `27572949276` failed;
+- no valid post-fix passing workflow run exists.
 
 ## 9. Remaining Risks
 
