@@ -105,19 +105,31 @@
 
 ### P0-11 API Order Flow Tests
 
+Статус: закрыто.
+
 Зачем: защитить критический сценарий создания заявки.
 
 Риск: поломка заказов в production.
 
-Объём: L.
+Итог: API order flow покрыт в `tests/checkout-submit-hook.test.ts`: создание заявки, persistence contract, manager/customer notification branches, validation/error branches и request cooldown/rate-limit contract.
+
+Доказательство: GitHub Actions QA run `27574321147` завершился `success`; шаги `Install dependencies`, `Typecheck frontend`, `Typecheck API`, `Build frontend` и `Fast active tests` прошли. В `.github/workflows/qa.yml` шаг `Fast active tests` включает `npm run test:checkout-submit-hook`.
+
+Документ: `docs/api/api-contract-completion-report-v1.md`.
 
 ### P0-12 Checkout Submit Tests
+
+Статус: закрыто.
 
 Зачем: проверить success/error/cooldown сценарии.
 
 Риск: потеря заявок и конверсии.
 
-Объём: M.
+Итог: checkout submit contract покрывает active Constructor3D submit source contract, customer validation, API success/failure handling, idempotency key, cooldown/no-reset guard, delivery и assembly validation.
+
+Доказательство: GitHub Actions QA run `27574321147` завершился `success`; `Fast active tests` прошёл и содержит `npm run test:checkout-submit-hook`.
+
+Документ: `docs/api/api-contract-completion-report-v1.md`.
 
 ### P0-13 Pricing Golden Fixtures & Parity
 
@@ -129,11 +141,17 @@
 
 ### P0-14 Supabase Contract Tests
 
+Статус: закрыто.
+
 Зачем: защитить схему БД, миграции и политики.
 
 Риск: скрытые ошибки данных и безопасности.
 
-Объём: M.
+Итог: Supabase contract coverage включает deterministic env-missing repository behavior, insert mapping, client IP hashing, schema/RLS/static migration contract, admin order mapping и status event mapping.
+
+Доказательство: GitHub Actions QA run `27574321147` завершился `success`; `Fast active tests` прошёл и содержит `npm run test:checkout-submit-hook`.
+
+Документ: `docs/api/api-contract-completion-report-v1.md`.
 
 ### P0-15 CI/CD & Vercel Failure Investigation
 
@@ -195,9 +213,9 @@ Closure condition: закрыть P0-17 можно только после по�
 
 ### P0-19 Dependency Layer Recovery Verification
 
-Статус: open / verification pending after Fast active tests recovery.
+Статус: закрыто.
 
-Источник: `docs/qa/fast-active-tests-recovery-report-v1.md`.
+Источник: `docs/qa/fast-active-tests-recovery-report-v1.md`; финальное подтверждение: `docs/api/api-contract-completion-report-v1.md`.
 
 Ответственный: Test Infrastructure / Dependency Recovery Agent.
 
@@ -205,7 +223,7 @@ Closure condition: закрыть P0-17 можно только после по�
 
 Риск: GitHub Actions может проходить install/typecheck/build, но падать в runtime-зависимом contract test из-за несовместимой Node/runtime конфигурации.
 
-Closure condition: закрыть только после реального passing GitHub Actions workflow run, где подтверждены `npm ci`, `npm run typecheck`, `npm run typecheck:api`, `npm run build`, `Fast active tests` и `npm run test:checkout-submit-hook`.
+Итог: GitHub Actions QA run `27574321147` подтвердил `npm ci`, `npm run typecheck`, `npm run typecheck:api`, `npm run build`, `Fast active tests` и `npm run test:checkout-submit-hook` через Node 22 runtime.
 
 Объём: M. Зависимости: P0-09, P0-11, P0-12, P0-14. Независимо: частично.
 
