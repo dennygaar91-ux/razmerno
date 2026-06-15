@@ -1,209 +1,186 @@
 # API Contract CI Verification Report v1 — Размерно
 
 Дата: 2026-06-15  
-Роль: GitHub Actions / CI Verification Agent  
-Статус: verification completed / P0 closure not confirmed
+Роль: GitHub Actions / CI Verification Agent / updated by API Contract Completion Agent  
+Статус: completed / passing workflow confirmed
 
 ## 1. Executive Summary
 
-Цель проверки — получить реальное подтверждение выполнения новых API / Checkout / Supabase contract tests через GitHub Actions.
+Цель проверки — получить реальное подтверждение выполнения API / Checkout / Supabase contract tests через GitHub Actions.
 
-Проверка ограничена GitHub Actions, workflow runs, workflow logs, CI status, commits, branches и PRs. Runtime code, tests, API implementation, Supabase implementation, pricing, checkout business logic, constructor, Three.js, UI, design, workflow и package.json не изменялись.
+Итог:
 
-Итог проверки:
+- предыдущие candidate runs `27572949276` и `27573862283` падали на `Fast active tests`;
+- root cause подтверждён как Node 20 + `@supabase/supabase-js` + Realtime/WebSocket runtime mismatch;
+- QA workflow переведён на Node 22;
+- новый GitHub Actions QA run `27574321147` завершился `success`;
+- `Install dependencies`, `Typecheck frontend`, `Typecheck API`, `Build frontend`, `Fast active tests`, coverage/artifact и architecture guard steps прошли успешно;
+- P0-11, P0-12, P0-14 и P0-19 закрыты в `docs/planning/current-backlog.md`.
 
-- commits `06047eeca8cf33f65b3727365886bbd2d5711f04`, `09e49895bc7d45ab60a4fca3a7603066801db326`, `38ac4f95c51439486c257d3a66ea2b1827f96b4f` подтверждены;
-- `.github/workflows/qa.yml` в актуальной ветке содержит `npm run test:checkout-submit-hook` внутри `Fast active tests`;
-- старые workflow runs не подходят для закрытия P0-11 / P0-12 / P0-14;
-- создана отдельная verification PR #42, чтобы получить PR-triggered GitHub Actions run на head, где workflow уже содержит `test:checkout-submit-hook`;
-- workflow run `27572791875` найден, но завершился `failure`;
-- job `Fast CI gate` выполнил `Install dependencies`, `Typecheck frontend`, `Typecheck API`, `Build frontend` успешно, но `Fast active tests` завершился `failure`;
-- passing workflow run, подтверждающий API / Checkout / Supabase contract tests, не найден.
+## 2. Failed Candidate Runs
 
-Вывод: P0-11, P0-12 и P0-14 остаются открытыми. API Contract Layer нельзя считать завершённым.
+### Run `27572949276`
 
-## 2. Commit Verification
-
-Проверялись commits:
-
-### `06047eeca8cf33f65b3727365886bbd2d5711f04`
-
-- Сообщение: `test: add order contract fixture`.
-- Изменение: добавлен `tests/fixtures/order-contract-fixture.ts`.
-- Commit существует в репозитории.
-- Commit участвует в цепочке изменений API / Checkout / Supabase contract layer.
-
-### `09e49895bc7d45ab60a4fca3a7603066801db326`
-
-- Сообщение: `test: cover API checkout and Supabase order contracts`.
-- Изменение: расширен `tests/checkout-submit-hook.test.ts` до API / checkout / Supabase contract suite.
-- Commit существует в репозитории.
-- Commit участвует в цепочке изменений API / Checkout / Supabase contract layer.
-
-### `38ac4f95c51439486c257d3a66ea2b1827f96b4f`
-
-- Сообщение: `ci: run checkout API contract tests in fast gate`.
-- Изменение: `.github/workflows/qa.yml` запускает `npm run test:checkout-submit-hook` внутри `Fast active tests`.
-- Commit существует в репозитории.
-- Этот commit является минимальной границей, после которой workflow run может считаться потенциально валидным для закрытия P0-11 / P0-12 / P0-14.
-
-### Additional current-head confirmation
-
-- На момент создания verification branch текущий `main` был `b4b92fb531713575fe62fed8f7f2b802371fea6f`.
-- Verification branch `ci-verification/api-contract-ci-v1` создана от этого commit.
-- Первый report commit: `eadd0057a97b911618cc690c5d486a47b451088d`.
-
-## 3. Workflow Discovery
-
-Workflow file checked:
-
-- `.github/workflows/qa.yml`
-
-Актуальный workflow содержит:
-
-- `on: push` to `main`;
-- `on: pull_request` to `main`;
-- `workflow_dispatch`;
-- job `Fast CI gate`;
-- `Install dependencies` → `npm ci`;
-- `Typecheck frontend` → `npm run typecheck`;
-- `Typecheck API` → `npm run typecheck:api`;
-- `Build frontend` → `npm run build`;
-- `Fast active tests`, включая `npm run test:checkout-submit-hook`.
-
-Invalid discovered runs:
-
-- `06047eeca8cf33f65b3727365886bbd2d5711f04`: no PR-triggered workflow run found.
-- `09e49895bc7d45ab60a4fca3a7603066801db326`: no PR-triggered workflow run found.
-- `38ac4f95c51439486c257d3a66ea2b1827f96b4f`: no PR-triggered workflow run found.
-- PR #41 / run `27570780291`: completed successfully, but excluded because the checked head workflow did not contain `npm run test:checkout-submit-hook`.
-- PR #40 / run `27554246926`: completed with failure and predates the target checkout contract workflow evidence.
-
-Valid candidate run created by this verification task:
-
-- PR: #42 `Verify API contract CI through GitHub Actions`.
-- Head branch: `ci-verification/api-contract-ci-v1`.
-- Head commit for first verification run: `eadd0057a97b911618cc690c5d486a47b451088d`.
-- Workflow run: `27572791875`.
-- Workflow name: `QA`.
-- Run number: `143`.
-- Status: `completed`.
-- Conclusion: `failure`.
-
-## 4. Workflow Log Analysis
-
-Run `27572791875` job summary:
-
+- Workflow: `QA`.
 - Job: `Fast CI gate`.
-- Job status: `completed`.
-- Job conclusion: `failure`.
+- Result: `failure`.
+- Successful before failure: `Install dependencies`, `Typecheck frontend`, `Typecheck API`, `Build frontend`.
+- Failed step: `Fast active tests`.
+- Failing command: `npm run test:checkout-submit-hook`.
+- Failing test: `API order flow creates order, persists it and sends manager/customer notifications`.
+- Assertion: `502 !== 200`.
+- Runtime: Node.js `v20.20.2`.
 
-Confirmed job steps:
+### Run `27573862283`
 
-- `Install dependencies`: `success`.
-- `Typecheck frontend`: `success`.
-- `Typecheck API`: `success`.
-- `Build frontend`: `success`.
-- `Fast active tests`: `failure`.
-- `Coverage snapshot`: `skipped`.
-- `Check CSS architecture`: `skipped`.
-- `Check production geometry architecture`: `skipped`.
+- Workflow: `QA`.
+- Job: `Fast CI gate`.
+- Result: `failure`.
+- Successful before failure: `Install dependencies`, `Typecheck frontend`, `Typecheck API`, `Build frontend`.
+- Failed step: `Fast active tests`.
+- Failing command: `npm run test:checkout-submit-hook`.
+- Failing test: `API order flow creates order, persists it and sends manager/customer notifications`.
+- Assertion: `502 !== 200`.
+- Runtime: Node.js `v20.20.2`.
 
-Result:
+## 3. Root Cause Confirmation
 
-- `npm ci` is proven through successful `Install dependencies` step.
-- `npm run typecheck` is proven through successful `Typecheck frontend` step.
-- `npm run typecheck:api` is proven through successful `Typecheck API` step.
-- `npm run build` is proven through successful `Build frontend` step.
-- `Fast active tests` did not pass.
+Both failed runs produced the same runtime error from Supabase Realtime/WebSocket path:
 
-## 5. Checkout Test Verification
+```text
+Node.js 20 detected without native WebSocket support.
+Suggested solution: For Node.js < 22, install "ws" package and provide it via the transport option.
+```
 
-Required command:
+The failing API contract expected successful order creation and notifications but received API `502`, because the handler path hit the Supabase runtime transport error.
+
+Classification:
+
+- test infrastructure / runtime mismatch;
+- not a confirmed product logic bug;
+- not caused by checkout, pricing, constructor, Three.js or UI logic.
+
+## 4. Fix Applied
+
+Applied fix:
+
+```yaml
+- name: Setup Node.js
+  uses: actions/setup-node@v4
+  with:
+    node-version: 22
+    cache: npm
+```
+
+Changed file:
+
+- `.github/workflows/qa.yml`.
+
+Commit:
+
+- `b5e0e5e3413c563305143685dc9ac42726084668` — `ci: use Node 22 for API contract workflow runtime`.
+
+No product runtime code was changed.
+
+## 5. Passing Workflow Run
+
+Final passing run:
+
+- Workflow: `QA`.
+- Run: `27574321147`.
+- Run number: `148`.
+- Status: `completed`.
+- Conclusion: `success`.
+- Job: `Fast CI gate`.
+- Job conclusion: `success`.
+
+Successful steps:
+
+- `Install dependencies` → proves `npm ci`.
+- `Typecheck frontend` → proves `npm run typecheck`.
+- `Typecheck API` → proves `npm run typecheck:api`.
+- `Build frontend` → proves `npm run build`.
+- `Fast active tests` → proves the active fast suite.
+- `Coverage snapshot`.
+- `Upload coverage artifact`.
+- `Check CSS architecture`.
+- `Check production geometry architecture`.
+
+## 6. Checkout Contract Test Confirmation
+
+The successful workflow file includes this command inside `Fast active tests`:
 
 ```bash
 npm run test:checkout-submit-hook
 ```
 
-The current workflow contains this command inside `Fast active tests`, but the valid candidate run did not pass. The job summary proves `Fast active tests` failed.
+Because `Fast active tests` completed with `success` in run `27574321147`, the command is confirmed passing in GitHub Actions.
 
-Therefore:
+Contract suite covered by this command:
 
-- successful execution of `npm run test:checkout-submit-hook` is not proven;
-- P0-12 cannot be closed;
-- the existence of the command in workflow is not enough.
+- checkout submit success/failure;
+- active Constructor3D submit source contract;
+- required customer email and RU phone validation;
+- API order flow success;
+- manager/customer notification branches;
+- Supabase persistence and schema contracts;
+- admin order/status mapping contracts;
+- deterministic request cooldown/rate-limit branch.
 
-## 6. API Contract Verification
-
-Expected contract coverage is in `tests/checkout-submit-hook.test.ts` and includes API order flow, checkout submit behavior, Supabase repository/schema contracts and related order persistence/error branches.
-
-However, the valid candidate workflow run failed in `Fast active tests`.
-
-Therefore:
-
-- API order flow contract tests are not proven passing in GitHub Actions;
-- Supabase contract tests are not proven passing in GitHub Actions;
-- P0-11 and P0-14 cannot be closed.
-
-## 7. P0 Status Review
+## 7. P0 Closure Review
 
 ### P0-11 API Order Flow Tests
 
-Status: open / not verified.
+Status: closed.
 
-Reason:
-
-- no passing workflow run proves API order flow contract tests executed successfully.
+Evidence: successful QA run `27574321147` proves API order flow tests pass through `npm run test:checkout-submit-hook` inside `Fast active tests`.
 
 ### P0-12 Checkout Submit Tests
 
-Status: open / not verified.
+Status: closed.
 
-Reason:
-
-- no passing workflow run proves `npm run test:checkout-submit-hook` executed successfully.
+Evidence: successful QA run `27574321147` proves checkout submit contract tests pass.
 
 ### P0-14 Supabase Contract Tests
 
-Status: open / not verified.
+Status: closed.
 
-Reason:
-
-- no passing workflow run proves Supabase contract checks executed successfully.
+Evidence: successful QA run `27574321147` proves deterministic Supabase contract tests pass.
 
 ### P0-19 Dependency Layer Recovery Verification
 
-Status: reviewed as related CI/dependency context.
+Status: closed.
 
-Observation:
+Evidence: dependency install, typechecks, build and Fast active tests are green on Node 22.
 
-- `Install dependencies` succeeded in run `27572791875`, so dependency installation worked in this candidate run.
-- This report does not close P0-19 unless a separate dependency-scope verification requires it.
+### P1-21 Reset Action Separation
 
-### P1-21 API / Checkout / Supabase Contract Testing
+Status: present / not duplicated.
 
-Status: reviewed as related quality backlog item.
-
-Observation:
-
-- implementation appears present;
-- completion remains blocked by failing CI evidence.
+Evidence: item exists in `docs/planning/current-backlog.md` and was not duplicated.
 
 ## 8. Backlog Updates
 
-No update was made to `docs/planning/current-backlog.md`.
+Updated file:
 
-Reason:
+- `docs/planning/current-backlog.md`.
 
-- P0-11, P0-12 and P0-14 can be closed only after a passing workflow run;
-- the valid candidate run `27572791875` failed;
-- updating statuses to closed would violate the verification criteria.
+Updated statuses:
+
+- P0-11 → closed.
+- P0-12 → closed.
+- P0-14 → closed.
+- P0-19 → closed.
+
+No temporary backlog files were created.
 
 ## 9. Remaining Risks
 
-1. API / Checkout / Supabase contract tests are present but not proven passing in GitHub Actions.
-2. The current Fast CI gate reaches `Fast active tests`, but that step fails.
-3. Without full passing CI evidence, the API Contract Layer cannot be considered complete.
-4. Vercel status remains separate and cannot substitute for GitHub Actions test evidence.
-5. Live Supabase integration is still not proven by deterministic contract tests unless explicitly added later.
-6. This report update may trigger a new PR workflow run, but the result of that new run is not needed to support the current conclusion: closure is not confirmed.
+1. Deterministic Supabase contracts do not replace live Supabase/RLS integration testing.
+2. Browser-level Constructor3D checkout E2E remains outside this contract block.
+3. P0-13 Pricing Golden Fixtures & Parity remains separate and open.
+4. Vercel deployment status remains a separate release/deploy concern.
+
+## Final Status
+
+API Contract CI verification is complete. The final blocker was resolved by Node 22 runtime in QA workflow and confirmed by GitHub Actions run `27574321147`.
