@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-API Contract Layer доведён до завершения по критериям блока. QA workflow запускает `npm run test:checkout-submit-hook` внутри `Fast active tests`, runtime исправлен на Node 22, финальный main run `27574702631` завершился `success`.
+API Contract Layer доведён до завершения по критериям блока. QA workflow запускает `npm run test:checkout-submit-hook` внутри `Fast active tests`, runtime исправлен на Node 22, финальный PR/head run `27574702631` завершился `success`.
 
 Product/runtime code не менялся: constructor, pricing, checkout business logic, API business logic, Supabase production logic, production layer, Three.js и UI не изменялись.
 
@@ -111,4 +111,4 @@ No temporary backlog files were created.
 
 ## Final Decision
 
-API Contract Layer can be considered completed by the criteria of this block because a real passing GitHub Actions main workflow run confirmed install, typechecks, build, Fast active tests and the checkout/API/Supabase contract suite.
+API Contract Layer can be considered completed by the criteria of this block because a real passing GitHub Actions PR/head workflow run confirmed install, typechecks, build, Fast active tests and the checkout/API/Supabase contract suite. The required documents and backlog updates were then moved into `main`.
