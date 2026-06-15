@@ -147,7 +147,9 @@
 
 ### P0-16 Constructor Reset Contract Resolution
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`.
+Статус: не закрыта — verification failed.
+
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`; повторно проверено в `docs/constructor/reset-contract-verification-report-v1.md`.
 
 Ответственный: Constructor Core Agent.
 
@@ -157,11 +159,15 @@
 
 Audit finding: текущий `reset()` реализован как configuration reset preserving checkout/step: сохраняются `step`, `contact`, `consent`, `deliveryEnabled`, `assemblyEnabled`, `deliveryAddress`. Это конфликтует с `constructorFlowSmoke.test.ts`, который ожидает возврат на `sizes` и очистку checkout/contact fields.
 
+Verification finding: обязательные `typecheck`, `build` и constructor tests не подтверждены фактическим успешным запуском; GitHub workflow run для проверенного commit не найден; Vercel status остаётся failure. Задачу нельзя считать закрытой.
+
 Объём: M. Зависимости: P0-02, P0-08. Независимо: частично.
 
 ### P0-17 Constructor Smoke Test Stabilization
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`.
+Статус: не закрыта — verification failed.
+
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`; повторно проверено в `docs/constructor/reset-contract-verification-report-v1.md`.
 
 Ответственный: Constructor Core Agent.
 
@@ -170,6 +176,8 @@ Audit finding: текущий `reset()` реализован как configuratio
 Риск: smoke test будет либо падать без продуктовой причины, либо перестанет защищать critical constructor flow.
 
 Audit finding: smoke test нельзя просто подогнать под текущую реализацию без решения P0-16. Сначала нужно назвать и зафиксировать продуктовый contract: full manual project reset или configuration reset preserving checkout.
+
+Verification finding: `constructorFlowSmoke.test.ts` всё ещё ожидает full wizard reset, тогда как реализация сохраняет `step`, contact и checkout/service fields. Успешный запуск `test:constructor-flow` не подтверждён. Задачу нельзя считать закрытой.
 
 Объём: M. Зависимости: P0-16. Независимо: нет.
 
