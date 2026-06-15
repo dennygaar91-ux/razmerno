@@ -193,6 +193,18 @@ Closure condition: закрыть P0-17 можно только после по�
 
 Объём: M. Зависимости: P0-01, P0-02, P0-08. Независимо: частично.
 
+### P0-19 Dependency Layer Recovery Verification
+
+Источник: `docs/infrastructure/dependency-recovery-report-v1.md`.
+
+Ответственный агент: Dependency Recovery Agent / Build Verification Agent.
+
+Описание: подтвердить, что dependency layer действительно восстановлен после фиксации npm registry configuration: `npm ci` или согласованный install command должен проходить в чистой среде, затем должны быть подтверждены `npm run typecheck` и `npm run build`.
+
+Риск: P0-16 и P0-17 остаются неподтверждёнными, если зависимости не устанавливаются и build/test commands не запускаются.
+
+Зависимости: `.npmrc`, `.github/workflows/qa.yml`, `package-lock.json`, доступность npm registry в CI/агентской среде.
+
 ---
 
 ## P1 — MVP Quality
