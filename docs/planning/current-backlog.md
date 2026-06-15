@@ -193,6 +193,22 @@ Closure condition: закрыть P0-17 можно только после по�
 
 Объём: M. Зависимости: P0-01, P0-02, P0-08. Независимо: частично.
 
+### P0-19 Dependency Layer Recovery Verification
+
+Статус: open / verification pending after Fast active tests recovery.
+
+Источник: `docs/qa/fast-active-tests-recovery-report-v1.md`.
+
+Ответственный: Test Infrastructure / Dependency Recovery Agent.
+
+Зачем: подтвердить, что dependency/runtime слой CI стабилен для install, typecheck, build и Fast active tests после восстановления Node/Supabase-compatible runtime.
+
+Риск: GitHub Actions может проходить install/typecheck/build, но падать в runtime-зависимом contract test из-за несовместимой Node/runtime конфигурации.
+
+Closure condition: закрыть только после реального passing GitHub Actions workflow run, где подтверждены `npm ci`, `npm run typecheck`, `npm run typecheck:api`, `npm run build`, `Fast active tests` и `npm run test:checkout-submit-hook`.
+
+Объём: M. Зависимости: P0-09, P0-11, P0-12, P0-14. Независимо: частично.
+
 ---
 
 ## P1 — MVP Quality
