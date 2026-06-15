@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadPricingModules } from "../pricingLoader";
+import facadeStyles from "../../../config/facade-styles.json";
+import hardwareItems from "../../../config/hardware.json";
 import { buildConstructorMaterialPricingContext } from "../../../pricing/materialPricing";
 import {
   buildPricingTransparencyNotice,
@@ -40,6 +42,17 @@ interface UseConstructorQuoteArgs {
   snapshot?: ConstructorSnapshot;
 }
 
+type FacadeStyleConfig = {
+  id: string;
+  priceMultiplier: number;
+};
+
+type HardwareConfig = {
+  id: string;
+  basePrice: number;
+  priceFactor: number;
+};
+
 type QuoteBuildInput = {
   price: CatalogPriceBreakdown;
   deliveryQuote: DeliveryQuote;
@@ -54,6 +67,18 @@ type QuoteBuildInput = {
   productionServicesDecision?: ProductionServicesPricingDecision | null;
   productionPreview?: ConstructorProductionPreview | null;
 };
+
+function getFacadeStyleConfig(handleless: boolean): FacadeStyleConfig {
+  const id = handleless ? "no-handle" : "regular";
+  const style = (facadeStyles as FacadeStyleConfig[]).find((entry) => entry.id === id);
+  return style ?? { id, priceMultiplier: handleless ? 1.15 : 1 };
+}
+
+function getHardwareConfig(handleless: boolean): HardwareConfig {
+  const id = handleless ? "comfort" : "base";
+  const hardware = (hardwareItems as HardwareConfig[]).find((entry) => entry.id === id);
+  return hardware ?? { id, basePrice: handleless ? 6200 : 3800, priceFactor: handleless ? 260 : 180 };
+}
 
 function buildQuoteState({
   price,
@@ -147,6 +172,8 @@ export function useConstructorQuote({
           facadeMaterialId: facadeMaterial.materialId as MaterialToken,
         });
         const basePricingNotice = buildPricingTransparencyNotice(materialPricingContext);
+        const facadeStyle = getFacadeStyleConfig(handleless);
+        const hardware = getHardwareConfig(handleless);
         const catalogPrice = pricing.calculatePrice({
           type: selectedFurniture.productType,
           dimensions: { width, height, depth },
@@ -161,14 +188,14 @@ export function useConstructorQuote({
           facadeMaterialKind: materialPricingContext.facade.materialKind as "ldsp" | "mdf",
           bodyPricePerLiter: 0,
           facadePricePerLiter: 0,
-          facadeStyleMultiplier: handleless ? 1.08 : 1,
-          hardwareBasePrice: handleless ? 6500 : 4200,
-          hardwarePriceFactor: 1,
+          facadeStyleMultiplier: facadeStyle.priceMultiplier,
+          hardwareBasePrice: hardware.basePrice,
+          hardwarePriceFactor: hardware.priceFactor,
         });
 
         const deliveryQuote = pricing.calculateDeliveryQuote(deliveryEnabled, deliveryAddress);
         const catalogAssemblyQuote = pricing.calculateAssemblyQuote(assemblyEnabled, catalogPrice.total);
-        let nextPrice = catalogPrice;
+        const nextPrice = catalogPrice;
         let productionPanelPricing: ProductionPanelPricingSummary | null = null;
         let productionHardwarePricing: ProductionHardwarePricingSummary | null = null;
         let productionHardwareDecision: ProductionHardwarePricingDecision | null = null;
@@ -200,7 +227,6 @@ export function useConstructorQuote({
           productionHardwareDecision = productionBundle.hardwareDecision;
           productionServicesPricing = productionBundle.servicesPricing;
           productionServicesDecision = productionBundle.servicesDecision;
-          nextPrice = productionBundle.appliedPrice.price;
           pricingNotice = withProductionPanelPricingNotice(
             basePricingNotice,
             productionBundle.appliedPrice.warnings,
