@@ -147,19 +147,21 @@
 
 ### P0-16 Constructor Reset Contract Resolution
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`.
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`.
 
 Ответственный: Constructor Core Agent.
 
 Зачем: определить целевое поведение `reset()` и зафиксировать единый reset contract для constructor state.
 
-Риск: `constructorStore.test.ts` и `constructorFlowSmoke.test.ts` будут проверять разные ожидания, что сделает smoke-тесты нестабильными.
+Риск: `constructorStore.test.ts` и `constructorFlowSmoke.test.ts` проверяют разные ожидания, что делает smoke-тесты нестабильными.
+
+Audit finding: текущий `reset()` реализован как configuration reset preserving checkout/step: сохраняются `step`, `contact`, `consent`, `deliveryEnabled`, `assemblyEnabled`, `deliveryAddress`. Это конфликтует с `constructorFlowSmoke.test.ts`, который ожидает возврат на `sizes` и очистку checkout/contact fields.
 
 Объём: M. Зависимости: P0-02, P0-08. Независимо: частично.
 
 ### P0-17 Constructor Smoke Test Stabilization
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`.
+Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`.
 
 Ответственный: Constructor Core Agent.
 
@@ -167,7 +169,21 @@
 
 Риск: smoke test будет либо падать без продуктовой причины, либо перестанет защищать critical constructor flow.
 
+Audit finding: smoke test нельзя просто подогнать под текущую реализацию без решения P0-16. Сначала нужно назвать и зафиксировать продуктовый contract: full manual project reset или configuration reset preserving checkout.
+
 Объём: M. Зависимости: P0-16. Независимо: нет.
+
+### P0-18 Constructor3D Architecture Guard Implementation
+
+Источник: `docs/constructor/constructor-core-audit-v1.md` + `docs/planning/constructor3d-guard-spec-v1.md`.
+
+Ответственный: Architecture Guard Agent.
+
+Зачем: enforce active Constructor3D boundary (`src/static-pages/Constructor3DPage.tsx`, `src/static-pages/constructor/**`) against legacy imports, direct API/Supabase/admin/server imports and forbidden layer crossings.
+
+Риск: агенты могут случайно вернуть legacy constructor/runtime dependencies в активный Constructor3D.
+
+Объём: M. Зависимости: P0-01, P0-02, P0-08. Независимо: частично.
 
 ---
 
@@ -272,6 +288,18 @@
 Риск: flaky tests будут либо блокировать разработку, либо неформально отключаться без следа в документации.
 
 Зависимости: P0-08, P1-16.
+
+### P1-20 Constructor Advanced / Scene State Contract Cleanup
+
+Источник: `docs/constructor/constructor-core-audit-v1.md`.
+
+Ответственный: Constructor Core Agent.
+
+Задачи: зафиксировать и покрыть тестами ownership для `exactModeEnabled`, `advancedSizes`, `advancedFill`, store-level `sceneRenderMode` и page-local render mode перед дальнейшей декомпозицией Constructor3D.
+
+Риск: будущие агенты могут принять mirrored flags или local/store scene mode за независимые источники истины и создать расхождение состояния.
+
+Зависимости: P0-02, P0-16.
 
 ---
 
