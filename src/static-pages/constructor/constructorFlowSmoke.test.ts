@@ -179,6 +179,6 @@ test("constructor flow: reset restores configuration and preserves current step"
   assert(state.width === 1800, "Reset should restore initial width");
   assert(state.height === 2400, "Reset should restore initial height");
   assert(state.depth === 600, "Reset should restore initial depth");
-  assert(state.contact.email === "", "Reset should clear contact email");
-  assert(state.deliveryAddress === "", "Reset should clear delivery address");
+  assert(state.contact.email === "ivan@example.ru", "Reset should preserve contact email");
+  assert(state.deliveryAddress === "Москва, в пределах МКАД", "Reset should preserve delivery address");
 });
