@@ -1,15 +1,10 @@
-import materials from '../../src/config/materials.json';
 import facadeStyles from '../../src/config/facade-styles.json';
 import hardwareItems from '../../src/config/hardware.json';
 import { calculateCatalogPrice, type CatalogPriceBreakdown } from '../../src/pricing/engine';
 import { calculateDeliveryQuote } from '../../src/pricing/delivery';
 import { calculateAssemblyQuote } from '../../src/pricing/assembly';
+import { buildConstructorMaterialPricingContext } from '../../src/pricing/materialPricing';
 import type { OrderRequest } from './order-types';
-
-type Material = {
-  id: string;
-  pricePerLiter: number;
-};
 
 type FacadeStyle = {
   id: string;
@@ -22,10 +17,28 @@ type Hardware = {
   priceFactor: number;
 };
 
+type MaterialPricingInput = Parameters<typeof buildConstructorMaterialPricingContext>[0];
+
+type CatalogProducer = 'Kronospan' | 'Egger' | 'Eterno' | 'AGT';
+
+type CatalogFacadeKind = 'ldsp' | 'mdf';
+
 function findById<T extends { id: string }>(items: T[], id: string | undefined, label: string): T {
   const item = items.find((entry) => entry.id === id);
   if (!item) throw new Error(`${label} not found: ${id ?? 'empty'}`);
   return item;
+}
+
+function resolveOrderMaterialPricing(body: OrderRequest) {
+  const bodyMaterialId = body.materials?.bodyId;
+  const facadeMaterialId = body.materials?.facadeId;
+
+  if (!bodyMaterialId || !facadeMaterialId) return null;
+
+  return buildConstructorMaterialPricingContext({
+    bodyMaterialId: bodyMaterialId as MaterialPricingInput['bodyMaterialId'],
+    facadeMaterialId: facadeMaterialId as MaterialPricingInput['facadeMaterialId'],
+  });
 }
 
 export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown {
@@ -35,12 +48,22 @@ export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown 
 
   const facadeStyle = findById(facadeStyles as FacadeStyle[], body.style?.facadeStyleId, 'facade style');
   const hardware = findById(hardwareItems as Hardware[], body.style?.hardwareId, 'hardware');
+  const materialPricing = resolveOrderMaterialPricing(body);
+  const bodyMaterialPricing = materialPricing?.body;
+  const facadeMaterialPricing = materialPricing?.facade;
 
   const basePrice = calculateCatalogPrice({
     type: body.productType,
     dimensions: body.dimensions,
     sections: body.sections ?? 1,
     filling: body.filling,
+    bodyProducer: bodyMaterialPricing?.producer as CatalogProducer | undefined,
+    bodyArticle: bodyMaterialPricing?.article,
+    bodyThicknessMm: bodyMaterialPricing?.thicknessMm,
+    facadeProducer: facadeMaterialPricing?.producer as CatalogProducer | undefined,
+    facadeArticle: facadeMaterialPricing?.article,
+    facadeThicknessMm: facadeMaterialPricing?.thicknessMm,
+    facadeMaterialKind: facadeMaterialPricing?.materialKind as CatalogFacadeKind | undefined,
     facadeStyleMultiplier: facadeStyle.priceMultiplier,
     hardwareLevel: hardware.basePrice > 5000 ? 'comfort' : 'base',
   });
