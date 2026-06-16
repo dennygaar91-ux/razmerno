@@ -262,6 +262,23 @@ npm run test:webgl-fallback-e2e
 
 Merge/main note: PR merge и main content verification фиксируются в финальном handoff после merge.
 
+### P1-13 Material / Texture Parity
+
+Статус: in progress.
+
+Итог на текущей ветке: частичная реализация продолжена — добавлены/сохранены material markers, 3D preview markers, WebGL fallback/SVG parity markers, отдельный E2E spec, guard-script, package scripts и QA workflow steps.
+
+Команды, которые должны быть подтверждены CI перед закрытием:
+
+```bash
+npm run check:material-texture-parity
+npm run test:material-texture-parity
+```
+
+Документ: `docs/visualization/material-texture-parity-report-v1.md`.
+
+Closure condition: закрыть P1-13 можно только после PR, successful GitHub Actions QA run на финальном head, обновления evidence в этом backlog, merge в `main` и main content verification.
+
 ### P1-21 Release / Post-MVP Visual QA Matrix
 
 Статус: open.
@@ -270,4 +287,4 @@ Merge/main note: PR merge и main content verification фиксируются в
 
 Риск: без дальнейшей visual QA matrix останутся непокрытыми cross-browser/mobile/device-specific визуальные регрессии.
 
-Важно: P1-21 не входит в scope P1-10 и не закрывается этой задачей.
+Важно: P1-21 не входит в scope P1-13 и не закрывается этой задачей.

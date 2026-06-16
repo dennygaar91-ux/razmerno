@@ -46,7 +46,16 @@ export function ThreeFurnitureViewer({
   const studioSize = Math.max(width, depth, 2.8);
 
   return (
-    <div className={`rzm-three-viewer rzm-three-viewer--product rzm-three-viewer--${sceneMode}`} data-scene-mode={sceneMode} aria-label="Интерактивная 3D-модель мебели">
+    <div
+      className={`rzm-three-viewer rzm-three-viewer--product rzm-three-viewer--${sceneMode}`}
+      data-testid="constructor-3d-preview"
+      data-scene-mode={sceneMode}
+      data-rendered-material={input.material}
+      data-rendered-facade-material={input.facadeMaterial}
+      data-material-id={input.material}
+      data-facade-material-id={input.facadeMaterial}
+      aria-label="Интерактивная 3D-модель мебели"
+    >
       <Canvas
         shadows={!isReduced}
         dpr={isReduced ? [1, 1.15] : [1, 1.65]}
