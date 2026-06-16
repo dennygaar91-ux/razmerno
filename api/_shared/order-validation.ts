@@ -3,7 +3,13 @@ import { validateDelivery } from '../../src/pricing/delivery'
 import { validateAssembly } from '../../src/pricing/assembly'
 import { validateOrderLayout } from './layout-validation'
 
+function isPlainOrderPayload(body: unknown): body is OrderRequest {
+  return Boolean(body && typeof body === 'object' && !Array.isArray(body))
+}
+
 export function validateOrder(body: OrderRequest): string | null {
+  if (!isPlainOrderPayload(body)) return 'Некорректный формат заявки'
+
   const name = body.customer?.name?.trim() ?? ''
   const phoneDigits = body.customer?.phone?.replace(/\D/g, '') ?? ''
   const email = body.customer?.email?.trim() ?? ''
