@@ -70,6 +70,12 @@ jobs:
           npm run test:geometry
           npm run test:production-export
 
+      - name: Production golden snapshots guard
+        run: npm run check:production-golden-snapshots
+
+      - name: Production golden snapshots tests
+        run: npm run test:production-golden-snapshots
+
       - name: P1-09 Constructor3D submit E2E guard
         run: |
           echo "npm run check:constructor-submit-e2e" | tee -a p1-09-ci-evidence.log
