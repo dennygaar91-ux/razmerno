@@ -69,8 +69,8 @@ Conclusion: success
 Final PR head after docs/backlog closure:
 
 ```text
-Head SHA: d75892313b956cbc0c23f3a20d1b550839345688
-QA run: 234
+Head SHA: 24f6f79de283bef2b9947822b5159c7d82b18d40
+QA run: 235
 Status: completed
 Conclusion: success
 ```
@@ -115,7 +115,7 @@ Final PR-head GitHub combined status evidence:
 ```text
 Context: Vercel
 State: success
-Head SHA: d75892313b956cbc0c23f3a20d1b550839345688
+Head SHA: 24f6f79de283bef2b9947822b5159c7d82b18d40
 ```
 
 ## 6. Vercel Raw Logs
