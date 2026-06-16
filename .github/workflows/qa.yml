@@ -79,6 +79,17 @@ jobs:
       - name: P1-09 Constructor3D submit E2E
         run: npm run test:constructor-submit-e2e
 
+      - name: Upload P1-09 Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-09-constructor-submit-e2e-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Coverage snapshot
         env:
           COVERAGE_MIN_BYTES: 15
