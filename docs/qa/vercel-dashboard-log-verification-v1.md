@@ -17,7 +17,7 @@ Error: Command "npm run build" exited with 126
 
 После dashboard-level исправления и redeploy without cache Preview deployment стал `Ready / Latest`.
 
-Финальный PR-head также подтверждён как green: GitHub QA success и Vercel status success.
+Финальный PR-head также подтверждается отдельным GitHub QA run и Vercel status; конкретные номера фиксируются в этом документе после завершения последнего docs/backlog update run.
 
 ## 2. Scope
 
@@ -68,18 +68,17 @@ Status: completed
 Conclusion: success
 ```
 
-Final PR-head evidence after report/backlog closure update:
+Final docs/backlog update evidence:
 
 ```text
-Head SHA: 47d397656f2f14072c31acf674868a0cb2d7ce1c
+Latest docs/backlog head before merge: 288ba9cfa1fd16e8273d74a1fddcba6d688ded38
 Workflow: QA
-Run number: 239
-Run id: 27647250963
-Status: completed
-Conclusion: success
+Run number: 241
+Run id: 27648090439
+Status: in_progress at the time of this report update
 ```
 
-GitHub QA uses Node 22, `npm ci`, and `npm run build`.
+GitHub QA uses Node 22, `npm ci`, and `npm run build`. PR #49 must not be merged until the latest QA run for the final docs/backlog head is completed with `success`.
 
 ## 5. Vercel Deployment Status
 
@@ -105,7 +104,7 @@ Commit: 3bb8907
 Duration: 51s
 ```
 
-Final PR-head GitHub combined status evidence:
+Final PR-head GitHub combined status evidence before the last report refresh:
 
 ```text
 Context: Vercel
@@ -113,6 +112,8 @@ State: success
 Head SHA: 47d397656f2f14072c31acf674868a0cb2d7ce1c
 Target deployment id: 6s1SC84wysEbv6Y8DCEqw3FWzUrV
 ```
+
+Latest head `288ba9cfa1fd16e8273d74a1fddcba6d688ded38` still requires final Vercel status confirmation before merge.
 
 ## 6. Vercel Raw Logs
 
@@ -172,8 +173,8 @@ Evidence chain:
 3. Vercel settings/logs showed build cache/runtime mismatch context.
 4. Vercel redeploy was triggered without cache after settings alignment.
 5. Vercel then executed `npm ci`, installed full dependencies, completed `vite build`, and produced `Ready / Latest`.
-6. Final PR-head deployment after docs/backlog update also reported `success` through GitHub combined status.
-7. Final PR-head GitHub QA run #239 completed with `success`.
+6. A later PR-head deployment after docs/backlog update also reported `success` through GitHub combined status.
+7. The latest docs/backlog-only head requires final QA/Vercel confirmation before merge.
 
 ## 10. Fix Applied / Fix Required
 
@@ -212,7 +213,7 @@ Commit: 3bb8907
 Duration: 51s
 ```
 
-Final PR-head Vercel result:
+Later PR-head Vercel result before final docs/backlog refresh:
 
 ```text
 Target deployment id: 6s1SC84wysEbv6Y8DCEqw3FWzUrV
@@ -222,17 +223,17 @@ GitHub combined status: success
 Head SHA: 47d397656f2f14072c31acf674868a0cb2d7ce1c
 ```
 
-P1-22 deployment blocker is resolved for PR #49 Preview deployments.
+P1-22 deployment blocker is resolved, pending final QA/Vercel confirmation on the latest docs/backlog-only head before merge.
 
 ## 12. Release Impact
 
 Release impact after fix:
 
 ```text
-No current Vercel Preview deployment blocker for PR #49.
+No current confirmed Vercel Preview deployment blocker for PR #49 after Dashboard fix.
 ```
 
-This does not rewrite older historical failed deployments, but confirms the current deployment path works with corrected Dashboard settings and clean cache.
+This does not rewrite older historical failed deployments, but confirms the deployment path works with corrected Dashboard settings and clean cache.
 
 ## 13. Visual QA Screenshot Pass Decision
 
@@ -244,10 +245,11 @@ The next Vercel-based visual QA screenshot pass can start after PR #49 merge and
 
 ## 14. Remaining Risks
 
-1. Main deployment after PR #49 merge still needs confirmation.
-2. Vercel Dashboard settings must remain aligned with GitHub QA: `npm ci`, `npm run build`, `dist`, Vite preset, Node 22.x where available.
-3. Non-blocking TypeScript unused-symbol warnings in `api/_shared/server-price.ts` may become relevant if future Vercel settings enforce stricter typecheck.
-4. Older failed Vercel statuses may remain historically failed.
+1. Final QA/Vercel confirmation on latest PR #49 head is required before merge.
+2. Main deployment after PR #49 merge still needs confirmation.
+3. Vercel Dashboard settings must remain aligned with GitHub QA: `npm ci`, `npm run build`, `dist`, Vite preset, Node 22.x where available.
+4. Non-blocking TypeScript unused-symbol warnings in `api/_shared/server-price.ts` may become relevant if future Vercel settings enforce stricter typecheck.
+5. Older failed Vercel statuses may remain historically failed.
 
 ## 15. Closure Review
 
@@ -260,8 +262,8 @@ The next Vercel-based visual QA screenshot pass can start after PR #49 merge and
 | Repository fix applied | Not required |
 | Dashboard fix applied | Done |
 | Vercel redeploy success | Done |
-| Final PR-head Vercel success | Done |
-| Final PR-head GitHub QA success | Done |
+| Final PR-head GitHub QA success | Pending latest docs/backlog head |
+| Final PR-head Vercel success | Pending latest docs/backlog head |
 | Report updated | Done |
 | Backlog update | Done |
 | GitHub issues untouched | Done |
@@ -270,5 +272,5 @@ The next Vercel-based visual QA screenshot pass can start after PR #49 merge and
 Final P1-22 status:
 
 ```text
-closed
+closed after final PR #49 QA/Vercel confirmation and merge to main
 ```
