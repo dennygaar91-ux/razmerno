@@ -2,125 +2,165 @@
 
 Документ фиксирует последовательность этапов до MVP release candidate.
 
+Последняя сверка: `docs/planning/project-reconciliation-report-v1.md` от 2026-06-16.
+
+Важно: этот roadmap не запускает новый development scope. Он только синхронизирует порядок этапов с фактическим backlog state.
+
 ---
 
-## Stage 01 — Planning & Governance
+## Stage R0 — Planning Reconciliation
 
-Цель: создать единый управляющий слой проекта.
+Статус: completed / documentation-only.
 
-Задачи:
+Цель: привести planning layer к фактическому состоянию после закрытия части P0.
 
-- master development plan;
-- current backlog;
-- MVP scope;
-- architecture decisions;
-- agent workflow;
-- parallelization rules;
-- release roadmap.
+Выполнено:
 
-Риски:
-
-- документы устареют, если их не обновлять после этапов.
+- обновлён `docs/planning/current-backlog.md`;
+- создан `docs/planning/project-reconciliation-report-v1.md`;
+- синхронизирован `docs/planning/master-development-plan-v1.md`;
+- синхронизирован `docs/planning/release-roadmap.md`.
 
 Результат:
 
-агенты стартуют из единого источника истины.
+- закрытые, открытые, duplicate и partially covered задачи разведены;
+- следующий критический блок определён как Constructor Reset Contract + Constructor State Stabilization.
 
 ---
 
-## Stage 02 — Constructor Architecture Stabilization
+## Stage R1 — Constructor Reset Contract Resolution
 
-Цель: стабилизировать границы нового конструктора.
+Статус: next recommended critical block.
+
+Цель: закрыть P0-16.
 
 Задачи:
 
-- Constructor3D как активный путь;
-- legacy Constructor как quarantine;
-- карта зависимостей state/UI/scene/pricing/checkout;
-- запрет случайных импортов из legacy.
+- явно выбрать и документировать целевой reset contract;
+- синхронизировать implementation с выбранным contract;
+- убрать конфликт ожиданий между constructor store и smoke tests;
+- подтвердить typecheck, build и релевантные constructor tests.
 
 Риски:
 
-- преждевременное удаление legacy может сломать тесты.
+- без этого Constructor3D, checkout и fallback могут опираться на нестабильную state-семантику.
 
 Результат:
 
-понятная архитектурная карта конструктора.
+- `reset()` имеет один подтверждённый смысл;
+- P0-16 можно закрыть только после evidence.
 
 ---
 
-## Stage 03 — Constructor State Model
+## Stage R2 — Constructor Smoke Test / State Model Stabilization
 
-Цель: стабилизировать модель данных.
+Цель: закрыть P0-17 и стабилизировать P0-02.
 
 Задачи:
 
-- dimensions;
-- layout;
-- sections;
-- zones;
-- filling;
-- fronts;
-- materials;
-- checkout;
-- validation.
+- синхронизировать `constructorFlowSmoke.test.ts` с выбранным reset contract;
+- проверить constructor store expectations;
+- стабилизировать ownership для dimensions, sections, zones, filling, materials, checkout и validation;
+- определить, какие state fields являются source of truth.
 
 Риски:
 
-- изменения state могут затронуть pricing и checkout.
+- нельзя параллельно делать Constructor3D UX changes или checkout refactor.
 
 Результат:
 
-единое состояние для UI, 3D, fallback и pricing.
+- constructor state можно безопасно использовать для 3D, fallback, pricing и checkout.
 
 ---
 
-## Stage 04 — Pricing Validation
+## Stage R3 — Constructor3D Architecture Guard Implementation
 
-Цель: подтвердить точность стоимости.
+Цель: закрыть P0-18.
 
 Задачи:
 
-- проверить sources of truth;
-- сверить материалы, кромку, упаковку, доставку, сборку;
-- добавить тесты на ключевые сценарии;
-- зафиксировать запрет на предварительную цену.
+- enforce active Constructor3D boundary;
+- запретить случайные legacy imports;
+- запретить direct API/Supabase/admin/server imports в активный constructor layer;
+- зафиксировать forbidden layer crossings.
 
 Риски:
 
-- нельзя параллельно менять production cost rules.
+- guard должен отражать реальную архитектуру после state/reset stabilization.
 
 Результат:
 
-цена считается стабильно и предсказуемо.
+- агенты меньше рискуют случайно вернуть legacy/runtime dependencies в Constructor3D.
 
 ---
 
-## Stage 05 — Three.js Stability
+## Stage R4 — Pricing Golden Fixtures & Client/Server Parity
 
-Цель: сделать 3D-сцену устойчивой.
+Цель: закрыть P0-13 и усилить P0-03.
+
+Задачи:
+
+- создать golden fixtures для ключевых сценариев цены;
+- проверить client/server parity;
+- проверить материалы, кромку, упаковку, доставку и сборку;
+- зафиксировать расхождения и источник истины;
+- не менять production cost rules параллельно.
+
+Риски:
+
+- pricing audit фиксирует риск разных client/server paths.
+
+Результат:
+
+- цена подтверждена fixture/evidence, а не только audit-выводом.
+
+---
+
+## Stage R5 — Three.js Stability
+
+Цель: закрыть P0-05.
 
 Задачи:
 
 - error boundary;
 - loading state;
-- fallback;
 - камеры;
 - reduced quality;
-- контроль производительности;
-- отсутствие блокировки заявки при сбое WebGL.
+- контроль базовой производительности;
+- устойчивость сцены без глубокого визуального redesign.
 
 Риски:
 
-- нельзя одновременно делать глубокий визуальный редизайн сцены.
+- нельзя одновременно делать deep visual scene rework.
 
 Результат:
 
-3D работает как основной интерфейс, fallback доступен.
+- 3D работает как основной интерфейс и не ломает сценарий заявки.
 
 ---
 
-## Stage 06 — Constructor3D Interaction MVP
+## Stage R6 — WebGL / 2D Fallback
+
+Цель: закрыть P0-06.
+
+Задачи:
+
+- fallback при недоступности WebGL;
+- 2D preview как рабочий fallback;
+- отсутствие блокировки настройки и заявки при сбое 3D;
+- базовые fallback tests.
+
+Риски:
+
+- fallback должен использовать стабильную state model.
+
+Результат:
+
+- пользователь может продолжить конфигурацию без WebGL.
+
+---
+
+## Stage R7 — Constructor3D Interaction MVP
 
 Цель: завершить основной сценарий сборки через 3D.
 
@@ -136,15 +176,15 @@
 
 Риски:
 
-- зависит от state model и scene stability.
+- зависит от state model, architecture guard и scene stability.
 
 Результат:
 
-пользователь может собрать мебель через 3D.
+- пользователь может собрать мебель через 3D без legacy-flow.
 
 ---
 
-## Stage 07 — Materials MVP
+## Stage R8 — Materials MVP
 
 Цель: сделать материалы убедительными и связанными с моделью.
 
@@ -154,66 +194,69 @@
 - swatches;
 - zoom-preview;
 - синхронизация материала с 3D;
-- fallback для 2D.
+- fallback для 2D;
+- material / texture parity tests.
 
 Риски:
 
-- текстуры могут ухудшить производительность.
+- текстуры могут ухудшить производительность;
+- material parity зависит от pricing и 3D material pipeline.
 
 Результат:
 
-материал визуально соответствует выбранному декору.
+- материал визуально соответствует выбранному декору.
 
 ---
 
-## Stage 08 — Checkout MVP
+## Stage R9 — Checkout UX + Submit E2E
 
-Цель: завершить заявку.
+Цель: завершить заявку на browser/user-flow уровне.
 
 Задачи:
 
-- имя;
-- телефон RU;
-- email;
+- итоговая смета;
 - доставка toggle + адрес;
 - сборка toggle;
-- итоговая смета;
-- блокировка заявки при errors;
-- success без reset модели.
+- контакты;
+- согласие;
+- success state без reset модели;
+- Constructor3D submit E2E.
 
 Риски:
 
-- зависит от pricing и validation.
+- зависит от pricing parity, state model и reset/no-reset contract.
 
 Результат:
 
-пользователь может отправить заявку.
+- пользователь может отправить заявку в основном browser flow.
 
 ---
 
-## Stage 09 — Testing & CI/CD
+## Stage R10 — QA Expansion / Nightly / Release Workflow
 
-Цель: сделать проект устойчивым к следующим этапам.
+Цель: усилить качество после baseline QA gate.
 
 Задачи:
 
-- typecheck;
-- build;
-- unit tests;
-- smoke tests;
-- CI quality gate.
+- Nightly QA Workflow;
+- Release QA Workflow;
+- Fast/Medium/Heavy test separation;
+- Istanbul/LCOV coverage;
+- Deployment Validation Layer;
+- Test Quarantine System.
 
 Риски:
 
-- нестабильные тесты будут замедлять работу.
+- не менять бизнес-логику ради тестов;
+- не ломать package scripts без ownership plan.
 
 Результат:
 
-регрессии отслеживаются автоматически.
+- проект готов к более крупным production/admin этапам.
 
 ---
 
-## Stage 10 — Production Layer MVP
+## Stage R11 — Production Layer MVP
 
 Цель: подготовить производственные данные без перегруза клиента.
 
@@ -224,19 +267,21 @@
 - hardware basics;
 - drilling basics;
 - warnings;
-- ручная технологическая проверка.
+- ручная технологическая проверка;
+- production golden snapshots.
 
 Риски:
 
-- нельзя показывать клиенту сложную производственную логику.
+- нельзя показывать клиенту сложную производственную логику;
+- production cost rules не менять параллельно с pricing parity.
 
 Результат:
 
-заказ содержит базу для технолога.
+- заказ содержит базу для технолога.
 
 ---
 
-## Stage 11 — Admin MVP
+## Stage R12 — Admin MVP
 
 Цель: дать менеджеру минимальный рабочий интерфейс.
 
@@ -248,19 +293,20 @@
 - состав заказа;
 - цена;
 - production warnings;
-- статус обработки.
+- статус обработки;
+- admin API/integration tests.
 
 Риски:
 
-- зависит от Supabase и order storage.
+- зависит от Supabase/order storage и production layer.
 
 Результат:
 
-заявки можно обрабатывать вручную.
+- заявки можно обрабатывать вручную.
 
 ---
 
-## Stage 12 — Release Candidate
+## Stage R13 — Release Candidate
 
 Цель: подготовить MVP к запуску.
 
@@ -270,7 +316,7 @@
 - performance pass;
 - security checklist;
 - env validation;
-- документация запуска;
+- release workflow;
 - rollback plan.
 
 Риски:
@@ -279,4 +325,25 @@
 
 Результат:
 
-готовность к MVP launch.
+- готовность к MVP launch.
+
+---
+
+## Parallelization Notes
+
+Можно параллельно:
+
+- documentation sync;
+- pricing parity analysis/fixtures;
+- materials content preparation без изменения Three.js pipeline;
+- QA workflow planning без package script mutation;
+- production planning docs без runtime changes.
+
+Нельзя параллельно:
+
+- constructor reset/state stabilization + Constructor3D UX changes;
+- constructor state model + WebGL fallback implementation;
+- pricing parity + production cost rules;
+- Three.js stability + deep visual scene rework;
+- legacy removal + test migration;
+- global CSS cleanup + active constructor UI refactor.
