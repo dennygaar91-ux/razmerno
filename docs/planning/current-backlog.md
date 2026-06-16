@@ -293,6 +293,20 @@ Closure summary: Material / Texture Parity is closed in main. The work proves th
 
 Closure summary: P1-21 закрыта как docs/planning-only задача. Матрица фиксирует, что подтверждённых P0 visual blockers по source/docs-аудиту не найдено, но перед public release нужен отдельный visual execution pass по desktop/tablet/mobile/cross-browser состояниям.
 
+### P1-22 Vercel Deployment Dashboard Log Verification
+
+Статус: open.
+
+Источник: `docs/qa/vercel-deployment-error-investigation-v1.md`.
+
+Зачем: получить Vercel raw logs и подтвердить конкретную причину `Vercel: failure` на PR #47 head и merge commit `49a635fe8831376e8afa32ebbcebd17a7a80025b`.
+
+Evidence: GitHub Actions QA run #205 (`27628914104`) завершился `success`, но GitHub combined status показывает `Vercel: failure` для PR #47 head и current `main`; Vercel failure также виден на более ранних merge commits PR #44 и PR #46.
+
+Риск: нельзя использовать Vercel preview/main deployment как источник release/screenshot evidence, пока не подтверждён успешный Vercel deployment или не устранена dashboard-level причина.
+
+Closure condition: проверить Vercel deployment log, build command, install command, Node version, root directory, output directory, env variables, framework preset и exact error stack; затем либо зафиксировать no-blocker/successful redeploy, либо применить точечный infra-fix с evidence.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
