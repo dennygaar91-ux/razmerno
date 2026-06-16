@@ -108,23 +108,12 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     })
     const dbResult = await insertOrderRecord(dbRecord)
     if (!dbResult.ok) {
+      if ('duplicate' in dbResult && dbResult.duplicate === true) {
+        logEvent('warn', 'orders.duplicate_order_id_conflict', { requestId, orderId, reason: dbResult.error })
+        return res.status(409).json({ ok: false, message: 'Заявка с таким номером уже существует. Повторите отправку.' })
+      }
       logEvent('error', 'orders.db_insert_failed', { requestId, orderId, reason: dbResult.error })
       return res.status(502).json({ ok: false, message: 'Не удалось сохранить заявку. Попробуйте позже.' })
-    }
-
-    if ('duplicate' in dbResult && dbResult.duplicate === true) {
-      logEvent('info', 'orders.duplicate_idempotent_replay', { requestId, orderId })
-      return res.status(200).json({
-        ok: true,
-        orderId,
-        receivedAt: new Date().toISOString(),
-        idempotent: true,
-        email: {
-          manager: 'skipped',
-          customer: 'skipped',
-          customerError: null,
-        },
-      })
     }
 
     let managerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
