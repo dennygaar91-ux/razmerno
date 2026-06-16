@@ -4,6 +4,8 @@
 
 Этот документ является **единственным источником истины по активным backlog-задачам**. Временные backlog-followup документы после переноса задач должны архивироваться или удаляться из active planning layer.
 
+Последняя сверка: `docs/planning/project-reconciliation-report-v1.md`.
+
 Формат приоритета:
 
 - P0 — блокирует безопасный MVP.
@@ -11,11 +13,21 @@
 - P2 — усиливает production-ready уровень.
 - P3 — post-MVP.
 
+Формат статуса:
+
+- `open` — актуально, не закрыто.
+- `in progress` — частично сделано, но closure conditions не выполнены.
+- `closed` — закрыто и подтверждено документальным evidence.
+- `obsolete` — потеряло актуальность.
+- `duplicate` — перекрыто другой задачей и не должно запускаться отдельно.
+
 ---
 
 ## P0 — Critical MVP Safety
 
 ### P0-01 Unified Constructor Architecture
+
+Статус: open.
 
 Зачем: зафиксировать Constructor3D как активную ветку, а legacy Constructor — как quarantine.
 
@@ -25,6 +37,8 @@
 
 ### P0-02 Constructor State Model Stabilization
 
+Статус: open.
+
 Зачем: единая модель данных для размеров, секций, зон, наполнения, фасадов, материалов, checkout и validation.
 
 Риск: ломается связь UI, 3D, fallback, pricing и checkout.
@@ -33,21 +47,29 @@
 
 ### P0-03 Pricing Engine Validation
 
+Статус: open.
+
 Зачем: цена должна быть точной.
 
 Риск: расхождение цены ломает доверие и заявку.
 
-Объём: M. Зависимости: price sources, delivery, assembly. Независимо: частично.
+Reconciliation note: остаётся открытой, потому что pricing audit фиксирует риск расхождения client/server pricing, а API completion report прямо указывает, что P0-13 остаётся открытой отдельной задачей.
+
+Объём: M. Зависимости: price sources, delivery, assembly, P0-13. Независимо: частично.
 
 ### P0-04 Checkout Reliability
+
+Статус: duplicate / partially covered by P0-11 and P0-12.
 
 Зачем: заявка должна стабильно отправляться с корректными данными.
 
 Риск: потеря конверсии и заявок.
 
-Объём: M. Зависимости: pricing, validation, order API. Независимо: частично.
+Reconciliation note: contract-scope закрыт через P0-11/P0-12. Остаточный browser-level checkout UX/E2E scope остаётся в P1-05 и P1-09.
 
 ### P0-05 Three.js Stability
+
+Статус: open.
 
 Зачем: 3D является основным интерфейсом.
 
@@ -57,6 +79,8 @@
 
 ### P0-06 WebGL / 2D Fallback
 
+Статус: open.
+
 Зачем: пользователь должен продолжить настройку, если WebGL недоступен.
 
 Риск: часть пользователей не сможет отправить заявку.
@@ -65,27 +89,29 @@
 
 ### P0-07 Documentation Sync
 
+Статус: in progress.
+
 Зачем: единый источник истины для агентов.
 
 Риск: агенты читают устаревшие документы.
+
+Reconciliation note: backlog обновлён, reconciliation report создан. Master plan и roadmap всё ещё требуют отдельной аккуратной актуализации после подтверждения новой priority matrix.
 
 Объём: M. Зависимости: audits, backlog. Независимо: да.
 
 ### P0-08 Testing Foundation
 
+Статус: duplicate / partially covered by P0-09, P0-10, P0-11, P0-12, P0-14, P0-19.
+
 Зачем: минимальная защита от регрессий.
 
 Риск: крупная декомпозиция станет небезопасной.
 
-Объём: L. Зависимости: стабильные границы модулей. Независимо: частично.
+Reconciliation note: базовая QA/CI/testing foundation закрыта инфраструктурно и contract-layer задачами. Остаточная работа по Fast/Medium/Heavy, nightly/release workflows и quarantine остаётся в P1-14—P1-19.
 
 ### P0-09 QA Fast CI Gate
 
-Статус: закрыто инфраструктурно.
-
-Зачем: сделать тесты обязательной частью CI.
-
-Риск: регрессии проходят в main несмотря на существующие тесты.
+Статус: closed.
 
 Итог: GitHub QA gate включает install, typecheck, build, active constructor/pricing/production fast tests, coverage snapshot и architecture guards.
 
@@ -93,11 +119,7 @@
 
 ### P0-10 Coverage & Thresholds
 
-Статус: закрыто как baseline.
-
-Зачем: измеряемое качество тестов.
-
-Риск: невозможно понимать реальное покрытие.
+Статус: closed as baseline.
 
 Итог: добавлен dependency-free V8 coverage snapshot; будущий upgrade — Istanbul/LCOV.
 
@@ -105,127 +127,101 @@
 
 ### P0-11 API Order Flow Tests
 
-Статус: закрыто.
+Статус: closed.
 
-Зачем: защитить критический сценарий создания заявки.
+Итог: API order flow покрыт в `tests/checkout-submit-hook.test.ts`: создание заявки, persistence contract, notification branches, validation/error branches и cooldown/rate-limit contract.
 
-Риск: поломка заказов в production.
-
-Итог: API order flow покрыт в `tests/checkout-submit-hook.test.ts`: создание заявки, persistence contract, manager/customer notification branches, validation/error branches и request cooldown/rate-limit contract.
-
-Доказательство: GitHub Actions QA run `27574702631` завершился `success`; шаги `Install dependencies`, `Typecheck frontend`, `Typecheck API`, `Build frontend` и `Fast active tests` прошли. В `.github/workflows/qa.yml` шаг `Fast active tests` включает `npm run test:checkout-submit-hook`.
+Доказательство: GitHub Actions QA run `27574702631` завершился `success`; `Fast active tests` включает `npm run test:checkout-submit-hook`.
 
 Документ: `docs/api/api-contract-completion-report-v1.md`.
 
 ### P0-12 Checkout Submit Tests
 
-Статус: закрыто.
+Статус: closed.
 
-Зачем: проверить success/error/cooldown сценарии.
+Итог: checkout submit contract покрывает active Constructor3D submit source contract, validation, API success/failure handling, idempotency key, cooldown/no-reset guard, delivery и assembly validation.
 
-Риск: потеря заявок и конверсии.
-
-Итог: checkout submit contract покрывает active Constructor3D submit source contract, customer validation, API success/failure handling, idempotency key, cooldown/no-reset guard, delivery и assembly validation.
-
-Доказательство: GitHub Actions QA run `27574702631` завершился `success`; `Fast active tests` прошёл и содержит `npm run test:checkout-submit-hook`.
+Доказательство: GitHub Actions QA run `27574702631` завершился `success`; `Fast active tests` содержит `npm run test:checkout-submit-hook`.
 
 Документ: `docs/api/api-contract-completion-report-v1.md`.
 
 ### P0-13 Pricing Golden Fixtures & Parity
 
+Статус: open.
+
 Зачем: гарантировать точную цену на клиенте и сервере.
 
 Риск: расхождение стоимости.
 
-Объём: L.
+Reconciliation note: не закрывать без отдельного pricing parity completion evidence. В репозитории найден pricing audit, который фиксирует риск расхождения client/server pricing; API completion report также указывает, что P0-13 остаётся открытой отдельной задачей.
+
+Объём: L. Зависимости: P0-03, pricing sources, client/server parity fixtures.
 
 ### P0-14 Supabase Contract Tests
 
-Статус: закрыто.
+Статус: closed.
 
-Зачем: защитить схему БД, миграции и политики.
+Итог: Supabase contract coverage включает deterministic env-missing behavior, insert mapping, client IP hashing, schema/RLS/static migration contract, admin order mapping и status event mapping.
 
-Риск: скрытые ошибки данных и безопасности.
-
-Итог: Supabase contract coverage включает deterministic env-missing repository behavior, insert mapping, client IP hashing, schema/RLS/static migration contract, admin order mapping и status event mapping.
-
-Доказательство: GitHub Actions QA run `27574702631` завершился `success`; `Fast active tests` прошёл и содержит `npm run test:checkout-submit-hook`.
+Доказательство: GitHub Actions QA run `27574702631` завершился `success`.
 
 Документ: `docs/api/api-contract-completion-report-v1.md`.
 
 ### P0-15 CI/CD & Vercel Failure Investigation
 
-Статус: закрыто как investigation + preventive CI controls; точная Vercel build error не подтверждена, потому что Vercel logs недоступны из текущего GitHub-only интерфейса.
+Статус: closed as investigation + preventive CI controls.
 
-Зачем: устранить текущие сбои пайплайна.
-
-Риск: невозможность доверять релизам.
+Ограничение: точная Vercel build error не подтверждена, потому что Vercel logs недоступны из GitHub-only интерфейса.
 
 Документ: `docs/qa/test-infrastructure-report-v1.md`.
 
 ### P0-16 Constructor Reset Contract Resolution
 
-Статус: implementation applied; closure pending real `typecheck`, `build` and constructor test evidence.
+Статус: open.
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`; повторно проверено в `docs/constructor/reset-contract-verification-report-v1.md`; исправление описано в `docs/constructor/reset-contract-fix-report-v2.md`.
-
-Ответственный: Constructor Core Agent.
+Источник: `docs/constructor/reset-contract-verification-report-v1.md`.
 
 Зачем: определить целевое поведение `reset()` и зафиксировать единый reset contract для constructor state.
 
-Риск: `constructorStore.test.ts` и `constructorFlowSmoke.test.ts` проверяли разные ожидания, что делало smoke-тесты нестабильными.
+Риск: constructor store и smoke tests могут проверять разные ожидания.
 
-Implementation finding: `reset()` переведён на full project reset по `constructorInitialState`: сбрасываются размеры, секции, зоны, наполнение, материалы, validation, checkout/contact/service fields, step и store-level transient state.
+Reconciliation note: в репозитории не найден completion/fix report, подтверждающий закрытие P0-16. Последний найденный verification report фиксирует, что P0-16 не закрыта.
 
-Closure condition: закрыть P0-16 можно только после подтверждённого успешного запуска `npm run typecheck`, `npm run build` и релевантных constructor tests.
-
-Объём: M. Зависимости: P0-02, P0-08. Независимо: частично.
+Closure condition: закрыть P0-16 можно только после подтверждённого успешного запуска typecheck, build и релевантных constructor tests, а также после документального решения reset contract.
 
 ### P0-17 Constructor Smoke Test Stabilization
 
-Статус: implementation applied; closure pending real `typecheck`, `build` and constructor test evidence.
+Статус: open.
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`; уточнено в `docs/constructor/constructor-core-audit-v1.md`; повторно проверено в `docs/constructor/reset-contract-verification-report-v1.md`; исправление описано в `docs/constructor/reset-contract-fix-report-v2.md`.
+Источник: `docs/constructor/reset-contract-verification-report-v1.md`.
 
-Ответственный: Constructor Core Agent.
-
-Зачем: привести `constructorFlowSmoke.test.ts` к текущему поведению constructor state/reset contract после решения P0-16.
+Зачем: привести smoke test к выбранному reset contract.
 
 Риск: smoke test будет либо падать без продуктовой причины, либо перестанет защищать critical constructor flow.
 
-Implementation finding: `constructorFlowSmoke.test.ts` синхронизирован с full project reset и дополнительно проверяет очистку consent, deliveryEnabled и assemblyEnabled.
+Reconciliation note: в репозитории не найден completion/fix report, подтверждающий закрытие P0-17. Последний найденный verification report фиксирует, что P0-17 не закрыта и зависит от P0-16.
 
 Closure condition: закрыть P0-17 можно только после подтверждённого успешного запуска constructor smoke/store tests.
 
-Объём: M. Зависимости: P0-16. Независимо: нет.
-
 ### P0-18 Constructor3D Architecture Guard Implementation
+
+Статус: open.
 
 Источник: `docs/constructor/constructor-core-audit-v1.md` + `docs/planning/constructor3d-guard-spec-v1.md`.
 
-Ответственный: Architecture Guard Agent.
+Зачем: enforce active Constructor3D boundary against legacy imports, direct API/Supabase/admin/server imports and forbidden layer crossings.
 
-Зачем: enforce active Constructor3D boundary (`src/static-pages/Constructor3DPage.tsx`, `src/static-pages/constructor/**`) against legacy imports, direct API/Supabase/admin/server imports and forbidden layer crossings.
-
-Риск: агенты могут случайно вернуть legacy constructor/runtime dependencies в активный Constructor3D.
+Риск: агенты могут случайно вернуть legacy/runtime dependencies в активный Constructor3D.
 
 Объём: M. Зависимости: P0-01, P0-02, P0-08. Независимо: частично.
 
 ### P0-19 Dependency Layer Recovery Verification
 
-Статус: закрыто.
+Статус: closed.
 
-Источник: `docs/qa/fast-active-tests-recovery-report-v1.md`; финальное подтверждение: `docs/api/api-contract-completion-report-v1.md`.
+Источник: `docs/api/api-contract-completion-report-v1.md`.
 
-Ответственный: Test Infrastructure / Dependency Recovery Agent.
-
-Зачем: подтвердить, что dependency/runtime слой CI стабилен для install, typecheck, build и Fast active tests после восстановления Node/Supabase-compatible runtime.
-
-Риск: GitHub Actions может проходить install/typecheck/build, но падать в runtime-зависимом contract test из-за несовместимой Node/runtime конфигурации.
-
-Итог: GitHub Actions QA run `27574702631` подтвердил `npm ci`, `npm run typecheck`, `npm run typecheck:api`, `npm run build`, `Fast active tests` и `npm run test:checkout-submit-hook` через Node 22 runtime.
-
-Объём: M. Зависимости: P0-09, P0-11, P0-12, P0-14. Независимо: частично.
+Итог: GitHub Actions QA run `27574702631` подтвердил `npm ci`, typechecks, build, Fast active tests и `npm run test:checkout-submit-hook` через Node 22 runtime.
 
 ---
 
@@ -233,158 +229,120 @@ Closure condition: закрыть P0-17 можно только после по�
 
 ### P1-01 Constructor3D UX Completion
 
-Задачи: выбор зон, локальное меню, наполнение, фасады, random preset. Объём: XL. Зависимости: P0-02, P0-05.
+Статус: open. Задачи: выбор зон, локальное меню, наполнение, фасады, random preset. Зависимости: P0-02, P0-05.
 
 ### P1-02 Material System
 
-Задачи: реальные текстуры, категории, swatches, zoom-preview. Объём: L. Зависимости: Three.js material pipeline.
+Статус: open. Задачи: реальные текстуры, категории, swatches, zoom-preview. Зависимости: Three.js material pipeline, P0-05.
 
 ### P1-03 3D Furniture Details
 
-Задачи: петли, направляющие, ручки, штанги, базовая фурнитура. Объём: XL. Зависимости: hardware model, scene architecture.
+Статус: open. Задачи: петли, направляющие, ручки, штанги, базовая фурнитура.
 
 ### P1-04 Warning / Error System
 
-Задачи: warning, blocking warning, error, auto-fix для простых случаев. Объём: M. Зависимости: validation model.
+Статус: open. Задачи: warning, blocking warning, error, auto-fix для простых случаев.
 
 ### P1-05 Checkout UX Completion
 
-Задачи: итоговая смета, доставка, сборка, контакты, согласие, success state. Объём: M. Зависимости: pricing, order flow.
+Статус: open. Задачи: итоговая смета, доставка, сборка, контакты, согласие, success state.
 
 ### P1-06 Legacy Constructor Cleanup Plan
 
-Задачи: миграция тестов, quarantine, безопасное удаление после подтверждения. Объём: L. Зависимости: tests.
+Статус: open. Задачи: миграция тестов, quarantine, безопасное удаление после подтверждения.
 
 ### P1-07 CI/CD Quality Gates
 
-Задачи: typecheck, build, tests as required checks. Объём: M. Зависимости: package scripts.
+Статус: duplicate / partially covered by P0-09 and P0-19. Остаточный release/deploy readiness scope живёт в P1-14, P1-15 и P1-18.
 
 ### P1-08 Design System Stabilization
 
-Задачи: tokens, buttons, forms, cards, focus states, spacing. Объём: L. Зависимости: актуальный UI scope.
+Статус: open. Задачи: tokens, buttons, forms, cards, focus states, spacing.
 
 ### P1-09 Constructor3D Submit E2E
 
-Задачи: полноценные Playwright сценарии оформления заявки.
+Статус: open. Задачи: полноценные Playwright сценарии оформления заявки.
 
 ### P1-10 WebGL Fallback E2E
 
-Задачи: принудительная проверка fallback при отказе WebGL.
+Статус: open. Задачи: принудительная проверка fallback при отказе WebGL.
 
 ### P1-11 Production Golden Snapshots
 
-Задачи: детерминированные снапшоты production model/export.
+Статус: open. Задачи: детерминированные снапшоты production model/export.
 
 ### P1-12 Admin API & Integration Tests
 
-Задачи: прямое тестирование admin API и статусов.
+Статус: open. Задачи: прямое тестирование admin API и статусов.
 
 ### P1-13 Material / Texture Parity Tests
 
-Задачи: соответствие материалов UI, pricing и 3D.
+Статус: open. Задачи: соответствие материалов UI, pricing и 3D.
 
 ### P1-14 Nightly QA Workflow
 
-Задачи: отдельный nightly pipeline для medium tests, Playwright smoke, bundle report и расширенной coverage публикации.
-
-Источник: `docs/qa/test-infrastructure-report-v1.md`; подтверждено временным follow-up backlog. Приоритет сохранён как P1, а не P2, чтобы не понижать QA-критичность.
+Статус: open. Задачи: отдельный nightly pipeline для medium tests, Playwright smoke, bundle report и расширенной coverage публикации.
 
 ### P1-15 Release QA Workflow
 
-Задачи: отдельный release pipeline для full Playwright matrix, Vercel preview smoke, Supabase validation, production snapshots и release readiness checks.
-
-Источник: `docs/qa/test-infrastructure-report-v1.md`; подтверждено временным follow-up backlog. Приоритет сохранён как P1, а не P2, чтобы не понижать release-критичность.
+Статус: open. Задачи: отдельный release pipeline для full Playwright matrix, Vercel preview smoke, Supabase validation, production snapshots и release readiness checks.
 
 ### P1-16 Package Scripts Ownership / Fast-Medium-Heavy Test Separation
 
-Источник: `docs/qa/test-infrastructure-report-v1.md` + `docs/planning/backlog-followups-test-infrastructure-v1.md`.
-
-Задачи: разделить scripts на `test:fast`, `test:medium`, `test:heavy`, `qa:release`; зафиксировать ownership и legacy deprecation plan; финализировать разделение тестов на Fast, Medium и Heavy и использовать это разделение в CI.
+Статус: open. Задачи: разделить scripts на `test:fast`, `test:medium`, `test:heavy`, `qa:release` и зафиксировать ownership.
 
 ### P1-17 Istanbul / LCOV Coverage Upgrade
 
-Задачи: заменить baseline V8 byte coverage на production-grade Istanbul/LCOV line/branch/function coverage и PR summary comment.
-
-Источник: `docs/qa/test-infrastructure-report-v1.md`.
+Статус: open. Задачи: заменить baseline V8 byte coverage на Istanbul/LCOV line/branch/function coverage.
 
 ### P1-18 Deployment Validation Layer
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`.
-
-Ответственный: Infrastructure Agent.
-
-Задачи: добавить слой deployment validation между GitHub Actions и Vercel, чтобы typecheck/build/fast tests выполнялись до деплоя и были явно связаны с release/deploy readiness.
-
-Риск: Vercel deployment может падать или расходиться с GitHub QA без раннего blocking-сигнала.
-
-Зависимости: P0-09, P1-07, P1-15.
+Статус: open. Задачи: добавить слой deployment validation между GitHub Actions и Vercel.
 
 ### P1-19 Test Quarantine System
 
-Источник: перенесено из `docs/planning/backlog-followups-test-infrastructure-v1.md`.
-
-Ответственный: Infrastructure Agent.
-
-Задачи: добавить официальный quarantine-механизм для unstable/flaky tests, чтобы они не скрывались, не удалялись без решения и не ломали весь pipeline без маркировки.
-
-Риск: flaky tests будут либо блокировать разработку, либо неформально отключаться без следа в документации.
-
-Зависимости: P0-08, P1-16.
+Статус: open. Задачи: официальный quarantine-механизм для unstable/flaky tests.
 
 ### P1-20 Constructor Advanced / Scene State Contract Cleanup
 
-Источник: `docs/constructor/constructor-core-audit-v1.md`.
-
-Ответственный: Constructor Core Agent.
-
-Задачи: зафиксировать и покрыть тестами ownership для `exactModeEnabled`, `advancedSizes`, `advancedFill`, store-level `sceneRenderMode` и page-local render mode перед дальнейшей декомпозицией Constructor3D.
-
-Риск: будущие агенты могут принять mirrored flags или local/store scene mode за независимые источники истины и создать расхождение состояния.
-
-Зависимости: P0-02, P0-16.
+Статус: open. Задачи: зафиксировать ownership для advanced flags и scene render mode перед дальнейшей декомпозицией Constructor3D. Зависимости: P0-02, P0-16.
 
 ### P1-21 Reset Action Separation
 
-Источник: `docs/constructor/reset-contract-fix-report-v2.md`.
-
-Ответственный агент: Constructor Core Agent.
-
-Описание: разделить именование reset-действий, чтобы ручной `reset()` всегда означал full project reset, а возможный будущий сценарий configuration reset preserving checkout был доступен только как отдельное явно названное действие.
-
-Зависимости: P0-16, P0-17.
+Статус: open. Задачи: разделить именование reset-действий. Зависимости: P0-16, P0-17.
 
 ---
 
 ## P2 — Production-Ready Depth
 
-1. Production Model Decomposition.
-2. Manufacturing Rules Engine.
-3. Basis Export JSON.
-4. Admin Orders.
-5. Admin Production Panel.
-6. Production Revisions.
-7. Operation editor for hinges/guides/drilling.
-8. Detailed production warnings.
-9. Visual regression testing.
-10. Cross-browser testing matrix.
-11. Property-based state testing.
-12. Vercel preview deployment smoke after deployment status.
+1. Production Model Decomposition — open.
+2. Manufacturing Rules Engine — open.
+3. Basis Export JSON — open.
+4. Admin Orders — open.
+5. Admin Production Panel — open.
+6. Production Revisions — open.
+7. Operation editor for hinges/guides/drilling — open.
+8. Detailed production warnings — open.
+9. Visual regression testing — open.
+10. Cross-browser testing matrix — open.
+11. Property-based state testing — open.
+12. Vercel preview deployment smoke after deployment status — open.
 
 ---
 
 ## P3 — Post-MVP
 
-1. AI Assembly System.
-2. B2B Mode.
-3. Kitchens.
-4. Automatic `.b3d` generation.
-5. Cinematic assembly animation.
-6. Deep Three.js optimization.
-7. CRM/logistics integration.
-8. Full PDF binary generation.
-9. Real email attachments.
-10. Full mobile E2E matrix.
-11. Automated performance budgets.
+1. AI Assembly System — open.
+2. B2B Mode — open.
+3. Kitchens — open.
+4. Automatic `.b3d` generation — open.
+5. Cinematic assembly animation — open.
+6. Deep Three.js optimization — open.
+7. CRM/logistics integration — open.
+8. Full PDF binary generation — open.
+9. Real email attachments — open.
+10. Full mobile E2E matrix — open.
+11. Automated performance budgets — open.
 
 ---
 
