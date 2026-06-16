@@ -307,6 +307,8 @@
     "test:constructor-submit-e2e": "playwright test tests/browser/constructor-submit.spec.ts --project=chromium-desktop",
     "check:webgl-fallback-e2e": "node scripts/check-p1-10-webgl-fallback-e2e.mjs",
     "test:webgl-fallback-e2e": "playwright test tests/browser/webgl-fallback.spec.ts --project=chromium-desktop",
+    "check:material-texture-parity": "node scripts/check-p1-13-material-texture-parity.mjs",
+    "test:material-texture-parity": "playwright test tests/browser/material-texture-parity.spec.ts --project=chromium-desktop",
     "check:stage-n10-e2e-cleanup": "node scripts/check-stage-n10-e2e-cleanup.mjs",
     "check:stage-q1-accessibility-foundation": "node scripts/check-stage-q1-accessibility-foundation.mjs",
     "check:stage-q2-price-clarity": "node scripts/check-stage-q2-price-clarity.mjs",
