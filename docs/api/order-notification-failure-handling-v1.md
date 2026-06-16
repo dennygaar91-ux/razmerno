@@ -2,11 +2,13 @@
 
 Дата: 2026-06-16  
 Роль: 04 API / Orders Agent  
-Статус: implementation in PR / CI evidence pending
+Статус: completed in PR / CI success confirmed
 
 ## 1. Executive Summary
 
 Этот документ фиксирует contract для API/order flow вокруг отказов уведомлений. Главный MVP-инвариант: если core order persistence прошла успешно и manager notification прошёл успешно, отказ customer confirmation email не ломает заявку. Такой отказ фиксируется как `customer: failed`, клиент получает успешный response, а причина отказа логируется только в безопасном виде.
+
+PR #52 подтвердил contract на GitHub Actions QA run #219 (`27639437300`), conclusion `success`, head commit `60b6c29dd0e28eb7c22cb109e23723209444eda2`.
 
 ## 2. Scope
 
@@ -114,23 +116,56 @@ Notification failure logs не должны содержать:
 - PII-safe log assertions;
 - provider error response sanitization.
 
-Existing coverage remains in:
+Тест подключён в существующий CI через импорт в:
 
 - `tests/checkout-submit-hook.test.ts`.
 
+Поэтому `npm run test:checkout-submit-hook` запускает и прежний checkout/API/Supabase suite, и новый notification failure contract suite без изменения `package.json` и `.github/workflows/qa.yml`.
+
 ## 10. QA / CI Evidence
 
-CI evidence pending until PR run completes.
+Confirmed PR workflow:
 
-Expected relevant commands:
+- PR: #52 `API Order Notification Failure Contracts`.
+- Head commit: `60b6c29dd0e28eb7c22cb109e23723209444eda2`.
+- Workflow: `QA`.
+- Run number: #219.
+- Run id: `27639437300`.
+- Job: `Fast CI gate`.
+- Conclusion: `success`.
+
+Relevant successful steps:
+
+- `Typecheck frontend`;
+- `Typecheck API`;
+- `Build frontend`;
+- `Fast active tests`;
+- `P1-09 Constructor3D submit E2E guard`;
+- `P1-09 Constructor3D submit E2E`;
+- `P1-10 WebGL fallback E2E guard`;
+- `P1-10 WebGL fallback E2E`;
+- `P1-13 Material / Texture parity guard`;
+- `P1-13 Material / Texture parity E2E`;
+- `Coverage snapshot`;
+- `Check CSS architecture`;
+- `Check production geometry architecture`.
+
+Commands covered by existing workflow:
 
 ```bash
+npm run typecheck
 npm run typecheck:api
+npm run build
 npm run test:checkout-submit-hook
-node --no-warnings --import tsx tests/order-notification-failure-contract.test.ts
+npm run check:constructor-submit-e2e
+npm run test:constructor-submit-e2e
+npm run check:webgl-fallback-e2e
+npm run test:webgl-fallback-e2e
+npm run check:material-texture-parity
+npm run test:material-texture-parity
 ```
 
-The new standalone test uses mocks/test doubles only.
+The new standalone test uses mocks/test doubles only and is executed via `npm run test:checkout-submit-hook`.
 
 ## 11. Known Limitations
 
@@ -138,7 +173,6 @@ The new standalone test uses mocks/test doubles only.
 - No live Supabase/RLS verification.
 - Tests use mocks/test doubles.
 - Vercel deployment remains unresolved under P1-22.
-- GitHub connector blocked direct QA workflow modification in this session; if the standalone test cannot be wired into existing CI without workflow/package changes, closure must remain pending.
 
 ## 12. Remaining Risks
 
@@ -148,10 +182,9 @@ The new standalone test uses mocks/test doubles only.
 
 ## 13. Closure Review
 
-Can be closed only after:
+Pre-merge closure criteria met in PR #52:
 
-1. PR CI succeeds on the current head commit.
-2. API/order tests pass.
-3. PII-safe notification failure tests pass.
-4. PR is merged into `main`.
-5. `main` content verification confirms code, tests, docs and backlog update.
+1. PR CI succeeded on current head commit `60b6c29dd0e28eb7c22cb109e23723209444eda2`.
+2. API/order tests passed via `Fast active tests`.
+3. PII-safe notification failure tests passed via `npm run test:checkout-submit-hook`.
+4. PR merge and main content verification remain the final closure actions.
