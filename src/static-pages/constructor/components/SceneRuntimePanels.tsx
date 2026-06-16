@@ -99,10 +99,7 @@ export function TwoDFallbackScene({
     sections: number;
     sectionLayout: ConstructorSection[];
     compartmentLayout: ConstructorCompartmentLayout;
-    fillingLayout: Record<
-      string,
-      Record<string, ConstructorCompartmentFilling>
-    >;
+    fillingLayout: Record<string, Record<string, ConstructorCompartmentFilling>>;
     facadeLayout: Record<string, "open" | "hinged">;
     material: string;
     facadeMaterial: string;
@@ -125,6 +122,11 @@ export function TwoDFallbackScene({
       className="rzm-3d-blueprint-fallback"
       role="region"
       aria-label="Рабочий 2D fallback конструктора"
+      data-testid="webgl-fallback-preview"
+      data-webgl-fallback="active"
+      data-webgl-diagnostics-status={diagnosticsStatus}
+      data-webgl-diagnostics-reason={reason ?? "none"}
+      data-three-failure-reason={failureReason ?? "none"}
     >
       <div className="rzm-3d-blueprint-status" role="status" aria-live="polite">
         <span>2D fallback активен</span>
@@ -158,18 +160,10 @@ export function TwoDFallbackScene({
         depthMm={input.depthMm}
       />
       <div className="rzm-3d-fallback-actions rzm-3d-blueprint-actions">
-        <button
-          type="button"
-          className="rzm-ui-btn rzm-ui-btn--primary"
-          onClick={onUseReducedModel}
-        >
+        <button type="button" className="rzm-ui-btn rzm-ui-btn--primary" onClick={onUseReducedModel}>
           Запустить упрощённое 3D
         </button>
-        <button
-          type="button"
-          className="rzm-ui-btn rzm-ui-btn--ghost"
-          onClick={onRetry3D}
-        >
+        <button type="button" className="rzm-ui-btn rzm-ui-btn--ghost" onClick={onRetry3D}>
           Повторить 3D
         </button>
       </div>
