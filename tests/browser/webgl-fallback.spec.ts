@@ -24,7 +24,7 @@ async function mockWebGLUnavailable(page: Page) {
         return null;
       }
 
-      return originalGetContext.call(this, contextId, ...(args as []));
+      return originalGetContext.apply(this, [contextId, ...args] as Parameters<typeof originalGetContext>);
     } as typeof HTMLCanvasElement.prototype.getContext;
   });
 }
