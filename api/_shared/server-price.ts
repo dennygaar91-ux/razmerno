@@ -19,7 +19,9 @@ type Hardware = {
 
 type MaterialPricingInput = Parameters<typeof buildConstructorMaterialPricingContext>[0];
 
-type CatalogProducer = 'Kronospan' | 'Egger' | 'Eterno' | 'AGT';
+type CatalogBodyProducer = 'Kronospan' | 'Egger' | 'Eterno';
+
+type CatalogFacadeProducer = CatalogBodyProducer | 'AGT';
 
 type CatalogFacadeKind = 'ldsp' | 'mdf';
 
@@ -57,10 +59,10 @@ export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown 
     dimensions: body.dimensions,
     sections: body.sections ?? 1,
     filling: body.filling,
-    bodyProducer: bodyMaterialPricing?.producer as CatalogProducer | undefined,
+    bodyProducer: bodyMaterialPricing?.producer as CatalogBodyProducer | undefined,
     bodyArticle: bodyMaterialPricing?.article,
     bodyThicknessMm: bodyMaterialPricing?.thicknessMm,
-    facadeProducer: facadeMaterialPricing?.producer as CatalogProducer | undefined,
+    facadeProducer: facadeMaterialPricing?.producer as CatalogFacadeProducer | undefined,
     facadeArticle: facadeMaterialPricing?.article,
     facadeThicknessMm: facadeMaterialPricing?.thicknessMm,
     facadeMaterialKind: facadeMaterialPricing?.materialKind as CatalogFacadeKind | undefined,
