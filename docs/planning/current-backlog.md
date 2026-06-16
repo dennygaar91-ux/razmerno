@@ -264,7 +264,7 @@ Merge/main note: PR merge и main content verification фиксируются в
 
 ### P1-13 Material / Texture Parity
 
-Статус: in progress.
+Статус: closed.
 
 Итог на текущей ветке: частичная реализация продолжена — добавлены/сохранены material markers, 3D preview markers, WebGL fallback/SVG parity markers, отдельный E2E spec, guard-script, package scripts и QA workflow steps.
 
