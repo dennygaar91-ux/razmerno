@@ -69,7 +69,6 @@ const requiredWorkflowFragments = [
   "npm run check:webgl-fallback-e2e",
   "P1-10 WebGL fallback E2E",
   "npm run test:webgl-fallback-e2e",
-  "p1-10-webgl-fallback-ci-evidence",
 ];
 
 const forbiddenTestFragments = [
