@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { calculateCatalogPrice } from "./engine";
 
@@ -62,4 +63,13 @@ for (const r of results) {
 const failed = results.filter((r) => !r.passed).length;
 console.log("");
 console.log(`${results.length - failed}/${results.length} passed`);
-process.exit(failed > 0 ? 1 : 0);
+
+if (failed > 0) {
+  process.exit(1);
+}
+
+const parityResult = spawnSync(process.execPath, ["--no-warnings", "--import", "tsx", "tests/pricing-parity.test.ts"], {
+  stdio: "inherit",
+});
+
+process.exit(parityResult.status ?? 1);
