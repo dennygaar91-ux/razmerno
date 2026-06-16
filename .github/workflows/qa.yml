@@ -103,6 +103,12 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      - name: P1-10 WebGL fallback E2E guard
+        run: npm run check:webgl-fallback-e2e
+
+      - name: P1-10 WebGL fallback E2E
+        run: npm run test:webgl-fallback-e2e
+
       - name: Coverage snapshot
         env:
           COVERAGE_MIN_BYTES: 15
