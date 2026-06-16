@@ -283,13 +283,104 @@ npm run test:material-texture-parity
 
 Closure summary: Material / Texture Parity is closed in main. The work proves that UI material selection, constructor state, 3D preview marker, fallback preview marker/state and submit-compatible state keep the same canonical materialId. Pixel-perfect texture comparison is intentionally out of scope for this MVP parity task.
 
-
 ### P1-21 Release / Post-MVP Visual QA Matrix
+
+Статус: closed.
+
+Итог: создана release/post-MVP visual QA matrix для UX/UI inventory, design system inventory, screen/state/viewport checks, release readiness criteria, visual blockers, risks и post-MVP visual backlog. Задача закрывает создание матрицы и классификацию visual risks; она не является фактическим browser screenshot execution pass.
+
+Документ: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Closure summary: P1-21 закрыта как docs/planning-only задача. Матрица фиксирует, что подтверждённых P0 visual blockers по source/docs-аудиту не найдено, но перед public release нужен отдельный visual execution pass по desktop/tablet/mobile/cross-browser состояниям.
+
+---
+
+## P2 — Production-ready Visual QA / UX Evidence
+
+### P2-20 Visual Regression Screenshot Suite
 
 Статус: open.
 
-Зачем: расширить visual/browser coverage после закрытия критичных Constructor3D и fallback proof задач.
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
 
-Риск: без дальнейшей visual QA matrix останутся непокрытыми cross-browser/mobile/device-specific визуальные регрессии.
+Зачем: добавить screenshot coverage для landing, info pages, Constructor3D, WebGL fallback, materials и checkout states.
 
-Важно: P1-21 не входит в scope P1-13 и не закрывается этой задачей.
+Риск: visual regressions могут пройти через code/contract CI.
+
+### P2-21 Cross-browser / Device Visual QA Execution
+
+Статус: open.
+
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Зачем: выполнить visual QA matrix в Chromium, Firefox, Safari/WebKit, Android Chrome, iOS Safari и основных viewport.
+
+Риск: mobile/tablet/browser-specific визуальные поломки останутся непокрытыми.
+
+### P2-22 Accessibility / Focus Visual Pass
+
+Статус: open.
+
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Зачем: проверить keyboard flow, visible focus, labels, aria-live и disabled/error/warning semantics на критичных control states.
+
+Риск: critical flow формально работает, но доступность и visual feedback недостаточны.
+
+### P2-23 Checkout Trust-state Visual Hardening
+
+Статус: open.
+
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Зачем: проверить и при необходимости усилить empty, validation, calculating, quote error, submit progress, success, API error и cooldown states.
+
+Риск: checkout выглядит ненадёжно в момент конверсии.
+
+### P2-24 Footer / Legal Trust Hardening
+
+Статус: open.
+
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Зачем: заменить placeholder document/legal links и убрать public-launch copy о недобавленных юридических данных.
+
+Риск: публичный запуск будет выглядеть незавершённым и снизит доверие.
+
+### P2-25 Admin Visual Consistency Pass
+
+Статус: open.
+
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Зачем: если admin входит в MVP operations, привести login/dashboard/detail/API fallback states к единой визуальной системе и явно отделить demo/internal states.
+
+Риск: операционный UI будет выглядеть как demo и снизит доверие команды к данным.
+
+---
+
+## P3 — Post-MVP Visual Polish
+
+### P3-10 Advanced Design Token Cleanup
+
+Статус: open.
+
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Зачем: аккуратно унифицировать старые и новые visual layers без массового rewrite.
+
+### P3-11 Rich Loading / Skeleton / Motion Layer
+
+Статус: open.
+
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Зачем: усилить perceived performance, loading, scene transition и micro-interactions после MVP.
+
+### P3-12 Landing Conversion Visual Polish
+
+Статус: open.
+
+Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
+
+Зачем: проводить post-MVP polish главной на основе аналитики и реального funnel evidence.
