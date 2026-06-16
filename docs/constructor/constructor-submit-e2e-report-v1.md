@@ -4,19 +4,21 @@
 Задача: P1-09 Constructor3D Submit E2E
 PR: #44 — `P1-09 Constructor3D Submit E2E`
 Ветка: `p1-09-constructor3d-submit-e2e-fix`
-Итоговый CI evidence commit: `3a1fb10462c358698f16002ce77e0465518adad2`
-GitHub Actions QA run: `189` (`27611519384`)
+Final PR head before merge: `089359351acbec1ba3ff2aee3f7b33c332e3fa24`
+Merge commit: `119ea6f1225b68f9ca0d38ff1c3e1bba1660a5fb`
+Primary CI evidence run on final head: QA run `191` (`27612249134`)
+Previous diagnostic/evidence run: QA run `189` (`27611519384`)
 
 ## 1. Executive Summary
 
-P1-09 закрыта после подтверждённого GitHub Actions QA evidence.
+P1-09 закрыта после подтверждённого GitHub Actions QA evidence и merge PR #44 в `main`.
 
-Новый Constructor3D submit E2E теперь не просто существует в репозитории, а явно подключён к npm scripts и обязательному QA workflow. В run `189` QA workflow завершился `success`, а CI evidence artifact `p1-09-constructor-submit-ci-evidence` подтвердил фактическое выполнение обеих команд:
+Новый Constructor3D submit E2E теперь не просто существует в репозитории, а явно подключён к npm scripts и обязательному QA workflow. Финальный PR head `089359351acbec1ba3ff2aee3f7b33c332e3fa24` прошёл GitHub Actions QA run `191` со статусом `success`. CI evidence artifact `p1-09-constructor-submit-ci-evidence` подтвердил фактическое выполнение обеих команд:
 
 - `npm run check:constructor-submit-e2e`
 - `npm run test:constructor-submit-e2e`
 
-Playwright результат: `5 passed (39.6s)`.
+Playwright результат на актуальном head перед merge: `5 passed (51.0s)`.
 
 ## 2. Что было не засчитано в предыдущем проходе
 
@@ -30,7 +32,7 @@ Playwright результат: `5 passed (39.6s)`.
 - QA workflow не запускал ни submit E2E, ни guard-script.
 - Поэтому P1-09 имела статус `implementation exists / CI gate missing / not closed`.
 
-## 3. Что исправлено сейчас
+## 3. Что исправлено
 
 В этом проходе исправлены три слоя:
 
@@ -127,11 +129,11 @@ Guard проверяет, что тест:
 
 ## 8. CI Evidence
 
-GitHub Actions QA run:
+Primary GitHub Actions QA run on final PR head:
 
-- Run number: `189`
-- Run id: `27611519384`
-- Head commit: `3a1fb10462c358698f16002ce77e0465518adad2`
+- Run number: `191`
+- Run id: `27612249134`
+- Head commit: `089359351acbec1ba3ff2aee3f7b33c332e3fa24`
 - Job: `Fast CI gate`
 - Result: `success`
 
@@ -164,8 +166,10 @@ npm run test:constructor-submit-e2e
 > playwright test tests/browser/constructor-submit.spec.ts --project=chromium-desktop
 
 Running 5 tests using 1 worker
-5 passed (39.6s)
+5 passed (51.0s)
 ```
+
+Previous diagnostic/evidence run `189` also completed `success` on commit `3a1fb10462c358698f16002ce77e0465518adad2`, with `5 passed (39.6s)`, but final closure uses run `191` because it belongs to the actual PR head before merge.
 
 ## 9. P1-09 Closure Review
 
@@ -175,16 +179,34 @@ Closure criteria:
 2. `test:constructor-submit-e2e` exists in `package.json` — yes.
 3. `check:constructor-submit-e2e` exists in `package.json` — yes.
 4. QA workflow explicitly runs both scripts — yes.
-5. GitHub Actions run completed `success` — yes, run `189`.
+5. GitHub Actions run completed `success` on final PR head — yes, run `191`.
 6. CI evidence shows both commands actually executed — yes, artifact `p1-09-constructor-submit-ci-evidence`.
-7. `docs/planning/current-backlog.md` updated — yes, P1-09 marked closed.
-8. `docs/constructor/constructor-submit-e2e-report-v1.md` updated — yes.
+7. PR #44 was merged into `main` — yes.
+8. `docs/planning/current-backlog.md` shows P1-09 as closed — yes.
+9. `docs/constructor/constructor-submit-e2e-report-v1.md` contains final merge/main confirmation — yes.
 
-Decision: P1-09 is closed.
+Decision: P1-09 is closed in `main`.
 
 P1-21 status: unchanged, open. P1-21 was not part of this task and was not closed.
 
-## 10. Remaining Risks
+## 10. Final Merge / Main Confirmation
+
+- PR: #44 — `P1-09 Constructor3D Submit E2E`
+- PR state after action: merged into `main`
+- Final PR head before merge: `089359351acbec1ba3ff2aee3f7b33c332e3fa24`
+- Merge commit: `119ea6f1225b68f9ca0d38ff1c3e1bba1660a5fb`
+- Primary QA evidence run: `191` (`27612249134`), result `success`
+- Main content verification after merge:
+  - `package.json` contains `check:constructor-submit-e2e` and `test:constructor-submit-e2e`;
+  - `.github/workflows/qa.yml` contains `P1-09 Constructor3D submit E2E guard` and `P1-09 Constructor3D submit E2E`;
+  - `tests/browser/constructor-submit.spec.ts` exists;
+  - `scripts/check-p1-09-constructor3d-submit-e2e.mjs` exists;
+  - `docs/planning/current-backlog.md` shows P1-09 as `closed`;
+  - this report exists in `main` and contains final merge/main confirmation.
+- Main QA workflow: a new main run is expected after this documentation confirmation commit if GitHub Actions is configured for direct `main` pushes. If no run is created, PR QA run `191` remains the required pre-merge evidence for this scope.
+- Final status: P1-09 closed in `main`.
+
+## 11. Remaining Risks
 
 1. The E2E currently runs only on `chromium-desktop`. Cross-browser/full matrix remains outside P1-09 and belongs to later QA/release scope.
 2. WebGL fallback submit E2E remains open as P1-10.
