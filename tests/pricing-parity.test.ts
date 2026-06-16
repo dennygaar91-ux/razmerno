@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import assert from "node:assert/strict";
 import facadeStyles from "../src/config/facade-styles.json";
 import hardwareItems from "../src/config/hardware.json";
@@ -19,7 +20,9 @@ import type { CatalogPriceBreakdown } from "../src/pricing/engine";
 import type { OrderRequest } from "../api/_shared/order-types";
 
 type TestResult = { name: string; passed: boolean; error?: string };
+type Diagnostic = { fixtureId: string; expected?: unknown; actual?: unknown; error?: string };
 const results: TestResult[] = [];
+const diagnostics: Diagnostic[] = [];
 
 type FacadeStyleConfig = { id: string; priceMultiplier: number };
 type HardwareConfig = { id: string; basePrice: number; priceFactor: number };
@@ -142,6 +145,7 @@ function assertGoldenMatches(fixture: PricingGoldenFixture, actual: PricingGolde
   try {
     assert.deepEqual(actual, fixture.expected);
   } catch (error) {
+    diagnostics.push({ fixtureId: fixture.id, expected: fixture.expected, actual, error: error instanceof Error ? error.message : String(error) });
     throw new Error([
       `Golden fixture mismatch: ${fixture.id}`,
       `Expected: ${JSON.stringify(fixture.expected)}`,
@@ -205,6 +209,15 @@ for (const r of results) {
 }
 
 const failed = results.filter((r) => !r.passed).length;
+if (failed > 0) {
+  fs.mkdirSync("coverage", { recursive: true });
+  fs.writeFileSync(
+    "coverage/pricing-parity-diagnostics.json",
+    JSON.stringify({ failed, results, diagnostics }, null, 2),
+    "utf-8",
+  );
+}
+
 console.log("");
 console.log(`${results.length - failed}/${results.length} passed`);
 process.exit(failed > 0 ? 1 : 0);
