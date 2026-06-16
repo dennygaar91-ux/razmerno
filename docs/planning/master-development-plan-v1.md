@@ -2,6 +2,8 @@
 
 Статус: главный управляющий документ для дальнейшей работы агентов.
 
+Последняя сверка: `docs/planning/project-reconciliation-report-v1.md` от 2026-06-16.
+
 Цель документа — зафиксировать порядок развития проекта до MVP, приоритеты, зависимости, ограничения и безопасную стратегию разработки.
 
 ---
@@ -10,13 +12,33 @@
 
 Проект «Размерно» находится в состоянии рабочего MVP-прототипа, но ещё не готов к production-запуску.
 
-Главный риск сейчас — не отсутствие функций, а рост сложности: активная 3D-ветка, legacy-конструктор, крупные файлы, pricing, checkout, production layer, API, Supabase и большая документация существуют одновременно.
-
-Основная стратегия:
+Основная стратегия остаётся:
 
 **Stabilize → Complete → Harden → Release**
 
-Сначала нужно стабилизировать архитектуру, state, pricing и Three.js. Затем завершить Constructor3D, checkout и fallback. После этого — тесты, CI/CD, production layer, admin и release candidate.
+После reconciliation стратегия уточнена:
+
+1. Сначала закрыть constructor reset/state uncertainty.
+2. Затем закрыть pricing parity uncertainty.
+3. После этого стабилизировать Three.js и WebGL/2D fallback.
+4. Затем завершать Constructor3D UX, materials, checkout UX/E2E.
+5. После этого углублять production/admin/release readiness.
+
+Подтверждённо закрыты инфраструктурные и contract-блоки:
+
+- P0-09 QA Fast CI Gate;
+- P0-10 Coverage & Thresholds as baseline;
+- P0-11 API Order Flow Tests;
+- P0-12 Checkout Submit Tests;
+- P0-14 Supabase Contract Tests;
+- P0-15 CI/CD & Vercel Failure Investigation as investigation;
+- P0-19 Dependency Layer Recovery Verification.
+
+Не подтверждены как закрытые по repository evidence:
+
+- P0-13 Pricing Golden Fixtures & Parity;
+- P0-16 Constructor Reset Contract Resolution;
+- P0-17 Constructor Smoke Test Stabilization.
 
 ---
 
@@ -24,61 +46,82 @@
 
 ### Инфраструктура
 
-Есть GitHub, Vercel, Supabase, docs, архитектурный аудит и документационный аудит.
+Есть GitHub, Vercel, Supabase, docs, architecture/documentation audits, QA fast gate, baseline coverage и подтверждённый dependency runtime recovery через Node 22.
 
-Проблемы: документационный шум, слабый CI/CD quality gate, недостаточное тестовое покрытие, отсутствие единого planning-слоя до создания этой папки.
+Остаётся: nightly/release workflow, test quarantine, Istanbul/LCOV coverage и deployment validation layer.
+
+### API / Checkout / Supabase contracts
+
+API order flow, checkout submit и Supabase contract coverage закрыты документально.
+
+Остаётся: browser-level Constructor3D submit E2E, checkout UX completion и live/release validation.
 
 ### Конструктор
 
-Активная разработка должна идти вокруг нового Constructor3D.
+Активная разработка должна идти вокруг Constructor3D. Legacy Constructor остаётся quarantine до безопасной миграции/удаления.
 
-Проблемы: крупный Constructor3DPage, крупный constructorStore, legacy Constructor в репозитории, риск дублирования логики.
-
-### Three.js
-
-3D открыт по умолчанию и является главным интерфейсом. Нужны стабильность, fallback, контроль производительности, реальные текстуры и аккуратная архитектура сцены.
+Критично: reset contract и constructor smoke stabilization не подтверждены как закрытые.
 
 ### Pricing Engine
 
-Цена должна быть точной, не предварительной. Главный риск — расхождение между клиентом, сервером и production layer.
+Цена должна быть точной, не предварительной. P0-13 остаётся открытой, потому что repository evidence фиксирует риск расхождения client/server pricing paths.
 
-### Production Layer
+### Three.js / WebGL
 
-Нужна production model для технолога, но сложная производственная логика не должна перегружать клиентский UI.
+3D открыт по умолчанию и является главным интерфейсом. Three.js stability и WebGL/2D fallback остаются P0, но их нельзя запускать как широкий scope до стабилизации constructor reset/state contract.
 
-### UX/UI
+### Production / Admin
 
-Продукт должен ощущаться как понятный мебельный конструктор, а не инженерная программа.
+Production/admin важны для MVP, но идут после constructor state, pricing parity, Three.js stability и fallback.
 
 ---
 
 ## 3. Главные риски
 
-1. Архитектурное расслоение между старым Constructor и новым Constructor3D.
-2. God Component и God Store, которые сложно менять агентами.
-3. Расхождение pricing.
-4. Нестабильность WebGL/Three.js без рабочего fallback.
-5. Устаревшая или противоречивая документация.
-6. Scope creep: кухни, AI, B2B, cinematic animation и автоматическая Basis generation не должны попадать в обязательный MVP.
+1. Constructor reset contract не подтверждён как закрытый.
+2. Constructor smoke tests зависят от P0-16.
+3. Архитектурное расслоение legacy Constructor / Constructor3D.
+4. Крупные constructor files и store.
+5. Расхождение pricing между client/server/production paths.
+6. WebGL/Three.js instability без рабочего fallback.
+7. Документационное устаревание после закрытия отдельных P0.
+8. Scope creep: кухни, AI, B2B, cinematic animation и automatic Basis generation не входят в обязательный MVP.
 
 ---
 
-## 4. P0 Backlog
+## 4. Актуальный P0 Backlog
 
-P0 — задачи, без которых MVP нельзя считать безопасным.
+### Open / In Progress
 
-1. Unified Constructor Architecture.
-2. Constructor State Model Stabilization.
-3. Pricing Engine Validation.
-4. Checkout Reliability.
-5. Three.js Stability.
-6. WebGL / 2D Fallback.
-7. Documentation Sync.
-8. Testing Foundation.
+1. P0-16 Constructor Reset Contract Resolution.
+2. P0-17 Constructor Smoke Test Stabilization.
+3. P0-02 Constructor State Model Stabilization.
+4. P0-18 Constructor3D Architecture Guard Implementation.
+5. P0-13 Pricing Golden Fixtures & Parity.
+6. P0-03 Pricing Engine Validation.
+7. P0-05 Three.js Stability.
+8. P0-06 WebGL / 2D Fallback.
+9. P0-01 Unified Constructor Architecture.
+10. P0-07 Documentation Sync.
+
+### Closed / Baseline Closed
+
+1. P0-09 QA Fast CI Gate.
+2. P0-10 Coverage & Thresholds as baseline.
+3. P0-11 API Order Flow Tests.
+4. P0-12 Checkout Submit Tests.
+5. P0-14 Supabase Contract Tests.
+6. P0-15 CI/CD & Vercel Failure Investigation as investigation.
+7. P0-19 Dependency Layer Recovery Verification.
+
+### Duplicate / Partially Covered
+
+1. P0-04 Checkout Reliability — contract-scope closed by P0-11/P0-12; остаток в P1-05/P1-09.
+2. P0-08 Testing Foundation — baseline closed by QA/API/contract tasks; advanced QA remains P1.
 
 ---
 
-## 5. P1 Backlog
+## 5. Актуальный P1 Backlog
 
 1. Constructor3D UX Completion.
 2. Material System.
@@ -86,8 +129,24 @@ P0 — задачи, без которых MVP нельзя считать бе�
 4. Warning / Error System.
 5. Checkout UX Completion.
 6. Legacy Constructor Cleanup Plan.
-7. CI/CD Quality Gates.
-8. Design System Stabilization.
+7. Design System Stabilization.
+8. Constructor3D Submit E2E.
+9. WebGL Fallback E2E.
+10. Production Golden Snapshots.
+11. Admin API & Integration Tests.
+12. Material / Texture Parity Tests.
+13. Nightly QA Workflow.
+14. Release QA Workflow.
+15. Package Scripts Ownership / Fast-Medium-Heavy Test Separation.
+16. Istanbul / LCOV Coverage Upgrade.
+17. Deployment Validation Layer.
+18. Test Quarantine System.
+19. Constructor Advanced / Scene State Contract Cleanup.
+20. Reset Action Separation.
+
+Duplicate / partially covered:
+
+- CI/CD Quality Gates as broad task — не запускать отдельно; использовать P1-14/P1-15/P1-18.
 
 ---
 
@@ -99,63 +158,74 @@ P0 — задачи, без которых MVP нельзя считать бе�
 4. Admin Orders.
 5. Admin Production Panel.
 6. Production Revisions.
+7. Operation editor for hinges/guides/drilling.
+8. Detailed production warnings.
+9. Visual regression testing.
+10. Cross-browser testing matrix.
+11. Property-based state testing.
+12. Vercel preview deployment smoke after deployment status.
 
 ---
 
 ## 7. P3 Backlog
 
-Post-MVP:
-
 - AI Assembly System;
 - B2B Mode;
-- кухни;
+- kitchens;
 - automatic .b3d generation;
 - cinematic assembly animation;
 - deep Three.js optimization;
 - CRM/logistics integration;
-- полноценная PDF generation;
-- real Resend attachments;
-- advanced operation editor.
+- full PDF generation;
+- real email attachments;
+- advanced operation editor;
+- full mobile E2E matrix;
+- automated performance budgets.
 
 ---
 
-## 8. Roadmap до MVP
+## 8. Roadmap до MVP после reconciliation
 
-1. Stage 01 — Planning & Governance.
-2. Stage 02 — Constructor Architecture Stabilization.
-3. Stage 03 — Constructor State Model.
-4. Stage 04 — Pricing Validation.
-5. Stage 05 — Three.js Stability.
-6. Stage 06 — Constructor3D Interaction MVP.
-7. Stage 07 — Materials MVP.
-8. Stage 08 — Checkout MVP.
-9. Stage 09 — Testing & CI/CD.
-10. Stage 10 — Production Layer MVP.
-11. Stage 11 — Admin MVP.
-12. Stage 12 — Release Candidate.
+1. Stage R0 — Planning Reconciliation.
+2. Stage R1 — Constructor Reset Contract Resolution.
+3. Stage R2 — Constructor State Model Stabilization.
+4. Stage R3 — Constructor3D Architecture Guard Implementation.
+5. Stage R4 — Pricing Golden Fixtures & Client/Server Parity.
+6. Stage R5 — Three.js Stability.
+7. Stage R6 — WebGL / 2D Fallback.
+8. Stage R7 — Constructor3D Interaction MVP.
+9. Stage R8 — Materials MVP.
+10. Stage R9 — Checkout UX + Submit E2E.
+11. Stage R10 — QA Expansion / Nightly / Release Workflow.
+12. Stage R11 — Production Layer MVP.
+13. Stage R12 — Admin MVP.
+14. Stage R13 — Release Candidate.
 
 ---
 
 ## 9. Рекомендуемый порядок запуска агентов
 
-1. Documentation / Planner Agent.
-2. Architect Agent.
-3. Constructor Core Agent.
-4. Pricing Agent.
-5. Three.js Agent.
-6. Constructor UX Agent.
-7. Checkout Agent.
-8. QA / Testing Agent.
-9. Production Layer Agent.
-10. Release Agent.
+1. Constructor Reset Contract Agent.
+2. Constructor State / Architecture Agent.
+3. Architecture Guard Agent.
+4. Pricing Parity Agent.
+5. Three.js Stability Agent.
+6. WebGL Fallback Agent.
+7. Constructor UX Agent.
+8. Materials Agent.
+9. Checkout UX / E2E Agent.
+10. QA Workflow Hardening Agent.
+11. Production Layer Agent.
+12. Admin Agent.
+13. Release Agent.
 
 ---
 
 ## 10. Самая безопасная стратегия
 
-Не начинать с дизайна, удаления legacy, Basis integration или post-MVP функций.
+Не начинать с дизайна, удаления legacy, Basis integration, admin expansion или post-MVP функций.
 
-Сначала стабилизировать документы, архитектуру, state и Three.js. Затем завершить pricing, checkout и основной 3D-flow. После этого покрыть тестами и только потом углублять production/admin.
+Сначала закрыть reset/state uncertainty и pricing parity. Затем стабилизировать Three.js и fallback. После этого завершать Constructor3D UX, materials и checkout UX/E2E. Только потом углублять QA workflows, production/admin и release readiness.
 
 Главный принцип:
 
