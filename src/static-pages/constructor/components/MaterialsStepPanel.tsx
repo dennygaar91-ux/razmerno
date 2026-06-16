@@ -43,7 +43,12 @@ export function MaterialsStepPanel({
   StepIntro,
 }: MaterialsStepPanelProps) {
   return (
-    <div className="rzm-3d-drawer-body rzm-3d-materials-polish rzm-3d-materials-polish--stage11">
+    <div
+      className="rzm-3d-drawer-body rzm-3d-materials-polish rzm-3d-materials-polish--stage11"
+      data-testid="materials-step-panel"
+      data-selected-material={selectedMaterial.materialId}
+      data-selected-facade-material={selectedFacadeMaterial.materialId}
+    >
       <StepIntro
         title="Материалы"
         text="Выберите декор корпуса и фасадов. 3D-модель сразу применяет выбранную текстуру."
@@ -87,6 +92,9 @@ function MaterialSelectionSummary({
     <section
       className="rzm-3d-material-summary"
       aria-label="Выбранные материалы"
+      data-testid="material-selection-summary"
+      data-selected-material={bodyMaterial.materialId}
+      data-selected-facade-material={facadeMaterial.materialId}
     >
       <MaterialSummaryItem label="Корпус" option={bodyMaterial} />
       <MaterialSummaryItem label="Фасады" option={facadeMaterial} />
@@ -102,7 +110,11 @@ function MaterialSummaryItem({
   option: MaterialOption;
 }) {
   return (
-    <div className="rzm-3d-material-summary-item">
+    <div
+      className="rzm-3d-material-summary-item"
+      data-material-id={option.materialId}
+      data-texture-id={option.textureUrl}
+    >
       <span
         className="rzm-3d-material-swatch"
         style={getMaterialSwatchStyle(option)}
@@ -164,6 +176,10 @@ function MaterialPicker({
     <section
       className="rzm-3d-material-picker"
       aria-labelledby={`rzm-material-${variant}-title`}
+      data-testid={`material-picker-${variant}`}
+      data-material-kind={variant}
+      data-selected-material={activeOption?.materialId ?? ""}
+      data-texture-id={activeOption?.textureUrl ?? ""}
     >
       <div className="rzm-3d-material-heading">
         <div>
@@ -202,6 +218,9 @@ function MaterialPicker({
         <div
           className="rzm-3d-material-zoom-preview"
           data-material-zoom="STAGE11"
+          data-testid={`material-preview-${variant}`}
+          data-material-id={previewOption.materialId}
+          data-texture-id={previewOption.textureUrl}
           style={getMaterialSwatchStyle(previewOption)}
           aria-label={`Крупное превью ${previewOption.displayName}`}
         >
@@ -243,6 +262,11 @@ function MaterialPicker({
               aria-label={`${active ? "Выбран материал" : "Выбрать материал"} ${option.displayName}`}
               aria-pressed={active}
               role="listitem"
+              data-testid={`material-swatch-${option.materialId}`}
+              data-material-id={option.materialId}
+              data-texture-id={option.textureUrl}
+              data-material-kind={variant}
+              data-selected-material={active ? option.materialId : ""}
             >
               <span
                 className="rzm-3d-material-swatch"
@@ -268,7 +292,12 @@ function MaterialPicker({
 function BackPanelMaterialPreview({ material }: { material: MaterialToken }) {
   const backPanel = getBackPanelMaterialForBody(material);
   return (
-    <section className="rzm-3d-back-panel-preview">
+    <section
+      className="rzm-3d-back-panel-preview"
+      data-testid="back-panel-material-preview"
+      data-material-id={backPanel.id}
+      data-texture-id={backPanel.textureUrl}
+    >
       <span
         className="rzm-3d-material-swatch"
         style={getMaterialSwatchStyle(backPanel)}
