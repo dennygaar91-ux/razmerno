@@ -78,7 +78,7 @@ Planned routes based on `docs/ux/release-visual-qa-matrix-v1.md`:
 | `/materials` or `/materials.html` | Info page / materials | Not executed |
 | `/assembly` or `/assembly.html` | Info page / assembly | Not executed |
 | `/configurator` | Active Constructor3D shell | Not executed |
-| `/configurator?rzm_webgl=off` | WebGL fallback simulation if supported on deployment | Not executed |
+| WebGL fallback | Requires Playwright-side WebGL mocking or a safe non-production test hook on Vercel; `?rzm_webgl=off` is localhost-only and must not be counted as Vercel fallback coverage | Not executed |
 | `/configurator-3d` | Constructor alias | Not executed |
 | `/admin` | Conditional admin visual matrix | Not executed |
 
@@ -121,6 +121,10 @@ The current assistant runtime cannot perform browser screenshots against the Ver
 
 Because UX/UI Agent is not allowed to create infrastructure workflow changes independently in this task, the correct next action is to hand off a focused prompt to 05 Infrastructure / QA Agent.
 
+### 8.4 WebGL fallback caveat
+
+The known `?rzm_webgl=off` test trigger is localhost-only. A Vercel screenshot pipeline must not count `target_url/configurator?rzm_webgl=off` as fallback evidence unless the implementation is changed safely or Playwright mocks WebGL capability/failure at browser context level.
+
 ## 9. Findings Table
 
 No product visual findings were created from screenshots because screenshots were not obtained.
@@ -129,13 +133,14 @@ No product visual findings were created from screenshots because screenshots wer
 |---|---|---|---|---|---|---|
 | VQA-BLOCK-01 | Blocker | screenshot infrastructure | Global | Vercel-based visual QA cannot be executed with current available tooling; no screenshot artifact pipeline exists for the required matrix. | Workflow review + no browser screenshot access in current runtime | Open |
 | VQA-BLOCK-02 | High | release evidence | Global | P2-20/P2-21 remain open because no visual screenshots exist for landing/info/constructor/responsive matrix. | `current-backlog.md` keeps P2-20/P2-21 open | Open |
+| VQA-BLOCK-03 | High | fallback coverage | WebGL fallback | The localhost-only `?rzm_webgl=off` route is not valid Vercel fallback evidence; pipeline must use Playwright-side WebGL mocking or a safe non-production test hook. | `useWebGLAvailable.ts` behavior noted by automated review | Open |
 
 ## 10. Blocker / High / Medium / Low Breakdown
 
 | Severity | Count | Notes |
 |---|---:|---|
 | Blocker | 1 | Screenshot pass cannot be claimed without actual screenshots. |
-| High | 1 | Visual release confidence remains incomplete until screenshot matrix artifacts exist. |
+| High | 2 | Visual release confidence remains incomplete; fallback coverage also requires a deploy-safe trigger. |
 | Medium | 0 | No screenshot-based medium findings. |
 | Low | 0 | No screenshot-based low findings. |
 
@@ -162,7 +167,7 @@ Mobile routes and states still need artifact screenshots at minimum for:
 - header/mobile navigation;
 - Constructor3D shell;
 - sizes/filling/materials/checkout steps;
-- WebGL fallback.
+- WebGL fallback through deploy-safe mocking/hook.
 
 ## 13. Constructor Problems
 
@@ -177,7 +182,7 @@ Constructor3D still needs screenshots for:
 - quote/price state;
 - validation/warning/error state;
 - checkout state;
-- fallback state.
+- fallback state through deploy-safe mocking/hook.
 
 ## 14. Landing Problems
 
@@ -220,6 +225,7 @@ Why:
 1. The available runtime cannot capture screenshots from Vercel.
 2. The repository has no existing Vercel visual QA artifact workflow covering the requested matrix.
 3. UX/UI Agent is explicitly not allowed to create infrastructure workflow changes in this task.
+4. Fallback coverage needs deploy-safe WebGL mocking/hook because the existing query trigger is localhost-only.
 
 ## 18. Final Conclusion
 
@@ -254,7 +260,7 @@ Existing backlog items remain the right targets:
 Recommended next step:
 
 ```text
-05 Infrastructure / QA Agent should create a GitHub Actions workflow_dispatch screenshot artifact pipeline that captures the release visual QA matrix against the Ready Vercel Preview URL, uploads screenshots as artifacts, and does not modify product UI/CSS/components.
+05 Infrastructure / QA Agent should create a GitHub Actions workflow_dispatch screenshot artifact pipeline that captures the release visual QA matrix against the Ready Vercel Preview URL, uploads screenshots as artifacts, uses deploy-safe WebGL fallback mocking/hook, and does not modify product UI/CSS/components except for an explicitly approved safe test hook if absolutely required.
 ```
 
 ## 20. Prompt for 05 Infrastructure / QA Agent
@@ -291,21 +297,23 @@ Pipeline должен:
    - `/materials`
    - `/assembly`
    - `/configurator`
-   - `/configurator?rzm_webgl=off`
    - `/configurator-3d`
    - `/admin` если доступен без secrets.
-4. Делать screenshots минимум в viewports:
+4. Для WebGL fallback НЕ считать `/configurator?rzm_webgl=off` валидным Vercel evidence, потому что текущий hook работает только на localhost. Нужно реализовать один из безопасных вариантов:
+   - Playwright-side WebGL mocking/failure at browser context level;
+   - или отдельный safe non-production test hook, явно ограниченный QA/Vercel preview и не влияющий на production behavior.
+5. Делать screenshots минимум в viewports:
    - 1440x900
    - 1280x800
    - 768x1024
    - 390x844
    - 375x812
-5. Сохранять PNG screenshots в artifact, например `vercel-visual-qa-screenshots`.
-6. Генерировать JSON/Markdown inventory со списком screenshot files, routes, viewport, HTTP status, console errors если есть.
-7. Не падать на отдельном недоступном optional admin route, но явно фиксировать его status.
-8. Upload artifact через actions/upload-artifact.
-9. Обновить docs/qa или docs/ux только если pipeline реально добавлен и прошёл.
-10. После merge pipeline можно запускать UX/UI Agent для фактического visual review.
+6. Сохранять PNG screenshots в artifact, например `vercel-visual-qa-screenshots`.
+7. Генерировать JSON/Markdown inventory со списком screenshot files, routes, viewport, HTTP status, console errors если есть.
+8. Не падать на отдельном недоступном optional admin route, но явно фиксировать его status.
+9. Upload artifact через actions/upload-artifact.
+10. Обновить docs/qa или docs/ux только если pipeline реально добавлен и прошёл.
+11. После merge pipeline можно запускать UX/UI Agent для фактического visual review.
 
 Branch:
 infra-vercel-visual-qa-screenshot-pipeline
@@ -321,7 +329,8 @@ Vercel Visual QA Screenshot Artifact Pipeline
 - tested target URL;
 - run id;
 - artifacts evidence;
-- confirmation that product UI/CSS/components were not changed.
+- deploy-safe WebGL fallback method;
+- confirmation that product UI/CSS/components were not changed, except an explicitly justified QA-only hook if approved.
 
 Обращаться к агенту: 05 Infrastructure / QA Agent
 ```
