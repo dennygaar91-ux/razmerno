@@ -225,6 +225,7 @@ export function useConstructorQuote({
           productionServicesDecision,
           productionPreview,
         }));
+        setQuoteStatus("ready");
       } catch (error) {
         if (cancelled) return;
         setQuoteStatus("error");

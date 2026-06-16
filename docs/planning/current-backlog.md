@@ -261,7 +261,13 @@ Closure condition: закрыть P0-17 можно только после по�
 
 ### P1-09 Constructor3D Submit E2E
 
-Статус: open. Задачи: полноценные Playwright сценарии оформления заявки.
+Статус: closed.
+
+Итог: Constructor3D submit browser E2E подключён к QA gate через `check:constructor-submit-e2e` и `test:constructor-submit-e2e`; покрывает успешную заявку без доставки/сборки, заявку с доставкой и сборкой, блокировку обязательных полей до API, RU phone validation до API и API error state без потери checkout state.
+
+Доказательство: PR #44, commit `3a1fb10462c358698f16002ce77e0465518adad2`, GitHub Actions QA run `189` (`27611519384`) завершился `success`; CI evidence artifact `p1-09-constructor-submit-ci-evidence` содержит фактические команды `npm run check:constructor-submit-e2e` и `npm run test:constructor-submit-e2e`, итог Playwright: `5 passed (39.6s)`.
+
+Документ: `docs/constructor/constructor-submit-e2e-report-v1.md`.
 
 ### P1-10 WebGL Fallback E2E
 

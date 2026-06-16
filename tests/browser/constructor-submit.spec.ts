@@ -1,252 +1,267 @@
-import { test, expect, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-// Helper to open the constructor page and wait for initial widgets
-async function openConstructor(page: Page) {
-  await page.goto("/configurator");
-  // Wait for workspace and stepper to be visible
-  await expect(page.locator(".rzm-r19-workspace")).toBeVisible();
-  await expect(page.locator(".rzm-constructor-stepper")).toBeVisible();
+type SubmittedConstructorOrder = {
+  orderId?: string;
+  productType: "wardrobe" | "dresser" | "nightstand";
+  dimensions: { width: number; height: number; depth: number };
+  sections: number;
+  filling: { shelves: number; drawers: number; hangingRod: boolean };
+  layout?: { sections?: unknown[] };
+  materials: {
+    bodyId: string;
+    facadeId: string;
+    facadeKind?: "ldsp" | "mdf";
+    backPanelId?: string;
+    backPanelKind?: "hdf";
+  };
+  style: { facadeStyleId: string; hardwareId: string };
+  priceBreakdown: Record<string, number>;
+  totalPrice: number;
+  customer: { name: string; phone: string; email: string; comment?: string };
+  delivery?: { enabled: boolean; address?: string; price: number };
+  assembly?: { enabled: boolean; price: number; rate: number; basePrice: number };
+  consent: { personalData: boolean; privacyVersion: string; acceptedAt: string };
+  configVersion?: string;
+  source: string;
+  utm?: Record<string, string>;
+  honeypot?: string;
+};
+
+type ContactFixture = {
+  name: string;
+  phone: string;
+  email: string;
+};
+
+async function openConstructor3D(page: Page) {
+  await page.goto("/configurator-3d");
+  await expect(page.locator(".rzm-3d-page")).toBeVisible();
+  await expect(page.locator(".rzm-3d-page")).toHaveAttribute(
+    "data-checkout-stage",
+    "STAGE15",
+  );
+  await expect(page.locator("[data-testid='constructor-3d-viewport']")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Перейти к наполнению/i })).toBeVisible();
 }
 
-// Helper to walk through steps until checkout
 async function proceedToCheckout(page: Page) {
-  // sizes -> fill
-  await page.getByRole("button", { name: /Далее|Перейти|Выбрать/i }).click();
-  await expect(page.locator("body")).toContainText(/Наполнение/);
-  // fill -> materials
-  await page.getByRole("button", { name: /Далее|Перейти|Выбрать/i }).click();
-  await expect(page.locator("body")).toContainText(/Материалы|Внешний вид/);
-  // materials -> checkout
-  await page.getByRole("button", { name: /Далее|Перейти|Выбрать/i }).click();
-  await expect(page.locator("body")).toContainText(/Проверьте контакты|Контакты/);
+  await page.getByRole("button", { name: /Перейти к наполнению/i }).click();
+  await expect(page.locator(".rzm-3d-drawer-body")).toContainText("Наполнение");
+
+  await page.getByRole("button", { name: /Выбрать материалы/i }).click();
+  await expect(page.locator(".rzm-3d-drawer-body")).toContainText("Материалы");
+
+  await page.getByRole("button", { name: /Перейти к заявке/i }).click();
+  await expect(page.locator(".rzm-3d-checkout")).toBeVisible();
+  await expect(page.locator(".rzm-3d-checkout")).toContainText("Контакты");
+  await waitForReadyQuote(page);
 }
 
-// Fill contact fields
-async function fillContact(page: Page, {
-  name,
-  phone,
-  email,
-}: { name: string; phone: string; email: string; }) {
-  await page.getByLabel(/Имя/i).fill(name);
-  await page.getByLabel(/Телефон/i).fill(phone);
-  await page.getByLabel(/Email/i).fill(email);
+async function waitForReadyQuote(page: Page) {
+  await expect(page.locator(".rzm-3d-price-status")).toContainText("Обновлено");
+  await expect(page.locator(".rzm-3d-checkout-price")).toContainText(/₽/);
 }
 
-test.describe("Constructor submit flow", () => {
-  test("submit successful order without delivery or assembly", async ({ page }) => {
-    await openConstructor(page);
-    await proceedToCheckout(page);
-    await fillContact(page, { name: "Тест", phone: "+7 900 000 00 00", email: "test@example.com" });
-    await page.getByLabel(/Согласен/i).check();
+async function fillRequiredContact(page: Page, contact: ContactFixture) {
+  await page.getByLabel(/Имя/i).fill(contact.name);
+  await page.getByLabel(/Телефон/i).fill(contact.phone);
+  await page.getByLabel(/Email/i).fill(contact.email);
+  await page.getByLabel(/Согласен на обработку персональных данных/i).check();
+}
 
-    const requests: any[] = [];
-    await page.route("**/api/orders", async (route) => {
-      const postData = route.request().postDataJSON();
-      requests.push(postData);
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ ok: true, orderId: "E2E1" }),
-      });
+async function interceptOrderSubmit(
+  page: Page,
+  options: { status?: number; body?: unknown } = {},
+) {
+  const requests: SubmittedConstructorOrder[] = [];
+
+  await page.route("**/api/orders", async (route) => {
+    const request = route.request();
+    expect(request.method()).toBe("POST");
+    expect(request.headers()["content-type"]).toContain("application/json");
+    expect(request.headers()["idempotency-key"]).toMatch(/^RZ-\d{8}-\d{4}$/);
+
+    requests.push(request.postDataJSON() as SubmittedConstructorOrder);
+
+    await route.fulfill({
+      status: options.status ?? 200,
+      contentType: "application/json",
+      body: JSON.stringify(options.body ?? { ok: true, orderId: "P1-09-E2E-001" }),
     });
-
-    await page.getByRole("button", { name: /Отправить/i }).click();
-
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/Заявка|отправлена/i);
-
-    expect(requests.length).toBe(1);
-    const payload = requests[0];
-    expect(payload.deliveryEnabled).toBeFalsy();
-    expect(payload.assemblyEnabled).toBeFalsy();
-    expect(payload.contact.name).toBe("Тест");
-    expect(payload.contact.phone).toMatch(/\+7/);
-    expect(payload.contact.email).toContain("@");
   });
 
-  test("submit with delivery", async ({ page }) => {
-    await openConstructor(page);
+  return requests;
+}
+
+function expectSubmittedOrderBase(payload: SubmittedConstructorOrder, contact: ContactFixture) {
+  expect(payload.orderId).toMatch(/^RZ-\d{8}-\d{4}$/);
+  expect(payload.productType).toBe("wardrobe");
+  expect(payload.source).toBe("constructor-store-adapter");
+
+  expect(payload.customer).toEqual(contact);
+  expect(payload.consent).toEqual(
+    expect.objectContaining({
+      personalData: true,
+      privacyVersion: "2026-05-24",
+    }),
+  );
+  expect(new Date(payload.consent.acceptedAt).toString()).not.toBe("Invalid Date");
+
+  expect(payload.dimensions.width).toBeGreaterThan(0);
+  expect(payload.dimensions.height).toBeGreaterThan(0);
+  expect(payload.dimensions.depth).toBeGreaterThan(0);
+  expect(payload.sections).toBeGreaterThan(0);
+  expect(payload.totalPrice).toBeGreaterThan(0);
+  expect(Object.values(payload.priceBreakdown).some((value) => value > 0)).toBe(true);
+
+  expect(payload.layout?.sections?.length).toBe(payload.sections);
+  expect(payload.materials.bodyId).toEqual(expect.any(String));
+  expect(payload.materials.facadeId).toEqual(expect.any(String));
+  expect(payload.materials.backPanelKind).toBe("hdf");
+  expect(payload.style).toEqual(
+    expect.objectContaining({
+      facadeStyleId: expect.any(String),
+      hardwareId: expect.any(String),
+    }),
+  );
+
+  expect(payload).not.toHaveProperty("contact");
+  expect(payload).not.toHaveProperty("deliveryEnabled");
+  expect(payload).not.toHaveProperty("deliveryAddress");
+  expect(payload).not.toHaveProperty("assemblyEnabled");
+}
+
+test.describe("Constructor3D submit flow", () => {
+  test("submits a production-shaped order without delivery or assembly", async ({ page }) => {
+    const contact = {
+      name: "P1-09 Клиент",
+      phone: "+7 900 000 00 00",
+      email: "p1-09@example.com",
+    };
+    const requests = await interceptOrderSubmit(page, {
+      body: { ok: true, orderId: "P1-09-E2E-001" },
+    });
+
+    await openConstructor3D(page);
     await proceedToCheckout(page);
-    await fillContact(page, { name: "Павел", phone: "+7 901 111 11 11", email: "pavel@example.com" });
+    await fillRequiredContact(page, contact);
+
+    await expect(page.getByRole("button", { name: /Отправить заявку/i })).toBeEnabled();
+    await page.getByRole("button", { name: /Отправить заявку/i }).click();
+
+    await expect(page.locator(".rzm-3d-submit-message")).toContainText(
+      /P1-09-E2E-001|отправлена/i,
+    );
+    await expect(page.getByRole("button", { name: /Отправлено|Повтор через/i })).toBeVisible();
+
+    expect(requests).toHaveLength(1);
+    const payload = requests[0];
+    expectSubmittedOrderBase(payload, contact);
+    expect(payload.delivery).toEqual(expect.objectContaining({ enabled: false, price: 0 }));
+    expect(payload.assembly).toEqual(expect.objectContaining({ enabled: false, price: 0 }));
+  });
+
+  test("submits delivery and assembly options in the real OrderPayload contract", async ({ page }) => {
+    const contact = {
+      name: "P1-09 Доставка",
+      phone: "+7 901 111 11 11",
+      email: "delivery-p1-09@example.com",
+    };
+    const requests = await interceptOrderSubmit(page, {
+      body: { ok: true, orderId: "P1-09-E2E-DELIVERY" },
+    });
+
+    await openConstructor3D(page);
+    await proceedToCheckout(page);
+    await fillRequiredContact(page, contact);
     await page.getByLabel(/Нужна доставка/i).check();
     await page.getByLabel(/Адрес доставки/i).fill("Москва, ул. Тверская, 1");
-    await page.getByLabel(/Согласен/i).check();
-
-    const requests: any[] = [];
-    await page.route("**/api/orders", async (route) => {
-      const data = route.request().postDataJSON();
-      requests.push(data);
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ ok: true, orderId: "E2E2" }),
-      });
-    });
-
-    await page.getByRole("button", { name: /Отправить/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/Заявка|отправлена/i);
-
-    const payload = requests[0];
-    expect(payload.deliveryEnabled).toBeTruthy();
-    expect(payload.deliveryAddress).toContain("Москва");
-    expect(payload.assemblyEnabled).toBeFalsy();
-  });
-
-  test("submit with delivery and assembly", async ({ page }) => {
-    await openConstructor(page);
-    await proceedToCheckout(page);
-    await fillContact(page, { name: "Мария", phone: "+7 902 222 22 22", email: "maria@example.com" });
-    await page.getByLabel(/Нужна доставка/i).check();
-    await page.getByLabel(/Адрес доставки/i).fill("Санкт-Петербург, Невский, 10");
     await page.getByLabel(/Нужна сборка/i).check();
-    await page.getByLabel(/Согласен/i).check();
+    await waitForReadyQuote(page);
 
-    const requests: any[] = [];
-    await page.route("**/api/orders", async (route) => {
-      const payload = route.request().postDataJSON();
-      requests.push(payload);
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ ok: true, orderId: "E2E3" }),
-      });
-    });
+    await page.getByRole("button", { name: /Отправить заявку/i }).click();
+    await expect(page.locator(".rzm-3d-submit-message")).toContainText(
+      /P1-09-E2E-DELIVERY|отправлена/i,
+    );
 
-    await page.getByRole("button", { name: /Отправить/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/Заявка|отправлена/i);
-
+    expect(requests).toHaveLength(1);
     const payload = requests[0];
-    expect(payload.deliveryEnabled).toBeTruthy();
-    expect(payload.deliveryAddress).toContain("Санкт-Петербург");
-    expect(payload.assemblyEnabled).toBeTruthy();
+    expectSubmittedOrderBase(payload, contact);
+    expect(payload.delivery).toEqual(
+      expect.objectContaining({
+        enabled: true,
+        address: "Москва, ул. Тверская, 1",
+      }),
+    );
+    expect(payload.delivery?.price).toBeGreaterThan(0);
+    expect(payload.assembly).toEqual(
+      expect.objectContaining({
+        enabled: true,
+        rate: expect.any(Number),
+        basePrice: expect.any(Number),
+      }),
+    );
+    expect(payload.assembly?.price).toBeGreaterThan(0);
   });
 
-  test("validation failure shows error and no API call", async ({ page }) => {
-    await openConstructor(page);
+  test("keeps required checkout fields blocked before any API request", async ({ page }) => {
+    const requests = await interceptOrderSubmit(page);
+
+    await openConstructor3D(page);
     await proceedToCheckout(page);
-    // Leave contact fields blank and do not check consent
-    await page.getByLabel(/Имя/i).fill("");
-    await page.getByLabel(/Телефон/i).fill("");
-    await page.getByLabel(/Email/i).fill("");
 
-    const requests: any[] = [];
-    await page.route("**/api/orders", async (route) => {
-      requests.push(route.request().postDataJSON());
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ ok: true, orderId: "E2E4" }),
-      });
-    });
-
-    await page.getByRole("button", { name: /Отправить/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/Проверьте|Нужно/i);
-    expect(requests.length).toBe(0);
+    await expect(page.getByRole("button", { name: /Заполните заявку/i })).toBeDisabled();
+    await expect(page.locator("#rzm-3d-primary-action-help")).toContainText(
+      "Заполните имя, телефон, email и подтвердите согласие.",
+    );
+    expect(requests).toHaveLength(0);
   });
 
-  test("API failure displays error message", async ({ page }) => {
-    await openConstructor(page);
-    await proceedToCheckout(page);
-    await fillContact(page, { name: "Ошибка", phone: "+7 903 333 33 33", email: "error@example.com" });
-    await page.getByLabel(/Согласен/i).check();
+  test("validates RU phone before submit and does not call the API", async ({ page }) => {
+    const requests = await interceptOrderSubmit(page);
 
-    await page.route("**/api/orders", async (route) => {
-      await route.fulfill({
-        status: 500,
-        contentType: "application/json",
-        body: JSON.stringify({ ok: false, error: "Server error" }),
-      });
+    await openConstructor3D(page);
+    await proceedToCheckout(page);
+    await fillRequiredContact(page, {
+      name: "P1-09 Ошибка",
+      phone: "12345",
+      email: "invalid-phone-p1-09@example.com",
     });
 
-    await page.getByRole("button", { name: /Отправить/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/Не удалось|ошибка/i);
+    await expect(page.getByRole("button", { name: /Отправить заявку/i })).toBeEnabled();
+    await page.getByRole("button", { name: /Отправить заявку/i }).click();
+
+    await expect(page.locator(".rzm-3d-submit-message")).toContainText(
+      /Проверьте обязательные поля/i,
+    );
+    await expect(page.locator(".rzm-3d-checkout")).toContainText(
+      "Укажите российский номер",
+    );
+    expect(requests).toHaveLength(0);
   });
 
-  test("submit after reset", async ({ page }) => {
-    await openConstructor(page);
-    await proceedToCheckout(page);
-    await fillContact(page, { name: "ResetTest", phone: "+7 904 444 44 44", email: "reset@example.com" });
-    await page.getByLabel(/Согласен/i).check();
-
-    // Open reset dialog via header control
-    await page.getByRole("button", { name: "Сбросить" }).click();
-    // Confirm reset in dialog
-    await page.locator(".rzm-3d-reset-dialog").getByRole("button", { name: "Сбросить" }).click();
-
-    // After reset we should be back to the first step; proceed again
-    await expect(page.locator("body")).toContainText(/Размеры|Корпус/);
-    await proceedToCheckout(page);
-    // Contact fields should be empty after reset
-    await expect(page.getByLabel(/Имя/i)).toHaveValue("");
-    await expect(page.getByLabel(/Телефон/i)).toHaveValue("");
-    await expect(page.getByLabel(/Email/i)).toHaveValue("");
-    // Fill again
-    await fillContact(page, { name: "ResetOK", phone: "+7 905 555 55 55", email: "resetok@example.com" });
-    await page.getByLabel(/Согласен/i).check();
-
-    const requests: any[] = [];
-    await page.route("**/api/orders", async (route) => {
-      const p = route.request().postDataJSON();
-      requests.push(p);
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ ok: true, orderId: "E2E5" }),
-      });
+  test("shows API error response without losing checkout state", async ({ page }) => {
+    const contact = {
+      name: "P1-09 API Ошибка",
+      phone: "+7 902 222 22 22",
+      email: "api-error-p1-09@example.com",
+    };
+    const requests = await interceptOrderSubmit(page, {
+      status: 500,
+      body: { ok: false, message: "P1-09 forced API failure" },
     });
 
-    await page.getByRole("button", { name: /Отправить/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/Заявка|отправлена/i);
-    expect(requests.length).toBe(1);
-  });
-
-  test("submit after state restore", async ({ page }) => {
-    await openConstructor(page);
+    await openConstructor3D(page);
     await proceedToCheckout(page);
-    await fillContact(page, { name: "Restore", phone: "+7 906 666 66 66", email: "restore@example.com" });
-    await page.getByLabel(/Согласен/i).check();
-    // enable delivery and assembly to have some state
-    await page.getByLabel(/Нужна доставка/i).check();
-    await page.getByLabel(/Адрес доставки/i).fill("Казань, Кремль, 1");
-    await page.getByLabel(/Нужна сборка/i).check();
+    await fillRequiredContact(page, contact);
 
-    // Reload the page; constructor should restore last snapshot
-    await page.reload();
-    // Wait until constructor loads
-    await expect(page.locator(".rzm-r19-workspace")).toBeVisible();
+    await page.getByRole("button", { name: /Отправить заявку/i }).click();
 
-    // Go directly to checkout; if the state persisted, we might already be on checkout; otherwise navigate again
-    if (await page.locator(".rzm-constructor-checkout-shell").count() === 0) {
-      // Not on checkout; navigate again through steps
-      await proceedToCheckout(page);
-    }
-
-    // Verify restored values
-    await expect(page.getByLabel(/Имя/i)).toHaveValue("Restore");
-    await expect(page.getByLabel(/Телефон/i)).toHaveValue("+7 906 666 66 66");
-    await expect(page.getByLabel(/Email/i)).toHaveValue("restore@example.com");
-    await expect(page.getByLabel(/Нужна доставка/i)).toBeChecked();
-    await expect(page.getByLabel(/Адрес доставки/i)).toHaveValue(/Казань/);
-    await expect(page.getByLabel(/Нужна сборка/i)).toBeChecked();
-
-    // Consent may not persist; check and enable if needed
-    const consentBox = page.getByLabel(/Согласен/i);
-    if (!(await consentBox.isChecked())) {
-      await consentBox.check();
-    }
-
-    const requests: any[] = [];
-    await page.route("**/api/orders", async (route) => {
-      const p = route.request().postDataJSON();
-      requests.push(p);
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ ok: true, orderId: "E2E6" }),
-      });
-    });
-
-    await page.getByRole("button", { name: /Отправить/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/Заявка|отправлена/i);
-    expect(requests.length).toBe(1);
+    await expect(page.locator(".rzm-3d-submit-message")).toContainText(
+      "P1-09 forced API failure",
+    );
+    await expect(page.getByLabel(/Email/i)).toHaveValue(contact.email);
+    expect(requests).toHaveLength(1);
+    expectSubmittedOrderBase(requests[0], contact);
   });
 });

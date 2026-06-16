@@ -303,6 +303,8 @@
     "check:stage-n8-validation-autofix": "node scripts/check-stage-n8-validation-autofix.mjs",
     "check:stage-n9-checkout-integration": "node scripts/check-stage-n9-checkout-integration.mjs",
     "test:constructor3d-e2e": "playwright test tests/browser/configurator3d.spec.ts --project=chromium-desktop",
+    "check:constructor-submit-e2e": "node scripts/check-p1-09-constructor3d-submit-e2e.mjs",
+    "test:constructor-submit-e2e": "playwright test tests/browser/constructor-submit.spec.ts --project=chromium-desktop",
     "check:stage-n10-e2e-cleanup": "node scripts/check-stage-n10-e2e-cleanup.mjs",
     "check:stage-q1-accessibility-foundation": "node scripts/check-stage-q1-accessibility-foundation.mjs",
     "check:stage-q2-price-clarity": "node scripts/check-stage-q2-price-clarity.mjs",
