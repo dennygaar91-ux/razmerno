@@ -11,29 +11,15 @@ import { toOrderDbInsert } from "../../api/_shared/order-db";
 import type { OrderRequest } from "../../api/_shared/order-types";
 import { buildCheckoutOrderPayload } from "../configurator/checkout/buildCheckoutOrderPayload";
 import { initialState, makeCompatibleLayout, type ConfigState } from "../configurator/context";
-import {
-  pricingGoldenFixtures,
-  pricingValidationFixtures,
-  type PricingGoldenExpected,
-  type PricingGoldenFixture,
-} from "./pricingGoldenFixtures";
+import { pricingGoldenFixtures, pricingValidationFixtures, type PricingGoldenExpected, type PricingGoldenFixture } from "./pricingGoldenFixtures";
 
 type TestResult = { name: string; passed: boolean; error?: string };
 const results: TestResult[] = [];
 
-type FacadeStyleConfig = {
-  id: string;
-  priceMultiplier: number;
-};
-
-type HardwareConfig = {
-  id: string;
-  basePrice: number;
-  priceFactor: number;
-};
-
-type CatalogProducer = "Kronospan" | "Egger" | "Eterno" | "AGT";
-
+type FacadeStyleConfig = { id: string; priceMultiplier: number };
+type HardwareConfig = { id: string; basePrice: number; priceFactor: number };
+type CatalogBodyProducer = "Kronospan" | "Egger" | "Eterno";
+type CatalogFacadeProducer = CatalogBodyProducer | "AGT";
 type CatalogFacadeKind = "ldsp" | "mdf";
 
 function test(name: string, fn: () => void) {
@@ -56,26 +42,18 @@ function calculateFrontendFixtureBasePrice(fixture: PricingGoldenFixture): Catal
     bodyMaterialId: fixture.materials.bodyId,
     facadeMaterialId: fixture.materials.facadeId,
   });
-  const facadeStyle = findById(
-    facadeStyles as FacadeStyleConfig[],
-    fixture.style.facadeStyleId,
-    "facade style",
-  );
-  const hardware = findById(
-    hardwareItems as HardwareConfig[],
-    fixture.style.hardwareId,
-    "hardware",
-  );
+  const facadeStyle = findById(facadeStyles as FacadeStyleConfig[], fixture.style.facadeStyleId, "facade style");
+  const hardware = findById(hardwareItems as HardwareConfig[], fixture.style.hardwareId, "hardware");
 
   return calculateFrontendPrice({
     type: fixture.productType,
     dimensions: fixture.dimensions,
     sections: fixture.sections,
     filling: fixture.filling,
-    bodyProducer: materialPricingContext.body.producer as CatalogProducer | undefined,
+    bodyProducer: materialPricingContext.body.producer as CatalogBodyProducer | undefined,
     bodyArticle: materialPricingContext.body.article,
     bodyThicknessMm: materialPricingContext.body.thicknessMm,
-    facadeProducer: materialPricingContext.facade.producer as CatalogProducer | undefined,
+    facadeProducer: materialPricingContext.facade.producer as CatalogFacadeProducer | undefined,
     facadeArticle: materialPricingContext.facade.article,
     facadeThicknessMm: materialPricingContext.facade.thicknessMm,
     facadeMaterialKind: materialPricingContext.facade.materialKind as CatalogFacadeKind | undefined,
@@ -123,9 +101,9 @@ function buildFixturePayload(fixture: PricingGoldenFixture): OrderRequest {
     deliveryQuote,
     assemblyQuote,
     customer: {
-      name: "Иван",
-      phone: "+79999999999",
-      email: "pricing-parity@example.com",
+      name: "Test Customer",
+      phone: "+70000000000",
+      email: "pricing-parity@example.test",
       comment: "",
       honeypot: "",
     },
@@ -135,10 +113,7 @@ function buildFixturePayload(fixture: PricingGoldenFixture): OrderRequest {
     consentAccepted: true,
   });
 
-  return {
-    ...payload,
-    source: payload.source ?? "order",
-  };
+  return { ...payload, source: payload.source ?? "order" };
 }
 
 function toGoldenExpected(price: CatalogPriceBreakdown): PricingGoldenExpected {
@@ -217,14 +192,7 @@ for (const fixture of pricingGoldenFixtures) {
     const frontendTotal = frontendPrice.total + deliveryQuote.price + assemblyQuote.price;
     const payload = buildFixturePayload(fixture);
     const serverPrice = calculateServerPrice(payload);
-    const pricedPayload = withServerPrice(
-      {
-        ...payload,
-        totalPrice: 1,
-        priceBreakdown: { ...payload.priceBreakdown, total: 1 },
-      },
-      serverPrice,
-    );
+    const pricedPayload = withServerPrice({ ...payload, totalPrice: 1, priceBreakdown: { ...payload.priceBreakdown, total: 1 } }, serverPrice);
     const storedOrder = toOrderDbInsert({
       orderId: `GOLDEN-${fixture.id}`,
       body: pricedPayload,
