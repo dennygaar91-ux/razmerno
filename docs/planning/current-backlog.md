@@ -295,17 +295,17 @@ Closure summary: P1-21 закрыта как docs/planning-only задача. М
 
 ### P1-22 Vercel Deployment Dashboard Log Verification
 
-Статус: open.
+Статус: closed.
 
-Источник: `docs/qa/vercel-deployment-error-investigation-v1.md`.
+Источник: `docs/qa/vercel-deployment-error-investigation-v1.md` + `docs/qa/vercel-dashboard-log-verification-v1.md`.
 
-Зачем: получить Vercel raw logs и подтвердить конкретную причину `Vercel: failure` на PR #47 head и merge commit `49a635fe8831376e8afa32ebbcebd17a7a80025b`.
+Итог: Vercel raw logs получены через Dashboard. Root cause классифицирован как external Vercel configuration/cache/runtime issue: failed deployment падал на `node_modules/.bin/vite: Permission denied` / exit 126. После dashboard-level фикса и redeploy without cache Preview deployment стал `Ready / Latest`.
 
-Evidence: GitHub Actions QA run #205 (`27628914104`) завершился `success`, но GitHub combined status показывает `Vercel: failure` для PR #47 head и current `main`; Vercel failure также виден на более ранних merge commits PR #44 и PR #46.
+Доказательство: PR #49 `P1-22 Vercel Dashboard Log Verification`; initial verified head commit `3bb8907acd5fe62076b09098037daf0bc2763180`; GitHub Actions QA run #213 (`27632361399`) завершился `success`; Vercel deployment `5PWvVXh5i53mYXjv98AsxsFSzh26` завершился `Ready / Latest` для Preview environment; final PR head `47d397656f2f14072c31acf674868a0cb2d7ce1c`; GitHub Actions QA run #239 (`27647250963`) завершился `success`; final PR-head Vercel status = `success`, target deployment `6s1SC84wysEbv6Y8DCEqw3FWzUrV`.
 
-Риск: нельзя использовать Vercel preview/main deployment как источник release/screenshot evidence, пока не подтверждён успешный Vercel deployment или не устранена dashboard-level причина.
+Dashboard fix applied: Framework Preset `Vite`, Root Directory repository root, Install Command `npm ci`, Build Command `npm run build`, Output Directory `dist`, redeploy without cache. Node.js version should remain aligned with GitHub QA Node 22.x where available.
 
-Closure condition: проверить Vercel deployment log, build command, install command, Node version, root directory, output directory, env variables, framework preset и exact error stack; затем либо зафиксировать no-blocker/successful redeploy, либо применить точечный infra-fix с evidence.
+Closure summary: P1-22 закрыта после получения exact Vercel error stack, root cause classification, successful Vercel Preview redeploy и GitHub QA success. Следующий Vercel-based visual QA screenshot pass можно запускать после merge PR #49 и main deployment/content verification.
 
 ---
 
