@@ -307,6 +307,42 @@ Evidence: GitHub Actions QA run #205 (`27628914104`) завершился `succe
 
 Closure condition: проверить Vercel deployment log, build command, install command, Node version, root directory, output directory, env variables, framework preset и exact error stack; затем либо зафиксировать no-blocker/successful redeploy, либо применить точечный infra-fix с evidence.
 
+### P1-23 Order Notification / Failure Handling Contract Tests
+
+Статус: closed in PR / pending merge commit.
+
+Итог: API/order flow усилен вокруг notification provider failures, idempotent duplicate order handling, invalid payload shape и PII-safe notification logging. Customer confirmation email failure не ломает успешно сохранённую заявку после успешного manager notification. Manager notification failure остаётся текущим safe `502` contract.
+
+Доказательство: PR #52 `API Order Notification Failure Contracts`; head commit `60b6c29dd0e28eb7c22cb109e23723209444eda2`; QA run #219 (`27639437300`) завершился `success`; job `Fast CI gate` passed. Merge commit: pending until PR merge.
+
+Команды, покрытые CI:
+
+```bash
+npm run typecheck
+npm run typecheck:api
+npm run build
+npm run test:checkout-submit-hook
+npm run check:constructor-submit-e2e
+npm run test:constructor-submit-e2e
+npm run check:webgl-fallback-e2e
+npm run test:webgl-fallback-e2e
+npm run check:material-texture-parity
+npm run test:material-texture-parity
+```
+
+Реализовано:
+
+- `tests/order-notification-failure-contract.test.ts`;
+- подключение нового contract suite через `tests/checkout-submit-hook.test.ts`;
+- invalid order payload shape validation в `api/_shared/order-validation.ts`;
+- duplicate `orderId` как idempotent replay в `api/_shared/supabase-orders.ts` и `api/orders.ts`;
+- sanitization notification provider failure reasons against current order PII in `api/orders.ts`;
+- documentation `docs/api/order-notification-failure-handling-v1.md`.
+
+Документ: `docs/api/order-notification-failure-handling-v1.md`.
+
+Scope guard: P1-22 осталась open/blocked; Production Golden Snapshots / PR #51 не изменялась; GitHub issues не изменялись.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
