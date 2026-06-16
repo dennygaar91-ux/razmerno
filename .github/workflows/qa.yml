@@ -109,6 +109,12 @@ jobs:
       - name: P1-10 WebGL fallback E2E
         run: npm run test:webgl-fallback-e2e
 
+      - name: P1-13 Material / Texture parity guard
+        run: npm run check:material-texture-parity
+
+      - name: P1-13 Material / Texture parity E2E
+        run: npm run test:material-texture-parity
+
       - name: Coverage snapshot
         env:
           COVERAGE_MIN_BYTES: 15
