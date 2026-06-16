@@ -20,6 +20,17 @@ const probeAttributes: WebGLContextAttributes = {
   stencil: false,
 };
 
+function isLocalhostFallbackProbeEnabled() {
+  if (typeof window === "undefined") return false;
+
+  const host = window.location.hostname;
+  const isLocalhost =
+    host === "localhost" || host === "127.0.0.1" || host === "::1";
+  if (!isLocalhost) return false;
+
+  return new URLSearchParams(window.location.search).get("rzm_webgl") === "off";
+}
+
 function getRendererInfo(context: WebGLRenderingContext | WebGL2RenderingContext) {
   try {
     const debugInfo = context.getExtension("WEBGL_debug_renderer_info");
@@ -47,6 +58,10 @@ function disposeProbeContext(context: WebGLRenderingContext | WebGL2RenderingCon
 export function detectWebGL(): WebGLDiagnostics {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return { status: "checking", renderer: null, reason: "ssr" };
+  }
+
+  if (isLocalhostFallbackProbeEnabled()) {
+    return { status: "unavailable", renderer: null, reason: "e2e-forced-webgl-off" };
   }
 
   try {
