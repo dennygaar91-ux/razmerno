@@ -17,6 +17,8 @@ Error: Command "npm run build" exited with 126
 
 После dashboard-level исправления и redeploy without cache Preview deployment стал `Ready / Latest`.
 
+Финальный PR-head также подтверждён как green: GitHub QA success и Vercel status success.
+
 ## 2. Scope
 
 In scope:
@@ -54,9 +56,9 @@ P1-22 was opened because GitHub QA was green while Vercel deployment status was 
 
 PR: #49 `P1-22 Vercel Dashboard Log Verification`  
 Branch: `p1-22-vercel-dashboard-log-verification`  
-Verified head SHA before final docs update: `3bb8907acd5fe62076b09098037daf0bc2763180`
+Initial verified head SHA before Dashboard fix: `3bb8907acd5fe62076b09098037daf0bc2763180`
 
-GitHub Actions evidence:
+Initial GitHub Actions evidence:
 
 ```text
 Workflow: QA
@@ -66,11 +68,13 @@ Status: completed
 Conclusion: success
 ```
 
-Final PR head after docs/backlog closure:
+Final PR-head evidence after report/backlog closure update:
 
 ```text
-Head SHA: 304cd0480c4cca3676d3fa8d4a01d6b142f7c13e
-QA run: 238
+Head SHA: 47d397656f2f14072c31acf674868a0cb2d7ce1c
+Workflow: QA
+Run number: 239
+Run id: 27647250963
 Status: completed
 Conclusion: success
 ```
@@ -101,20 +105,13 @@ Commit: 3bb8907
 Duration: 51s
 ```
 
-Final PR-head Vercel bot evidence after docs/backlog update:
-
-```text
-Deployment id: 7Mo6ZJtAkdgHnTASzTt18S3r1peN
-Environment: Preview
-Status: Ready
-```
-
 Final PR-head GitHub combined status evidence:
 
 ```text
 Context: Vercel
 State: success
-Head SHA: 304cd0480c4cca3676d3fa8d4a01d6b142f7c13e
+Head SHA: 47d397656f2f14072c31acf674868a0cb2d7ce1c
+Target deployment id: 6s1SC84wysEbv6Y8DCEqw3FWzUrV
 ```
 
 ## 6. Vercel Raw Logs
@@ -175,7 +172,8 @@ Evidence chain:
 3. Vercel settings/logs showed build cache/runtime mismatch context.
 4. Vercel redeploy was triggered without cache after settings alignment.
 5. Vercel then executed `npm ci`, installed full dependencies, completed `vite build`, and produced `Ready / Latest`.
-6. Final PR-head deployment after docs/backlog update also reported `Ready` through Vercel bot and `success` through GitHub combined status.
+6. Final PR-head deployment after docs/backlog update also reported `success` through GitHub combined status.
+7. Final PR-head GitHub QA run #239 completed with `success`.
 
 ## 10. Fix Applied / Fix Required
 
@@ -217,10 +215,11 @@ Duration: 51s
 Final PR-head Vercel result:
 
 ```text
-Deployment id: 7Mo6ZJtAkdgHnTASzTt18S3r1peN
-Status: Ready
+Target deployment id: 6s1SC84wysEbv6Y8DCEqw3FWzUrV
+Status: success
 Environment: Preview
 GitHub combined status: success
+Head SHA: 47d397656f2f14072c31acf674868a0cb2d7ce1c
 ```
 
 P1-22 deployment blocker is resolved for PR #49 Preview deployments.
@@ -240,7 +239,7 @@ This does not rewrite older historical failed deployments, but confirms the curr
 Decision:
 
 ```text
-The next Vercel-based visual QA screenshot pass can start after main deployment/content verification is complete.
+The next Vercel-based visual QA screenshot pass can start after PR #49 merge and main deployment/content verification are complete.
 ```
 
 ## 14. Remaining Risks
