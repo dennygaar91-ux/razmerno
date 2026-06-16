@@ -69,8 +69,8 @@ Conclusion: success
 Final PR head after docs/backlog closure:
 
 ```text
-Head SHA: f7ede34cf8efd2e2aa71f56d1bab4f08a1ebcc2f
-QA run: 236
+Head SHA: 12c5d2dfa9f8bb8dd6afb776c2a0ad05f6380824
+QA run: 237
 Status: completed
 Conclusion: success
 ```
@@ -104,10 +104,10 @@ Duration: 51s
 Final PR-head Vercel bot evidence after docs/backlog update:
 
 ```text
-Deployment id: FAJPqKVm3ATsv3vKxfrwp6qVbLer
+Deployment id: 9HWFNNvZtUsgJkpdRMJZ1vTXn38u
 Environment: Preview
 Status: Ready
-Vercel bot PR comment timestamp: Jun 16, 2026 8:36pm UTC
+Vercel bot PR comment timestamp: Jun 16, 2026 8:39pm UTC
 ```
 
 Final PR-head GitHub combined status evidence:
@@ -115,7 +115,7 @@ Final PR-head GitHub combined status evidence:
 ```text
 Context: Vercel
 State: success
-Head SHA: f7ede34cf8efd2e2aa71f56d1bab4f08a1ebcc2f
+Head SHA: 12c5d2dfa9f8bb8dd6afb776c2a0ad05f6380824
 ```
 
 ## 6. Vercel Raw Logs
@@ -218,7 +218,7 @@ Duration: 51s
 Final PR-head Vercel result:
 
 ```text
-Deployment id: FAJPqKVm3ATsv3vKxfrwp6qVbLer
+Deployment id: 9HWFNNvZtUsgJkpdRMJZ1vTXn38u
 Status: Ready
 Environment: Preview
 GitHub combined status: success
@@ -241,7 +241,7 @@ This does not rewrite older historical failed deployments, but confirms the curr
 Decision:
 
 ```text
-The next Vercel-based visual QA screenshot pass can start after PR #49 is merged into main and main deployment/content verification is complete.
+The next Vercel-based visual QA screenshot pass can start after main deployment/content verification is complete.
 ```
 
 ## 14. Remaining Risks
@@ -272,5 +272,5 @@ The next Vercel-based visual QA screenshot pass can start after PR #49 is merged
 Final P1-22 status:
 
 ```text
-closed after PR #49 merge and main verification
+closed
 ```
