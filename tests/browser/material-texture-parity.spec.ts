@@ -45,8 +45,7 @@ async function openConstructor3D(page: Page, options: { forceFallback?: boolean 
   await page.goto(options.forceFallback ? "/configurator-3d?rzm_webgl=off" : "/configurator-3d");
   await expect(page.locator(".rzm-3d-page")).toBeVisible();
   await expect(viewport(page)).toBeVisible();
-  expect(page.url()).toContain("/configurator-3d");
-  expect(page.url()).not.toContain("/configurator?");
+  expect(new URL(page.url()).pathname).toBe("/configurator-3d");
 }
 
 async function goToMaterialsStep(page: Page) {
