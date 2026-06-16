@@ -266,18 +266,23 @@ Merge/main note: PR merge и main content verification фиксируются в
 
 Статус: closed.
 
-Итог на текущей ветке: частичная реализация продолжена — добавлены/сохранены material markers, 3D preview markers, WebGL fallback/SVG parity markers, отдельный E2E spec, guard-script, package scripts и QA workflow steps.
+Итог: Material / Texture Parity закрыта в `main`. Работа доказывает, что UI material selection, constructor state, 3D preview marker, fallback preview marker/state и submit-compatible state сохраняют один и тот же canonical materialId. Pixel-perfect texture comparison намеренно не входит в scope этой MVP parity-задачи.
 
-Команды, которые должны быть подтверждены CI перед закрытием:
+Доказательство: PR #46 `P1-13 Material / Texture Parity`; final PR head `08a471503ece858fa887cbe8b47c5d3f2ea289b1`; QA run #200 (`27620370555`), job id `81667288718`, завершился `success`; merge commit `7be24a586a3541fab2cdf9e23fa2cc8cedefc2b3`.
+
+Команды, явно выполненные в CI:
 
 ```bash
 npm run check:material-texture-parity
 npm run test:material-texture-parity
 ```
 
+Также в CI прошли build, typecheck, P1-09 checks, P1-10 checks, P1-13 guard, P1-13 E2E, coverage checks и architecture checks.
+
 Документ: `docs/visualization/material-texture-parity-report-v1.md`.
 
-Closure condition: закрыть P1-13 можно только после PR, successful GitHub Actions QA run на финальном head, обновления evidence в этом backlog, merge в `main` и main content verification.
+Closure summary: Material / Texture Parity is closed in main. The work proves that UI material selection, constructor state, 3D preview marker, fallback preview marker/state and submit-compatible state keep the same canonical materialId. Pixel-perfect texture comparison is intentionally out of scope for this MVP parity task.
+
 
 ### P1-21 Release / Post-MVP Visual QA Matrix
 
