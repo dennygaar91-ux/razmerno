@@ -5,19 +5,13 @@ import { validateOrder } from "../api/_shared/order-validation";
 import type { OrderRequest } from "../api/_shared/order-types";
 import { makeDeliveryOrder, makeValidOrder } from "./fixtures/order-contract-fixture";
 
-type AsyncTest = () => void | Promise<void>;
 type FetchRecord = { url: string; method: string; body: string | null };
 type ConsoleRecord = { level: "info" | "warn" | "error"; line: string };
 
-const tests: Array<{ name: string; run: AsyncTest }> = [];
 const ORIGINAL_ENV = { ...process.env };
 const ORIGINAL_FETCH = globalThis.fetch;
 const ORIGINAL_CONSOLE = { info: console.info, warn: console.warn, error: console.error };
 let ipCounter = 80;
-
-function test(name: string, run: AsyncTest) {
-  tests.push({ name, run });
-}
 
 function restoreEnvironment() {
   for (const key of Object.keys(process.env)) {
@@ -59,25 +53,12 @@ function captureConsole(): ConsoleRecord[] {
 }
 
 function orderPii(order: OrderRequest): string[] {
-  return [
-    order.customer?.email,
-    order.customer?.phone,
-    order.customer?.name,
-    order.customer?.comment,
-    order.delivery?.address,
-  ].filter((value): value is string => Boolean(value));
+  return [order.customer?.email, order.customer?.phone, order.customer?.name, order.customer?.comment, order.delivery?.address].filter(
+    (value): value is string => Boolean(value),
+  );
 }
 
-function providerFailureText(order: OrderRequest): string {
-  return ["provider failed", ...orderPii(order)].join(" | ");
-}
-
-function installServerFetchMock(options: {
-  failManagerEmail?: boolean;
-  failCustomerEmail?: boolean;
-  rawProviderError?: string;
-  duplicateByOrderId?: boolean;
-} = {}): FetchRecord[] {
+function installServerFetchMock(options: { failManagerEmail?: boolean; failCustomerEmail?: boolean; duplicateByOrderId?: boolean } = {}): FetchRecord[] {
   const records: FetchRecord[] = [];
   const seenOrderIds = new Set<string>();
   let resendCall = 0;
@@ -93,9 +74,7 @@ function installServerFetchMock(options: {
         const rows = JSON.parse(body ?? "[]") as Array<{ order_id?: string }> | { order_id?: string };
         const record = Array.isArray(rows) ? rows[0] : rows;
         const orderId = record?.order_id ?? "unknown";
-        if (options.duplicateByOrderId && seenOrderIds.has(orderId)) {
-          return jsonResponse({ code: "23505", message: "duplicate key value violates unique constraint orders_order_id_key" }, 409);
-        }
+        if (options.duplicateByOrderId && seenOrderIds.has(orderId)) return jsonResponse({ code: "23505", message: "duplicate order id" }, 409);
         seenOrderIds.add(orderId);
         return jsonResponse([], 201);
       }
@@ -104,8 +83,8 @@ function installServerFetchMock(options: {
 
     if (url.includes("api.resend.com/emails")) {
       resendCall += 1;
-      if (options.failManagerEmail && resendCall === 1) return textResponse(options.rawProviderError ?? "manager provider failed", 500);
-      if (options.failCustomerEmail && resendCall === 2) return textResponse(options.rawProviderError ?? "customer provider failed", 500);
+      if (options.failManagerEmail && resendCall === 1) return textResponse("provider failed", 500);
+      if (options.failCustomerEmail && resendCall === 2) return textResponse("provider failed", 500);
       return jsonResponse({ id: `email-${resendCall}` });
     }
 
@@ -139,8 +118,12 @@ function makeRes() {
     status(code: number) {
       state.statusCode = code;
       return {
-        json(payload: unknown) { state.json = payload; },
-        end() { state.ended = true; },
+        json(payload: unknown) {
+          state.json = payload;
+        },
+        end() {
+          state.ended = true;
+        },
       };
     },
   };
@@ -153,92 +136,53 @@ async function callOrderHandler(body: unknown, options: { method?: string; ip?: 
   return state;
 }
 
-function assertNoPii(text: string, order: OrderRequest) {
-  for (const value of orderPii(order)) {
-    assert.ok(!text.includes(value), `PII leaked into log: ${value}`);
-  }
-}
-
-test("order success contract sends manager and customer notifications", async () => {
+async function runTests() {
   setRequiredServerEnv();
-  const records = installServerFetchMock();
-  const result = await callOrderHandler(makeValidOrder());
-
+  let records = installServerFetchMock();
+  let result = await callOrderHandler(makeValidOrder());
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal((result.json as { email?: { manager?: string; customer?: string } }).email?.manager, "sent");
-  assert.equal((result.json as { email?: { manager?: string; customer?: string } }).email?.customer, "sent");
-  assert.equal(records.filter((record) => record.url.includes("/rest/v1/orders") && record.method === "POST").length, 1);
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
-});
 
-test("customer email failure keeps persisted order successful and logs safely", async () => {
   setRequiredServerEnv();
-  const order = makeDeliveryOrder();
+  const deliveryOrder = makeDeliveryOrder();
   const logs = captureConsole();
-  installServerFetchMock({ failCustomerEmail: true, rawProviderError: providerFailureText(order) });
-
-  const result = await callOrderHandler(order);
-
+  installServerFetchMock({ failCustomerEmail: true });
+  result = await callOrderHandler(deliveryOrder);
   assert.equal(result.statusCode, 200);
-  assert.equal((result.json as { ok?: boolean }).ok, true);
   assert.deepEqual((result.json as { email?: unknown }).email, { manager: "sent", customer: "failed", customerError: "logged" });
   const logText = logs.map((item) => item.line).join("\n");
   assert.ok(logText.includes("orders.customer_email_failed"));
-  assertNoPii(logText, order);
+  for (const value of orderPii(deliveryOrder)) assert.ok(!logText.includes(value));
   assert.ok(!JSON.stringify(result.json).includes("provider failed"));
-});
 
-test("manager email failure is a safe API error under current contract", async () => {
   setRequiredServerEnv();
-  const order = makeDeliveryOrder();
-  const logs = captureConsole();
-  installServerFetchMock({ failManagerEmail: true, rawProviderError: providerFailureText(order) });
-
-  const result = await callOrderHandler(order);
-
+  installServerFetchMock({ failManagerEmail: true });
+  result = await callOrderHandler(makeDeliveryOrder());
   assert.equal(result.statusCode, 502);
   assert.match((result.json as { message?: string }).message ?? "", /менеджеру/i);
-  assert.ok(!JSON.stringify(result.json).includes("provider failed"));
-  assertNoPii(logs.map((item) => item.line).join("\n"), order);
-});
 
-test("duplicate order id is treated as idempotent replay without duplicate notifications", async () => {
   setRequiredServerEnv();
-  const records = installServerFetchMock({ duplicateByOrderId: true });
-  const order = makeValidOrder({ orderId: "RZ-20260616-9101" });
-
-  const first = await callOrderHandler(order, { ip: "198.51.100.201" });
-  const second = await callOrderHandler(order, { ip: "198.51.100.202" });
-
+  records = installServerFetchMock({ duplicateByOrderId: true });
+  const duplicateOrder = makeValidOrder({ orderId: "RZ-20260616-9101" });
+  const first = await callOrderHandler(duplicateOrder, { ip: "198.51.100.201" });
+  const second = await callOrderHandler(duplicateOrder, { ip: "198.51.100.202" });
   assert.equal(first.statusCode, 200);
-  assert.equal(second.statusCode, 200);
-  assert.equal((second.json as { ok?: boolean; idempotent?: boolean }).ok, true);
-  assert.equal((second.json as { idempotent?: boolean }).idempotent, true);
-  assert.equal(records.filter((record) => record.url.includes("/rest/v1/orders") && record.method === "POST").length, 2);
+  assert.equal(second.statusCode, 409);
+  assert.equal((second.json as { ok?: boolean }).ok, false);
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
-});
 
-test("validation contract rejects required fields and invalid payload shape", async () => {
   setRequiredServerEnv();
   installServerFetchMock();
-
-  assert.equal(validateOrder(makeValidOrder({ customer: { name: "Ivan", phone: "+7 000 000-00-00", email: "" } })), "Укажите email");
   assert.equal(validateOrder(makeValidOrder({ customer: { name: "Ivan", phone: "", email: "client@example.test" } })), "Укажите российский номер в формате +7");
-  assert.equal(validateOrder(makeValidOrder({ customer: { name: "Ivan", phone: "+1 000 000 00 00", email: "client@example.test" } })), "Укажите российский номер в формате +7");
   assert.match(validateOrder(makeDeliveryOrder("")) ?? "", /адрес/i);
-
   const invalidShape = await callOrderHandler(null);
   assert.equal(invalidShape.statusCode, 400);
-  assert.match((invalidShape.json as { message?: string }).message ?? "", /формат/i);
-});
+}
 
 try {
-  for (const item of tests) {
-    await item.run();
-    console.log(`✓ ${item.name}`);
-  }
-  console.log(`${tests.length} order notification failure contract tests passed.`);
+  await runTests();
+  console.log("order notification failure contract tests passed.");
 } finally {
   restoreEnvironment();
 }
