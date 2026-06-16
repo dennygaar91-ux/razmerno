@@ -71,13 +71,26 @@ jobs:
           npm run test:production-export
 
       - name: P1-09 Constructor3D submit E2E guard
-        run: npm run check:constructor-submit-e2e
+        run: |
+          echo "npm run check:constructor-submit-e2e" | tee -a p1-09-ci-evidence.log
+          npm run check:constructor-submit-e2e 2>&1 | tee -a p1-09-ci-evidence.log
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
       - name: P1-09 Constructor3D submit E2E
-        run: npm run test:constructor-submit-e2e
+        run: |
+          echo "npm run test:constructor-submit-e2e" | tee -a p1-09-ci-evidence.log
+          npm run test:constructor-submit-e2e 2>&1 | tee -a p1-09-ci-evidence.log
+
+      - name: Upload P1-09 CI evidence log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p1-09-constructor-submit-ci-evidence
+          path: p1-09-ci-evidence.log
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Upload P1-09 Playwright report
         uses: actions/upload-artifact@v4
