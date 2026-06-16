@@ -22,6 +22,13 @@ function safeOrderId(): string {
   return `RZ-${yyyy}${mm}${dd}-${rand}`
 }
 
+function sanitizeNotificationReason(error: unknown): string {
+  return safeErrorMessage(error)
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[redacted-email]')
+    .replace(/(?:\+?7|8)[\s\-()]*\d{3}[\s\-()]*\d{3}[\s\-()]*\d{2}[\s\-()]*\d{2}/g, '[redacted-phone]')
+    .replace(/(?:ул\.|улица|проспект|дом|квартира)[^\n,;]*/gi, '[redacted-address]')
+}
+
 async function persistEmailPatch(orderId: string, patch: Parameters<typeof updateOrderEmailStatus>[1]) {
   const result = await updateOrderEmailStatus(orderId, patch)
   if (!result.ok) {
@@ -92,6 +99,21 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       return res.status(502).json({ ok: false, message: 'Не удалось сохранить заявку. Попробуйте позже.' })
     }
 
+    if ('duplicate' in dbResult && dbResult.duplicate === true) {
+      logEvent('info', 'orders.duplicate_idempotent_replay', { requestId, orderId })
+      return res.status(200).json({
+        ok: true,
+        orderId,
+        receivedAt: new Date().toISOString(),
+        idempotent: true,
+        email: {
+          manager: 'skipped',
+          customer: 'skipped',
+          customerError: null,
+        },
+      })
+    }
+
     let managerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
     let customerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
     let customerEmailError: string | null = null
@@ -102,7 +124,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
         managerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { manager_email_status: managerEmailStatus, manager_email_error: null })
       } catch (error) {
-        const message = safeErrorMessage(error)
+        const message = sanitizeNotificationReason(error)
         await persistEmailPatch(orderId, { manager_email_status: 'failed', manager_email_error: message })
         logEvent('error', 'orders.manager_email_failed', { requestId, orderId, reason: message })
         return res.status(502).json({ ok: false, message: 'Заявка сохранена, но не удалось отправить письмо менеджеру. Попробуйте позже.' })
@@ -118,7 +140,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
         await persistEmailPatch(orderId, { customer_email_status: customerEmailStatus, customer_email_error: null })
       } catch (error) {
         customerEmailStatus = 'failed'
-        customerEmailError = safeErrorMessage(error)
+        customerEmailError = sanitizeNotificationReason(error)
         await persistEmailPatch(orderId, { customer_email_status: 'failed', customer_email_error: customerEmailError })
         logEvent('warn', 'orders.customer_email_failed', { requestId, orderId, reason: customerEmailError })
       }
@@ -140,7 +162,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     logEvent('error', 'orders.submit_failed', { reason: safeErrorMessage(error) })
     return res.status(502).json({
       ok: false,
-      message: error instanceof Error ? error.message : 'Не удалось отправить заявку',
+      message: 'Не удалось отправить заявку',
     })
   }
 }
