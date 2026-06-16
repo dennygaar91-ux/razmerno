@@ -8,11 +8,11 @@
 
 Этот документ фиксирует contract для API/order flow вокруг отказов уведомлений. Главный MVP-инвариант: если core order persistence прошла успешно и manager notification прошёл успешно, отказ customer confirmation email не ломает заявку. Такой отказ фиксируется как `customer: failed`, клиент получает успешный response, а причина отказа логируется только в безопасном виде.
 
-PR #52 подтвердил contract на GitHub Actions QA run #219 (`27639437300`), conclusion `success`, head commit `60b6c29dd0e28eb7c22cb109e23723209444eda2`.
+PR #52 подтвердил contract на GitHub Actions QA run #224 (`27641211635`), conclusion `success`, head commit `b79860d70bba905287f3f33d3dd5cb3cb6830473`.
 
 ## 2. Scope
 
-В scope входят только API/order flow, server-side validation, Supabase order persistence contract, notification failure handling, idempotent duplicate order handling, safe API responses, deterministic tests и backlog evidence.
+В scope входят только API/order flow, server-side validation, Supabase order persistence contract, notification failure handling, duplicate order id conflict handling, safe API responses, deterministic tests и backlog evidence.
 
 Не входят UI, CSS, Constructor, Three.js, Pricing logic, Production/manufacturing layer, Vercel dashboard verification, GitHub issues и PR #51.
 
@@ -61,15 +61,17 @@ Manager notification failure по текущему коду остаётся API
 
 Это поведение зафиксировано как текущий contract, без изменения бизнес-правила на success-with-warning.
 
-## 6. Idempotency Contract
+## 6. Duplicate Order Id Contract
 
-`orderId` используется как practical idempotency key. Если storage возвращает duplicate order id, API трактует это как idempotent replay:
+`orderId` используется как номер заявки, но не считается доказанным idempotency replay без проверки payload. Если storage возвращает duplicate `order_id`, API не создаёт новую заявку и не отправляет повторные manager/customer notifications.
 
-- новая заявка не создаётся;
-- повторные manager/customer notifications не отправляются;
-- response возвращается `200` / `ok: true`;
-- response включает `idempotent: true`;
-- email statuses для replay возвращаются как `skipped`.
+Текущий safe contract:
+
+- duplicate `order_id` возвращает safe `409`;
+- response содержит `ok: false` и пользовательское сообщение о повторной отправке;
+- raw storage/provider details не раскрываются клиенту;
+- duplicate conflict логируется без customer PII;
+- silent `200` replay запрещён, чтобы случайная коллизия номера не потеряла новую заявку.
 
 ## 7. Validation Contract
 
@@ -111,7 +113,7 @@ Notification failure logs не должны содержать:
 - happy path notifications;
 - customer email failure success contract;
 - manager email failure safe error contract;
-- duplicate order id idempotent replay;
+- duplicate order id safe conflict without duplicate notifications;
 - validation cases;
 - PII-safe log assertions;
 - provider error response sanitization.
@@ -127,10 +129,10 @@ Notification failure logs не должны содержать:
 Confirmed PR workflow:
 
 - PR: #52 `API Order Notification Failure Contracts`.
-- Head commit: `60b6c29dd0e28eb7c22cb109e23723209444eda2`.
+- Head commit: `b79860d70bba905287f3f33d3dd5cb3cb6830473`.
 - Workflow: `QA`.
-- Run number: #219.
-- Run id: `27639437300`.
+- Run number: #224.
+- Run id: `27641211635`.
 - Job: `Fast CI gate`.
 - Conclusion: `success`.
 
@@ -177,14 +179,15 @@ The new standalone test uses mocks/test doubles only and is executed via `npm ru
 ## 12. Remaining Risks
 
 - Manager notification failure business behavior remains strict `502`; product may later decide to convert it to success-with-warning after operational review.
-- Duplicate replay returns skipped email statuses because the API does not fetch the previous order email statuses in this MVP contract.
+- True idempotent replay with payload equality is not implemented yet; duplicate `order_id` is intentionally treated as `409` conflict to avoid lost orders from random collisions.
 - Full live Supabase duplicate constraint behavior still requires deployment/RLS verification outside deterministic tests.
 
 ## 13. Closure Review
 
 Pre-merge closure criteria met in PR #52:
 
-1. PR CI succeeded on current head commit `60b6c29dd0e28eb7c22cb109e23723209444eda2`.
+1. PR CI succeeded on current head commit `b79860d70bba905287f3f33d3dd5cb3cb6830473`.
 2. API/order tests passed via `Fast active tests`.
 3. PII-safe notification failure tests passed via `npm run test:checkout-submit-hook`.
-4. PR merge and main content verification remain the final closure actions.
+4. Duplicate `order_id` conflict handling passed via `npm run test:checkout-submit-hook`.
+5. PR merge and main content verification remain the final closure actions.
