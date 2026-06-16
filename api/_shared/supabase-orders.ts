@@ -37,9 +37,9 @@ export async function insertOrderRecord(record: OrderDbInsert) {
 
   if (error) {
     if (isDuplicateOrderError(error)) {
-      return { ok: true as const, skipped: false as const, duplicate: true as const };
+      return { ok: false as const, skipped: false as const, duplicate: true as const, error: "duplicate-order-id" };
     }
-    return { ok: false as const, skipped: false as const, error: error.message };
+    return { ok: false as const, skipped: false as const, duplicate: false as const, error: error.message };
   }
 
   return { ok: true as const, skipped: false as const, duplicate: false as const };
