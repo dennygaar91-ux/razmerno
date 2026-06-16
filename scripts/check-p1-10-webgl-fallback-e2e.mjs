@@ -73,7 +73,7 @@ const requiredWorkflowFragments = [
 
 const forbiddenTestFragments = [
   'page.goto("/configurator")',
-  'page.goto("/configurator?",
+  'page.goto("/configurator?")',
   ".rzm-r19-workspace",
   ".rzm-constructor-stepper",
 ];
