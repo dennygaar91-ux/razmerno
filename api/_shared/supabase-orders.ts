@@ -21,6 +21,11 @@ function getSupabaseClient(): SupabaseClient | null {
   return cachedClient;
 }
 
+function isDuplicateOrderError(error: { code?: string; message?: string } | null | undefined): boolean {
+  const message = error?.message?.toLowerCase() ?? "";
+  return error?.code === "23505" || (message.includes("duplicate") && message.includes("order"));
+}
+
 export async function insertOrderRecord(record: OrderDbInsert) {
   const client = getSupabaseClient();
 
@@ -31,10 +36,13 @@ export async function insertOrderRecord(record: OrderDbInsert) {
   const { error } = await client.from("orders").insert(record);
 
   if (error) {
+    if (isDuplicateOrderError(error)) {
+      return { ok: true as const, skipped: false as const, duplicate: true as const };
+    }
     return { ok: false as const, skipped: false as const, error: error.message };
   }
 
-  return { ok: true as const, skipped: false as const };
+  return { ok: true as const, skipped: false as const, duplicate: false as const };
 }
 
 export async function updateOrderEmailStatus(
