@@ -3,15 +3,16 @@
 Дата: 2026-06-16
 Задача: P1-10 WebGL Fallback E2E
 Ветка: `p1-10-webgl-fallback-e2e`
-Статус документа: pre-CI implementation report. P1-10 нельзя считать закрытой до зелёного GitHub Actions QA run, merge PR в `main` и main content verification.
+PR: #45 `P1-10 WebGL Fallback E2E`
+Статус документа: CI evidence recorded for PR head `f61324fb1de80167ee20c3092d8a049dba676bdd`. Final closure still requires merge into `main` and main content verification.
 
 ## 1. Executive Summary
 
-P1-10 направлена на проверку fail-safe поведения Constructor3D: если WebGL или Three.js runtime недоступен, пользователь должен остаться внутри актуального маршрута `/configurator-3d`, увидеть рабочее fallback-превью мебели, пройти основные шаги настройки, дойти до checkout и не быть заблокированным при отправке заявки.
+P1-10 проверяет fail-safe поведение Constructor3D: если WebGL или Three.js runtime недоступен, пользователь должен остаться внутри актуального маршрута `/configurator-3d`, увидеть рабочее fallback-превью мебели, пройти основные шаги настройки, дойти до checkout и не быть заблокированным при отправке заявки.
 
-В текущем коде уже существовал базовый fallback-путь: `Constructor3DPage` проверял WebGL diagnostics, отключал Three.js viewer при недоступном WebGL и рендерил `TwoDFallbackScene` на базе SVG/2D preview. Пробел был не в самой идее fallback, а в доказуемости: не было отдельного P1-10 E2E, стабильного E2E marker, контролируемой симуляции WebGL failure, package scripts и явного QA workflow step.
+В текущем коде уже был базовый fallback-путь: `Constructor3DPage` проверял WebGL diagnostics, отключал Three.js viewer при недоступном WebGL и рендерил `TwoDFallbackScene` на базе SVG/2D preview. Пробел был в доказуемости: не было отдельного P1-10 E2E, стабильного E2E marker, контролируемой симуляции WebGL failure, package scripts и явного QA workflow step.
 
-В этой ветке добавлены:
+В PR #45 добавлены:
 
 - localhost-only test hook `?rzm_webgl=off` для безопасной симуляции WebGL failure;
 - стабильные fallback-маркеры `data-testid="webgl-fallback-preview"` и `data-webgl-fallback="active"`;
@@ -22,7 +23,7 @@ P1-10 направлена на проверку fail-safe поведения Co
 
 ## 2. Current WebGL Behavior
 
-Текущий Constructor3D route уже содержит WebGL diagnostics и fallback decision:
+Текущий Constructor3D route содержит WebGL diagnostics и fallback decision:
 
 1. `useWebGLDiagnostics()` возвращает статус `checking`, `available` или `unavailable`.
 2. `canRenderThree` истинно только когда выбран режим `three`, WebGL доступен и Three.js runtime не упал.
@@ -64,9 +65,9 @@ Fallback не является отдельной тупиковой стран�
 
 ## 4. Fallback Implementation
 
-Ветка не переписывает основной 3D-конструктор и не делает полноценный инженерный 2D-режим.
+PR #45 не переписывает основной 3D-конструктор и не делает полноценный инженерный 2D-режим.
 
-Изменения минимальны:
+Изменения:
 
 - `src/static-pages/constructor/three/useWebGLAvailable.ts`
   - добавлен `isLocalhostFallbackProbeEnabled()`;
@@ -135,56 +136,64 @@ Guard проверяет:
   run: npm run test:webgl-fallback-e2e
 ```
 
-Отдельный upload artifact для P1-10 пытался добавляться по аналогии с P1-09, но write-вызов на полный workflow с дополнительными artifact steps был заблокирован инструментом. Поэтому evidence для P1-10 на этом этапе ожидается через GitHub Actions step logs. P1-10 всё равно нельзя закрывать без фактического зелёного QA run и проверки логов этих двух steps.
+Отдельный upload artifact для P1-10 не добавлен: при попытке записать расширенный workflow с отдельным P1-10 artifact upload GitHub connector заблокировал write-вызов. Поэтому evidence для P1-10 хранится в GitHub Actions step logs. Это допустимо для P1-10 closure, потому что workflow явно запускает оба P1-10 scripts, а job steps фиксируют их `success`.
 
 ## 9. CI Evidence
 
-Pre-CI статус:
+PR QA evidence:
 
-- PR: not created yet at the time of this report version.
-- QA run: pending.
-- Required commands expected in CI:
-  - `npm run check:webgl-fallback-e2e`
-  - `npm run test:webgl-fallback-e2e`
-- Expected Playwright result: all P1-10 fallback tests passed.
+- PR: #45 `P1-10 WebGL Fallback E2E`.
+- Head commit: `f61324fb1de80167ee20c3092d8a049dba676bdd`.
+- GitHub Actions workflow: `QA`.
+- GitHub Actions run number: `194`.
+- GitHub Actions run id: `27615964539`.
+- Job: `Fast CI gate`.
+- Job id: `81651836131`.
+- Result: `success`.
 
-После зелёного PR QA run этот раздел должен быть обновлён фактическими данными:
+Confirmed successful steps in run #194:
 
-- GitHub Actions run number;
-- run id;
-- final head commit;
-- job/result;
-- relevant step conclusions;
-- Playwright result;
-- PR number;
-- merge commit after merge.
+- `P1-10 WebGL fallback E2E guard` → `success`.
+- `P1-10 WebGL fallback E2E` → `success`.
+- `Typecheck frontend` → `success`.
+- `Typecheck API` → `success`.
+- `Build frontend` → `success`.
+- `P1-09 Constructor3D submit E2E` → `success`.
+
+Commands executed by workflow:
+
+```bash
+npm run check:webgl-fallback-e2e
+npm run test:webgl-fallback-e2e
+```
+
+Artifact note: run #194 uploaded the shared `coverage-summary`, `repository-infrastructure-inventory`, and existing P1-09 artifacts. No separate P1-10 artifact exists in run #194; P1-10 evidence is the workflow step summary/logs.
 
 ## 10. Remaining Risks
 
-1. P1-10 пока не закрыта до CI success и merge в `main`.
-2. E2E работает на `chromium-desktop`; cross-browser/mobile fallback matrix остаётся вне P1-10.
-3. Fallback является MVP fail-safe preview, не production engineering 2D drawing.
-4. P1-10 workflow evidence пока основан на step logs, а не на отдельном P1-10 artifact, потому что artifact workflow update был заблокирован write-инструментом.
-5. Если CI покажет, что headless Chromium не создаёт WebGL context даже в available-сценарии, первый тест нужно адаптировать под environment capability без ослабления fallback proof.
+1. Cross-browser/mobile fallback matrix remains outside P1-10.
+2. Fallback is MVP fail-safe preview, not production engineering 2D drawing.
+3. P1-10 evidence is step-log based rather than a separate P1-10 artifact.
+4. This report records PR QA evidence for head `f61324fb1de80167ee20c3092d8a049dba676bdd`; if documentation-only commits are added after this report, the final merge should use the latest successful PR QA run for the final head.
 
 ## 11. Closure Review
 
-Closure checklist на момент pre-CI:
+Closure checklist based on PR QA run #194:
 
-1. Рабочий WebGL fallback — implemented, pending CI proof.
+1. Рабочий WebGL fallback — implemented.
 2. Simulated WebGL failure — implemented via localhost query hook + Playwright getContext mock.
-3. Fallback не ломает constructor state — covered by E2E, pending CI proof.
-4. Fallback позволяет пройти к checkout — covered by E2E, pending CI proof.
-5. Fallback не блокирует submit path — covered by E2E, pending CI proof.
+3. Fallback не ломает constructor state — covered by P1-10 E2E.
+4. Fallback позволяет пройти к checkout — covered by P1-10 E2E.
+5. Fallback не блокирует submit path — covered by P1-10 E2E.
 6. Separate E2E test file — implemented.
-7. Guard-script — implemented.
+7. Guard-script — implemented and passed in CI.
 8. Package scripts — implemented.
-9. QA workflow explicit steps — implemented.
-10. GitHub Actions QA run success — pending.
-11. CI logs/evidence — pending.
-12. Report — created.
-13. current-backlog update — pending in branch.
-14. PR merged in main — pending.
-15. main content verification — pending.
+9. QA workflow explicit steps — implemented and passed in CI.
+10. GitHub Actions QA run success — run #194 / id `27615964539` success.
+11. CI logs/evidence — workflow step summary confirms both P1-10 steps success.
+12. Report — created and updated with CI evidence.
+13. current-backlog update — updated in PR branch.
+14. PR merged in main — pending at the time of this report update.
+15. main content verification — pending at the time of this report update.
 
-Decision: P1-10 is not closed yet.
+Decision: P1-10 implementation and PR QA evidence are complete. Final project-level closure requires PR #45 merge into `main` and main content verification.
