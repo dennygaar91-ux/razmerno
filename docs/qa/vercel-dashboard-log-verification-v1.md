@@ -69,8 +69,8 @@ Conclusion: success
 Final PR head after docs/backlog closure:
 
 ```text
-Head SHA: 24f6f79de283bef2b9947822b5159c7d82b18d40
-QA run: 235
+Head SHA: f7ede34cf8efd2e2aa71f56d1bab4f08a1ebcc2f
+QA run: 236
 Status: completed
 Conclusion: success
 ```
@@ -104,10 +104,10 @@ Duration: 51s
 Final PR-head Vercel bot evidence after docs/backlog update:
 
 ```text
-Deployment id: BRy5riRihVkJmkpDPxqWJVhHuDC1
+Deployment id: FAJPqKVm3ATsv3vKxfrwp6qVbLer
 Environment: Preview
 Status: Ready
-Vercel bot PR comment timestamp: Jun 16, 2026 8:25pm UTC
+Vercel bot PR comment timestamp: Jun 16, 2026 8:36pm UTC
 ```
 
 Final PR-head GitHub combined status evidence:
@@ -115,7 +115,7 @@ Final PR-head GitHub combined status evidence:
 ```text
 Context: Vercel
 State: success
-Head SHA: 24f6f79de283bef2b9947822b5159c7d82b18d40
+Head SHA: f7ede34cf8efd2e2aa71f56d1bab4f08a1ebcc2f
 ```
 
 ## 6. Vercel Raw Logs
@@ -218,7 +218,7 @@ Duration: 51s
 Final PR-head Vercel result:
 
 ```text
-Deployment id: BRy5riRihVkJmkpDPxqWJVhHuDC1
+Deployment id: FAJPqKVm3ATsv3vKxfrwp6qVbLer
 Status: Ready
 Environment: Preview
 GitHub combined status: success
