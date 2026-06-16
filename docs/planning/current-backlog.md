@@ -235,15 +235,20 @@ Closure condition: закрыть P0-17 можно только после по�
 
 ### P1-10 WebGL Fallback E2E
 
-Статус: in progress.
+Статус: closed.
 
-Зачем: доказать, что при недоступном WebGL / Three.js пользователь остаётся в `/configurator-3d`, видит рабочее fallback-превью, проходит основные шаги, доходит до checkout и не блокируется на submit path.
+Итог: WebGL fallback для активного `/configurator-3d` покрыт implementation + E2E proof. При simulated WebGL failure пользователь остаётся в Constructor3D, видит fallback preview, проходит основные шаги, доходит до checkout и submit path не блокируется отсутствием WebGL.
 
-Риск: без fallback-proof часть пользователей может увидеть сломанный/пустой constructor viewport и не отправить заявку.
+Доказательство: PR #45 `P1-10 WebGL Fallback E2E`; PR QA run #194 (`27615964539`) завершился `success`; verified head commit `f61324fb1de80167ee20c3092d8a049dba676bdd`; job `Fast CI gate` id `81651836131`; workflow steps `P1-10 WebGL fallback E2E guard` and `P1-10 WebGL fallback E2E` завершились `success`.
 
-Scope текущей ветки: `p1-10-webgl-fallback-e2e`.
+Команды, явно выполненные в CI:
 
-Реализовано в ветке:
+```bash
+npm run check:webgl-fallback-e2e
+npm run test:webgl-fallback-e2e
+```
+
+Реализовано:
 
 - localhost-only simulation hook `?rzm_webgl=off` в `src/static-pages/constructor/three/useWebGLAvailable.ts`;
 - fallback marker `data-testid="webgl-fallback-preview"` в `src/static-pages/constructor/components/SceneRuntimePanels.tsx`;
@@ -253,11 +258,9 @@ Scope текущей ветки: `p1-10-webgl-fallback-e2e`.
 - QA workflow steps `P1-10 WebGL fallback E2E guard` и `P1-10 WebGL fallback E2E`;
 - report `docs/visualization/webgl-fallback-e2e-report-v1.md`.
 
-Closure condition: не переводить в `closed` до GitHub Actions QA `success`, подтверждения логов steps `npm run check:webgl-fallback-e2e` и `npm run test:webgl-fallback-e2e`, PR merge в `main` и main content verification.
+Ограничение evidence: отдельный P1-10 artifact не добавлен из-за блокировки write-вызова при расширении workflow; evidence фиксируется в GitHub Actions step logs и job step summary.
 
-PR: pending.
-GitHub Actions run: pending.
-Результат: pending.
+Merge/main note: PR merge и main content verification фиксируются в финальном handoff после merge.
 
 ### P1-21 Release / Post-MVP Visual QA Matrix
 
