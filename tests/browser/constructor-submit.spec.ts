@@ -6,6 +6,7 @@ type SubmittedConstructorOrder = {
   dimensions: { width: number; height: number; depth: number };
   sections: number;
   filling: { shelves: number; drawers: number; hangingRod: boolean };
+  layout?: { sections?: unknown[] };
   materials: {
     bodyId: string;
     facadeId: string;
