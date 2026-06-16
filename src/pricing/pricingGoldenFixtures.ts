@@ -1,3 +1,5 @@
+import type { MaterialToken } from '../shared/materials/materialCatalog';
+
 export type PricingFixtureProductType = 'wardrobe' | 'dresser' | 'nightstand';
 
 export type PricingFixtureFilling = {
@@ -34,10 +36,10 @@ export type PricingGoldenFixture = {
   sections: number;
   filling: PricingFixtureFilling;
   materials: {
-    bodyId: string;
-    facadeId: string;
+    bodyId: MaterialToken;
+    facadeId: MaterialToken;
     facadeKind: 'ldsp' | 'mdf';
-    backPanelId: string;
+    backPanelId: MaterialToken;
     backPanelKind: 'hdf';
   };
   style: PricingFixtureStyle;
@@ -52,7 +54,7 @@ const defaultMaterials = {
   facadeKind: 'ldsp' as const,
   backPanelId: 'hdf-kronospan-k101-belyy-fasadnyy',
   backPanelKind: 'hdf' as const,
-};
+} satisfies PricingGoldenFixture['materials'];
 
 const mdfFacadeMaterials = {
   bodyId: 'ldsp-egger-w960-belyy-klassicheskiy-sm',
@@ -60,7 +62,7 @@ const mdfFacadeMaterials = {
   facadeKind: 'mdf' as const,
   backPanelId: 'hdf-kronospan-k101-belyy-fasadnyy',
   backPanelKind: 'hdf' as const,
-};
+} satisfies PricingGoldenFixture['materials'];
 
 const zeroExpected: PricingGoldenExpected = {
   body: 0,
