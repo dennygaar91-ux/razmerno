@@ -63,7 +63,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   }
 
   const body = req.body as OrderRequest
-  if (body.honeypot?.trim()) {
+  if (body && body.honeypot?.trim()) {
     logEvent('warn', 'orders.honeypot_rejected', { requestId, clientHash: clientKey })
     return res.status(200).json({ ok: true, orderId: safeOrderId(), receivedAt: new Date().toISOString(), spam: 'filtered' })
   }
