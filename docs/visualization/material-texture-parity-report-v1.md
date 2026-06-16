@@ -4,7 +4,7 @@
 
 P1-13 continues the already-started Material / Texture Parity task for active Constructor3D. The scope is visual/rendering parity only: the material selected in UI must be reflected by constructor state, 3D preview markers, WebGL fallback/SVG markers, and submit-compatible state.
 
-Status before CI evidence: **in progress**.
+Final status: **closed in `main`** after PR #46, GitHub Actions QA success, merge and main content verification.
 
 ## 2. Previous Partial Implementation
 
@@ -148,7 +148,7 @@ npm run check:material-texture-parity
 npm run test:material-texture-parity
 ```
 
-Expected package commands:
+Package commands:
 
 ```json
 "check:material-texture-parity": "node scripts/check-p1-13-material-texture-parity.mjs"
@@ -175,9 +175,44 @@ npm run test:material-texture-parity
 
 ## 12. CI Evidence
 
-Pending.
+Final PR head that passed GitHub Actions QA:
 
-This section must be updated after GitHub Actions QA completes on the final PR head.
+```text
+08a471503ece858fa887cbe8b47c5d3f2ea289b1
+```
+
+GitHub Actions QA evidence:
+
+- PR: #46 `P1-13 Material / Texture Parity`;
+- QA run number: #200;
+- run id: `27620370555`;
+- job: `Fast CI gate`;
+- job id: `81667288718`;
+- result: `success`;
+- merge commit: `7be24a586a3541fab2cdf9e23fa2cc8cedefc2b3`.
+
+Commands explicitly executed by CI:
+
+```bash
+npm run check:material-texture-parity
+npm run test:material-texture-parity
+```
+
+Relevant successful CI steps:
+
+- Typecheck frontend;
+- Typecheck API;
+- Build frontend;
+- Fast active tests;
+- P1-09 Constructor3D submit E2E guard;
+- P1-09 Constructor3D submit E2E;
+- P1-10 WebGL fallback E2E guard;
+- P1-10 WebGL fallback E2E;
+- P1-13 Material / Texture parity guard;
+- P1-13 Material / Texture parity E2E;
+- Coverage snapshot;
+- Check CSS architecture;
+- Check production geometry architecture.
 
 ## 13. Remaining Risks
 
@@ -187,11 +222,12 @@ This section must be updated after GitHub Actions QA completes on the final PR h
 
 ## 14. Closure Review
 
-P1-13 can be closed only after:
+P1-13 is closed because:
 
-- PR is opened;
-- GitHub Actions QA completes successfully on final head;
-- CI logs show both P1-13 commands executed;
+- PR #46 was opened and merged;
+- GitHub Actions QA completed successfully on final PR head;
+- CI logs/job steps show both P1-13 commands executed successfully;
 - backlog is updated with final PR/CI/merge evidence;
 - PR is merged into `main`;
-- main content verification confirms all P1-13 files are present.
+- main content verification confirms all P1-13 files are present;
+- GitHub issues were not modified in this continuation.
