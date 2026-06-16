@@ -22,8 +22,21 @@ function safeOrderId(): string {
   return `RZ-${yyyy}${mm}${dd}-${rand}`
 }
 
-function sanitizeNotificationReason(error: unknown): string {
-  return safeErrorMessage(error)
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function redactOrderPii(message: string, body: OrderRequest): string {
+  const samples = [body.customer?.name, body.customer?.phone, body.customer?.email, body.customer?.comment, body.delivery?.address]
+  return samples.reduce((current, sample) => {
+    const value = sample?.trim()
+    if (!value) return current
+    return current.replace(new RegExp(escapeRegExp(value), 'g'), '[redacted]')
+  }, message)
+}
+
+function sanitizeNotificationReason(error: unknown, body: OrderRequest): string {
+  return redactOrderPii(safeErrorMessage(error), body)
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[redacted-email]')
     .replace(/(?:\+?7|8)[\s\-()]*\d{3}[\s\-()]*\d{3}[\s\-()]*\d{2}[\s\-()]*\d{2}/g, '[redacted-phone]')
     .replace(/(?:ул\.|улица|проспект|дом|квартира)[^\n,;]*/gi, '[redacted-address]')
@@ -124,7 +137,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
         managerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { manager_email_status: managerEmailStatus, manager_email_error: null })
       } catch (error) {
-        const message = sanitizeNotificationReason(error)
+        const message = sanitizeNotificationReason(error, pricedBody)
         await persistEmailPatch(orderId, { manager_email_status: 'failed', manager_email_error: message })
         logEvent('error', 'orders.manager_email_failed', { requestId, orderId, reason: message })
         return res.status(502).json({ ok: false, message: 'Заявка сохранена, но не удалось отправить письмо менеджеру. Попробуйте позже.' })
@@ -140,7 +153,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
         await persistEmailPatch(orderId, { customer_email_status: customerEmailStatus, customer_email_error: null })
       } catch (error) {
         customerEmailStatus = 'failed'
-        customerEmailError = sanitizeNotificationReason(error)
+        customerEmailError = sanitizeNotificationReason(error, pricedBody)
         await persistEmailPatch(orderId, { customer_email_status: 'failed', customer_email_error: customerEmailError })
         logEvent('warn', 'orders.customer_email_failed', { requestId, orderId, reason: customerEmailError })
       }
