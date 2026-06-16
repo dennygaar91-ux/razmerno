@@ -54,7 +54,7 @@ P1-22 was opened because GitHub QA was green while Vercel deployment status was 
 
 PR: #49 `P1-22 Vercel Dashboard Log Verification`  
 Branch: `p1-22-vercel-dashboard-log-verification`  
-Verified head SHA: `3bb8907acd5fe62076b09098037daf0bc2763180`
+Verified head SHA before final docs update: `3bb8907acd5fe62076b09098037daf0bc2763180`
 
 GitHub Actions evidence:
 
@@ -90,7 +90,15 @@ Status: Ready / Latest
 Source branch: p1-22-vercel-dashboard-log-verification
 Commit: 3bb8907
 Duration: 51s
-Vercel bot PR comment timestamp: Jun 16, 2026 8:18pm UTC
+```
+
+Final PR-head Vercel bot evidence after docs/backlog update:
+
+```text
+Deployment id: BRy5riRihVkJmkpDPxqWJVhHuDC1
+Environment: Preview
+Status: Ready
+Vercel bot PR comment timestamp: Jun 16, 2026 8:25pm UTC
 ```
 
 ## 6. Vercel Raw Logs
@@ -151,6 +159,7 @@ Evidence chain:
 3. Vercel settings/logs showed build cache/runtime mismatch context.
 4. Vercel redeploy was triggered without cache after settings alignment.
 5. Vercel then executed `npm ci`, installed full dependencies, completed `vite build`, and produced `Ready / Latest`.
+6. Final PR-head deployment after docs/backlog update also reported `Ready` through Vercel bot.
 
 ## 10. Fix Applied / Fix Required
 
@@ -189,7 +198,15 @@ Commit: 3bb8907
 Duration: 51s
 ```
 
-P1-22 deployment blocker is resolved for the PR #49 Preview deployment.
+Final PR-head Vercel bot result:
+
+```text
+Deployment id: BRy5riRihVkJmkpDPxqWJVhHuDC1
+Status: Ready
+Environment: Preview
+```
+
+P1-22 deployment blocker is resolved for PR #49 Preview deployments.
 
 ## 12. Release Impact
 
@@ -228,7 +245,7 @@ The next Vercel-based visual QA screenshot pass can start after PR #49 is merged
 | Dashboard fix applied | Done |
 | Vercel redeploy success | Done |
 | Report updated | Done |
-| Backlog update | Done in PR #49 follow-up commit |
+| Backlog update | Done |
 | GitHub issues untouched | Done |
 | Visual QA screenshot pass decision | Done |
 
