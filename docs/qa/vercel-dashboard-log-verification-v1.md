@@ -6,7 +6,7 @@ Scope: infrastructure / deployment verification only
 
 ## 1. Executive Summary
 
-P1-22 закрыта по результатам Vercel Dashboard log verification и successful Preview redeploy.
+P1-22 закрывается по результатам Vercel Dashboard log verification и successful Preview redeploy.
 
 Raw Vercel log подтвердил исходную ошибку на ветке `p1-22-vercel-dashboard-log-verification`, commit `3bb8907acd5fe62076b09098037daf0bc2763180`:
 
@@ -17,7 +17,7 @@ Error: Command "npm run build" exited with 126
 
 После dashboard-level исправления и redeploy without cache Preview deployment стал `Ready / Latest`.
 
-Финальный PR-head также подтверждается отдельным GitHub QA run и Vercel status; конкретные номера фиксируются в этом документе после завершения последнего docs/backlog update run.
+Финальная блокировка снята при условии, что latest PR #49 head проходит GitHub QA и Vercel status before merge.
 
 ## 2. Scope
 
@@ -68,14 +68,10 @@ Status: completed
 Conclusion: success
 ```
 
-Final docs/backlog update evidence:
+Latest docs/backlog-only head at report lock:
 
 ```text
-Latest docs/backlog head before merge: 288ba9cfa1fd16e8273d74a1fddcba6d688ded38
-Workflow: QA
-Run number: 241
-Run id: 27648090439
-Status: in_progress at the time of this report update
+Head SHA: 6b602eae762d81e6fbfd76fe5e9174896e5affdb
 ```
 
 GitHub QA uses Node 22, `npm ci`, and `npm run build`. PR #49 must not be merged until the latest QA run for the final docs/backlog head is completed with `success`.
@@ -104,7 +100,7 @@ Commit: 3bb8907
 Duration: 51s
 ```
 
-Final PR-head GitHub combined status evidence before the last report refresh:
+Later PR-head GitHub combined status evidence before the last report refresh:
 
 ```text
 Context: Vercel
@@ -113,7 +109,7 @@ Head SHA: 47d397656f2f14072c31acf674868a0cb2d7ce1c
 Target deployment id: 6s1SC84wysEbv6Y8DCEqw3FWzUrV
 ```
 
-Latest head `288ba9cfa1fd16e8273d74a1fddcba6d688ded38` still requires final Vercel status confirmation before merge.
+Latest head `6b602eae762d81e6fbfd76fe5e9174896e5affdb` requires final Vercel status confirmation before merge.
 
 ## 6. Vercel Raw Logs
 
@@ -174,7 +170,7 @@ Evidence chain:
 4. Vercel redeploy was triggered without cache after settings alignment.
 5. Vercel then executed `npm ci`, installed full dependencies, completed `vite build`, and produced `Ready / Latest`.
 6. A later PR-head deployment after docs/backlog update also reported `success` through GitHub combined status.
-7. The latest docs/backlog-only head requires final QA/Vercel confirmation before merge.
+7. Latest docs/backlog-only head requires final QA/Vercel confirmation before merge.
 
 ## 10. Fix Applied / Fix Required
 
@@ -213,7 +209,7 @@ Commit: 3bb8907
 Duration: 51s
 ```
 
-Later PR-head Vercel result before final docs/backlog refresh:
+Later PR-head Vercel result before final report lock:
 
 ```text
 Target deployment id: 6s1SC84wysEbv6Y8DCEqw3FWzUrV
@@ -262,12 +258,12 @@ The next Vercel-based visual QA screenshot pass can start after PR #49 merge and
 | Repository fix applied | Not required |
 | Dashboard fix applied | Done |
 | Vercel redeploy success | Done |
-| Final PR-head GitHub QA success | Pending latest docs/backlog head |
-| Final PR-head Vercel success | Pending latest docs/backlog head |
 | Report updated | Done |
 | Backlog update | Done |
 | GitHub issues untouched | Done |
 | Visual QA screenshot pass decision | Done |
+| Final PR-head GitHub QA success | Pending latest docs/backlog head |
+| Final PR-head Vercel success | Pending latest docs/backlog head |
 
 Final P1-22 status:
 
