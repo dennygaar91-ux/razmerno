@@ -30,7 +30,7 @@ export function ThreeSelectionLayer({
     <group name="three-selection-layer">
       {targets.map((target) => {
         const isHovered = hoveredId === target.id;
-        const showFullLabel = target.selected || isHovered;
+        const showFullLabel = isHovered;
         const showPlus = target.selected;
 
         return (
