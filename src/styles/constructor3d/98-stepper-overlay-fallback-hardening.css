@@ -31,17 +31,29 @@
 }
 
 .rzm-3d-step-copy {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  display: grid;
+  place-items: initial;
   overflow: hidden;
   line-height: 1.05;
+  background: transparent;
 }
 
 .rzm-3d-step-title {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .rzm-3d-step-copy small {
+  width: auto;
+  height: auto;
   display: none;
 }
 
