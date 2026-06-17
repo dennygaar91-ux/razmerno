@@ -73,7 +73,6 @@ Not changed:
 - `src/styles/constructor3d.css`
 - `src/styles/constructor3d/98-stepper-overlay-fallback-hardening.css`
 - `docs/constructor/constructor-stepper-overlay-fallback-hardening-v1.md`
-- `docs/planning/current-backlog.md`
 
 ## QA plan
 
@@ -117,4 +116,4 @@ Technical implementation: completed in branch `constructor-stepper-overlay-fallb
 
 Visual status: pending fresh screenshot verification.
 
-Backlog status: `P2-26` remains open until screenshot artifact evidence confirms VQA-001—VQA-005.
+Backlog status: `P2-26` remains open until screenshot artifact evidence confirms VQA-001—VQA-005. A targeted `current-backlog.md` status note is still required before final closure of the stage if this PR is accepted.
