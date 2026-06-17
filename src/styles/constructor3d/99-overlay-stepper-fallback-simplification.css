@@ -294,7 +294,9 @@
 .rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-random-chip,
 .rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-random-chip,
 .rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-chip,
-.rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-scene-chip {
+.rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-scene-chip,
+.rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-legend,
+.rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-scene-legend {
   display: none;
 }
 
