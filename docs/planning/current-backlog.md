@@ -337,13 +337,20 @@ Closure summary: P1-22 закрыта после получения exact Vercel
 
 Источник: `docs/ux/vercel-visual-qa-findings-v1.md`.
 
+Latest verification: `docs/ux/vercel-visual-qa-verification-after-pr57-v1.md`.
+
 Evidence:
 
-- GitHub Actions workflow: `Vercel Visual QA Screenshots`;
-- run id: `27668876861`;
-- artifact: `vercel-visual-qa-screenshots-27668876861`;
-- artifact id: `7687188747`;
-- commit: `1e25c93578fc8953212d6bf44c0986a9a8a6e3d1`;
+- Initial visual QA workflow: `Vercel Visual QA Screenshots`;
+- initial run id: `27668876861`;
+- initial artifact: `vercel-visual-qa-screenshots-27668876861`;
+- initial artifact id: `7687188747`;
+- initial commit: `1e25c93578fc8953212d6bf44c0986a9a8a6e3d1`;
+- fresh verification run id: `27705896411`;
+- fresh artifact: `vercel-visual-qa-screenshots-27705896411`;
+- fresh artifact id: `7702467233`;
+- fresh artifact digest: `sha256:dd525cc7a3dbb61d959d966baca89d6975f3b71c75bcc0c72d07581ac22f2d9d`;
+- fresh commit: `75082c9d595438cd0407ecab287f4a887537667d`;
 - screenshots reviewed: 37/37;
 - routes reviewed: `/`, `/measurements`, `/materials`, `/assembly`, `/configurator`, `/configurator-3d`, WebGL fallback для `/configurator-3d`, `/admin`;
 - viewports reviewed: `1440×900`, `1280×800`, `768×1024`, `390×844`, `375×812`.
@@ -351,15 +358,16 @@ Evidence:
 Статус visual QA:
 
 ```text
-Visual QA Review — executed with findings; follow-up implementation tasks open.
+Visual QA Review — executed with findings.
+After PR #57 verification — partially improved, P2-26 remains open.
 ```
 
-Severity summary:
+Severity summary after PR #57 verification:
 
-- Blocker: 1;
-- High: 4;
-- Medium: 7;
-- Low: 2.
+- Blocker: 0 for checked VQA-001—VQA-005 scope;
+- High closed: VQA-001, VQA-004;
+- High partial: VQA-002, VQA-003;
+- High open: VQA-005.
 
 Release follow-ups:
 
@@ -367,51 +375,59 @@ Release follow-ups:
    - Impact: mobile constructor не release-safe.
    - Owner: 02 Constructor Agent + 08 UX/UI / Design System Agent.
    - Priority: P1 / release blocker.
-   - Status: open.
+   - Status: closed after PR #57 visual verification.
+   - Evidence: `configurator-3d__mobile-390.png`, `configurator-3d__mobile-375.png`, `configurator-3d__tablet-768.png` from artifact `7702467233`.
 
 2. `VQA-002 / High` — scene labels and add markers are oversized and cover the furniture model.
    - Impact: model preview теряет trust; overlay выглядит как debug layer.
    - Owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
    - Priority: P1/P2 visual release risk.
-   - Status: open.
+   - Status: partial after PR #57 visual verification.
+   - Remaining issue: active `+` marker and inactive zone bubbles still compete with model; mobile scene crop makes overlay feel heavier.
+   - Next owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
 
 3. `VQA-003 / High` — constructor stepper overlaps and loses readability.
    - Impact: пользователь теряет progress context.
    - Owner: 08 UX/UI / Design System Agent + 02 Constructor Agent.
    - Priority: P1/P2.
-   - Status: open.
+   - Status: partial after PR #57 visual verification.
+   - Remaining issue: mobile/tablet are readable, but desktop/laptop labels remain truncated (`Разм`, `Напо`, `Мате`, `Заяв`).
+   - Next owner: 08 UX/UI / Design System Agent + 02 Constructor Agent.
 
 4. `VQA-004 / High` — mobile constructor violates 3D-first hierarchy.
    - Impact: mobile flow выглядит как длинная форма, а не визуальный 3D-конструктор.
    - Owner: 02 Constructor Agent + 08 UX/UI / Design System Agent.
    - Priority: P1/P2.
-   - Status: open.
+   - Status: closed after PR #57 visual verification.
+   - Evidence: `configurator-3d__mobile-390.png`, `configurator-3d__mobile-375.png`, `configurator-3d__tablet-768.png` from artifact `7702467233`.
 
 5. `VQA-005 / High` — WebGL fallback mobile looks crowded/clipped.
    - Impact: fallback может восприниматься как broken state.
    - Owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
    - Priority: P2.
-   - Status: open.
+   - Status: open after PR #57 visual verification.
+   - Remaining issue: mobile fallback CTA overlays preview, bottom chip overlaps drawing, helper text/preview area feel clipped; desktop fallback remains crowded at bottom overlay.
+   - Next owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
 
 6. `VQA-006 / Medium` — desktop fallback usable but crowded.
    - Owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
    - Priority: P2.
-   - Status: open.
+   - Status: open / still visible in fresh artifact.
 
 7. `VQA-007 / Medium` — runtime/price status text concatenated.
    - Owner: 08 UX/UI / Design System Agent + 02 Constructor Agent.
    - Priority: P2.
-   - Status: open.
+   - Status: closed for checked Constructor3D screenshots after PR #57 verification.
 
 8. `VQA-008 / Medium` — “Выйти на сайт” weak contrast.
    - Owner: 08 UX/UI / Design System Agent.
    - Priority: P2.
-   - Status: open.
+   - Status: acceptable in checked desktop/tablet screenshots; keep under general polish unless it regresses.
 
 9. `VQA-009 / Medium` — scene composition unbalanced; model clusters left.
    - Owner: 06 Three.js / Visualization Agent.
    - Priority: P2.
-   - Status: open.
+   - Status: open / still visible in desktop/laptop scene framing.
 
 10. `VQA-010 / Medium` — admin protected screen visually raw/outside design system.
     - Owner: 08 UX/UI / Design System Agent.
@@ -420,8 +436,18 @@ Release follow-ups:
 
 Closure condition:
 
-- implementation follow-ups are not closed by visual QA evidence;
+- P2-26 remains open because VQA-002, VQA-003 and VQA-005 are not fully closed;
 - close only after scoped UI/constructor/visualization fixes, fresh screenshot evidence, GitHub QA success and updated visual report.
+
+Next recommended implementation prompt:
+
+`Constructor Overlay, Stepper Label and WebGL Fallback Visual Polish`
+
+Owners:
+
+- 02 Constructor Agent — shell/stepper component behavior;
+- 06 Three.js / Visualization Agent — scene overlay/marker placement and fallback preview composition;
+- 08 UX/UI / Design System Agent — responsive visual rules, label hierarchy and fallback layout acceptance.
 
 ### P2-22 Accessibility / Focus Visual Pass
 
