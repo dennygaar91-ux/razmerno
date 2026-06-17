@@ -1,7 +1,7 @@
 /* Constructor overlay, stepper and fallback simplification.
    Presentation-only layer after VQA screenshot artifact 27685109856. */
 
-/* Stepper: numbers first, active summary carries the text on narrow layouts. */
+/* Stepper: numbers first; active text stays in the summary on narrow layouts. */
 .rzm-3d-stepper-mobile-summary {
   border-radius: 16px;
   background: rgba(255, 255, 255, .78);
@@ -49,7 +49,9 @@
 
   .rzm-3d-stagebar-meta {
     order: 1;
+    min-width: 0;
     justify-content: flex-start;
+    overflow: hidden;
   }
 
   .rzm-3d-stepper-block {
@@ -90,11 +92,6 @@
     gap: 7px;
   }
 
-  .rzm-3d-stagebar-meta {
-    min-width: 0;
-    overflow: hidden;
-  }
-
   .rzm-3d-status-badge--runtime {
     max-width: 100%;
     min-height: 26px;
@@ -132,7 +129,7 @@
   }
 }
 
-/* Scene overlay scale: keep model dominant. */
+/* Scene overlays: keep the furniture model visually dominant. */
 .rzm-3d-model-label {
   min-width: 18px;
   height: 18px;
@@ -259,7 +256,7 @@
   }
 }
 
-/* WebGL fallback: keep preview and actions in separate rows. */
+/* WebGL fallback: separate status, preview and actions. */
 .rzm-3d-blueprint-fallback {
   grid-template-rows: auto minmax(260px, 1fr) auto;
   gap: 12px;
