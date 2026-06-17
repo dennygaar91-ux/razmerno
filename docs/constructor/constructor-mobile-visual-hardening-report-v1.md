@@ -64,7 +64,10 @@ Out of scope:
 - `src/styles/constructor3d.css`
 - `src/styles/constructor3d/97-mobile-visual-hardening.css`
 - `docs/constructor/constructor-mobile-visual-hardening-report-v1.md`
-- `docs/planning/current-backlog.md`
+
+## Backlog status
+
+`docs/planning/current-backlog.md` was not changed in this implementation PR. `P2-26 Vercel Visual QA Findings Implementation Follow-ups` remains open until a fresh screenshot artifact verifies the visual result.
 
 ## QA commands
 
