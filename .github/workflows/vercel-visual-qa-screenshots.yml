@@ -33,7 +33,7 @@ jobs:
   capture:
     name: Capture Vercel visual QA screenshots
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -81,6 +81,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Capture screenshots
+        id: capture
+        continue-on-error: true
         env:
           TARGET_URL: ${{ inputs.target_url }}
           VISUAL_QA_ROUTES: ${{ inputs.routes }}
@@ -90,6 +92,10 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_WORKFLOW: ${{ github.workflow }}
+          VISUAL_QA_CAPTURE_TIMEOUT_MS: "75000"
+          VISUAL_QA_GOTO_TIMEOUT_MS: "30000"
+          VISUAL_QA_SETTLE_TIMEOUT_MS: "12000"
+          VISUAL_QA_SCREENSHOT_TIMEOUT_MS: "15000"
         run: node scripts/capture-vercel-visual-qa-screenshots.mjs
 
       - name: Upload visual QA screenshots artifact
@@ -98,5 +104,40 @@ jobs:
         with:
           name: vercel-visual-qa-screenshots-${{ github.run_id }}
           path: ${{ env.VISUAL_QA_OUTPUT_DIR }}/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: ${{ inputs.upload_retention_days }}
+
+      - name: Validate screenshot manifest
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          const manifestPath = 'visual-qa-screenshots/manifest.json';
+          let manifest;
+          try {
+            manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+          } catch (error) {
+            console.error(`[visual-qa] Manifest validation failed: ${manifestPath} is missing or invalid.`);
+            console.error(error instanceof Error ? error.message : String(error));
+            process.exit(1);
+          }
+          const summary = manifest.summary || {};
+          const screenshotsWritten = Number(summary.screenshotsWritten || 0);
+          const failed = Number(summary.failed || summary.error || 0);
+          const timedOut = Number(summary.timeout || 0);
+          console.log(`[visual-qa] Manifest summary: total=${summary.total ?? 0} screenshotsWritten=${screenshotsWritten} ok=${summary.ok ?? 0} warning=${summary.warning ?? 0} failed=${failed} timeout=${timedOut}`);
+          if (manifest.lastAttemptedCapture) {
+            console.log(`[visual-qa] Last attempted capture: ${JSON.stringify(manifest.lastAttemptedCapture)}`);
+          }
+          if (screenshotsWritten <= 0) {
+            console.error('[visual-qa] Manifest validation failed: zero screenshots were written.');
+            process.exit(1);
+          }
+          if (failed > 0 || timedOut > 0) {
+            console.error('[visual-qa] Manifest validation failed: one or more captures failed/timed out. Artifact was uploaded for diagnostics.');
+            process.exit(1);
+          }
+          console.log('[visual-qa] Manifest validation passed.');
+          NODE

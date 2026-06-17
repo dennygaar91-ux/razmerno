@@ -2,24 +2,41 @@
 
 Дата: 2026-06-17  
 Роль: 05 Infrastructure / QA Agent  
-Статус: pipeline created / pending workflow_dispatch run  
+Статус: pipeline created / timeout diagnostics hardened  
 Scope: infrastructure / QA only
 
 ## 1. Зачем нужен pipeline
 
-`docs/ux/release-visual-qa-matrix-v1.md` требует фактических browser screenshots для landing, info pages, Constructor3D, responsive states, WebGL fallback и admin route. После закрытия P1-22 Vercel deployment blocker снят, но `docs/ux/vercel-visual-qa-screenshot-pass-v1.md` зафиксировал, что фактический visual QA pass заблокирован: screenshots не были получены, routes/viewports не были визуально проверены, а существующие GitHub Actions artifacts не покрывают release visual QA matrix.
-
-Этот PR создаёт infrastructure toolchain для получения screenshot artifact из GitHub Actions вручную через `workflow_dispatch`.
+`docs/ux/release-visual-qa-matrix-v1.md` требует фактических browser screenshots для landing, info pages, Constructor3D, responsive states, WebGL fallback и admin route. Pipeline создаёт infrastructure toolchain для получения screenshot artifact из GitHub Actions вручную через `workflow_dispatch`.
 
 Важно: pipeline только создаёт способ получить screenshots. Он не выполняет UX/UI visual review автоматически и не закрывает visual QA screenshot pass.
 
-## 2. Что добавлено
+## 2. Почему добавлен timeout diagnostics guard
 
-Добавлены:
+После merge PR #59 workflow `Vercel Visual QA Screenshots #5` был отменён по общему лимиту job:
+
+```text
+exceeded maximum execution time 20m0s
+No files were found with the provided path: visual-qa-screenshots/
+No artifacts will be uploaded
+The operation was canceled
+```
+
+Это не доказывает, что Constructor/CSS сломан. Это показывает, что screenshot capture step завис до общего workflow timeout и не успел записать artifact. Поэтому pipeline усилен:
+
+- per-route/per-viewport diagnostic logs;
+- per-capture timeout guard;
+- manifest, который пишется на старте и после каждого capture;
+- partial artifact upload даже при failed/timeout captures;
+- отдельная post-upload manifest validation step.
+
+## 3. Что входит в pipeline
+
+Файлы pipeline:
 
 - `.github/workflows/vercel-visual-qa-screenshots.yml`;
 - `scripts/capture-vercel-visual-qa-screenshots.mjs`;
-- этот документ.
+- `docs/qa/vercel-visual-qa-screenshot-pipeline-v1.md`.
 
 Не менялись:
 
@@ -32,7 +49,7 @@ Scope: infrastructure / QA only
 - `vercel.json`;
 - GitHub issues.
 
-## 3. Как запускать workflow
+## 4. Как запускать workflow
 
 Открыть GitHub Actions:
 
@@ -54,7 +71,7 @@ routes = /,/measurements,/materials,/assembly,/configurator,/configurator-3d,/ad
 upload_retention_days = 14
 ```
 
-## 4. Workflow inputs
+## 5. Workflow inputs
 
 | Input | Required | Default | Description |
 |---|---:|---|---|
@@ -65,7 +82,7 @@ upload_retention_days = 14
 
 The workflow validates `target_url` before screenshot capture and does not print secrets.
 
-## 5. Routes covered by default
+## 6. Routes covered by default
 
 Default route list:
 
@@ -79,9 +96,9 @@ Default route list:
 
 `vercel.json` currently guarantees direct deploy rewrites only for `/configurator` and `/configurator/(.*)`. To avoid capturing Vercel platform 404 pages for SPA-only routes, the script captures non-direct routes through the deployable `/configurator` entry and then switches the browser URL inside Playwright using client-side history navigation.
 
-If a route returns `404`, `401`, `403`, or another warning state after the deployable entry cannot be reached, the script still captures a screenshot when possible and marks the capture as `warning` in the manifest. A single inaccessible optional route does not fail the pipeline.
+If a route returns `404`, `401`, `403`, or another warning state after the deployable entry cannot be reached, the script still captures a screenshot when possible and marks the capture as `warning` in the manifest. A single inaccessible optional route does not prevent partial artifact creation.
 
-## 6. Viewports covered by default
+## 7. Viewports covered by default
 
 Default viewport list:
 
@@ -91,7 +108,7 @@ Default viewport list:
 - `mobile-390`: `390×844`;
 - `mobile-375`: `375×812`.
 
-## 7. Screenshot naming convention
+## 8. Screenshot naming convention
 
 Screenshots are saved as:
 
@@ -113,7 +130,7 @@ configurator-3d-webgl-fallback__desktop-1440.png
 configurator-3d-webgl-fallback__mobile-390.png
 ```
 
-## 8. Artifact structure
+## 9. Artifact structure
 
 Artifact name:
 
@@ -135,40 +152,74 @@ visual-qa-screenshots/
     ...
 ```
 
-## 9. Manifest fields
+The artifact upload step runs with `if: always()` and `if-no-files-found: warn`. A separate validation step runs after upload and can fail the workflow if manifest evidence shows zero screenshots or failed/timeout captures.
+
+## 10. Manifest fields
 
 `manifest.json` and `manifest.md` include:
 
-- `target_url`;
+- `startedAt`;
+- `completedAt`;
+- `artifactGenerated`;
+- `targetUrl`;
 - commit SHA;
 - workflow run id;
 - workflow name;
 - ref/branch name;
 - route list;
 - viewport list;
-- timestamp;
-- success/warning/error per screenshot;
-- HTTP status if available;
-- navigation mode: `direct` or `spa-history`;
-- screenshot filename;
-- console error count;
-- WebGL fallback marker;
-- skipped/warning reasons.
+- timeout settings;
+- total planned captures;
+- completed captures;
+- successful captures;
+- failed captures;
+- skipped captures;
+- per-capture duration;
+- per-capture status;
+- per-capture error message;
+- last attempted route/viewport/mode;
+- WebGL fallback capture status;
+- console error count.
 
 Interpretation:
 
 - `ok` — screenshot was captured and HTTP status did not indicate route failure;
 - `warning` — screenshot may exist, but route returned 4xx/5xx/unknown status;
-- `error` — navigation/screenshot had an error; if any diagnostic screenshot exists, the manifest references it;
-- pipeline exits non-zero only for systemic failures, such as invalid input or no screenshots written at all.
+- `error` — navigation/screenshot had an error; diagnostic screenshot is attempted;
+- `timeout` — one route/viewport exceeded the per-capture guard and the pipeline continued;
+- pipeline validation fails after artifact upload if zero screenshots exist or any captures fail/timeout.
 
-## 10. WebGL fallback strategy
+## 11. Timeout guards
+
+Current timeout defaults:
+
+```text
+goto timeout: 30000ms
+settle timeout: 12000ms
+screenshot timeout: 15000ms
+single capture timeout: 75000ms
+job timeout: 30m
+```
+
+The script logs before every capture:
+
+```text
+[visual-qa] Capturing route=/configurator-3d viewport=mobile-390 size=390x844 mode=normal output=configurator-3d__mobile-390.png startedAt=...
+```
+
+If a capture times out, the script logs:
+
+```text
+[visual-qa] TIMEOUT route=/configurator-3d viewport=mobile-390 mode=normal after 75000ms
+```
+
+The manifest records the timeout and the script continues to the next route/viewport.
+
+## 12. WebGL fallback strategy
 
 The existing `?rzm_webgl=off` hook is localhost-only and must not be counted as Vercel fallback evidence.
 
-This pipeline uses the preferred safe strategy: Playwright-side WebGL mocking without product-code changes.
-
-Mechanism:
+This pipeline uses Playwright-side WebGL mocking without product-code changes:
 
 - a separate browser context is created for fallback capture;
 - `HTMLCanvasElement.prototype.getContext` is overridden through `context.addInitScript`;
@@ -182,15 +233,15 @@ Fallback screenshots are captured for:
 - `/configurator-3d` at `desktop-1440`;
 - `/configurator-3d` at `mobile-390`.
 
-## 11. Limitations
+## 13. Limitations
 
-- This workflow captures Chromium screenshots only. Cross-browser coverage remains a follow-up for P2-21.
-- It does not interact through every constructor step/state; it captures default route states and fallback state. Deeper forced checkout/error/success states remain UX/UI/Product follow-up work.
+- This workflow captures Chromium screenshots only. Cross-browser coverage remains a follow-up.
+- It does not interact through every constructor step/state; it captures default route states and fallback state.
 - It does not judge visual quality. UX/UI Agent must review the artifact and create product visual findings.
-- It does not close P2-20/P2-21 by itself.
-- If the workflow is not manually run after merge, status remains `pipeline created / not yet run`.
+- It does not close VQA-001—VQA-005 or P2-26 by itself.
+- If `workflow_dispatch` cannot be started from the agent toolset, status remains `pipeline fix merged / awaiting manual workflow_dispatch`.
 
-## 12. QA expectations
+## 14. QA expectations
 
 Expected PR validation:
 
@@ -199,13 +250,7 @@ Expected PR validation:
 - script should run in Node 22 after `npm ci` and `npx playwright install --with-deps chromium`;
 - workflow_dispatch should be run manually against a Ready Vercel URL to produce the artifact.
 
-If workflow_dispatch cannot be started from the agent toolset, the PR can only be reported as:
-
-```text
-pipeline created / not yet run
-```
-
-## 13. Next step after merge
+## 15. Next step after merge
 
 After this PR is merged:
 
@@ -215,13 +260,16 @@ After this PR is merged:
 4. Pass `manifest.json`, `manifest.md`, and screenshots to `08 UX/UI / Design System Agent`.
 5. UX/UI Agent performs the actual visual review and creates findings.
 
-## 14. Closure review
+## 16. Closure review
 
 | Criterion | Status |
 |---|---|
-| workflow_dispatch screenshot pipeline created | Done in PR |
-| screenshot capture script created | Done in PR |
-| manifest JSON/Markdown generated by script | Implemented |
+| workflow_dispatch screenshot pipeline created | Done |
+| per-route/per-viewport diagnostic logs | Implemented |
+| per-capture timeout guard | Implemented |
+| partial manifest write during run | Implemented |
+| partial artifact upload before final validation | Implemented |
+| post-upload manifest validation | Implemented |
 | SPA-safe route capture without `vercel.json` changes | Implemented |
 | Playwright-side WebGL fallback mocking | Implemented |
 | product UI/CSS/components changed | No |
@@ -229,11 +277,11 @@ After this PR is merged:
 | package.json changed | No |
 | vercel.json changed | No |
 | GitHub issues touched | No |
-| workflow_dispatch artifact obtained | Pending manual run |
+| workflow_dispatch artifact obtained after fix | Pending manual run |
 | visual QA screenshot pass completed | No — explicitly out of scope |
 
-Final status for this PR before manual run:
+Final status before manual run:
 
 ```text
-pipeline created / not yet run
+pipeline fixed / awaiting workflow_dispatch
 ```
