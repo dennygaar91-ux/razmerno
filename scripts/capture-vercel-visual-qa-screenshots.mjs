@@ -14,8 +14,7 @@ const FALLBACK_VIEWPORT_NAMES = new Set(["desktop-1440", "mobile-390"]);
 
 function getArg(name) {
   const index = process.argv.indexOf(`--${name}`);
-  if (index === -1) return undefined;
-  return process.argv[index + 1];
+  return index === -1 ? undefined : process.argv[index + 1];
 }
 
 function normalizeBoolean(value, defaultValue = false) {
@@ -25,20 +24,13 @@ function normalizeBoolean(value, defaultValue = false) {
 
 function normalizeTargetUrl(rawTargetUrl) {
   const value = String(rawTargetUrl || "").trim();
-  if (!value) {
-    throw new Error("target_url is required");
-  }
-
+  if (!value) throw new Error("target_url is required");
   const parsed = new URL(value);
-  if (parsed.protocol !== "https:") {
-    throw new Error("target_url must start with https://");
-  }
-
+  if (parsed.protocol !== "https:") throw new Error("target_url must start with https://");
   const host = parsed.hostname.toLowerCase();
   if (host === "localhost" || host === "127.0.0.1" || host.endsWith(".localhost")) {
     throw new Error("target_url must not point to localhost");
   }
-
   parsed.hash = "";
   return parsed;
 }
@@ -46,13 +38,11 @@ function normalizeTargetUrl(rawTargetUrl) {
 function parseRoutes(rawRoutes) {
   const value = String(rawRoutes || "").trim();
   if (!value) return DEFAULT_ROUTES;
-
   const routes = value
     .split(/[\n,]+/)
     .map((route) => route.trim())
     .filter(Boolean)
     .map((route) => (route.startsWith("/") ? route : `/${route}`));
-
   return routes.length > 0 ? [...new Set(routes)] : DEFAULT_ROUTES;
 }
 
@@ -73,13 +63,22 @@ function buildUrl(targetUrl, route) {
   return url.href;
 }
 
+function buildSpaEntryUrl(targetUrl) {
+  const url = new URL("/configurator", targetUrl);
+  url.hash = "";
+  return url.href;
+}
+
+function shouldUseSpaEntry(route) {
+  return route !== "/" && route !== "/configurator" && !route.startsWith("/configurator/");
+}
+
 function shortConsoleMessage(message) {
   return String(message || "").replace(/\s+/g, " ").trim().slice(0, 500);
 }
 
 function statusFromHttp(httpStatus) {
   if (httpStatus === null || httpStatus === undefined) return "warning";
-  if (httpStatus >= 500) return "warning";
   if (httpStatus >= 400) return "warning";
   return "ok";
 }
@@ -95,13 +94,45 @@ async function applyWebGLMock(context) {
     const originalGetContext = HTMLCanvasElement.prototype.getContext;
     HTMLCanvasElement.prototype.getContext = function patchedGetContext(contextId, ...args) {
       const normalized = String(contextId || "").toLowerCase();
-      if (["webgl", "webgl2", "experimental-webgl"].includes(normalized)) {
-        return null;
-      }
-
+      if (["webgl", "webgl2", "experimental-webgl"].includes(normalized)) return null;
       return originalGetContext.apply(this, [contextId, ...args]);
     };
   });
+}
+
+async function switchClientRoute(page, route) {
+  await page.evaluate((nextPath) => {
+    globalThis.history.replaceState({}, "", nextPath);
+    globalThis.dispatchEvent(new Event("popstate"));
+  }, route);
+  await page.waitForFunction((nextPath) => globalThis.location.pathname === nextPath, route, { timeout: 10_000 }).catch(() => undefined);
+}
+
+async function navigateToRoute(page, targetUrl, route) {
+  const finalUrl = buildUrl(targetUrl, route);
+  if (!shouldUseSpaEntry(route)) {
+    const response = await page.goto(finalUrl, { waitUntil: "domcontentloaded", timeout: 45_000 });
+    return {
+      finalUrl,
+      entryUrl: finalUrl,
+      httpStatus: response ? response.status() : null,
+      navigationMode: "direct",
+      warning: null,
+    };
+  }
+
+  const entryUrl = buildSpaEntryUrl(targetUrl);
+  const response = await page.goto(entryUrl, { waitUntil: "domcontentloaded", timeout: 45_000 });
+  const entryStatus = response ? response.status() : null;
+  await switchClientRoute(page, route);
+
+  return {
+    finalUrl,
+    entryUrl,
+    httpStatus: entryStatus,
+    navigationMode: "spa-history",
+    warning: entryStatus && entryStatus >= 400 ? `SPA entry HTTP status ${entryStatus}` : null,
+  };
 }
 
 async function captureOne({ browser, targetUrl, route, viewport, screenshotsDir, fallbackMocked = false, slugOverride }) {
@@ -112,41 +143,37 @@ async function captureOne({ browser, targetUrl, route, viewport, screenshotsDir,
     locale: "ru-RU",
   });
 
-  if (fallbackMocked) {
-    await applyWebGLMock(context);
-  }
+  if (fallbackMocked) await applyWebGLMock(context);
 
   const page = await context.newPage();
   const consoleErrors = [];
   page.on("console", (message) => {
-    if (message.type() === "error") {
-      consoleErrors.push(shortConsoleMessage(message.text()));
-    }
+    if (message.type() === "error") consoleErrors.push(shortConsoleMessage(message.text()));
   });
-  page.on("pageerror", (error) => {
-    consoleErrors.push(shortConsoleMessage(error?.message || error));
-  });
+  page.on("pageerror", (error) => consoleErrors.push(shortConsoleMessage(error?.message || error)));
 
-  const url = buildUrl(targetUrl, route);
   const routeSlug = slugOverride || routeToSlug(route);
   const filename = `${routeSlug}__${viewport.name}.png`;
   const filePath = path.join(screenshotsDir, filename);
   const relativePath = `screenshots/${filename}`;
 
-  let httpStatus = null;
+  let navigation = {
+    finalUrl: buildUrl(targetUrl, route),
+    entryUrl: buildUrl(targetUrl, route),
+    httpStatus: null,
+    navigationMode: "direct",
+    warning: null,
+  };
   let status = "ok";
   let warning = null;
   let error = null;
   let screenshotWritten = false;
 
   try {
-    const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45_000 });
-    httpStatus = response ? response.status() : null;
-    status = statusFromHttp(httpStatus);
-    if (status === "warning") {
-      warning = `HTTP status ${httpStatus ?? "unknown"}`;
-    }
-
+    navigation = await navigateToRoute(page, targetUrl, route);
+    status = statusFromHttp(navigation.httpStatus);
+    warning = navigation.warning;
+    if (status === "warning") warning = warning || `HTTP status ${navigation.httpStatus ?? "unknown"}`;
     await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
     await page.waitForTimeout(1_000);
     await page.screenshot({ path: filePath, fullPage: true, animations: "disabled" });
@@ -154,7 +181,6 @@ async function captureOne({ browser, targetUrl, route, viewport, screenshotsDir,
   } catch (captureError) {
     status = "error";
     error = captureError instanceof Error ? captureError.message : String(captureError);
-
     try {
       await page.screenshot({ path: filePath, fullPage: true, animations: "disabled" });
       screenshotWritten = true;
@@ -170,13 +196,15 @@ async function captureOne({ browser, targetUrl, route, viewport, screenshotsDir,
   const result = {
     route,
     routeSlug,
-    url,
+    url: navigation.finalUrl,
+    entryUrl: navigation.entryUrl,
+    navigationMode: navigation.navigationMode,
     viewport: viewport.name,
     width: viewport.width,
     height: viewport.height,
     filename,
     file: screenshotWritten ? relativePath : null,
-    httpStatus,
+    httpStatus: navigation.httpStatus,
     status,
     warning,
     error,
@@ -186,8 +214,7 @@ async function captureOne({ browser, targetUrl, route, viewport, screenshotsDir,
   };
 
   const label = fallbackMocked ? `${route} [webgl-fallback]` : route;
-  console.log(`[${result.status}] ${label} ${viewport.name} -> ${result.file || "no screenshot"}`);
-
+  console.log(`[${result.status}] ${label} ${viewport.name} (${result.navigationMode}) -> ${result.file || "no screenshot"}`);
   return result;
 }
 
@@ -217,24 +244,21 @@ function buildMarkdownManifest(manifest) {
   lines.push("");
   lines.push("## Viewports");
   lines.push("");
-  for (const viewport of manifest.viewports) {
-    lines.push(`- ${viewport.name}: ${viewport.width}x${viewport.height}`);
-  }
+  for (const viewport of manifest.viewports) lines.push(`- ${viewport.name}: ${viewport.width}x${viewport.height}`);
   lines.push("");
   lines.push("## Captures");
   lines.push("");
-  lines.push("| Status | Route | Viewport | HTTP | Fallback | File | Warning |");
-  lines.push("|---|---|---|---:|---|---|---|");
+  lines.push("| Status | Route | Viewport | HTTP | Navigation | Fallback | File | Warning |");
+  lines.push("|---|---|---|---:|---|---|---|---|");
   for (const capture of manifest.captures) {
-    lines.push(
-      `| ${capture.status} | ${capture.route} | ${capture.viewport} | ${capture.httpStatus ?? ""} | ${capture.fallbackMocked ? "yes" : "no"} | ${capture.file || ""} | ${capture.warning || capture.error || ""} |`,
-    );
+    lines.push(`| ${capture.status} | ${capture.route} | ${capture.viewport} | ${capture.httpStatus ?? ""} | ${capture.navigationMode} | ${capture.fallbackMocked ? "yes" : "no"} | ${capture.file || ""} | ${capture.warning || capture.error || ""} |`);
   }
   lines.push("");
   lines.push("## Interpretation");
   lines.push("");
   lines.push("This artifact is screenshot evidence only. It does not complete UX/UI visual review by itself.");
-  lines.push("Routes with 404/auth/blocked states are captured and marked as warning instead of failing the pipeline immediately.");
+  lines.push("SPA-only routes are captured through the deployable app entry route and browser history navigation, so Vercel platform 404 pages are not mistaken for app screens.");
+  lines.push("Routes with inaccessible/auth/blocked states are captured and marked as warning instead of failing the pipeline immediately.");
   lines.push("WebGL fallback screenshots use Playwright-side canvas WebGL mocking and do not rely on the localhost-only `?rzm_webgl=off` hook.");
   lines.push("");
   return `${lines.join("\n")}\n`;
@@ -252,46 +276,40 @@ async function main() {
   console.log(`Routes: ${routes.join(", ")}`);
   console.log(`Viewports: ${VIEWPORTS.map((viewport) => `${viewport.name}=${viewport.width}x${viewport.height}`).join(", ")}`);
   console.log(`Playwright WebGL fallback capture: ${captureWebglFallback ? "enabled" : "disabled"}`);
+  console.log("SPA-only routes use the deployable /configurator entry plus browser history navigation.");
 
   const browser = await chromium.launch({ args: ["--no-sandbox", "--disable-dev-shm-usage"] });
   const captures = [];
 
   try {
     for (const route of routes) {
-      for (const viewport of VIEWPORTS) {
-        captures.push(await captureOne({ browser, targetUrl, route, viewport, screenshotsDir }));
-      }
+      for (const viewport of VIEWPORTS) captures.push(await captureOne({ browser, targetUrl, route, viewport, screenshotsDir }));
     }
 
     if (captureWebglFallback) {
       for (const viewport of VIEWPORTS.filter((candidate) => FALLBACK_VIEWPORT_NAMES.has(candidate.name))) {
-        captures.push(
-          await captureOne({
-            browser,
-            targetUrl,
-            route: "/configurator-3d",
-            viewport,
-            screenshotsDir,
-            fallbackMocked: true,
-            slugOverride: "configurator-3d-webgl-fallback",
-          }),
-        );
+        captures.push(await captureOne({
+          browser,
+          targetUrl,
+          route: "/configurator-3d",
+          viewport,
+          screenshotsDir,
+          fallbackMocked: true,
+          slugOverride: "configurator-3d-webgl-fallback",
+        }));
       }
     }
   } finally {
     await browser.close();
   }
 
-  const summary = captures.reduce(
-    (accumulator, capture) => {
-      accumulator.total += 1;
-      accumulator[capture.status] = (accumulator[capture.status] || 0) + 1;
-      if (capture.file) accumulator.screenshotsWritten += 1;
-      if (capture.fallbackMocked) accumulator.webglFallbackCaptures += 1;
-      return accumulator;
-    },
-    { total: 0, ok: 0, warning: 0, error: 0, screenshotsWritten: 0, webglFallbackCaptures: 0 },
-  );
+  const summary = captures.reduce((accumulator, capture) => {
+    accumulator.total += 1;
+    accumulator[capture.status] = (accumulator[capture.status] || 0) + 1;
+    if (capture.file) accumulator.screenshotsWritten += 1;
+    if (capture.fallbackMocked) accumulator.webglFallbackCaptures += 1;
+    return accumulator;
+  }, { total: 0, ok: 0, warning: 0, error: 0, screenshotsWritten: 0, webglFallbackCaptures: 0 });
 
   const manifest = {
     generatedAt: new Date().toISOString(),
@@ -309,9 +327,7 @@ async function main() {
   await writeFile(path.join(outputDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
   await writeFile(path.join(outputDir, "manifest.md"), buildMarkdownManifest(manifest), "utf8");
 
-  if (summary.screenshotsWritten === 0) {
-    throw new Error("No screenshots were written. Treating this as a systemic pipeline failure.");
-  }
+  if (summary.screenshotsWritten === 0) throw new Error("No screenshots were written. Treating this as a systemic pipeline failure.");
 
   console.log(`Screenshots written: ${summary.screenshotsWritten}/${summary.total}`);
   console.log(`Manifest written to ${path.join(outputDir, "manifest.json")}`);
