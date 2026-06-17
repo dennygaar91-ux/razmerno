@@ -23,11 +23,17 @@ export function ConstructorStagebar({
   onStepChange: (step: StepKey) => void;
 }) {
   const currentStepIndex = stepOrder.indexOf(step);
+  const currentStepNumber = currentStepIndex + 1;
+  const currentStepSummary = `Шаг ${currentStepNumber} из ${stepOrder.length}: ${stepLabels[step]}`;
 
   return (
     <div className="rzm-3d-stagebar rzm-3d-stagebar--stage05 rzm-3d-stagebar--stage06 rzm-3d-stagebar--stage08">
       <div className="rzm-3d-stepper-block">
         <span className="rzm-3d-stagebar-eyebrow">Шаги конструктора</span>
+        <div className="rzm-3d-stepper-mobile-summary" aria-hidden="true">
+          <span>{currentStepSummary}</span>
+          <strong>{stepDescriptions[step]}</strong>
+        </div>
         <div className="rzm-3d-stepper" aria-label="Шаги конструктора" role="list">
           {stepOrder.map((item, index) => {
             const state = getStepVisualState(item, index, currentStepIndex, validation);
@@ -42,6 +48,7 @@ export function ConstructorStagebar({
                   onClick={() => onStepChange(item)}
                   aria-label={`Открыть шаг ${index + 1}: ${stepLabels[item]}, ${stepStateLabels[state]}`}
                   aria-current={isActive ? "step" : undefined}
+                  data-step-index={index + 1}
                 >
                   <span className="rzm-3d-step-index" aria-hidden="true">
                     {isCompleted ? "✓" : index + 1}

@@ -1,0 +1,560 @@
+/* VQA-001..VQA-009 — targeted Constructor3D shell hardening.
+   Scope guard: layout/presentation only; no pricing/API/production/Three.js runtime changes. */
+
+.rzm-3d-stepper-mobile-summary {
+  display: none;
+}
+
+.rzm-3d-runtime-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.rzm-3d-runtime-status > span,
+.rzm-3d-runtime-status > em {
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.rzm-3d-runtime-status > span + span::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 8px 2px 0;
+  border-radius: 999px;
+  background: rgba(42, 44, 65, .28);
+}
+
+.rzm-ui-btn--exit,
+.rzm-constructor-shell-exit {
+  color: #2a2c41;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: inset 0 0 0 1px rgba(42, 44, 65, .18);
+}
+
+.rzm-3d-model-label {
+  min-width: 24px;
+  height: 24px;
+  padding-inline: 7px;
+  font-size: 11px;
+  box-shadow: 0 8px 18px rgba(42, 44, 65, .07);
+}
+
+.rzm-3d-model-plus {
+  width: 38px;
+  height: 38px;
+  font-size: 21px;
+  box-shadow: 0 12px 28px rgba(255, 114, 76, .24), inset 0 0 0 1px rgba(255, 255, 255, .28);
+}
+
+.rzm-3d-blueprint-status small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.rzm-3d-blueprint-actions .rzm-ui-btn {
+  white-space: normal;
+}
+
+@media (max-width: 1100px) {
+  .rzm-3d-page {
+    padding-top: 94px;
+  }
+
+  .rzm-constructor-shell-header-wrap {
+    top: 10px;
+  }
+
+  .rzm-constructor-shell-header,
+  .rzm-3d-shell {
+    width: min(100vw - 24px, 1440px);
+  }
+
+  .rzm-constructor-shell-header {
+    min-height: 58px;
+    grid-template-columns: minmax(132px, auto) minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 24px;
+  }
+
+  .rzm-constructor-shell-status strong {
+    font-size: 14px;
+  }
+
+  .rzm-constructor-shell-status small {
+    display: none;
+  }
+
+  .rzm-constructor-shell-reset,
+  .rzm-constructor-shell-exit {
+    min-height: 38px;
+    padding-inline: 12px;
+  }
+
+  .rzm-3d-stagebar {
+    min-height: 64px;
+    padding: 10px;
+    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .rzm-3d-stagebar-eyebrow {
+    display: none;
+  }
+
+  .rzm-3d-stepper {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+
+  .rzm-3d-step-wrap,
+  .rzm-3d-step {
+    min-width: 0;
+  }
+
+  .rzm-3d-step {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+    padding: 6px 8px;
+    border-radius: 18px;
+  }
+
+  .rzm-3d-step-copy small {
+    display: none;
+  }
+
+  .rzm-3d-stagebar-meta {
+    align-self: stretch;
+  }
+
+  .rzm-3d-status-badge--runtime {
+    min-height: 34px;
+    white-space: nowrap;
+  }
+
+  .rzm-3d-workspace {
+    min-height: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .rzm-3d-scene-card {
+    order: 1;
+    min-height: 0;
+    padding: 12px;
+    border-radius: 28px;
+  }
+
+  .rzm-3d-drawer {
+    order: 2;
+    position: relative;
+    top: auto;
+    height: auto;
+    max-height: none;
+    display: grid;
+    grid-template-rows: minmax(0, auto) auto;
+    padding: 12px;
+    border-radius: 28px 28px 0 0;
+  }
+
+  .rzm-3d-drawer-body {
+    max-height: min(48vh, 470px);
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .rzm-3d-drawer-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 6;
+    margin-top: 10px;
+  }
+
+  .rzm-3d-toolbar {
+    min-height: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 6px 4px 10px;
+  }
+
+  .rzm-3d-toolbar strong {
+    max-width: 100%;
+    font-size: 15px;
+    white-space: normal;
+  }
+
+  .rzm-3d-view-switch,
+  .rzm-3d-mode-switch,
+  .rzm-3d-render-switch {
+    justify-self: start;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .rzm-3d-view-switch button,
+  .rzm-3d-render-switch button {
+    min-height: 32px;
+    padding-inline: 10px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .rzm-3d-viewport {
+    min-height: clamp(390px, 55vh, 560px);
+    border-radius: 24px;
+  }
+
+  .rzm-3d-random-chip {
+    left: 12px;
+    bottom: 12px;
+    min-height: 36px;
+    padding-inline: 13px;
+    font-size: 12px;
+  }
+
+  .rzm-3d-scene-info {
+    max-width: min(320px, calc(100% - 24px));
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 760px) {
+  .rzm-3d-page {
+    padding: 78px 10px 14px;
+  }
+  
+
+  .rzm-constructor-shell-header {
+    width: calc(100vw - 16px);
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+    min-height: 52px;
+    gap: 8px;
+    border-radius: 20px;
+  }
+
+  .rzm-constructor-shell-logo .rzm-logo-image-wrap {
+    width: 34px;
+    height: 34px;
+  }
+
+  .rzm-constructor-shell-logo .rzm-logo-word {
+    display: none;
+  }
+
+  .rzm-constructor-shell-status {
+    gap: 0;
+  }
+
+  .rzm-constructor-shell-status span {
+    font-size: 9px;
+  }
+
+  .rzm-constructor-shell-status strong {
+    font-size: 13px;
+    line-height: 1.05;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rzm-constructor-shell-actions {
+    gap: 6px;
+  }
+
+  .rzm-constructor-shell-reset,
+  .rzm-constructor-shell-exit {
+    min-height: 34px;
+    padding-inline: 9px;
+    font-size: 12px;
+  }
+
+  .rzm-constructor-shell-exit {
+    display: none;
+  }
+
+  .rzm-3d-shell {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .rzm-3d-stagebar {
+    display: grid;
+    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 10px;
+    border-radius: 22px;
+  }
+
+  .rzm-3d-stagebar-meta {
+    order: 1;
+    justify-content: flex-start;
+  }
+
+  .rzm-3d-stepper-block {
+    order: 2;
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .rzm-3d-stepper-mobile-summary {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .rzm-3d-stepper-mobile-summary span {
+    color: rgba(42, 44, 65, .56);
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .rzm-3d-stepper-mobile-summary strong {
+    color: #2a2c41;
+    font-size: 13px;
+    line-height: 1.18;
+    font-weight: 780;
+    letter-spacing: -.025em;
+  }
+
+  .rzm-3d-stepper {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rzm-3d-step {
+    min-height: 34px;
+    padding: 4px;
+    border-radius: 999px;
+    gap: 0;
+  }
+
+  .rzm-3d-step-index {
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+  }
+
+  .rzm-3d-step-copy {
+    display: none;
+  }
+
+  .rzm-3d-step.is-active .rzm-3d-step-copy {
+    display: none;
+  }
+
+  .rzm-3d-step-issue {
+    top: -3px;
+    right: -3px;
+  }
+
+  .rzm-3d-status-badge--runtime {
+    min-height: 28px;
+    padding-inline: 10px;
+    font-size: 11px;
+  }
+
+  .rzm-3d-scene-card {
+    padding: 9px;
+    border-radius: 22px;
+  }
+
+  .rzm-3d-viewport {
+    min-height: clamp(320px, 47vh, 430px);
+    border-radius: 20px;
+  }
+
+  .rzm-3d-drawer {
+    padding: 10px;
+    border-radius: 24px;
+  }
+
+  .rzm-3d-drawer-body {
+    max-height: 42vh;
+    gap: 10px;
+  }
+
+  .rzm-3d-step-intro h1 {
+    font-size: 24px;
+  }
+
+  .rzm-3d-step-intro p {
+    font-size: 13px;
+  }
+
+  .rzm-3d-control-row {
+    min-height: 58px;
+    padding: 10px;
+  }
+
+  .rzm-3d-control-row strong {
+    font-size: 17px;
+  }
+
+  .rzm-3d-mini-control button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .rzm-3d-drawer-footer {
+    border-radius: 20px;
+    padding: 11px;
+  }
+
+  .rzm-3d-drawer-actions {
+    display: grid;
+    grid-template-columns: minmax(82px, .36fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .rzm-3d-drawer-actions button {
+    min-height: 42px;
+    padding-inline: 10px;
+  }
+
+  .rzm-3d-model-label {
+    min-width: 20px;
+    height: 20px;
+    padding-inline: 5px;
+    font-size: 10px;
+    box-shadow: 0 6px 14px rgba(42, 44, 65, .06);
+  }
+
+   .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
+     max-width: 46px;
+     overflow: hidden;
+     color: rgba(42, 44, 65, .72);
+     text-overflow: ellipsis;
+   }
+
+  .rzm-3d-model-plus {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+
+  .rzm-3d-blueprint-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    align-content: stretch;
+    justify-items: stretch;
+    gap: 10px;
+    padding: 12px;
+    overflow: hidden auto;
+  }
+   .rzm-3d-blueprint-fallback
+   .rzm-3d-blueprint-actions
+   .rzm-3d-random-chip
+
+  .rzm-3d-blueprint-status {
+    position: static;
+    width: 100%;
+    display: grid;
+    gap: 5px;
+    padding: 9px;
+    border-radius: 16px;
+  }
+
+  .rzm-3d-blueprint-status span,
+  .rzm-3d-blueprint-status strong,
+  .rzm-3d-blueprint-status small {
+    margin: 0;
+  }
+
+  .rzm-3d-blueprint-status span {
+    width: fit-content;
+    min-height: 22px;
+    font-size: 10px;
+  }
+
+  .rzm-3d-blueprint-status strong {
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .rzm-3d-blueprint-status small {
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .rzm-3d-blueprint-fallback .rzm-constructor-model,
+  .rzm-3d-blueprint-fallback .rzm-constructor-svg-model {
+    width: 100%;
+    max-height: 100%;
+    align-self: center;
+  }
+
+  .rzm-3d-blueprint-actions {
+    position: static;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 7px;
+    border-radius: 16px;
+  }
+
+  .rzm-3d-blueprint-actions .rzm-ui-btn {
+    min-height: 40px;
+    justify-content: center;
+  }
+
+  .rzm-3d-runtime-status {
+    gap: 4px 8px;
+  }
+
+  .rzm-3d-runtime-status > span + span::before {
+    margin-right: 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .rzm-3d-page {
+    padding-inline: 8px;
+  }
+
+  .rzm-constructor-shell-header {
+    width: calc(100vw - 12px);
+    padding-inline: 8px;
+  }
+
+  .rzm-constructor-shell-reset {
+    max-width: 92px;
+  }
+
+  .rzm-3d-toolbar span {
+    font-size: 9px;
+  }
+
+  .rzm-3d-toolbar strong {
+    font-size: 13px;
+  }
+
+  .rzm-3d-viewport {
+    min-height: 310px;
+  }
+
+  .rzm-3d-drawer-body {
+    max-height: 40vh;
+  }
+
+  .rzm-3d-random-chip {
+    bottom: 10px;
+    left: 10px;
+    min-height: 32px;
+    padding-inline: 11px;
+    font-size: 11px;
+  }
+}
