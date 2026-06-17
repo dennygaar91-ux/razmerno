@@ -331,6 +331,28 @@ Closure summary: P1-22 закрыта после получения exact Vercel
 
 Риск: mobile/tablet/browser-specific визуальные поломки останутся непокрытыми.
 
+### P2-26 Vercel Visual QA Findings Implementation Follow-ups
+
+Статус: open.
+
+Источник: `docs/ux/vercel-visual-qa-findings-v1.md`.
+
+Evidence:
+
+- GitHub Actions workflow: `Vercel Visual QA Screenshots`;
+- run id: `27668876861`;
+- artifact: `vercel-visual-qa-screenshots-27668876861`;
+- artifact id: `7687188747`;
+- commit: `1e25c93578fc8953212d6bf44c0986a9a8a6e3d1`;
+- screenshots reviewed: 37/37;
+- routes reviewed: `/`, `/measurements`, `/materials`, `/assembly`, `/configurator`, `/configurator-3d`, WebGL fallback для `/configurator-3d`, `/admin`;
+- viewports reviewed: `1440×900`, `1280×800`, `768×1024`, `390×844`, `375×812`.
+
+Статус visual QA:
+
+```text
+Visual QA Review — executed with findings; follow-up implementation tasks open.
+
 ### P2-22 Accessibility / Focus Visual Pass
 
 Статус: open.
