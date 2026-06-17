@@ -231,6 +231,7 @@
   .rzm-3d-page {
     padding: 78px 10px 14px;
   }
+  
 
   .rzm-constructor-shell-header {
     width: calc(100vw - 16px);
@@ -429,15 +430,12 @@
     box-shadow: 0 6px 14px rgba(42, 44, 65, .06);
   }
 
-  .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
-    max-width: 24px;
-    overflow: hidden;
-    color: transparent;
-  }
-
-  .rzm-3d-model-label:not(.is-selected):not(.is-hovered)::first-letter {
-    color: rgba(42, 44, 65, .72);
-  }
+   .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
+     max-width: 46px;
+     overflow: hidden;
+     color: rgba(42, 44, 65, .72);
+     text-overflow: ellipsis;
+   }
 
   .rzm-3d-model-plus {
     width: 32px;
@@ -456,6 +454,9 @@
     padding: 12px;
     overflow: hidden auto;
   }
+   .rzm-3d-blueprint-fallback
+   .rzm-3d-blueprint-actions
+   .rzm-3d-random-chip
 
   .rzm-3d-blueprint-status {
     position: static;
