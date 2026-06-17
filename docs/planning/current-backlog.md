@@ -352,6 +352,76 @@ Evidence:
 
 ```text
 Visual QA Review — executed with findings; follow-up implementation tasks open.
+```
+
+Severity summary:
+
+- Blocker: 1;
+- High: 4;
+- Medium: 7;
+- Low: 2.
+
+Release follow-ups:
+
+1. `VQA-001 / Blocker` — mobile constructor shell visually collapses: overlap header/title/reset/stepper, scene уходит ниже длинной controls card.
+   - Impact: mobile constructor не release-safe.
+   - Owner: 02 Constructor Agent + 08 UX/UI / Design System Agent.
+   - Priority: P1 / release blocker.
+   - Status: open.
+
+2. `VQA-002 / High` — scene labels and add markers are oversized and cover the furniture model.
+   - Impact: model preview теряет trust; overlay выглядит как debug layer.
+   - Owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
+   - Priority: P1/P2 visual release risk.
+   - Status: open.
+
+3. `VQA-003 / High` — constructor stepper overlaps and loses readability.
+   - Impact: пользователь теряет progress context.
+   - Owner: 08 UX/UI / Design System Agent + 02 Constructor Agent.
+   - Priority: P1/P2.
+   - Status: open.
+
+4. `VQA-004 / High` — mobile constructor violates 3D-first hierarchy.
+   - Impact: mobile flow выглядит как длинная форма, а не визуальный 3D-конструктор.
+   - Owner: 02 Constructor Agent + 08 UX/UI / Design System Agent.
+   - Priority: P1/P2.
+   - Status: open.
+
+5. `VQA-005 / High` — WebGL fallback mobile looks crowded/clipped.
+   - Impact: fallback может восприниматься как broken state.
+   - Owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
+   - Priority: P2.
+   - Status: open.
+
+6. `VQA-006 / Medium` — desktop fallback usable but crowded.
+   - Owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
+   - Priority: P2.
+   - Status: open.
+
+7. `VQA-007 / Medium` — runtime/price status text concatenated.
+   - Owner: 08 UX/UI / Design System Agent + 02 Constructor Agent.
+   - Priority: P2.
+   - Status: open.
+
+8. `VQA-008 / Medium` — “Выйти на сайт” weak contrast.
+   - Owner: 08 UX/UI / Design System Agent.
+   - Priority: P2.
+   - Status: open.
+
+9. `VQA-009 / Medium` — scene composition unbalanced; model clusters left.
+   - Owner: 06 Three.js / Visualization Agent.
+   - Priority: P2.
+   - Status: open.
+
+10. `VQA-010 / Medium` — admin protected screen visually raw/outside design system.
+    - Owner: 08 UX/UI / Design System Agent.
+    - Priority: P2, covered by / related to P2-25.
+    - Status: open.
+
+Closure condition:
+
+- implementation follow-ups are not closed by visual QA evidence;
+- close only after scoped UI/constructor/visualization fixes, fresh screenshot evidence, GitHub QA success and updated visual report.
 
 ### P2-22 Accessibility / Focus Visual Pass
 
