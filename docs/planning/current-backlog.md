@@ -1088,3 +1088,269 @@ Closure condition:
 Источник: `docs/ux/release-visual-qa-matrix-v1.md`.
 
 Зачем: проводить post-MVP polish главной на основе аналитики и реального funnel evidence.
+
+---
+
+## Engineering Maturity Backlog — 8/10, 9/10, 10/10
+
+Цель раздела: зафиксировать компактную карту зрелости проекта, не заменяя существующие P0/P1/P2/P3 задачи и не закрывая их автоматически.
+
+- `8/10 strong MVP-ready` — основной пользовательский сценарий готов к первым реальным заявкам.
+- `9/10 production-ready` — проект готов к более серьёзному трафику, мониторингу и операционной поддержке.
+- `10/10 high-maturity production-grade` — зрелая система с расширенной безопасностью, наблюдаемостью, производственной глубиной и процессами поддержки.
+- Closure evidence остаётся прежним: PR merged to main, GitHub checks success, backlog evidence, main verification, clean local main.
+- Если maturity-задача пересекается с существующей задачей, закрывать нужно связанный existing task или его decomposed PR, а не считать этот раздел самостоятельным evidence.
+
+### Maturity Target Map
+
+| Target | Goal | Required focus | Release impact |
+|---|---|---|---|
+| 8/10 | Strong MVP-ready | pricing parity, constructor stability, order reliability, live-provider checks, visual execution | Должно быть закрыто перед уверенным public MVP. |
+| 9/10 | Production-ready | automation, admin operations, retries, observability, security hardening, rollback | Желательно перед серьёзным трафиком и регулярными заказами. |
+| 10/10 | High maturity | visual regression, accessibility, SLO, compliance, load testing, manufacturing depth | Не блокирует MVP, но задаёт долгосрочную инженерную планку. |
+
+### Needed for 8/10 strong MVP-ready
+
+#### M8-P0-01 — Pricing parity closure plan
+- Status: open
+- Area: pricing
+- Product-visible: yes
+- Related existing task: P0-03, P0-13, PR #43 triage
+- Acceptance summary: golden fixtures, material-aware client/server parity, delivery/assembly matrix, quote/order/stored price parity verified on main.
+- Suggested agent: 03 Pricing Agent
+
+#### M8-P1-01 — Visual QA execution gate
+- Status: open
+- Area: UX/UI visual QA
+- Product-visible: yes
+- Related existing task: P1-21, P2-20, P2-21, P2-26
+- Acceptance summary: fresh desktop/tablet/mobile screenshots reviewed for landing, constructor, checkout and WebGL fallback; blockers documented or split.
+- Suggested agent: 08 UX/UI / Design System Agent
+
+#### M8-P0-02 — Constructor state ownership contract
+- Status: open
+- Area: constructor state
+- Product-visible: no
+- Related existing task: P0-02, P0-16, P0-17
+- Acceptance summary: dimensions, sections, zones, filling, facades, materials, checkout and validation ownership documented and covered by focused state-transition tests.
+- Suggested agent: 02 Constructor Agent
+
+#### M8-P0-03 — Three.js runtime stability and fallback readiness
+- Status: open
+- Area: visualization
+- Product-visible: yes
+- Related existing task: P0-05, P0-06, P1-10, P2-26A, P2-26B, P2-26C
+- Acceptance summary: error boundary, loading state, camera reset, reduced-quality path and fallback UX verified without weakening existing WebGL fallback E2E.
+- Suggested agent: 06 Three.js / Visualization Agent
+
+#### M8-P0-04 — Notification failure policy
+- Status: open
+- Area: API / orders
+- Product-visible: yes
+- Related existing task: API Order Notification Failure Contracts, Manager Notification Failure Policy, PR #52 triage
+- Acceptance summary: manager/customer email failure policy chosen, tested, documented and aligned with order success semantics.
+- Suggested agent: 04 API / Orders Agent
+
+#### M8-P0-05 — Duplicate submit and idempotency policy
+- Status: open
+- Area: API / orders
+- Product-visible: no
+- Related existing task: Duplicate Submit / Payload-match Idempotency
+- Acceptance summary: safe repeated submit behavior defined, duplicate notifications prevented, frontend 409/replay handling verified.
+- Suggested agent: 04 API / Orders Agent
+
+#### M8-P1-02 — Live provider and Supabase persistence verification
+- Status: open
+- Area: Supabase / live providers
+- Product-visible: no
+- Related existing task: Live Provider / Supabase Order Flow Verification, P0-14
+- Acceptance summary: production-like insert/read, RLS assumptions, safe email recipients and no-PII logging verified with evidence.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M8-P1-03 — PII and logging audit
+- Status: open
+- Area: security / privacy
+- Product-visible: no
+- Related existing task: Live Provider / Supabase Order Flow Verification, order security docs
+- Acceptance summary: phone/email/address do not leak into logs, localStorage or unsafe errors; `safeErrorMessage` and request-id logging reviewed.
+- Suggested agent: 04 API / Orders Agent
+
+#### M8-P1-04 — Vercel post-deploy verification
+- Status: open
+- Area: CI/CD / deploy
+- Product-visible: no
+- Related existing task: P1-22, QA Release Maturity Matrix
+- Acceptance summary: preview/production deploy smoke path documented and executed after main merge; deployment evidence linked without treating dashboard status alone as product QA.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M8-P1-05 — MVP release candidate checklist
+- Status: open
+- Area: release readiness
+- Product-visible: yes
+- Related existing task: QA Release Maturity Matrix, P1-21, P2-26
+- Acceptance summary: one end-to-end release candidate pass covers landing to constructor to order persistence to notifications, with manual and automated evidence.
+- Suggested agent: 01 Product / Planning Agent
+
+### Needed for 9/10 production-ready
+
+#### M9-P1-01 — Automated E2E release suite
+- Status: open
+- Area: QA automation
+- Product-visible: no
+- Related existing task: P1-09, P1-10, P2-20, P2-21
+- Acceptance summary: happy path, failure path, duplicate submit, pricing parity, delivery/assembly and fallback scenarios covered by release-grade E2E.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M9-P1-02 — Admin and manager workflow hardening
+- Status: open
+- Area: admin / operations
+- Product-visible: yes
+- Related existing task: P2-25, TASK 08-UX-04, P2-09
+- Acceptance summary: real order list/detail, status change, manager notes, auth hardening and basic audit trail are usable for MVP operations.
+- Suggested agent: 04 API / Orders Agent
+
+#### M9-P1-03 — Email retry and failure queue
+- Status: open
+- Area: notifications
+- Product-visible: yes
+- Related existing task: API Order Notification Failure Contracts, Manager Notification Failure Policy
+- Acceptance summary: failed notifications are visible, retryable or safely queued; manual resend and status tracking are defined.
+- Suggested agent: 04 API / Orders Agent
+
+#### M9-P1-04 — Observability integration
+- Status: open
+- Area: observability
+- Product-visible: no
+- Related existing task: QA Release Maturity Matrix
+- Acceptance summary: Sentry or equivalent captures critical client/API errors with request/order correlation and safe PII handling.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M9-P1-05 — Security hardening pass
+- Status: open
+- Area: security
+- Product-visible: no
+- Related existing task: order security docs, Live Provider / Supabase Order Flow Verification
+- Acceptance summary: secrets/env, origin/rate-limit, honeypot, address sanitization and admin access reviewed against release risk.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M9-P1-06 — Supabase backup, restore and migration runbook
+- Status: open
+- Area: data / storage
+- Product-visible: no
+- Related existing task: P0-14, Live Provider / Supabase Order Flow Verification
+- Acceptance summary: backup, restore, migration and RLS verification process is documented and tested in a safe environment.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M9-P1-07 — Performance baseline
+- Status: open
+- Area: performance
+- Product-visible: yes
+- Related existing task: P0-05, P3-11
+- Acceptance summary: Lighthouse, bundle size, Three.js runtime and mobile fallback performance baselines recorded with thresholds or action items.
+- Suggested agent: 06 Three.js / Visualization Agent
+
+#### M9-P1-08 — Cross-browser and device QA
+- Status: open
+- Area: visual QA
+- Product-visible: yes
+- Related existing task: P2-21, TASK 08-UX-06
+- Acceptance summary: Chromium, Firefox and available WebKit/Safari-equivalent checks cover public pages, Constructor3D, checkout, fallback and admin states.
+- Suggested agent: 08 UX/UI / Design System Agent
+
+#### M9-P1-09 — Production and manufacturing validation
+- Status: open
+- Area: production / manufacturing
+- Product-visible: no
+- Related existing task: Production Golden Snapshots, P1-11A, P1-11B, P1-23, P1-24
+- Acceptance summary: HDF, edge banding, production export v3 snapshots, factory profile and Basis boundary are reconciled with tests.
+- Suggested agent: 07 Production / Manufacturing Agent
+
+#### M9-P1-10 — Release and rollback process
+- Status: open
+- Area: release management
+- Product-visible: no
+- Related existing task: QA Release Maturity Matrix, P1-22
+- Acceptance summary: release checklist, rollback procedure, post-deploy smoke and incident trigger rules are documented and rehearsed.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+### Needed for 10/10 high-maturity production-grade
+
+#### M10-P2-01 — Full visual regression system
+- Status: open
+- Area: visual QA automation
+- Product-visible: no
+- Related existing task: P2-20
+- Acceptance summary: screenshot baselines, automated diffs and release/PR gating strategy are in place for critical routes and states.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M10-P2-02 — Accessibility audit
+- Status: open
+- Area: accessibility
+- Product-visible: yes
+- Related existing task: P2-22, TASK 08-UX-05
+- Acceptance summary: keyboard navigation, focus states, ARIA, disabled/error/warning semantics and screen-reader smoke are reviewed and fixed.
+- Suggested agent: 08 UX/UI / Design System Agent
+
+#### M10-P2-03 — Advanced observability and SLO
+- Status: open
+- Area: observability / reliability
+- Product-visible: no
+- Related existing task: M9-P1-04
+- Acceptance summary: dashboards, SLOs, error budgets, latency/error-rate tracking and alert escalation are defined.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M10-P2-04 — Incident response playbook
+- Status: open
+- Area: operations
+- Product-visible: no
+- Related existing task: none found
+- Acceptance summary: severity levels, owner escalation, customer communication and recovery checklist are documented and tested.
+- Suggested agent: 01 Product / Planning Agent
+
+#### M10-P2-05 — Data lifecycle and compliance
+- Status: open
+- Area: data / compliance
+- Product-visible: no
+- Related existing task: M8-P1-03, M9-P1-06
+- Acceptance summary: retention, deletion/export, admin audit logs and access review are defined for customer/order data.
+- Suggested agent: 04 API / Orders Agent
+
+#### M10-P2-06 — Manufacturing depth roadmap
+- Status: open
+- Area: manufacturing
+- Product-visible: no
+- Related existing task: P2-07, P2-08, P2-09, БАЗИС-Мебельщик Boundary Lock
+- Acceptance summary: BOM, drilling maps, Basis/.b3d path, QC checklist and assembly instruction export are decomposed into executable tracks.
+- Suggested agent: 07 Production / Manufacturing Agent
+
+#### M10-P2-07 — Architecture decomposition and legacy removal
+- Status: open
+- Area: architecture
+- Product-visible: no
+- Related existing task: P0-01, P0-02, P0-18, TASK 08-UX-07
+- Acceptance summary: large components, legacy Constructor boundaries, domain contracts and dead code removal are planned without weakening current guards.
+- Suggested agent: 02 Constructor Agent
+
+#### M10-P2-08 — Load and stress testing
+- Status: open
+- Area: performance / API
+- Product-visible: no
+- Related existing task: M9-P1-07
+- Acceptance summary: order submit, rate-limit behavior, Supabase capacity and email provider limits are tested under realistic load assumptions.
+- Suggested agent: 05 Infrastructure / QA Agent
+
+#### M10-P2-09 — Customer support operations
+- Status: open
+- Area: support
+- Product-visible: yes
+- Related existing task: none found
+- Acceptance summary: support/debug checklist, order lookup, failed order recovery and customer-facing FAQ are ready for real customers.
+- Suggested agent: 01 Product / Planning Agent
+
+#### M10-P3-01 — Post-MVP product roadmap
+- Status: open
+- Area: product roadmap
+- Product-visible: yes
+- Related existing task: P3-12
+- Acceptance summary: B2B mode, AI assembly instructions, additional furniture types, customer account/history and production integrations are prioritized after MVP evidence.
+- Suggested agent: 01 Product / Planning Agent
