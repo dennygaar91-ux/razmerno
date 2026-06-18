@@ -258,7 +258,7 @@ Do not close until final tests are merged and verified on main.
 
 ### P0-16 Constructor Reset Contract Resolution
 
-Статус: open.
+Статус: closed.
 
 Источник: `docs/constructor/reset-contract-verification-report-v1.md`.
 
@@ -268,9 +268,9 @@ Do not close until final tests are merged and verified on main.
 
 Reconciliation note: в репозитории не найден completion/fix report, подтверждающий закрытие P0-16. Последний найденный verification report фиксирует, что P0-16 не закрыта.
 
-Audit reconciliation: P0-16 remains open. Current main appears to implement full manual reset behavior, while older docs described preserving checkout/step. The reset contract must be explicitly reconciled and verified.
+Audit reconciliation: P0-16 closed after PR #66 was merged and verified on main commit `cf407241`.
 
-Implementation/reconciliation note: current code and focused tests now align on full manual reset to `constructorInitialState`, including checkout/contact/delivery/assembly/consent/transient state reset, while submit success keeps the model/configuration available. This is evidence candidate only; P0-16 remains open until PR review, GitHub QA success, main verification and final backlog evidence.
+Implementation/reconciliation note: current code and focused tests align on full manual reset to `constructorInitialState`, including checkout/contact/delivery/assembly/consent/transient state reset, while submit success keeps the model/configuration available.
 
 Closure condition:
 
@@ -281,6 +281,22 @@ Closure condition:
 - typecheck/build pass;
 - GitHub QA success;
 - backlog updated with evidence.
+
+Evidence:
+
+- PR #66 merged: `docs: reconcile P0-16 reset contract`.
+- Main commit after merge: `cf407241` — `docs: reconcile P0-16 reset contract`.
+- PR checks succeeded before merge.
+- Local main verification after pulling `main` at `cf407241` passed:
+  - `npm run test:constructor-store`;
+  - `npm run test:constructor-flow`;
+  - `npm run test:checkout-submit-hook`;
+  - `npm run typecheck`;
+  - `npm run build`.
+- Final `git status --short` was empty.
+- Contract confirmed: manual constructor reset is a full reset to `constructorInitialState`.
+- Contract confirmed: submit success does not reset the model/configuration, so the model remains available after a successful order request.
+- P0-17 remains open and must be closed separately with its own evidence.
 
 Do not mix with P2 visual QA work.
 
