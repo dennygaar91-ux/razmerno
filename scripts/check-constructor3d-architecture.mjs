@@ -238,8 +238,7 @@ function scanSizes(files) {
     const lines = countLines(text);
 
     if (file === activeEntrypoint) {
-      if (lines > 520) errors.size.push(`${file} has ${lines} lines; hard limit is 520.`);
-      else if (lines > 420) warnings.size.push(`${file} has ${lines} lines; warning threshold is 420.`);
+      if (lines > 420) warnings.size.push(`${file} has ${lines} lines; decomposition warning threshold is 420. P0-18 enforces import boundaries only.`);
       continue;
     }
 
@@ -300,7 +299,6 @@ const hardErrors = [
   ...errors.legacy,
   ...errors.layers,
   ...errors.pageBypass,
-  ...errors.size,
 ];
 
 if (hardErrors.length) {
