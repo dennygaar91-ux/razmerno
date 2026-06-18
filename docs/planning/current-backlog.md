@@ -314,6 +314,14 @@ Reconciliation note: в репозитории не найден completion/fix 
 
 Audit reconciliation: P0-17 remains open until current-main smoke/store/reset evidence is tied to the accepted reset contract from P0-16.
 
+Implementation evidence candidate:
+
+- P0-16 is closed and defines the accepted reset contract.
+- Local branch `task/p0-17-constructor-smoke-stabilization` confirms current smoke/store/submit tests already match the accepted contract:
+  - manual reset is covered as full reset to `constructorInitialState`;
+  - submit success is covered as no-reset for model/configuration.
+- P0-17 must remain open until PR QA/merge evidence is recorded on main.
+
 Closure condition:
 
 - P0-16 reset contract decided;
