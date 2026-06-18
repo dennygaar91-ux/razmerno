@@ -312,7 +312,7 @@ Do not mix with P2 visual QA work.
 
 Reconciliation note: в репозитории не найден completion/fix report, подтверждающий закрытие P0-17. Последний найденный verification report фиксирует, что P0-17 не закрыта и зависит от P0-16.
 
-Audit reconciliation: P0-17 remains open until current-main smoke/store/reset evidence is tied to the accepted reset contract from P0-16.
+Audit reconciliation: P0-17 closed after PR #68 was merged and verified on main, then closure evidence was recorded in PR #69 on main commit `a57e0cab`.
 
 Implementation evidence candidate:
 
