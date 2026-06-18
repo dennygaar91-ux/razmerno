@@ -274,6 +274,7 @@
     "check:no-static-html-pages": "node scripts/check-no-static-html-pages.mjs",
     "check:static-pages-architecture": "node scripts/check-static-pages-architecture.mjs",
     "report:react-components": "node scripts/react-component-inventory.mjs",
+    "check:constructor3d-architecture": "node scripts/check-constructor3d-architecture.mjs",
     "check:constructor-architecture": "node scripts/check-constructor-architecture.mjs",
     "test:constructor-flow": "node --no-warnings --import tsx src/static-pages/constructor/constructorFlowSmoke.test.ts",
     "test:constructor-pii-order": "node --no-warnings --import tsx src/static-pages/constructor/constructorPiiOrderInvariants.test.ts",

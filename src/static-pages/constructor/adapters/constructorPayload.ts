@@ -1,6 +1,6 @@
 import type { OrderPayload } from "../../../shared/lib/order";
-import type { LayoutModel } from "../../../configurator/model/compartments";
 import type { ConstructorStoreState } from "../store/constructorStore";
+import type { ConstructorLayoutModel } from "../layoutTypes";
 import type {
   ConstructorDraft,
   FillKey,
@@ -200,7 +200,7 @@ function getSnapshotCompartments(
 
 export function buildConstructorLayout(
   snapshot: ConstructorSnapshot,
-): LayoutModel {
+): ConstructorLayoutModel {
   const safeSections = Math.max(1, Math.floor(snapshot.sections || 1));
   const sectionWidths = getSnapshotSectionWidths(snapshot);
   const kind = getCompartmentKind(snapshot.fill);
