@@ -270,6 +270,8 @@ Reconciliation note: в репозитории не найден completion/fix 
 
 Audit reconciliation: P0-16 remains open. Current main appears to implement full manual reset behavior, while older docs described preserving checkout/step. The reset contract must be explicitly reconciled and verified.
 
+Implementation/reconciliation note: current code and focused tests now align on full manual reset to `constructorInitialState`, including checkout/contact/delivery/assembly/consent/transient state reset, while submit success keeps the model/configuration available. This is evidence candidate only; P0-16 remains open until PR review, GitHub QA success, main verification and final backlog evidence.
+
 Closure condition:
 
 - reset contract documented;
