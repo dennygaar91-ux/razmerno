@@ -296,7 +296,7 @@ Evidence:
 - Final `git status --short` was empty.
 - Contract confirmed: manual constructor reset is a full reset to `constructorInitialState`.
 - Contract confirmed: submit success does not reset the model/configuration, so the model remains available after a successful order request.
-- P0-17 remains open and must be closed separately with its own evidence.
+- P0-17 was closed separately with its own evidence in PR #69 on main commit `a57e0cab`.
 
 Do not mix with P2 visual QA work.
 
