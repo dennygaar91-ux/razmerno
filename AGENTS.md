@@ -1,4 +1,4 @@
-﻿# AGENTS.md
+# AGENTS.md
 
 Practical rules for Codex agents working in the local repository of the Razmerno project.
 
