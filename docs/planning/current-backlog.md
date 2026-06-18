@@ -309,7 +309,7 @@ Do not close from generic Constructor E2E evidence alone.
 
 ### P0-18 Constructor3D Architecture Guard Implementation
 
-Статус: open.
+Статус: closed.
 
 Источник: `docs/constructor/constructor-core-audit-v1.md` + `docs/planning/constructor3d-guard-spec-v1.md`.
 
@@ -317,7 +317,7 @@ Do not close from generic Constructor E2E evidence alone.
 
 Риск: агенты могут случайно вернуть legacy/runtime dependencies в активный Constructor3D.
 
-Audit reconciliation: P0-18 remains open. Existing guards cover specific areas, but a dedicated Constructor3D architecture boundary guard is not confirmed in main.
+Audit reconciliation: P0-18 closed after PR #64 was merged and verified on main commit `79829cc4`.
 
 Closure condition:
 
@@ -328,6 +328,25 @@ Closure condition:
 - guard blocks forbidden direct imports from API/Supabase/admin/server-only modules where applicable;
 - QA passes;
 - PR merged and main verified.
+
+Evidence:
+
+- Implementation PR: #64 — Add Constructor3D architecture guard.
+- Main commit after merge: `79829cc4` — Add Constructor3D architecture guard.
+- GitHub Actions PR QA: run #283 succeeded for PR #64.
+- Local main verification was run after pulling main at `79829cc4`.
+- `git status` on main was clean before verification.
+- `npm run check:constructor3d-architecture` passed.
+- `npm run typecheck` passed.
+- `npm run build` passed.
+- `npm run test:constructor-payload` passed.
+- `npm run test:constructor-store` passed.
+- `npm run test:constructor-three` passed.
+- `npm run test:constructor-three-safety` passed.
+- Final `git status --short` was empty.
+- Implementation facts: `scripts/check-constructor3d-architecture.mjs` exists; `package.json` has `check:constructor3d-architecture`; `.github/workflows/qa.yml` runs `npm run check:constructor3d-architecture`.
+- Active Constructor3D no longer imports `LayoutModel` from `src/configurator/model/compartments`; `src/static-pages/constructor/layoutTypes.ts` provides the local Constructor3D layout type.
+- Constructor3D architecture guard passes with warnings only. Size/decomposition findings are intentionally non-blocking warnings in this PR because P0-18 is about import-boundary enforcement, not component decomposition.
 
 Объём: M. Зависимости: P0-01, P0-02, P0-08. Независимо: частично.
 
