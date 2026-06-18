@@ -282,6 +282,13 @@ Expected current result:
 | Malicious lower `totalPrice` in payload | Security overwrite | Should pass |
 | Payload with layout/filling mismatch | Validation/model parity | Needs explicit expected rule |
 
+Evidence update:
+
+- P0-13A adds passing fixtures in `tests/checkout-submit-hook.test.ts`.
+- Covered now: default baseline currently matches, body material change diverges, facade material change diverges, no-handle multiplier currently matches, server assembly base is deterministic.
+- Not covered in this PR: delivery distance matrix, production-panel parity, quote/order/stored price snapshot parity and malicious lower payload overwrite.
+- This evidence does not close P0-13 and does not fix formulas.
+
 ---
 
 ## 6. Recommended next implementation sequence

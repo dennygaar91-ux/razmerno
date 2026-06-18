@@ -5,9 +5,11 @@ import { readFileSync } from "node:fs";
 import handler from "../api/orders";
 import { mapOrderRow, mapStatusEvent, isAdminOrderStatus } from "../api/_shared/admin-orders";
 import { toOrderDbInsert } from "../api/_shared/order-db";
+import { calculateServerPrice } from "../api/_shared/server-price";
 import { validateOrder } from "../api/_shared/order-validation";
 import { insertOrderRecord, updateOrderEmailStatus } from "../api/_shared/supabase-orders";
 import type { OrderRequest } from "../api/_shared/order-types";
+import { calculateCatalogPrice, type CatalogPriceInput } from "../src/pricing/engine";
 import { submitOrder, validateCustomer } from "../src/shared/lib/order";
 import {
   makeAssemblyOrder,
@@ -176,6 +178,26 @@ function makeRes() {
   return { res, state };
 }
 
+const pricingParityBaseInput: CatalogPriceInput = {
+  type: "wardrobe",
+  dimensions: { width: 1800, height: 2200, depth: 600 },
+  sections: 2,
+  filling: { shelves: 4, drawers: 0, hangingRod: true },
+  facadeStyleMultiplier: 1,
+  hardwareLevel: "base",
+};
+
+function compareClientServerPricing(order: OrderRequest, clientInput: CatalogPriceInput = pricingParityBaseInput) {
+  const client = calculateCatalogPrice(clientInput);
+  const server = calculateServerPrice(order);
+
+  return {
+    client,
+    server,
+    delta: server.total - client.total,
+  };
+}
+
 async function callOrderHandler(body: OrderRequest, options: { method?: string; ip?: string; origin?: string } = {}) {
   const { res, state } = makeRes();
   await handler(makeReq(body, options), res);
@@ -243,6 +265,98 @@ test("delivery and assembly enabled payloads pass validation when required field
     },
   });
   assert.match(validateOrder(assemblyInvalidRate) ?? "", /сборк|некоррект/i);
+});
+
+test("P0-13 pricing parity fixture: default baseline currently matches client and server totals", () => {
+  const { client, server, delta } = compareClientServerPricing(makeValidOrder());
+
+  assert.equal(delta, 0);
+  assert.equal(server.total, client.total);
+  assert.equal(server.body, client.body);
+  assert.equal(server.facades, client.facades);
+  assert.equal(server.hardware, client.hardware);
+});
+
+test("P0-13 pricing parity fixture: body material change currently diverges", () => {
+  const { client, server, delta } = compareClientServerPricing(
+    makeValidOrder({
+      materials: {
+        bodyId: "graphite",
+        facadeId: "white-matt",
+        facadeKind: "ldsp",
+        backPanelId: "white-matt",
+        backPanelKind: "hdf",
+      },
+    }),
+    {
+      ...pricingParityBaseInput,
+      bodyProducer: "Egger",
+      bodyArticle: "graphite",
+    },
+  );
+
+  assert.notEqual(delta, 0);
+  assert.notEqual(server.body, client.body);
+  assert.equal(server.facades, client.facades);
+});
+
+test("P0-13 pricing parity fixture: facade material change currently diverges", () => {
+  const { client, server, delta } = compareClientServerPricing(
+    makeValidOrder({
+      materials: {
+        bodyId: "white-matt",
+        facadeId: "graphite",
+        facadeKind: "mdf",
+        backPanelId: "white-matt",
+        backPanelKind: "hdf",
+      },
+    }),
+    {
+      ...pricingParityBaseInput,
+      facadeProducer: "AGT",
+      facadeThicknessMm: 18,
+      facadeMaterialKind: "mdf",
+    },
+  );
+
+  assert.notEqual(delta, 0);
+  assert.equal(server.body, client.body);
+  assert.notEqual(server.facades, client.facades);
+});
+
+test("P0-13 pricing parity fixture: no-handle multiplier currently matches client and server", () => {
+  const baseline = compareClientServerPricing(makeValidOrder());
+  const { client, server, delta } = compareClientServerPricing(
+    makeValidOrder({ style: { facadeStyleId: "no-handle", hardwareId: "base" } }),
+    {
+      ...pricingParityBaseInput,
+      facadeStyleMultiplier: 1.15,
+    },
+  );
+
+  assert.equal(delta, 0);
+  assert.equal(server.total, client.total);
+  assert.ok(server.facades > baseline.server.facades);
+  assert.ok(server.hardware > baseline.server.hardware);
+});
+
+test("P0-13 pricing parity fixture: assembly base is added consistently on the server", () => {
+  const baseline = compareClientServerPricing(makeValidOrder());
+  const { client, server, delta } = compareClientServerPricing(
+    makeValidOrder({
+      assembly: {
+        enabled: true,
+        price: 0,
+        rate: 0.1,
+        basePrice: 0,
+      },
+    }),
+  );
+
+  assert.equal(client.total, baseline.client.total);
+  assert.equal(server.assembly, Math.round(baseline.server.total * 0.1));
+  assert.equal(delta, server.assembly);
+  assert.equal(server.total, baseline.server.total + server.assembly);
 });
 
 test("checkout submit sends API payload with idempotency key and returns success", async () => {
