@@ -18,8 +18,62 @@
 - `open` — актуально, не закрыто.
 - `in progress` — частично сделано, но closure conditions не выполнены.
 - `closed` — закрыто и подтверждено документальным evidence.
+- `closed / disputed` — в backlog есть закрытие, но closure evidence требует reconciliation.
+- `open / blocked` — актуально, но выполнение зависит от внешнего решения, PR cleanup или evidence.
 - `obsolete` — потеряло актуальность.
 - `duplicate` — перекрыто другой задачей и не должно запускаться отдельно.
+
+## Evidence / Closure Rules
+
+A task may be marked closed only when closure evidence exists in main:
+
+- merged PR or direct main evidence;
+- GitHub QA success for technical tasks;
+- main verification;
+- backlog updated with evidence.
+
+The following are not closure evidence by themselves:
+
+- open PR;
+- draft PR;
+- branch-only tests;
+- branch-only docs;
+- report-only evidence;
+- screenshot artifact success without visual review;
+- local/manual claim without CI or artifact evidence.
+
+For visual QA:
+
+- screenshot artifact success confirms capture success only;
+- visual closure requires fresh screenshots, visual report, and explicit VQA closed status.
+
+For pricing:
+
+- branch parity work does not close pricing parity until merged and verified in main.
+
+For production:
+
+- customer-facing Three.js preview is not production truth;
+- Basis manual JSON is not `.b3d` generation;
+- factory-ready handoff must not be claimed without factory/SKU/drilling evidence.
+
+## Open PR Triage Required
+
+The following PRs must not be treated as closure evidence until merged and verified:
+
+- PR #41 — dependency recovery: open/draft/not merged; P0-19 remains disputed until closure evidence is reconciled.
+- PR #43 — pricing parity: open/draft/not merged; cannot close P0-13.
+- PR #51 — production golden snapshots: open/not merged; not closure-ready because package scripts are not committed and snapshots target legacy v2 while active export uses v3.
+- PR #52 — API notification failure contracts: open/not merged; useful branch work, but wording must be corrected from idempotent replay to safe 409 conflict unless true idempotency is implemented.
+
+Next action:
+
+Each PR requires one decision:
+
+- continue/rebase/fix;
+- close/recreate;
+- close obsolete;
+- merge only after fresh QA and main verification.
 
 ---
 
@@ -43,6 +97,8 @@
 
 Риск: ломается связь UI, 3D, fallback, pricing и checkout.
 
+Audit follow-up: требуется зафиксировать ownership contract для `sceneRenderMode`, exact/advanced flags, `selectedZoneId` / `selectedCompartmentId` bridge и snapshot/payload boundary. Не закрывать через visual QA или generic Constructor E2E.
+
 Объём: L. Зависимости: P0-01. Независимо: нет.
 
 ### P0-03 Pricing Engine Validation
@@ -54,6 +110,16 @@
 Риск: расхождение цены ломает доверие и заявку.
 
 Reconciliation note: остаётся открытой, потому что pricing audit фиксирует риск расхождения client/server pricing, а API completion report прямо указывает, что P0-13 остаётся открытой отдельной задачей.
+
+Audit follow-ups:
+
+- pricing source of truth: bundled seed vs Supabase/runtime catalog;
+- MVP hardware/fittings pricing scope;
+- rounding / VAT / markup / min charge policy;
+- exact delivery price trust decision;
+- legacy/demo pricing path guard.
+
+These follow-ups must not be mixed with Production or API implementation PRs unless explicitly scoped.
 
 Объём: M. Зависимости: price sources, delivery, assembly, P0-13. Независимо: частично.
 
@@ -96,6 +162,8 @@ Reconciliation note: contract-scope закрыт через P0-11/P0-12. Ост�
 Риск: агенты читают устаревшие документы.
 
 Reconciliation note: backlog обновлён, reconciliation report создан. Master plan и roadmap всё ещё требуют отдельной аккуратной актуализации после подтверждения новой priority matrix.
+
+Audit follow-up: open PR triage for #41, #43, #51 and #52 must be coordinated here, but domain-specific implementation remains with 05, 03, 07 and 04 respectively.
 
 Объём: M. Зависимости: audits, backlog. Независимо: да.
 
@@ -155,6 +223,19 @@ Reconciliation note: базовая QA/CI/testing foundation закрыта ин
 
 Reconciliation note: не закрывать без отдельного pricing parity completion evidence. В репозитории найден pricing audit, который фиксирует риск расхождения client/server pricing; API completion report также указывает, что P0-13 остаётся открытой отдельной задачей.
 
+Audit reconciliation: P0-13 remains open. PR #43 is open/draft/not merged and is branch-only evidence. It cannot close pricing parity. Main closure requires merged pricing golden fixtures, material-aware client/server parity, delivery/assembly matrix coverage, quote/order/stored price snapshot parity, GitHub QA success and main verification.
+
+Required sub-work:
+
+- PR #43 triage: rebase/fix/continue or replace;
+- golden pricing fixtures in main;
+- material-aware client/server parity;
+- delivery/assembly pricing matrix;
+- quote/order/stored price snapshot parity;
+- API server-authoritative price boundary verification.
+
+Do not close until final tests are merged and verified on main.
+
 Объём: L. Зависимости: P0-03, pricing sources, client/server parity fixtures.
 
 ### P0-14 Supabase Contract Tests
@@ -187,7 +268,19 @@ Reconciliation note: не закрывать без отдельного pricing
 
 Reconciliation note: в репозитории не найден completion/fix report, подтверждающий закрытие P0-16. Последний найденный verification report фиксирует, что P0-16 не закрыта.
 
-Closure condition: закрыть P0-16 можно только после подтверждённого успешного запуска typecheck, build и релевантных constructor tests, а также после документального решения reset contract.
+Audit reconciliation: P0-16 remains open. Current main appears to implement full manual reset behavior, while older docs described preserving checkout/step. The reset contract must be explicitly reconciled and verified.
+
+Closure condition:
+
+- reset contract documented;
+- manual reset behavior verified;
+- submit-success no-reset rule verified;
+- relevant reset/store tests pass;
+- typecheck/build pass;
+- GitHub QA success;
+- backlog updated with evidence.
+
+Do not mix with P2 visual QA work.
 
 ### P0-17 Constructor Smoke Test Stabilization
 
@@ -201,7 +294,18 @@ Closure condition: закрыть P0-16 можно только после по�
 
 Reconciliation note: в репозитории не найден completion/fix report, подтверждающий закрытие P0-17. Последний найденный verification report фиксирует, что P0-17 не закрыта и зависит от P0-16.
 
-Closure condition: закрыть P0-17 можно только после подтверждённого успешного запуска constructor smoke/store tests.
+Audit reconciliation: P0-17 remains open until current-main smoke/store/reset evidence is tied to the accepted reset contract from P0-16.
+
+Closure condition:
+
+- P0-16 reset contract decided;
+- constructor smoke/store tests identified;
+- tests pass on final main/PR head;
+- typecheck/build pass;
+- GitHub QA success;
+- backlog updated.
+
+Do not close from generic Constructor E2E evidence alone.
 
 ### P0-18 Constructor3D Architecture Guard Implementation
 
@@ -213,11 +317,36 @@ Closure condition: закрыть P0-17 можно только после по�
 
 Риск: агенты могут случайно вернуть legacy/runtime dependencies в активный Constructor3D.
 
+Audit reconciliation: P0-18 remains open. Existing guards cover specific areas, but a dedicated Constructor3D architecture boundary guard is not confirmed in main.
+
+Closure condition:
+
+- dedicated guard script exists;
+- package script exists;
+- GitHub QA workflow step exists;
+- guard blocks active Constructor3D imports from legacy paths;
+- guard blocks forbidden direct imports from API/Supabase/admin/server-only modules where applicable;
+- QA passes;
+- PR merged and main verified.
+
 Объём: M. Зависимости: P0-01, P0-02, P0-08. Независимо: частично.
 
 ### P0-19 Dependency Layer Recovery Verification
 
-Статус: closed.
+Статус: closed / disputed.
+
+Disputed: requires reconciliation before backlog closure.
+
+Audit reconciliation: P0-19 closure evidence is disputed. PR #41 remains open/draft/not merged and cannot be used as closure evidence. Current main QA evidence suggests dependency install currently works operationally, but the backlog must explicitly identify the merged/main evidence that closed P0-19 or reopen the task as disputed.
+
+Next action:
+
+- identify actual main evidence for dependency recovery;
+- document current main `npm ci` / install evidence;
+- decide PR #41 fate: close obsolete, recreate minimal dependency PR, or rebase/fix;
+- update this task with final evidence.
+
+Do not close from PR #41 while it remains open/draft/not merged.
 
 ---
 
@@ -306,6 +435,134 @@ Closure summary: P1-21 закрыта как docs/planning-only задача. М
 Dashboard fix applied: Framework Preset `Vite`, Root Directory repository root, Install Command `npm ci`, Build Command `npm run build`, Output Directory `dist`, redeploy without cache. Node.js version should remain aligned with GitHub QA Node 22.x where available.
 
 Closure summary: P1-22 закрыта после получения exact Vercel error stack, root cause classification, successful Vercel Preview redeploy и GitHub QA success. Следующий Vercel-based visual QA screenshot pass можно запускать после merge PR #49 и main deployment/content verification.
+
+### API Order Notification Failure Contracts
+
+Статус: open.
+
+Owner: 04 API / Orders Agent + 05 Infrastructure / QA Agent.
+
+Reason: PR #52 is useful but remains open/not merged. It hardens notification failure handling but wording must be reconciled: duplicate order ID behavior is safe 409 conflict unless true idempotent replay is implemented.
+
+Closure condition:
+
+- PR #52 or replacement merged;
+- PR/body/docs wording matches actual duplicate contract;
+- customer email failure tested;
+- manager email failure policy documented;
+- PII-safe logging tests merged;
+- GitHub QA success;
+- main verification.
+
+### Duplicate Submit / Payload-match Idempotency
+
+Статус: open.
+
+Owner: 04 API / Orders Agent.
+
+Reason: Safe duplicate 409 conflict exists in branch evidence, but true payload-match idempotent replay is not confirmed.
+
+Closure condition:
+
+- same payload replay vs different payload conflict behavior decided;
+- payload hash/idempotency key or equivalent implemented if chosen;
+- no duplicate notifications;
+- frontend 409 handling verified;
+- GitHub QA success.
+
+### Manager Notification Failure Policy
+
+Статус: open.
+
+Owner: 04 API / Orders Agent + 01 Product / Planning Agent.
+
+Reason: If order persistence succeeds but manager notification fails, the product/API contract must define whether the order is successful, warning, failed, or queued for retry.
+
+Closure condition:
+
+- policy chosen;
+- API behavior tested;
+- customer/admin messaging documented;
+- notification retry/failure logging policy documented.
+
+### Production Golden Snapshots
+
+Статус: open / blocked.
+
+Audit reconciliation: Production Golden Snapshots must remain open. PR #51 is branch-only evidence and cannot close this task because it is open/not merged, does not update package.json, does not update current-backlog.md, and protects legacy production model v2 while active API order export uses production model v3.
+
+Required wording: PR #51 is branch-only evidence and cannot close Production Golden Snapshots until merged into main with stable package scripts and GitHub QA success.
+
+Current blockers:
+
+- PR #51 open/not merged;
+- package.json patch empty;
+- workflow uses temporary `npm pkg set`;
+- snapshots target legacy v2;
+- active export uses v3.
+
+### P1-11A — Resolve Production Golden Snapshot Scope
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent + 05 Infrastructure / QA Agent.
+
+Reason: PR #51 protects legacy production model v2 while active order export uses production model v3.
+
+Closure condition:
+
+- snapshot scope decision recorded: v2, v3, or split;
+- PR #51 repaired or replaced;
+- package scripts committed;
+- GitHub QA success;
+- PR merged;
+- main verification.
+
+### P1-11B — Production v3 Golden Snapshots
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent.
+
+Reason: Active API order export uses production model v3, so golden snapshots must protect active v3 production-export path.
+
+Closure condition:
+
+- 4+ v3 golden cases;
+- snapshots cover panels, edgeBanding, hardware, drilling, warnings, validation, Basis plan and review block;
+- volatile fields normalized;
+- package scripts and QA workflow run tests;
+- PR merged and main verified.
+
+### P1-23 — HDF Thickness Reconciliation
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent.
+
+Reason: HDF thickness conflict exists: production export/input uses 3 мм while factory profile/drawer bottom path indicates 4 мм.
+
+Closure condition:
+
+- single HDF rule selected or back/drawer distinction documented;
+- factory profile aligned;
+- tests cover back panel and drawer bottom;
+- golden snapshots updated.
+
+### P1-24 — Edge Banding Policy Lock
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent.
+
+Reason: Factory profile says edgeAllSides, while implementation often uses front-only body edge.
+
+Closure condition:
+
+- body/shelf/facade/drawer edge policy documented;
+- implementation aligned;
+- tests fail if required sides are missing;
+- edge length totals verified.
 
 ---
 
@@ -436,8 +693,16 @@ Release follow-ups:
 
 Closure condition:
 
-- P2-26 remains open because VQA-002, VQA-003 and VQA-005 are not fully closed;
-- close only after scoped UI/constructor/visualization fixes, fresh screenshot evidence, GitHub QA success and updated visual report.
+P2-26 remains open until VQA-002, VQA-003, VQA-005, VQA-006, VQA-009 and VQA-010 are either closed with fresh screenshot evidence or explicitly split into separate backlog tracks.
+
+Close only after:
+
+- scoped UI/constructor/visualization fixes or explicit backlog split;
+- fresh screenshot evidence;
+- GitHub QA success;
+- updated visual report.
+
+Artifact success confirms capture success, not visual closure.
 
 Next recommended implementation prompt:
 
@@ -449,6 +714,50 @@ Owners:
 - 06 Three.js / Visualization Agent — scene overlay/marker placement and fallback preview composition;
 - 08 UX/UI / Design System Agent — responsive visual rules, label hierarchy and fallback layout acceptance.
 
+### P2-26A — Scene Overlay Marker Density Pass
+
+Статус: open.
+
+Owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent + 02 Constructor Agent.
+
+Reason: VQA-002 remains partial; active `+` marker and zone bubbles compete with model.
+
+Closure condition:
+
+- model remains dominant;
+- active `+` compact/non-debug-like;
+- inactive bubbles secondary;
+- fresh artifact reviewed.
+
+### P2-26B — WebGL Fallback Visual Layout Pass
+
+Статус: open.
+
+Owner: 06 Three.js / Visualization Agent + 08 UX/UI / Design System Agent.
+
+Reason: VQA-005 open and VQA-006 visible/open; fallback layout crowded/clipped.
+
+Closure condition:
+
+- desktop/mobile fallback screenshots show preview/status/actions separated;
+- CTA/chips do not overlay drawing;
+- P1-10 functional fallback remains green.
+
+### P2-26C — Scene Framing / Camera Fit Pass
+
+Статус: open.
+
+Owner: 06 Three.js / Visualization Agent.
+
+Reason: VQA-009 remains open; desktop/laptop scene composition unbalanced.
+
+Closure condition:
+
+- balanced model framing across viewports;
+- no critical model/dimension clipping;
+- camera modes usable;
+- fresh artifact confirms.
+
 ### P2-22 Accessibility / Focus Visual Pass
 
 Статус: open.
@@ -458,6 +767,20 @@ Owners:
 Зачем: проверить keyboard flow, visible focus, labels, aria-live и disabled/error/warning semantics на критичных control states.
 
 Риск: critical flow формально работает, но доступность и visual feedback недостаточны.
+
+### TASK 08-UX-01 — Stepper Readability / VQA-003 Closure
+
+Статус: open.
+
+Owner: 08 UX/UI / Design System Agent + 02 Constructor Agent.
+
+Reason: VQA-003 remains partial due desktop/laptop stepper truncation.
+
+Closure condition:
+
+- fresh screenshots show readable/intentionally standardized labels across viewports;
+- active/done/error/warning states distinct;
+- no collision with scene/status/exact-toggle.
 
 ### P2-23 Checkout Trust-state Visual Hardening
 
@@ -488,6 +811,170 @@ Owners:
 Зачем: если admin входит в MVP operations, привести login/dashboard/detail/API fallback states к единой визуальной системе и явно отделить demo/internal states.
 
 Риск: операционный UI будет выглядеть как demo и снизит доверие команды к данным.
+
+### TASK 08-UX-04 — Admin Visual Consistency / VQA-010
+
+Статус: open.
+
+Owner: 08 UX/UI / Design System Agent / Admin owner.
+
+Reason: Admin protected screen is raw/outside design system.
+
+Closure condition:
+
+- decision recorded: VQA-010 stays in P2-26 or moves to P2-25;
+- admin protected/dashboard/detail/error states use consistent internal design system;
+- fresh admin screenshots attached.
+
+### TASK 08-UX-05 — Accessibility / Focus Visual Pass
+
+Статус: open.
+
+Owner: 08 UX/UI / Design System Agent.
+
+Reason: UI-level keyboard/focus states are not fully proven.
+
+Closure condition:
+
+- keyboard/focus screenshot pass exists;
+- constructor, drawer, fallback, checkout, disabled/error/warning states covered.
+
+### TASK 08-UX-06 — Visual Regression / Cross-browser Device Coverage
+
+Статус: open.
+
+Owner: 08 UX/UI / Design System Agent + 05 Infrastructure / QA Agent.
+
+Reason: Current screenshot evidence is Chromium-heavy; cross-browser/device coverage not confirmed.
+
+Closure condition:
+
+- visual matrix documented;
+- public pages, Constructor3D, fallback, admin, checkout forced states captured.
+
+### TASK 08-UX-07 — Design-system Inventory / Token Cleanup
+
+Статус: open.
+
+Owner: 08 UX/UI / Design System Agent.
+
+Reason: Dedicated design-system inventory not confirmed; Constructor3D CSS is layered hardening, not clean DS architecture.
+
+Closure condition:
+
+- token/component inventory exists;
+- one-off Constructor3D overrides classified;
+- no mass cleanup without visual regression evidence.
+
+---
+
+## P2 — API / Production / QA Readiness
+
+### Live Provider / Supabase Order Flow Verification
+
+Статус: open.
+
+Owner: 04 API / Orders Agent + 05 Infrastructure / QA Agent.
+
+Reason: Mock tests do not confirm live Supabase/RLS/email provider behavior.
+
+Closure condition:
+
+- staging/live verification report;
+- no PII in logs;
+- Supabase insert/status updates verified;
+- email provider verified with safe recipients;
+- failure branches documented.
+
+### P2-07 — Drilling Coordinate Standard
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent.
+
+Reason: Current drilling coordinates are approximate and require technologist check.
+
+Closure condition:
+
+- panel-local coordinate convention documented;
+- operation templates defined;
+- collision validation added;
+- tests cover hinge/shelf/runner/rod/confirmat.
+
+### P2-08 — Supplier Hardware Catalog
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent.
+
+Reason: Hardware/fittings remain generic; real Hettich/Firmax SKUs and drilling templates are not confirmed.
+
+Closure condition:
+
+- actual SKUs documented;
+- drilling templates connected to SKUs;
+- fallback rules documented;
+- BOM output uses concrete articles where required.
+
+### P2-09 — Admin Operation Editor
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent + 04 API / Orders Agent + Admin/UX owner.
+
+Reason: Admin production review is partial: no per-panel, per-hole, hardware/SKU operation editing.
+
+Closure condition:
+
+- operation edit model defined;
+- revisions/audit trail preserved;
+- API/Admin contract defined;
+- tests cover revision creation and operation override.
+
+### Production Export Failure Contract with API
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent + 04 API / Orders Agent.
+
+Reason: API builds production export before persistence. Failure behavior must be explicit.
+
+Closure condition:
+
+- failure policy chosen;
+- API response behavior tested;
+- DB/order status behavior tested;
+- admin/notification implications documented.
+
+### БАЗИС-Мебельщик Boundary Lock
+
+Статус: open.
+
+Owner: 07 Production / Manufacturing Agent.
+
+Reason: Current Basis layer is manual/intermediate JSON only, not `.b3d` generation.
+
+Closure condition:
+
+- docs clearly state current Basis boundary;
+- UI/admin copy does not claim automatic `.b3d`;
+- future script requirements documented.
+
+### QA Release Maturity Matrix
+
+Статус: open.
+
+Owner: 05 Infrastructure / QA Agent.
+
+Reason: release readiness needs explicit QA policy for manual visual QA, Chromium-only screenshots, live provider/env verification and coverage upgrades.
+
+Closure condition:
+
+- release QA matrix documented;
+- manual-only vs required checks classified;
+- cross-browser/device policy;
+- live provider/Supabase/Vercel env plan;
+- coverage upgrade path.
 
 ---
 
