@@ -256,6 +256,7 @@
 Результат:
 
 - проект готов к более крупным production/admin этапам.
+- QA maturity policy: `docs/planning/release-qa-maturity-matrix-v1.md`.
 
 ---
 
