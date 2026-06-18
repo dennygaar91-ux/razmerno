@@ -163,6 +163,12 @@ Reconciliation note: contract-scope закрыт через P0-11/P0-12. Ост�
 
 Reconciliation note: backlog обновлён, reconciliation report создан. Master plan и roadmap всё ещё требуют отдельной аккуратной актуализации после подтверждения новой priority matrix.
 
+Implementation evidence candidate:
+
+- `docs/planning/master-development-plan-v1.md` was synced with current backlog status for P0-16, P0-17 and P0-18.
+- `docs/planning/release-roadmap.md` now records evidence notes for P0-16, P0-17 and P0-18 closure commits.
+- P0-07 must remain in progress until the docs sync PR is merged and verified on main.
+
 Audit follow-up: open PR triage for #41, #43, #51 and #52 must be coordinated here, but domain-specific implementation remains with 05, 03, 07 and 04 respectively.
 
 Объём: M. Зависимости: audits, backlog. Независимо: да.
