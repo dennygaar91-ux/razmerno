@@ -1039,6 +1039,12 @@ Owner: 05 Infrastructure / QA Agent.
 
 Reason: release readiness needs explicit QA policy for manual visual QA, Chromium-only screenshots, live provider/env verification and coverage upgrades.
 
+Implementation evidence candidate:
+
+- `docs/planning/release-qa-maturity-matrix-v1.md` documents required, manual/release-gate and deferred QA evidence.
+- `docs/planning/release-roadmap.md` links the QA maturity policy from Stage R10.
+- This task must remain open until the docs PR is merged and verified on main.
+
 Closure condition:
 
 - release QA matrix documented;
