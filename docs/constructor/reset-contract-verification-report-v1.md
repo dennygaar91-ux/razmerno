@@ -6,6 +6,24 @@
 
 Статус: verification-only / no runtime code changes.
 
+## 0. 2026-06-18 reconciliation addendum
+
+This report originally captured a stale conflict: at that time reset behavior was described as preserving checkout/step state. Current main has since moved to the P0-16 target contract:
+
+- manual constructor reset is a full project reset to `constructorInitialState`;
+- checkout/contact/delivery/assembly/consent state is reset with the rest of constructor state;
+- transient scene state and production snapshot state are reset;
+- submit success does not reset the model/configuration and only saves the draft.
+
+Current implementation evidence:
+
+- `src/static-pages/constructor/store/constructorResetState.ts` returns `{ ...constructorInitialState }`;
+- `src/static-pages/constructor/store/constructorResetContract.test.ts` verifies checkout/contact/service/transient state is reset;
+- `src/static-pages/constructor/constructorFlowSmoke.test.ts` verifies reset returns to the initial wizard state;
+- `tests/checkout-submit-hook.test.ts` verifies the active Constructor3D submit hook does not call the constructor store reset path.
+
+This addendum supersedes the historical findings below where they describe preserving checkout/step state as the current behavior. P0-16 should remain open until this reconciliation branch has PR review, GitHub QA success, main verification, and backlog evidence recorded. P0-17 remains separate and must not be closed by this addendum alone.
+
 ## 1. Цель проверки
 
 Проверить, можно ли действительно считать закрытыми:
