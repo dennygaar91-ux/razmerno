@@ -155,7 +155,7 @@ Reconciliation note: contract-scope закрыт через P0-11/P0-12. Ост�
 
 ### P0-07 Documentation Sync
 
-Статус: in progress.
+Статус: closed.
 
 Зачем: единый источник истины для агентов.
 
@@ -167,7 +167,15 @@ Implementation evidence candidate:
 
 - `docs/planning/master-development-plan-v1.md` was synced with current backlog status for P0-16, P0-17 and P0-18.
 - `docs/planning/release-roadmap.md` now records evidence notes for P0-16, P0-17 and P0-18 closure commits.
-- P0-07 must remain in progress until the docs sync PR is merged and verified on main.
+- PR #72 was merged.
+- Main merge commit: `e8d2cfa2` (`docs: sync planning after P0 closures`).
+- PR checks succeeded before merge.
+- Local main verification after pulling `e8d2cfa2` passed:
+  - `git status --short --branch`;
+  - `git log --oneline -5`;
+  - targeted `rg` verification for P0-07/P0-16/P0-17/P0-18 planning sync.
+- Final `git status --short --branch` was clean.
+- Documentation sync is limited to planning docs and does not touch runtime, package/workflow, API, pricing, admin, Supabase, or order flow.
 
 Audit follow-up: open PR triage for #41, #43, #51 and #52 must be coordinated here, but domain-specific implementation remains with 05, 03, 07 and 04 respectively.
 
