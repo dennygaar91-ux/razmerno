@@ -30,7 +30,7 @@
 
 ## Stage R1 — Constructor Reset Contract Resolution
 
-Статус: next recommended critical block.
+Статус: completed with backlog evidence.
 
 Цель: закрыть P0-16.
 
@@ -49,6 +49,7 @@
 
 - `reset()` имеет один подтверждённый смысл;
 - P0-16 можно закрыть только после evidence.
+- Evidence update: P0-16 is closed on main after PR #66 and closure evidence commit `827b2af7`.
 
 ---
 
@@ -70,6 +71,7 @@
 Результат:
 
 - constructor state можно безопасно использовать для 3D, fallback, pricing и checkout.
+- Evidence update: P0-17 is closed on main after PR #68 and closure evidence commit `a57e0cab`.
 
 ---
 
@@ -91,6 +93,7 @@
 Результат:
 
 - агенты меньше рискуют случайно вернуть legacy/runtime dependencies в Constructor3D.
+- Evidence update: P0-18 is closed on main after PR #64 and closure evidence commit `839c3463`.
 
 ---
 

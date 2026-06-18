@@ -18,7 +18,7 @@
 
 После reconciliation стратегия уточнена:
 
-1. Сначала закрыть constructor reset/state uncertainty.
+1. Сначала закрыть remaining constructor state ownership uncertainty.
 2. Затем закрыть pricing parity uncertainty.
 3. После этого стабилизировать Three.js и WebGL/2D fallback.
 4. Затем завершать Constructor3D UX, materials, checkout UX/E2E.
@@ -32,13 +32,15 @@
 - P0-12 Checkout Submit Tests;
 - P0-14 Supabase Contract Tests;
 - P0-15 CI/CD & Vercel Failure Investigation as investigation;
+- P0-16 Constructor Reset Contract Resolution;
+- P0-17 Constructor Smoke Test Stabilization;
+- P0-18 Constructor3D Architecture Guard Implementation;
 - P0-19 Dependency Layer Recovery Verification.
 
 Не подтверждены как закрытые по repository evidence:
 
 - P0-13 Pricing Golden Fixtures & Parity;
-- P0-16 Constructor Reset Contract Resolution;
-- P0-17 Constructor Smoke Test Stabilization.
+- P0-01/P0-02/P0-03/P0-05/P0-06/P0-07 remain open or in progress in `current-backlog.md`.
 
 ---
 
@@ -60,7 +62,7 @@ API order flow, checkout submit и Supabase contract coverage закрыты д�
 
 Активная разработка должна идти вокруг Constructor3D. Legacy Constructor остаётся quarantine до безопасной миграции/удаления.
 
-Критично: reset contract и constructor smoke stabilization не подтверждены как закрытые.
+Критично: reset contract и constructor smoke stabilization уже закрыты; remaining constructor state ownership остаётся отдельным P0 scope.
 
 ### Pricing Engine
 
@@ -78,8 +80,8 @@ Production/admin важны для MVP, но идут после constructor sta
 
 ## 3. Главные риски
 
-1. Constructor reset contract не подтверждён как закрытый.
-2. Constructor smoke tests зависят от P0-16.
+1. Remaining constructor state ownership uncertainty after reset/smoke closure.
+2. Constructor3D state model still needs careful scoped stabilization.
 3. Архитектурное расслоение legacy Constructor / Constructor3D.
 4. Крупные constructor files и store.
 5. Расхождение pricing между client/server/production paths.
@@ -93,16 +95,13 @@ Production/admin важны для MVP, но идут после constructor sta
 
 ### Open / In Progress
 
-1. P0-16 Constructor Reset Contract Resolution.
-2. P0-17 Constructor Smoke Test Stabilization.
-3. P0-02 Constructor State Model Stabilization.
-4. P0-18 Constructor3D Architecture Guard Implementation.
-5. P0-13 Pricing Golden Fixtures & Parity.
-6. P0-03 Pricing Engine Validation.
-7. P0-05 Three.js Stability.
-8. P0-06 WebGL / 2D Fallback.
-9. P0-01 Unified Constructor Architecture.
-10. P0-07 Documentation Sync.
+1. P0-02 Constructor State Model Stabilization.
+2. P0-13 Pricing Golden Fixtures & Parity.
+3. P0-03 Pricing Engine Validation.
+4. P0-05 Three.js Stability.
+5. P0-06 WebGL / 2D Fallback.
+6. P0-01 Unified Constructor Architecture.
+7. P0-07 Documentation Sync.
 
 ### Closed / Baseline Closed
 
@@ -112,7 +111,10 @@ Production/admin важны для MVP, но идут после constructor sta
 4. P0-12 Checkout Submit Tests.
 5. P0-14 Supabase Contract Tests.
 6. P0-15 CI/CD & Vercel Failure Investigation as investigation.
-7. P0-19 Dependency Layer Recovery Verification.
+7. P0-16 Constructor Reset Contract Resolution.
+8. P0-17 Constructor Smoke Test Stabilization.
+9. P0-18 Constructor3D Architecture Guard Implementation.
+10. P0-19 Dependency Layer Recovery Verification.
 
 ### Duplicate / Partially Covered
 
@@ -205,19 +207,17 @@ Duplicate / partially covered:
 
 ## 9. Рекомендуемый порядок запуска агентов
 
-1. Constructor Reset Contract Agent.
-2. Constructor State / Architecture Agent.
-3. Architecture Guard Agent.
-4. Pricing Parity Agent.
-5. Three.js Stability Agent.
-6. WebGL Fallback Agent.
-7. Constructor UX Agent.
-8. Materials Agent.
-9. Checkout UX / E2E Agent.
-10. QA Workflow Hardening Agent.
-11. Production Layer Agent.
-12. Admin Agent.
-13. Release Agent.
+1. Constructor State / Architecture Agent.
+2. Pricing Parity Agent.
+3. Three.js Stability Agent.
+4. WebGL Fallback Agent.
+5. Constructor UX Agent.
+6. Materials Agent.
+7. Checkout UX / E2E Agent.
+8. QA Workflow Hardening Agent.
+9. Production Layer Agent.
+10. Admin Agent.
+11. Release Agent.
 
 ---
 
