@@ -302,7 +302,7 @@ Do not mix with P2 visual QA work.
 
 ### P0-17 Constructor Smoke Test Stabilization
 
-Статус: open.
+Статус: closed.
 
 Источник: `docs/constructor/reset-contract-verification-report-v1.md`.
 
@@ -320,7 +320,19 @@ Implementation evidence candidate:
 - Local branch `task/p0-17-constructor-smoke-stabilization` confirms current smoke/store/submit tests already match the accepted contract:
   - manual reset is covered as full reset to `constructorInitialState`;
   - submit success is covered as no-reset for model/configuration.
-- P0-17 must remain open until PR QA/merge evidence is recorded on main.
+- PR #68 was merged.
+- Main merge commit: `334c743e` (`test: stabilize constructor smoke flow`).
+- PR checks succeeded before merge.
+- Local main verification after pulling `334c743e` passed:
+  - `npm run test:constructor-flow`;
+  - `npm run test:constructor-store`;
+  - `npm run test:checkout-submit-hook`;
+  - `npm run typecheck`;
+  - `npm run build`.
+- Final `git status --short` was empty.
+- Smoke/store/submit tests confirm the P0-16 accepted reset contract:
+  - manual reset is a full reset to `constructorInitialState`;
+  - submit success does not reset the model/configuration.
 
 Closure condition:
 
