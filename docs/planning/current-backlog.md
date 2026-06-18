@@ -1033,7 +1033,7 @@ Closure condition:
 
 ### QA Release Maturity Matrix
 
-Статус: open.
+Статус: closed.
 
 Owner: 05 Infrastructure / QA Agent.
 
@@ -1043,7 +1043,15 @@ Implementation evidence candidate:
 
 - `docs/planning/release-qa-maturity-matrix-v1.md` documents required, manual/release-gate and deferred QA evidence.
 - `docs/planning/release-roadmap.md` links the QA maturity policy from Stage R10.
-- This task must remain open until the docs PR is merged and verified on main.
+- PR #74 was merged.
+- Main merge commit: `e461ff5d` (`docs: add release QA maturity matrix`).
+- PR checks succeeded before merge.
+- Local main verification after pulling `e461ff5d` passed:
+  - `git status --short --branch`;
+  - `git log --oneline -5`;
+  - targeted `rg` verification for QA matrix, roadmap link and backlog evidence.
+- Final `git status --short --branch` was clean.
+- Matrix documents required QA, manual/release-gate QA, cross-browser/device policy, live provider/Supabase/Vercel env policy and coverage upgrade path.
 
 Closure condition:
 
