@@ -246,13 +246,14 @@ Implementation evidence candidate:
 - Current evidence confirms material-aware client/server parity gaps remain; P0-13 stays open for the next pricing implementation PR.
 - Production-panel parity remains untested in this PR because the safe existing pure test path lives outside the allowed files/scope.
 - P0-13B evidence candidate: server pricing now reads selected body/facade material tokens for catalog material pricing; body-material and facade-material parity fixtures now assert client/server parity. P0-13 remains open for delivery/assembly matrix, production-panel parity and quote/order/stored snapshot parity.
+- P0-13C evidence candidate: delivery/assembly pricing matrix fixtures cover no delivery/no assembly, Moscow delivery, outside-MKAD delivery, assembly-only, delivery+assembly and material-aware delivery+assembly parity. No runtime pricing changes were required. P0-13 remains open for production-panel parity and quote/order/stored snapshot parity.
 
 Required sub-work:
 
 - PR #43 triage: rebase/fix/continue or replace;
 - golden pricing fixtures in main;
 - material-aware client/server parity;
-- delivery/assembly pricing matrix;
+- production-panel pricing parity;
 - quote/order/stored price snapshot parity;
 - API server-authoritative price boundary verification.
 

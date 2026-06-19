@@ -289,6 +289,7 @@ Evidence update:
 - Not covered in this PR: delivery distance matrix, production-panel parity, quote/order/stored price snapshot parity and malicious lower payload overwrite.
 - This evidence does not close P0-13 and does not fix formulas.
 - P0-13B evidence candidate: server catalog pricing now consumes selected body/facade material tokens when they are known; body-material and facade-material fixtures now assert parity instead of divergence. Remaining gaps stay open: delivery/assembly matrix, production-panel parity, quote/order/stored price snapshot parity and malicious lower payload overwrite.
+- P0-13C evidence candidate: delivery/assembly matrix fixtures now cover no delivery/no assembly, Moscow delivery, outside-MKAD delivery, assembly-only, delivery+assembly and material-aware delivery+assembly parity. No runtime pricing changes were required. Remaining gaps stay open: production-panel parity, quote/order/stored price snapshot parity and malicious lower payload overwrite.
 
 ---
 
