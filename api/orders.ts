@@ -16,6 +16,7 @@ import { validateOrder } from './_shared/order-validation'
 
 const MANAGER_NOTIFICATION_FAILED = 'manager_notification_failed'
 const CUSTOMER_NOTIFICATION_FAILED = 'customer_notification_failed'
+const GENERIC_ORDER_SUBMIT_FAILED = 'Не удалось обработать заявку. Попробуйте ещё раз или свяжитесь с нами.'
 
 function safeOrderId(): string {
   const now = new Date()
@@ -105,7 +106,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       try {
         const result = await sendEmail(
           managerEmail,
-          `Р Р°Р·РјРµСЂРЅРѕ вЂ” Р·Р°СЏРІРєР° ${orderId}`,
+          `Р Р°Р·РјРµСЂРЅРѕ вЂ” Р·Р°СЏРІРєР° ${orderId}`,
           buildManagerText(orderId, pricedBody),
           buildManagerAttachments(orderId, pricedBody),
         )
@@ -132,7 +133,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
     if (pricedBody.customer?.email) {
       try {
-        const result = await sendEmail(pricedBody.customer.email, `Р Р°Р·РјРµСЂРЅРѕ вЂ” Р·Р°СЏРІРєР° ${orderId}`, buildClientText(orderId, pricedBody))
+        const result = await sendEmail(pricedBody.customer.email, `Р Р°Р·РјРµСЂРЅРѕ вЂ” Р·Р°СЏРІРєР° ${orderId}`, buildClientText(orderId, pricedBody))
         customerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { customer_email_status: customerEmailStatus, customer_email_error: null })
       } catch (error) {
@@ -169,7 +170,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     logEvent('error', 'orders.submit_failed', { reason: safeErrorMessage(error) })
     return res.status(502).json({
       ok: false,
-      message: error instanceof Error ? error.message : 'РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ Р·Р°СЏРІРєСѓ',
+      message: GENERIC_ORDER_SUBMIT_FAILED,
     })
   }
 }
