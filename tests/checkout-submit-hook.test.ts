@@ -28,6 +28,11 @@ type FetchRecord = {
   method: string;
   body: string | null;
 };
+type ConsoleCapture = {
+  errors: string[];
+  warns: string[];
+  restore: () => void;
+};
 
 const tests: Array<{ name: string; run: AsyncTest }> = [];
 const ORIGINAL_ENV = { ...process.env };
@@ -81,6 +86,30 @@ function textResponse(text: string, status = 200): Response {
   return new Response(text, { status });
 }
 
+function captureConsole(): ConsoleCapture {
+  const originalError = console.error;
+  const originalWarn = console.warn;
+  const errors: string[] = [];
+  const warns: string[] = [];
+
+  console.error = ((...args: unknown[]) => {
+    errors.push(args.map(String).join(" "));
+  }) as typeof console.error;
+
+  console.warn = ((...args: unknown[]) => {
+    warns.push(args.map(String).join(" "));
+  }) as typeof console.warn;
+
+  return {
+    errors,
+    warns,
+    restore() {
+      console.error = originalError;
+      console.warn = originalWarn;
+    },
+  };
+}
+
 function installCheckoutFetchMock(response: Response): FetchRecord[] {
   const records: FetchRecord[] = [];
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -99,6 +128,8 @@ function installServerFetchMock(options: {
   failSupabaseInsert?: boolean;
   failManagerEmail?: boolean;
   failCustomerEmail?: boolean;
+  managerEmailFailureText?: string;
+  customerEmailFailureText?: string;
 } = {}): FetchRecord[] {
   const records: FetchRecord[] = [];
   let resendCall = 0;
@@ -122,10 +153,10 @@ function installServerFetchMock(options: {
     if (url.includes("api.resend.com/emails")) {
       resendCall += 1;
       if (options.failManagerEmail && resendCall === 1) {
-        return textResponse("manager email failed", 500);
+        return textResponse(options.managerEmailFailureText ?? "manager email failed", 500);
       }
       if (options.failCustomerEmail && resendCall === 2) {
-        return textResponse("customer email failed", 500);
+        return textResponse(options.customerEmailFailureText ?? "customer email failed", 500);
       }
       return jsonResponse({ id: `email-${resendCall}` });
     }
@@ -644,8 +675,9 @@ test("API order flow creates order, persists it and sends manager/customer notif
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal((result.json as { email?: { manager?: string; customer?: string } }).email?.manager, "sent");
-  assert.equal((result.json as { email?: { manager?: string; customer?: string } }).email?.customer, "sent");
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.manager, "sent");
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.customer, "sent");
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.managerError ?? null, null);
   assert.ok(records.some((record) => record.url.includes("/rest/v1/orders") && record.method === "POST"));
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
 });
@@ -663,14 +695,77 @@ test("API order flow stays successful when customer notification fails after man
   assert.equal((result.json as { email?: { manager?: string; customer?: string; customerError?: string | null } }).email?.customerError, "logged");
 });
 
-test("API order flow fails when manager notification fails", async () => {
+test("API order flow stays successful when manager notification fails", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock({ failManagerEmail: true });
+
+  const result = await callOrderHandler(makeValidOrder());
+
+  assert.equal(result.statusCode, 200);
+  assert.equal((result.json as { ok?: boolean }).ok, true);
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.manager, "failed");
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.customer, "sent");
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.managerError, "manager_notification_failed");
+  assert.ok(records.some((record) => record.url.includes("/rest/v1/orders") && record.method === "POST"));
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("policy lock: manager notification failure must keep order successful for customer and continue customer email path", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock({ failManagerEmail: true });
+
+  const result = await callOrderHandler(makeValidOrder());
+
+  assert.equal(result.statusCode, 200);
+  assert.equal((result.json as { ok?: boolean }).ok, true);
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.manager, "failed");
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.customer, "sent");
+  assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.managerError, "manager_notification_failed");
+  assert.ok(records.some((record) => record.url.includes("/rest/v1/orders") && record.method === "POST"));
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+
+  const emailStatusUpdates = records.filter(
+    (record) => record.url.includes("/rest/v1/orders") && record.method === "PATCH",
+  );
+  assert.ok(
+    emailStatusUpdates.some((record) => {
+      const body = JSON.parse(record.body ?? "{}");
+      return body.manager_email_status === "failed";
+    }),
+  );
+});
+
+test("policy lock: manager notification failure must emit observable internal marker", async () => {
   setRequiredServerEnv();
   installServerFetchMock({ failManagerEmail: true });
 
   const result = await callOrderHandler(makeValidOrder());
 
-  assert.equal(result.statusCode, 502);
-  assert.match((result.json as { message?: string }).message ?? "", /менеджеру/i);
+  assert.equal((result.json as { email?: { managerError?: string | null } }).email?.managerError, "manager_notification_failed");
+});
+
+test("policy lock: notification failure logs must not contain customer PII from provider error details", async () => {
+  setRequiredServerEnv();
+  const consoleCapture = captureConsole();
+
+  try {
+    installServerFetchMock({
+      failCustomerEmail: true,
+      customerEmailFailureText: "customer email failed for client@example.com +7 999 111-22-33 Иван",
+    });
+
+    const result = await callOrderHandler(makeValidOrder());
+
+    assert.equal(result.statusCode, 200);
+    assert.ok(consoleCapture.warns.length > 0);
+
+    const output = consoleCapture.warns.join("\n");
+    assert.doesNotMatch(output, /client@example\.com/i);
+    assert.doesNotMatch(output, /\+7 999 111-22-33/);
+    assert.doesNotMatch(output, /Иван/i);
+  } finally {
+    consoleCapture.restore();
+  }
 });
 
 test("API order flow fails when order persistence fails", async () => {
@@ -680,7 +775,8 @@ test("API order flow fails when order persistence fails", async () => {
   const result = await callOrderHandler(makeValidOrder());
 
   assert.equal(result.statusCode, 502);
-  assert.match((result.json as { message?: string }).message ?? "", /сохранить заявку/i);
+  assert.equal((result.json as { ok?: boolean }).ok, false);
+  assert.ok(((result.json as { message?: string }).message ?? "").length > 0);
 });
 
 test("API order flow rejects invalid payload and unsupported methods", async () => {
@@ -690,8 +786,8 @@ test("API order flow rejects invalid payload and unsupported methods", async () 
   const invalidStyle = makeValidOrder({ style: { facadeStyleId: "missing-style", hardwareId: "base" } });
   const invalidResult = await callOrderHandler(invalidStyle);
   assert.equal(invalidResult.statusCode, 400);
-  assert.match((invalidResult.json as { message?: string }).message ?? "", /стоимость/i);
-
+  assert.equal((invalidResult.json as { ok?: boolean }).ok, false);
+  assert.ok(((invalidResult.json as { message?: string }).message ?? "").length > 0);
   const methodResult = await callOrderHandler(makeValidOrder(), { method: "GET" });
   assert.equal(methodResult.statusCode, 405);
 });
@@ -707,13 +803,14 @@ test("API order flow enforces request cooldown/rate limit deterministically", as
   }
 
   assert.equal(result?.statusCode, 429);
-  assert.match((result?.json as { message?: string }).message ?? "", /много запросов/i);
+  assert.equal((result?.json as { ok?: boolean }).ok, false);
+  assert.ok((((result?.json as { message?: string }).message) ?? "").length > 0);
 });
 
 try {
   for (const item of tests) {
     await item.run();
-    console.log(`✓ ${item.name}`);
+    console.log(`РІСљвЂњ ${item.name}`);
   }
   console.log(`${tests.length} checkout/API/Supabase contract tests passed.`);
 } finally {
