@@ -239,6 +239,13 @@ Reconciliation note: не закрывать без отдельного pricing
 
 Audit reconciliation: P0-13 remains open. PR #43 is open/draft/not merged and is branch-only evidence. It cannot close pricing parity. Main closure requires merged pricing golden fixtures, material-aware client/server parity, delivery/assembly matrix coverage, quote/order/stored price snapshot parity, GitHub QA success and main verification.
 
+Implementation evidence candidate:
+
+- `tests/checkout-submit-hook.test.ts` adds P0-13 pricing parity fixtures without changing pricing formulas.
+- Fixtures cover default baseline, body material divergence, facade material divergence, no-handle multiplier parity and server assembly base behavior.
+- Current evidence confirms material-aware client/server parity gaps remain; P0-13 stays open for the next pricing implementation PR.
+- Production-panel parity remains untested in this PR because the safe existing pure test path lives outside the allowed files/scope.
+
 Required sub-work:
 
 - PR #43 triage: rebase/fix/continue or replace;
