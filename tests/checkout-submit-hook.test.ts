@@ -10,6 +10,8 @@ import { validateOrder } from "../api/_shared/order-validation";
 import { insertOrderRecord, updateOrderEmailStatus } from "../api/_shared/supabase-orders";
 import type { OrderRequest } from "../api/_shared/order-types";
 import { calculateCatalogPrice, type CatalogPriceInput } from "../src/pricing/engine";
+import { calculateAssemblyQuote } from "../src/pricing/assembly";
+import { calculateDeliveryQuote } from "../src/pricing/delivery";
 import { buildConstructorMaterialPricingContext } from "../src/pricing/materialPricing";
 import type { MaterialToken } from "../src/shared/materials/materialCatalog";
 import { submitOrder, validateCustomer } from "../src/shared/lib/order";
@@ -200,6 +202,46 @@ function compareClientServerPricing(order: OrderRequest, clientInput: CatalogPri
   };
 }
 
+function calculateClientOrderPricing(order: OrderRequest, clientInput: CatalogPriceInput = pricingParityBaseInput) {
+  const base = calculateCatalogPrice(clientInput);
+  const delivery = calculateDeliveryQuote(order.delivery?.enabled === true, order.delivery?.address ?? "");
+  const assembly = calculateAssemblyQuote(order.assembly?.enabled === true, base.total);
+
+  return {
+    ...base,
+    delivery: delivery.price,
+    assembly: assembly.price,
+    total: base.total + delivery.price + assembly.price,
+  };
+}
+
+function compareClientServerOrderPricing(order: OrderRequest, clientInput: CatalogPriceInput = pricingParityBaseInput) {
+  const client = calculateClientOrderPricing(order, clientInput);
+  const server = calculateServerPrice(order);
+
+  return {
+    client,
+    server,
+    delta: server.total - client.total,
+  };
+}
+
+function assertOrderPricingParity(order: OrderRequest, clientInput: CatalogPriceInput = pricingParityBaseInput) {
+  const { client, server, delta } = compareClientServerOrderPricing(order, clientInput);
+
+  assert.equal(delta, 0);
+  assert.equal(server.total, client.total);
+  assert.equal(server.body, client.body);
+  assert.equal(server.facades, client.facades);
+  assert.equal(server.delivery, client.delivery);
+  assert.equal(server.assembly ?? 0, client.assembly ?? 0);
+  assert.equal(server.filling, client.filling);
+  assert.equal(server.hardware, client.hardware);
+  assert.equal(server.materials, client.materials);
+  assert.equal(server.edgeBanding, client.edgeBanding);
+  assert.equal(server.services, client.services);
+}
+
 function withMaterialPricingInput(input: CatalogPriceInput, materials: { bodyId: MaterialToken; facadeId: MaterialToken }): CatalogPriceInput {
   const context = buildConstructorMaterialPricingContext({
     bodyMaterialId: materials.bodyId,
@@ -378,6 +420,80 @@ test("P0-13 pricing parity fixture: assembly base is added consistently on the s
   assert.equal(server.assembly, Math.round(baseline.server.total * 0.1));
   assert.equal(delta, server.assembly);
   assert.equal(server.total, baseline.server.total + server.assembly);
+});
+
+test("P0-13 pricing parity fixture: no delivery and no assembly match order total", () => {
+  assertOrderPricingParity(makeValidOrder());
+});
+
+test("P0-13 pricing parity fixture: Moscow delivery matches client and server totals", () => {
+  assertOrderPricingParity(makeDeliveryOrder("Москва, ул. Тверская, 1"));
+});
+
+test("P0-13 pricing parity fixture: outside MKAD delivery matches client and server totals", () => {
+  assertOrderPricingParity(makeDeliveryOrder("Московская область, Химки, за МКАД 20 км"));
+});
+
+test("P0-13 pricing parity fixture: assembly without delivery matches client and server totals", () => {
+  assertOrderPricingParity(
+    makeValidOrder({
+      assembly: {
+        enabled: true,
+        price: 0,
+        rate: 0.1,
+        basePrice: 0,
+      },
+    }),
+  );
+});
+
+test("P0-13 pricing parity fixture: delivery and assembly together match client and server totals", () => {
+  assertOrderPricingParity(
+    makeValidOrder({
+      delivery: {
+        enabled: true,
+        address: "Москва, ул. Тверская, 1",
+        price: 0,
+      },
+      assembly: {
+        enabled: true,
+        price: 0,
+        rate: 0.1,
+        basePrice: 0,
+      },
+    }),
+  );
+});
+
+test("P0-13 pricing parity fixture: material-aware delivery and assembly match client and server totals", () => {
+  const materials = {
+    bodyId: "ldsp-egger-u780-seryy-monumentalnyy-st9",
+    facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+  } satisfies { bodyId: MaterialToken; facadeId: MaterialToken };
+
+  assertOrderPricingParity(
+    makeValidOrder({
+      materials: {
+        bodyId: materials.bodyId,
+        facadeId: materials.facadeId,
+        facadeKind: "mdf",
+        backPanelId: "white-matt",
+        backPanelKind: "hdf",
+      },
+      delivery: {
+        enabled: true,
+        address: "Московская область, Химки, за МКАД 20 км",
+        price: 0,
+      },
+      assembly: {
+        enabled: true,
+        price: 0,
+        rate: 0.1,
+        basePrice: 0,
+      },
+    }),
+    withMaterialPricingInput(pricingParityBaseInput, materials),
+  );
 });
 
 test("checkout submit sends API payload with idempotency key and returns success", async () => {
