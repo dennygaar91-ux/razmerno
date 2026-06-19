@@ -51,6 +51,32 @@ Default sequence:
 6. Execute one narrow change only.
 7. Report evidence and limits.
 
+## Accepted Backlog Decisions Layer
+
+Before changing `docs/planning/current-backlog.md`, agents must read:
+
+- `docs/planning/accepted-backlog-decisions-v1.md`
+
+Before implementation, agents must also read this file if the task affects:
+
+- pricing;
+- API/orders;
+- idempotency;
+- Supabase verification;
+- production materials;
+- HDF;
+- edge banding;
+- Constructor3D;
+- WebGL fallback;
+- visual QA;
+- release maturity.
+
+`docs/planning/current-backlog.md` remains the main backlog source of truth.
+
+`docs/planning/accepted-backlog-decisions-v1.md` does not replace the backlog. It is a mandatory decision layer for interpreting backlog tasks.
+
+If `current-backlog.md` and accepted decisions appear to conflict, the agent must stop and request reconciliation. The agent must not choose its own interpretation.
+
 ## 5. Frozen decisions block
 
 Every implementation prompt must contain:
