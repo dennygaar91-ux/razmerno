@@ -278,6 +278,7 @@
     "check:constructor-architecture": "node scripts/check-constructor-architecture.mjs",
     "test:constructor-flow": "node --no-warnings --import tsx src/static-pages/constructor/constructorFlowSmoke.test.ts",
     "test:constructor-pii-order": "node --no-warnings --import tsx src/static-pages/constructor/constructorPiiOrderInvariants.test.ts",
+    "test:pii-logging": "node --no-warnings --import tsx tests/pii-logging-sanitization.test.ts",
     "release:check": "node scripts/release-checklist.mjs",
     "report:visual-qa": "node scripts/visual-qa-inventory.mjs",
     "test:constructor-three": "node --no-warnings --import tsx src/static-pages/constructor/three/threeSceneAdapter.test.ts",
