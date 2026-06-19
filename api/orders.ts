@@ -13,6 +13,10 @@ import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless
 import { applyCorsHeaders, getHeader, isAllowedOrigin } from './_shared/order-cors'
 import { getClientKey, isRateLimited } from './_shared/order-rate-limit'
 import { validateOrder } from './_shared/order-validation'
+
+const MANAGER_NOTIFICATION_FAILED = 'manager_notification_failed'
+const CUSTOMER_NOTIFICATION_FAILED = 'customer_notification_failed'
+
 function safeOrderId(): string {
   const now = new Date()
   const yyyy = now.getFullYear()
@@ -52,7 +56,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
   const clientKey = getClientKey(req)
   if (await isRateLimited(clientKey)) {
-    return res.status(429).json({ ok: false, message: 'Слишком много запросов. Попробуйте позже.' })
+    return res.status(429).json({ ok: false, message: 'РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ Р·Р°РїСЂРѕСЃРѕРІ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·Р¶Рµ.' })
   }
 
   const body = req.body as OrderRequest
@@ -73,7 +77,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     pricedBody = { ...pricedBody, productionExport }
   } catch (error) {
     logEvent('error', 'orders.server_price_failed', { reason: safeErrorMessage(error) })
-    return res.status(400).json({ ok: false, message: 'Не удалось пересчитать стоимость заявки.' })
+    return res.status(400).json({ ok: false, message: 'РќРµ СѓРґР°Р»РѕСЃСЊ РїРµСЂРµСЃС‡РёС‚Р°С‚СЊ СЃС‚РѕРёРјРѕСЃС‚СЊ Р·Р°СЏРІРєРё.' })
   }
 
   const orderId = body.orderId || safeOrderId()
@@ -89,23 +93,38 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     const dbResult = await insertOrderRecord(dbRecord)
     if (!dbResult.ok) {
       logEvent('error', 'orders.db_insert_failed', { requestId, orderId, reason: dbResult.error })
-      return res.status(502).json({ ok: false, message: 'Не удалось сохранить заявку. Попробуйте позже.' })
+      return res.status(502).json({ ok: false, message: 'РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ Р·Р°СЏРІРєСѓ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·Р¶Рµ.' })
     }
 
     let managerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
     let customerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
+    let managerEmailError: string | null = null
     let customerEmailError: string | null = null
 
     if (managerEmail) {
       try {
-        const result = await sendEmail(managerEmail, `Размерно — заявка ${orderId}`, buildManagerText(orderId, pricedBody), buildManagerAttachments(orderId, pricedBody))
+        const result = await sendEmail(
+          managerEmail,
+          `Р Р°Р·РјРµСЂРЅРѕ вЂ” Р·Р°СЏРІРєР° ${orderId}`,
+          buildManagerText(orderId, pricedBody),
+          buildManagerAttachments(orderId, pricedBody),
+        )
         managerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { manager_email_status: managerEmailStatus, manager_email_error: null })
       } catch (error) {
-        const message = safeErrorMessage(error)
-        await persistEmailPatch(orderId, { manager_email_status: 'failed', manager_email_error: message })
-        logEvent('error', 'orders.manager_email_failed', { requestId, orderId, reason: message })
-        return res.status(502).json({ ok: false, message: 'Заявка сохранена, но не удалось отправить письмо менеджеру. Попробуйте позже.' })
+        void error
+        managerEmailStatus = 'failed'
+        managerEmailError = MANAGER_NOTIFICATION_FAILED
+        await persistEmailPatch(orderId, {
+          manager_email_status: 'failed',
+          manager_email_error: MANAGER_NOTIFICATION_FAILED,
+        })
+        logEvent('error', 'orders.manager_email_failed', {
+          requestId,
+          orderId,
+          reason: MANAGER_NOTIFICATION_FAILED,
+          notificationState: MANAGER_NOTIFICATION_FAILED,
+        })
       }
     } else {
       await persistEmailPatch(orderId, { manager_email_status: 'skipped', manager_email_error: 'ORDER_MANAGER_EMAIL is not set' })
@@ -113,14 +132,23 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
     if (pricedBody.customer?.email) {
       try {
-        const result = await sendEmail(pricedBody.customer.email, `Размерно — заявка ${orderId}`, buildClientText(orderId, pricedBody))
+        const result = await sendEmail(pricedBody.customer.email, `Р Р°Р·РјРµСЂРЅРѕ вЂ” Р·Р°СЏРІРєР° ${orderId}`, buildClientText(orderId, pricedBody))
         customerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { customer_email_status: customerEmailStatus, customer_email_error: null })
       } catch (error) {
+        void error
         customerEmailStatus = 'failed'
-        customerEmailError = safeErrorMessage(error)
-        await persistEmailPatch(orderId, { customer_email_status: 'failed', customer_email_error: customerEmailError })
-        logEvent('warn', 'orders.customer_email_failed', { requestId, orderId, reason: customerEmailError })
+        customerEmailError = CUSTOMER_NOTIFICATION_FAILED
+        await persistEmailPatch(orderId, {
+          customer_email_status: 'failed',
+          customer_email_error: CUSTOMER_NOTIFICATION_FAILED,
+        })
+        logEvent('warn', 'orders.customer_email_failed', {
+          requestId,
+          orderId,
+          reason: CUSTOMER_NOTIFICATION_FAILED,
+          notificationState: CUSTOMER_NOTIFICATION_FAILED,
+        })
       }
     } else {
       await persistEmailPatch(orderId, { customer_email_status: 'skipped', customer_email_error: 'customer email is empty' })
@@ -132,6 +160,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       receivedAt: new Date().toISOString(),
       email: {
         manager: managerEmailStatus,
+        managerError: managerEmailError,
         customer: customerEmailStatus,
         customerError: customerEmailError ? 'logged' : null,
       },
@@ -140,7 +169,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     logEvent('error', 'orders.submit_failed', { reason: safeErrorMessage(error) })
     return res.status(502).json({
       ok: false,
-      message: error instanceof Error ? error.message : 'Не удалось отправить заявку',
+      message: error instanceof Error ? error.message : 'РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ Р·Р°СЏРІРєСѓ',
     })
   }
 }
