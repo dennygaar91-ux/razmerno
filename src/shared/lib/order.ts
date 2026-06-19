@@ -43,6 +43,8 @@ type ViteRuntimeEnv = Record<string, string | undefined> & { DEV?: boolean };
 const viteEnv = ((import.meta as ImportMeta & { env?: ViteRuntimeEnv }).env ?? {}) as ViteRuntimeEnv;
 const USE_MOCK = viteEnv.VITE_USE_MOCK_API === "true";
 const ORDER_API_URL = viteEnv.VITE_ORDER_API_URL || "/api/orders";
+const ORDER_SUBMIT_ERROR_EVENT = "order_submit_failed";
+const GENERIC_SUBMIT_FAILURE_REASON = "generic_submit_failure";
 
 function generateOrderId(): string {
   const now = new Date();
@@ -106,7 +108,10 @@ export async function submitOrder(
     trackEvent("order_submit_success", { orderId: serverOrderId, total: payload.totalPrice, mode: "api" });
     return { ok: true, orderId: serverOrderId };
   } catch (e) {
-    trackEvent("order_submit_error", { error: String(e) });
+    trackEvent("order_submit_error", {
+      error: ORDER_SUBMIT_ERROR_EVENT,
+      reason: GENERIC_SUBMIT_FAILURE_REASON,
+    });
     return {
       ok: false,
       error: e instanceof Error ? e.message : "Не удалось отправить заявку",
