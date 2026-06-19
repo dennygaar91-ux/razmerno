@@ -53,9 +53,8 @@ export function ConstructorStagebar({
                   <span className="rzm-3d-step-index" aria-hidden="true">
                     {isCompleted ? "✓" : index + 1}
                   </span>
-                  <span className="rzm-3d-step-copy">
-                    <span className="rzm-3d-step-title">{stepLabels[item]}</span>
-                    <small>{stepDescriptions[item]}</small>
+                  <span className="rzm-3d-step-label" title={stepLabels[item]}>
+                    {stepLabels[item]}
                   </span>
                   {issueCount > 0 ? (
                     <span className="rzm-3d-step-issue" aria-label={`${issueCount} замечаний`}>
