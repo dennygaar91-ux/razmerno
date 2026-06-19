@@ -10,6 +10,8 @@ import { validateOrder } from "../api/_shared/order-validation";
 import { insertOrderRecord, updateOrderEmailStatus } from "../api/_shared/supabase-orders";
 import type { OrderRequest } from "../api/_shared/order-types";
 import { calculateCatalogPrice, type CatalogPriceInput } from "../src/pricing/engine";
+import { buildConstructorMaterialPricingContext } from "../src/pricing/materialPricing";
+import type { MaterialToken } from "../src/shared/materials/materialCatalog";
 import { submitOrder, validateCustomer } from "../src/shared/lib/order";
 import {
   makeAssemblyOrder,
@@ -198,6 +200,24 @@ function compareClientServerPricing(order: OrderRequest, clientInput: CatalogPri
   };
 }
 
+function withMaterialPricingInput(input: CatalogPriceInput, materials: { bodyId: MaterialToken; facadeId: MaterialToken }): CatalogPriceInput {
+  const context = buildConstructorMaterialPricingContext({
+    bodyMaterialId: materials.bodyId,
+    facadeMaterialId: materials.facadeId,
+  });
+
+  return {
+    ...input,
+    bodyProducer: context.body.producer as CatalogPriceInput["bodyProducer"],
+    bodyArticle: context.body.article,
+    bodyThicknessMm: context.body.thicknessMm,
+    facadeProducer: context.facade.producer as CatalogPriceInput["facadeProducer"],
+    facadeArticle: context.facade.article,
+    facadeThicknessMm: context.facade.thicknessMm,
+    facadeMaterialKind: context.facade.materialKind === "mdf" ? "mdf" : "ldsp",
+  };
+}
+
 async function callOrderHandler(body: OrderRequest, options: { method?: string; ip?: string; origin?: string } = {}) {
   const { res, state } = makeRes();
   await handler(makeReq(body, options), res);
@@ -277,51 +297,52 @@ test("P0-13 pricing parity fixture: default baseline currently matches client an
   assert.equal(server.hardware, client.hardware);
 });
 
-test("P0-13 pricing parity fixture: body material change currently diverges", () => {
+test("P0-13 pricing parity fixture: body material change matches client and server totals", () => {
+  const materials = {
+    bodyId: "ldsp-egger-u780-seryy-monumentalnyy-st9",
+    facadeId: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+  } satisfies { bodyId: MaterialToken; facadeId: MaterialToken };
   const { client, server, delta } = compareClientServerPricing(
     makeValidOrder({
       materials: {
-        bodyId: "graphite",
-        facadeId: "white-matt",
+        bodyId: materials.bodyId,
+        facadeId: materials.facadeId,
         facadeKind: "ldsp",
         backPanelId: "white-matt",
         backPanelKind: "hdf",
       },
     }),
-    {
-      ...pricingParityBaseInput,
-      bodyProducer: "Egger",
-      bodyArticle: "graphite",
-    },
+    withMaterialPricingInput(pricingParityBaseInput, materials),
   );
 
-  assert.notEqual(delta, 0);
-  assert.notEqual(server.body, client.body);
+  assert.equal(delta, 0);
+  assert.equal(server.total, client.total);
+  assert.equal(server.body, client.body);
   assert.equal(server.facades, client.facades);
 });
 
-test("P0-13 pricing parity fixture: facade material change currently diverges", () => {
+test("P0-13 pricing parity fixture: facade material change matches client and server totals", () => {
+  const materials = {
+    bodyId: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+    facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+  } satisfies { bodyId: MaterialToken; facadeId: MaterialToken };
   const { client, server, delta } = compareClientServerPricing(
     makeValidOrder({
       materials: {
-        bodyId: "white-matt",
-        facadeId: "graphite",
+        bodyId: materials.bodyId,
+        facadeId: materials.facadeId,
         facadeKind: "mdf",
         backPanelId: "white-matt",
         backPanelKind: "hdf",
       },
     }),
-    {
-      ...pricingParityBaseInput,
-      facadeProducer: "AGT",
-      facadeThicknessMm: 18,
-      facadeMaterialKind: "mdf",
-    },
+    withMaterialPricingInput(pricingParityBaseInput, materials),
   );
 
-  assert.notEqual(delta, 0);
+  assert.equal(delta, 0);
+  assert.equal(server.total, client.total);
   assert.equal(server.body, client.body);
-  assert.notEqual(server.facades, client.facades);
+  assert.equal(server.facades, client.facades);
 });
 
 test("P0-13 pricing parity fixture: no-handle multiplier currently matches client and server", () => {

@@ -245,6 +245,7 @@ Implementation evidence candidate:
 - Fixtures cover default baseline, body material divergence, facade material divergence, no-handle multiplier parity and server assembly base behavior.
 - Current evidence confirms material-aware client/server parity gaps remain; P0-13 stays open for the next pricing implementation PR.
 - Production-panel parity remains untested in this PR because the safe existing pure test path lives outside the allowed files/scope.
+- P0-13B evidence candidate: server pricing now reads selected body/facade material tokens for catalog material pricing; body-material and facade-material parity fixtures now assert client/server parity. P0-13 remains open for delivery/assembly matrix, production-panel parity and quote/order/stored snapshot parity.
 
 Required sub-work:
 

@@ -1,15 +1,11 @@
-import materials from '../../src/config/materials.json';
 import facadeStyles from '../../src/config/facade-styles.json';
 import hardwareItems from '../../src/config/hardware.json';
-import { calculateCatalogPrice, type CatalogPriceBreakdown } from '../../src/pricing/engine';
+import { calculateCatalogPrice, type CatalogPriceBreakdown, type CatalogPriceInput } from '../../src/pricing/engine';
+import { buildConstructorMaterialPricingContext } from '../../src/pricing/materialPricing';
+import { legacyMaterialAliases, materialCatalog, type MaterialToken } from '../../src/shared/materials/materialCatalog';
 import { calculateDeliveryQuote } from '../../src/pricing/delivery';
 import { calculateAssemblyQuote } from '../../src/pricing/assembly';
 import type { OrderRequest } from './order-types';
-
-type Material = {
-  id: string;
-  pricePerLiter: number;
-};
 
 type FacadeStyle = {
   id: string;
@@ -22,10 +18,65 @@ type Hardware = {
   priceFactor: number;
 };
 
+const materialFallbackId = 'ldsp-egger-w960-belyy-klassicheskiy-sm' satisfies MaterialToken;
+const bodyProducers = ['Kronospan', 'Egger', 'Eterno'] as const;
+const facadeProducers = ['Kronospan', 'Egger', 'Eterno', 'AGT'] as const;
+
 function findById<T extends { id: string }>(items: T[], id: string | undefined, label: string): T {
   const item = items.find((entry) => entry.id === id);
   if (!item) throw new Error(`${label} not found: ${id ?? 'empty'}`);
   return item;
+}
+
+function isKnownMaterialToken(value: string | undefined): value is MaterialToken {
+  if (!value) return false;
+  return value in legacyMaterialAliases || materialCatalog.some((material) => material.id === value);
+}
+
+function toBodyProducer(value: string | undefined): CatalogPriceInput['bodyProducer'] | undefined {
+  return bodyProducers.find((producer) => producer === value);
+}
+
+function toFacadeProducer(value: string | undefined): CatalogPriceInput['facadeProducer'] | undefined {
+  return facadeProducers.find((producer) => producer === value);
+}
+
+function materialPricingOverrides(body: OrderRequest): Partial<CatalogPriceInput> {
+  const selected = body.materials;
+  if (!selected) return {};
+
+  const overrides: Partial<CatalogPriceInput> = {};
+
+  if (isKnownMaterialToken(selected.bodyId)) {
+    try {
+      const context = buildConstructorMaterialPricingContext({
+        bodyMaterialId: selected.bodyId,
+        facadeMaterialId: materialFallbackId,
+      });
+      overrides.bodyProducer = toBodyProducer(context.body.producer);
+      overrides.bodyArticle = context.body.article;
+      overrides.bodyThicknessMm = context.body.thicknessMm;
+    } catch {
+      // Keep the historical catalog fallback for unsupported body material payloads.
+    }
+  }
+
+  if (isKnownMaterialToken(selected.facadeId)) {
+    try {
+      const context = buildConstructorMaterialPricingContext({
+        bodyMaterialId: materialFallbackId,
+        facadeMaterialId: selected.facadeId,
+      });
+      overrides.facadeProducer = toFacadeProducer(context.facade.producer);
+      overrides.facadeArticle = context.facade.article;
+      overrides.facadeThicknessMm = context.facade.thicknessMm;
+      overrides.facadeMaterialKind = context.facade.materialKind === 'mdf' ? 'mdf' : 'ldsp';
+    } catch {
+      // Keep the historical catalog fallback for unsupported facade material payloads.
+    }
+  }
+
+  return overrides;
 }
 
 export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown {
@@ -41,6 +92,7 @@ export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown 
     dimensions: body.dimensions,
     sections: body.sections ?? 1,
     filling: body.filling,
+    ...materialPricingOverrides(body),
     facadeStyleMultiplier: facadeStyle.priceMultiplier,
     hardwareLevel: hardware.basePrice > 5000 ? 'comfort' : 'base',
   });
