@@ -1,0 +1,370 @@
+/* UI-01: client-facing Constructor3D shell polish.
+   Presentation-only layer: scene priority, lighter controls, clearer CTA. */
+
+.rzm-3d-page {
+  padding-top: 104px;
+  background:
+    radial-gradient(circle at 82% 8%, rgba(255, 114, 76, .12), transparent 28%),
+    linear-gradient(180deg, #fbfaf7 0%, #f3f4f7 100%);
+}
+
+.rzm-3d-shell {
+  width: min(1520px, calc(100vw - 40px));
+  gap: 12px;
+}
+
+.rzm-3d-stagebar {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 14px 38px rgba(42, 44, 65, .07), inset 0 0 0 1px rgba(229, 231, 239, .86);
+}
+
+.rzm-3d-stepper-block {
+  display: grid;
+  gap: 8px;
+}
+
+.rzm-3d-stagebar-eyebrow {
+  color: rgba(42, 44, 65, .5);
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(132px, 1fr));
+  gap: 8px;
+}
+
+.rzm-3d-step {
+  min-height: 46px;
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: 16px;
+  background: #f7f8fb;
+  color: rgba(42, 44, 65, .74);
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 239, .9);
+}
+
+.rzm-3d-step.is-active {
+  background: #2a2c41;
+  color: #fff;
+  box-shadow: 0 14px 28px rgba(42, 44, 65, .18);
+}
+
+.rzm-3d-step.is-completed {
+  background: #fff;
+  color: #2a2c41;
+}
+
+.rzm-3d-step-title {
+  font-size: 13px;
+}
+
+.rzm-3d-step-copy small {
+  display: none;
+}
+
+.rzm-3d-stagebar-meta {
+  align-self: stretch;
+}
+
+.rzm-3d-status-badge--runtime {
+  min-height: 34px;
+  border-radius: 999px;
+  background: rgba(42, 44, 65, .07);
+  color: rgba(42, 44, 65, .72);
+}
+
+.rzm-3d-workspace {
+  min-height: calc(100vh - 190px);
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 392px);
+  gap: 12px;
+}
+
+.rzm-3d-scene-card {
+  grid-column: 1;
+  grid-row: 1;
+  min-height: calc(100vh - 190px);
+  padding: 12px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 20px 55px rgba(42, 44, 65, .08), inset 0 0 0 1px rgba(229, 231, 239, .82);
+}
+
+.rzm-3d-drawer {
+  grid-column: 2;
+  grid-row: 1;
+  top: 104px;
+  height: calc(100vh - 138px);
+  padding: 14px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 16px 44px rgba(42, 44, 65, .07), inset 0 0 0 1px rgba(229, 231, 239, .9);
+  backdrop-filter: none;
+}
+
+.rzm-3d-drawer-body {
+  gap: 10px;
+  padding: 0 2px 10px 0;
+}
+
+.rzm-3d-toolbar {
+  min-height: 58px;
+  padding: 8px 10px 12px;
+  gap: 10px;
+}
+
+.rzm-3d-toolbar span {
+  color: rgba(42, 44, 65, .48);
+  font-size: 10px;
+}
+
+.rzm-3d-toolbar strong {
+  font-size: 20px;
+  letter-spacing: -.035em;
+}
+
+.rzm-3d-mode-switch {
+  background: rgba(42, 44, 65, .05);
+  box-shadow: inset 0 0 0 1px rgba(42, 44, 65, .06);
+}
+
+.rzm-3d-mode-switch .rzm-ui-btn {
+  min-height: 34px;
+  color: rgba(42, 44, 65, .7);
+}
+
+.rzm-3d-mode-switch .rzm-ui-btn.is-active {
+  background: #2a2c41;
+  color: #fff;
+}
+
+.rzm-3d-runtime-status {
+  margin: 0 10px 10px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  background: #f7f8fb;
+  color: rgba(42, 44, 65, .66);
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 239, .9);
+}
+
+.rzm-3d-runtime-status span,
+.rzm-3d-runtime-status em {
+  font-size: 12px;
+}
+
+.rzm-3d-viewport {
+  min-height: 700px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, .98), rgba(248, 245, 239, .86) 42%, rgba(229, 224, 216, .96) 100%),
+    linear-gradient(180deg, #faf7f0, #eee8dc);
+}
+
+.rzm-3d-scene-legend {
+  top: 16px;
+  left: 16px;
+  max-width: min(420px, calc(100% - 32px));
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .86);
+  color: rgba(42, 44, 65, .76);
+  box-shadow: 0 10px 24px rgba(42, 44, 65, .08), inset 0 0 0 1px rgba(229, 231, 239, .86);
+  font-size: 13px;
+  font-weight: 730;
+}
+
+.rzm-3d-random-chip {
+  right: 16px;
+  left: auto;
+  bottom: 16px;
+  min-height: 38px;
+  padding-inline: 14px;
+  background: rgba(255, 255, 255, .82);
+  color: rgba(42, 44, 65, .72);
+  font-size: 12px;
+}
+
+.rzm-3d-scene-info {
+  left: 16px;
+  bottom: 16px;
+  max-width: min(380px, calc(100% - 112px));
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .9);
+}
+
+.rzm-3d-scene-info span {
+  color: rgba(42, 44, 65, .52);
+  font-size: 11px;
+  font-weight: 830;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.rzm-3d-scene-info strong {
+  color: #2a2c41;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.rzm-3d-step-intro span,
+.rzm-constructor-validation-eyebrow,
+.rzm-r16-step-eyebrow,
+.rzm-r26-step-eyebrow {
+  background: rgba(255, 114, 76, .1);
+  color: #c24e2f;
+}
+
+.rzm-3d-control-row,
+.rzm-3d-selection-card,
+.rzm-3d-add-card,
+.rzm-3d-validation,
+.rzm-3d-material-picker,
+.rzm-3d-toggle-row,
+.rzm-3d-text-input,
+.rzm-constructor-card,
+.rzm-fill-target-card,
+.rzm-r16-materials-card,
+.rzm-r26-materials-card {
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 239, .9);
+}
+
+.rzm-3d-drawer-footer {
+  border-radius: 20px;
+  padding: 14px;
+  background: #2a2c41;
+  color: #fff;
+  box-shadow: 0 18px 38px rgba(42, 44, 65, .18);
+}
+
+.rzm-3d-drawer-footer > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.rzm-3d-drawer-footer > div:first-child span {
+  color: rgba(255, 255, 255, .68);
+}
+
+.rzm-3d-drawer-footer strong {
+  color: #fff;
+  font-size: 28px;
+  letter-spacing: 0;
+}
+
+.rzm-3d-price-status {
+  width: fit-content;
+  min-height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  color: rgba(255, 255, 255, .78);
+}
+
+.rzm-3d-drawer-actions {
+  display: grid;
+  grid-template-columns: minmax(82px, .42fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.rzm-3d-drawer-actions .rzm-ui-btn {
+  min-height: 50px;
+  border-radius: 16px;
+}
+
+.rzm-3d-drawer-actions .rzm-ui-btn--secondary {
+  background: rgba(255, 255, 255, .1);
+  color: rgba(255, 255, 255, .82);
+}
+
+.rzm-3d-drawer-actions .rzm-ui-btn--primary,
+.rzm-3d-drawer-actions button.is-primary {
+  background: linear-gradient(135deg, #ff724c 0%, #ff9d43 100%);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(255, 114, 76, .28);
+}
+
+.rzm-3d-action-help {
+  color: rgba(255, 255, 255, .68);
+}
+
+@media (max-width: 1180px) {
+  .rzm-3d-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .rzm-3d-scene-card,
+  .rzm-3d-drawer {
+    grid-column: 1;
+  }
+
+  .rzm-3d-drawer {
+    grid-row: 2;
+    position: relative;
+    top: auto;
+    height: auto;
+    order: 2;
+  }
+
+  .rzm-3d-scene-card {
+    grid-row: 1;
+    order: 1;
+    min-height: auto;
+  }
+
+  .rzm-3d-viewport {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 760px) {
+  .rzm-3d-page {
+    padding: 92px 12px 20px;
+  }
+
+  .rzm-3d-shell {
+    width: 100%;
+  }
+
+  .rzm-3d-stepper {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rzm-3d-step {
+    border-radius: 999px;
+  }
+
+  .rzm-3d-viewport {
+    min-height: 420px;
+  }
+
+  .rzm-3d-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .rzm-3d-mode-switch {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .rzm-3d-scene-legend {
+    min-height: 32px;
+    font-size: 11px;
+  }
+
+  .rzm-3d-scene-info {
+    max-width: calc(100% - 32px);
+  }
+
+  .rzm-3d-random-chip {
+    display: none;
+  }
+}

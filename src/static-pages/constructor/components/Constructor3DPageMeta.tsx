@@ -115,13 +115,13 @@ export function getSceneInfo(input: {
   const selectedZone = zones.find((zone) => zone.id === selectedCompartmentId);
   const title = sectionNumber
     ? zoneNumber
-      ? `Секция ${sectionNumber} · Зона ${zoneNumber}`
-      : `Секция ${sectionNumber}`
-    : "Проект";
+      ? `Выбрано: секция ${sectionNumber}, зона ${zoneNumber}`
+      : `Выбрано: секция ${sectionNumber}`
+    : "Весь проект";
   const size =
     selectedZone && selectedSection
-      ? `${formatMm(selectedSection.widthMm)} × ${formatMm(selectedZone.heightMm)} · глубина ${formatMm(input.depth)}`
-      : `${formatMm(input.width)} × ${formatMm(input.height)} × ${formatMm(input.depth)}`;
+      ? `Размер зоны: ${formatMm(selectedSection.widthMm)} × ${formatMm(selectedZone.heightMm)} · глубина ${formatMm(input.depth)}`
+      : `Размер шкафа: ${formatMm(input.width)} × ${formatMm(input.height)} × ${formatMm(input.depth)}`;
   return { title, size };
 }
 

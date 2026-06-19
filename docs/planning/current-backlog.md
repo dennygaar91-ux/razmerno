@@ -691,6 +691,7 @@ Evidence:
 - screenshots reviewed: 37/37;
 - routes reviewed: `/`, `/measurements`, `/materials`, `/assembly`, `/configurator`, `/configurator-3d`, WebGL fallback для `/configurator-3d`, `/admin`;
 - viewports reviewed: `1440×900`, `1280×800`, `768×1024`, `390×844`, `375×812`.
+- UI-01 evidence candidate: Constructor3D client-facing shell pass makes the 3D scene the dominant workspace, keeps the journey stepper above the scene, lightens the settings panel, clarifies the selected section/zone status and strengthens the orange CTA near the accurate price. Fresh screenshot evidence is still required before closing visual follow-ups.
 
 Статус visual QA:
 

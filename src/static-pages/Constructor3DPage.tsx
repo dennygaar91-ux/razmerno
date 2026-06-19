@@ -309,12 +309,12 @@ export default function Constructor3DPage() {
   );
 
   const threePillLabel = useBlueprintFallback
-    ? "2D fallback"
+    ? "2D вид"
     : canRenderThree
       ? "3D готово"
       : webglDiagnostics.status === "checking"
         ? "Проверяем 3D"
-        : "2D fallback";
+        : "2D вид";
 
   const blueprintMetrics = useMemo(
     () => getModelMetrics(width, height, depth),
@@ -461,7 +461,7 @@ export default function Constructor3DPage() {
             >
               <div className="rzm-3d-toolbar">
                 <div>
-                  <span>Рабочая сцена</span>
+                  <span>Ваш проект</span>
                   <strong>
                     {selectedFurniture.label} · {formatMm(width)} ×{" "}
                     {formatMm(height)} × {formatMm(depth)}
@@ -525,7 +525,7 @@ export default function Constructor3DPage() {
                 data-testid="constructor-3d-viewport"
               >
                 <div className="rzm-3d-scene-legend" role="note">
-                  Вращайте модель мышкой
+                  Вращайте модель мышкой. Кликните по зоне, чтобы настроить.
                 </div>
                 <button
                   type="button"
