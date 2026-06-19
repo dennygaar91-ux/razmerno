@@ -6,6 +6,12 @@
 
 Последняя сверка: `docs/planning/project-reconciliation-report-v1.md`.
 
+Governance note:
+
+- `docs/planning/accepted-backlog-decisions-v1.md` is a mandatory decision layer for interpreting backlog tasks.
+- `docs/planning/current-backlog.md` remains the main backlog source of truth.
+- If `current-backlog.md` and accepted decisions appear to conflict, stop and request reconciliation.
+
 Формат приоритета:
 
 - P0 — блокирует безопасный MVP.
@@ -120,6 +126,8 @@ Audit follow-ups:
 - legacy/demo pricing path guard.
 
 These follow-ups must not be mixed with Production or API implementation PRs unless explicitly scoped.
+
+Accepted decisions note: interpret this task together with Q8 in `accepted-backlog-decisions-v1.md`, where `Supabase/runtime catalog` is the primary MVP price source.
 
 Объём: M. Зависимости: price sources, delivery, assembly, P0-13. Независимо: частично.
 
@@ -258,6 +266,8 @@ Required sub-work:
 - API server-authoritative price boundary verification.
 
 Do not close until final tests are merged and verified on main.
+
+Accepted decisions note: interpret parity closure together with Q8 and the explicit PR #43 decision in `accepted-backlog-decisions-v1.md`; branch-only pricing evidence still cannot close this task.
 
 Объём: L. Зависимости: P0-03, pricing sources, client/server parity fixtures.
 
@@ -534,6 +544,8 @@ Closure condition:
 - GitHub QA success;
 - main verification.
 
+Accepted decisions note: interpret this task together with the accepted notification policy: customer email failure keeps order success with logged error; manager email failure keeps customer success but must record `manager_notification_failed`; MVP retry is manual, automatic retry queue is later.
+
 ### Duplicate Submit / Payload-match Idempotency
 
 Статус: open.
@@ -549,6 +561,8 @@ Closure condition:
 - no duplicate notifications;
 - frontend 409 handling verified;
 - GitHub QA success.
+
+Accepted decisions note: interpret this task together with accepted idempotency rules: same payload replay returns the same order/result; different payload replay returns `409 conflict`; PR/body wording must not claim stronger replay semantics unless implemented.
 
 ### Manager Notification Failure Policy
 
@@ -580,6 +594,8 @@ Current blockers:
 - workflow uses temporary `npm pkg set`;
 - snapshots target legacy v2;
 - active export uses v3.
+
+Accepted decisions note: PR #51 must not be merged as-is; MVP production snapshots must be aligned with the active v3 path described in `accepted-backlog-decisions-v1.md`.
 
 ### P1-11A — Resolve Production Golden Snapshot Scope
 
@@ -629,6 +645,8 @@ Closure condition:
 - tests cover back panel and drawer bottom;
 - golden snapshots updated.
 
+Accepted decisions note: current accepted MVP decision is `HDF = 3 мм` in all MVP scenarios unless a later reconciliation explicitly replaces it.
+
 ### P1-24 — Edge Banding Policy Lock
 
 Статус: open.
@@ -643,6 +661,8 @@ Closure condition:
 - implementation aligned;
 - tests fail if required sides are missing;
 - edge length totals verified.
+
+Accepted decisions note: current accepted MVP decision is body/drawers/shelves = `1 мм` edge banding all around, facades = `2 мм` all around unless a later reconciliation explicitly replaces it.
 
 ---
 
@@ -784,6 +804,8 @@ Close only after:
 
 Artifact success confirms capture success, not visual closure.
 
+Accepted decisions note: visual closure for this task family still requires fresh screenshots and explicit visual review under `accepted-backlog-decisions-v1.md`.
+
 Next recommended implementation prompt:
 
 `Constructor Overlay, Stepper Label and WebGL Fallback Visual Polish`
@@ -809,6 +831,8 @@ Closure condition:
 - inactive bubbles secondary;
 - fresh artifact reviewed.
 
+Accepted decisions note: visual closure still requires fresh screenshots and explicit visual review.
+
 ### P2-26B — WebGL Fallback Visual Layout Pass
 
 Статус: open.
@@ -822,6 +846,8 @@ Closure condition:
 - desktop/mobile fallback screenshots show preview/status/actions separated;
 - CTA/chips do not overlay drawing;
 - P1-10 functional fallback remains green.
+
+Accepted decisions note: WebGL fallback must remain a полноценный SVG/2D mode, and visual closure still requires fresh screenshots and explicit visual review.
 
 ### P2-26C — Scene Framing / Camera Fit Pass
 
@@ -837,6 +863,8 @@ Closure condition:
 - no critical model/dimension clipping;
 - camera modes usable;
 - fresh artifact confirms.
+
+Accepted decisions note: visual closure still requires fresh screenshots and explicit visual review.
 
 ### P2-22 Accessibility / Focus Visual Pass
 
@@ -861,6 +889,8 @@ Closure condition:
 - fresh screenshots show readable/intentionally standardized labels across viewports;
 - active/done/error/warning states distinct;
 - no collision with scene/status/exact-toggle.
+
+Accepted decisions note: interpret closure together with the global visual decision layer; screenshot capture alone is not enough without fresh visual review.
 
 ### P2-23 Checkout Trust-state Visual Hardening
 
@@ -965,6 +995,8 @@ Closure condition:
 - Supabase insert/status updates verified;
 - email provider verified with safe recipients;
 - failure branches documented.
+
+Accepted decisions note: interpret this task together with accepted Supabase/runtime catalog, idempotency, notification failure and PII-handling decisions from `accepted-backlog-decisions-v1.md`.
 
 ### P2-07 — Drilling Coordinate Standard
 
@@ -1120,6 +1152,8 @@ Closure condition:
 
 ### Needed for 8/10 strong MVP-ready
 
+Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning/accepted-backlog-decisions-v1.md`, especially for pricing source of truth, idempotency, notification failure policy, Constructor3D/WebGL fallback boundaries, visual closure and the `8/10 strong MVP-ready` target itself.
+
 #### M8-P0-01 — Pricing parity closure plan
 - Status: open
 - Area: pricing
@@ -1127,6 +1161,7 @@ Closure condition:
 - Related existing task: P0-03, P0-13, PR #43 triage
 - Acceptance summary: golden fixtures, material-aware client/server parity, delivery/assembly matrix, quote/order/stored price parity verified on main.
 - Suggested agent: 03 Pricing Agent
+- Accepted decisions note: use Q8 pricing source-of-truth rules and the PR #43 stale-branch decision.
 
 #### M8-P1-01 — Visual QA execution gate
 - Status: open
@@ -1135,6 +1170,7 @@ Closure condition:
 - Related existing task: P1-21, P2-20, P2-21, P2-26
 - Acceptance summary: fresh desktop/tablet/mobile screenshots reviewed for landing, constructor, checkout and WebGL fallback; blockers documented or split.
 - Suggested agent: 08 UX/UI / Design System Agent
+- Accepted decisions note: screenshot capture does not close visual work without fresh visual review.
 
 #### M8-P0-02 — Constructor state ownership contract
 - Status: open
@@ -1143,6 +1179,7 @@ Closure condition:
 - Related existing task: P0-02, P0-16, P0-17
 - Acceptance summary: dimensions, sections, zones, filling, facades, materials, checkout and validation ownership documented and covered by focused state-transition tests.
 - Suggested agent: 02 Constructor Agent
+- Accepted decisions note: Constructor3D state ownership is expected to remain an explicit separate document boundary.
 
 #### M8-P0-03 — Three.js runtime stability and fallback readiness
 - Status: open
@@ -1151,6 +1188,7 @@ Closure condition:
 - Related existing task: P0-05, P0-06, P1-10, P2-26A, P2-26B, P2-26C
 - Acceptance summary: error boundary, loading state, camera reset, reduced-quality path and fallback UX verified without weakening existing WebGL fallback E2E.
 - Suggested agent: 06 Three.js / Visualization Agent
+- Accepted decisions note: fallback must remain a полноценный SVG/2D mode, not a degraded pseudo-preview.
 
 #### M8-P0-04 — Notification failure policy
 - Status: open
@@ -1159,6 +1197,7 @@ Closure condition:
 - Related existing task: API Order Notification Failure Contracts, Manager Notification Failure Policy, PR #52 triage
 - Acceptance summary: manager/customer email failure policy chosen, tested, documented and aligned with order success semantics.
 - Suggested agent: 04 API / Orders Agent
+- Accepted decisions note: customer email failure keeps order success with logging; manager email failure keeps customer success and records `manager_notification_failed`; MVP retry is manual.
 
 #### M8-P0-05 — Duplicate submit and idempotency policy
 - Status: open
@@ -1167,6 +1206,7 @@ Closure condition:
 - Related existing task: Duplicate Submit / Payload-match Idempotency
 - Acceptance summary: safe repeated submit behavior defined, duplicate notifications prevented, frontend 409/replay handling verified.
 - Suggested agent: 04 API / Orders Agent
+- Accepted decisions note: same payload replay returns the same order/result; different payload replay returns `409 conflict`.
 
 #### M8-P1-02 — Live provider and Supabase persistence verification
 - Status: open
@@ -1175,6 +1215,7 @@ Closure condition:
 - Related existing task: Live Provider / Supabase Order Flow Verification, P0-14
 - Acceptance summary: production-like insert/read, RLS assumptions, safe email recipients and no-PII logging verified with evidence.
 - Suggested agent: 05 Infrastructure / QA Agent
+- Accepted decisions note: evaluate against accepted Supabase/runtime catalog, notification failure and no-PII decision layer.
 
 #### M8-P1-03 — PII and logging audit
 - Status: open
