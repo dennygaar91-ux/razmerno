@@ -217,3 +217,20 @@ Stop and ask if:
 - Prefer targeted search over broad scans.
 - Prefer narrow docs-only or test-only PRs when possible.
 - Ask before another iteration if a PR already looks structurally wrong.
+
+## 16. GitHub tool safety rules
+
+- GitHub tool blocks are safety-layer events, not necessarily repository permission failures.
+- If a GitHub write action is blocked once, stop repeating the same action and report the manual fallback.
+- Prefer GitHub tools for reading files, creating branches, small file edits, and comparing branches.
+- Avoid large write payloads in tool calls.
+- Avoid long PR bodies, large markdown tables, and large code fences in `create_pull_request` calls.
+- If `create_pull_request` is blocked, leave the branch ready and ask the user to open the PR manually through GitHub UI.
+- Manual PR fallback format: base `main`, compare the prepared branch, short title, short docs-only/runtime scope summary.
+- Keep commits small and file changes narrow to reduce connector risk.
+- Do not replace very large files through `update_file` unless there is no safer option.
+- Prefer creating small new docs files over rewriting large existing docs files.
+- If an update to a large file is required, first fetch the current file, keep the replacement minimal, and stop if GitHub reports truncation or blocked action.
+- After any blocked GitHub action, do not attempt workaround loops that repeatedly call the same blocked tool.
+- Always run or request `compare_commits` after connector-based edits to verify changed files and branch distance from `main`.
+- PR creation and merge can be manual user actions; agent work is still valid if branch commits and compare evidence exist.
