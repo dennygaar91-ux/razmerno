@@ -534,6 +534,8 @@ Owner: 04 API / Orders Agent + 05 Infrastructure / QA Agent.
 
 Reason: PR #52 is useful but remains open/not merged. It hardens notification failure handling but wording must be reconciled: duplicate order ID behavior is safe 409 conflict unless true idempotent replay is implemented.
 
+Main evidence update: PR #84 `fix: align notification failure policy` merged to `main` at `af9fd2813bfc68014b852a0fdf6af4cfe9760237`. Changed files: `api/orders.ts`, `tests/checkout-submit-hook.test.ts`. Pre-merge QA: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`. Outcome on `main`: manager email failure no longer returns customer-facing `502` after saved order; customer email path continues after manager email failure; `manager_notification_failed` is observable through response/persisted email status/error; notification failure logs use generic safe markers instead of raw provider error details. Remaining out of scope here: duplicate submit / payload-match idempotency remains open, manual retry remains open, automatic retry queue remains later, separate `order_status_events` notification event model remains out of scope.
+
 Closure condition:
 
 - PR #52 or replacement merged;
@@ -571,6 +573,8 @@ Accepted decisions note: interpret this task together with accepted idempotency 
 Owner: 04 API / Orders Agent + 01 Product / Planning Agent.
 
 Reason: If order persistence succeeds but manager notification fails, the product/API contract must define whether the order is successful, warning, failed, or queued for retry.
+
+Main evidence update: PR #84 `fix: align notification failure policy` merged to `main` at `af9fd2813bfc68014b852a0fdf6af4cfe9760237`. Changed files: `api/orders.ts`, `tests/checkout-submit-hook.test.ts`. Pre-merge QA: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`. Outcome on `main`: manager email failure now keeps customer success semantics, customer email path continues, `manager_notification_failed` is observable through response/persisted email status/error, and notification failure logs use generic safe markers instead of raw provider error details. Remaining follow-up stays separate: manual retry is still MVP-open, automatic retry queue is later, and separate `order_status_events` notification event model was not added in this scope.
 
 Closure condition:
 
@@ -1191,13 +1195,18 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Accepted decisions note: fallback must remain a полноценный SVG/2D mode, not a degraded pseudo-preview.
 
 #### M8-P0-04 — Notification failure policy
-- Status: open
+- Status: closed with evidence
 - Area: API / orders
 - Product-visible: yes
 - Related existing task: API Order Notification Failure Contracts, Manager Notification Failure Policy, PR #52 triage
 - Acceptance summary: manager/customer email failure policy chosen, tested, documented and aligned with order success semantics.
 - Suggested agent: 04 API / Orders Agent
 - Accepted decisions note: customer email failure keeps order success with logging; manager email failure keeps customer success and records `manager_notification_failed`; MVP retry is manual.
+- Main evidence: PR #84 `fix: align notification failure policy` merged to `main`; merge baseline `af9fd2813bfc68014b852a0fdf6af4cfe9760237`.
+- Changed files: `api/orders.ts`, `tests/checkout-submit-hook.test.ts`.
+- QA before merge: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`.
+- Outcome: manager email failure no longer returns customer-facing `502` after saved order; customer email path continues after manager email failure; `manager_notification_failed` marker is observable through response/persisted email status/error; notification failure logs use generic safe markers instead of raw provider error details.
+- Remaining out of scope: duplicate submit / payload-match idempotency remains open; manual retry remains open; automatic retry queue remains later; separate `order_status_events` notification event model remains out of scope.
 
 #### M8-P0-05 — Duplicate submit and idempotency policy
 - Status: open
