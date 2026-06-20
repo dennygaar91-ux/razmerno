@@ -90,6 +90,57 @@ test("constructor store: scene view and render modes are stored centrally", () =
   assert(state.sceneViewMode === "top", "Expected top view mode in store");
 });
 
+test("constructor store: exact mode actions mirror one global professional mode", () => {
+  useConstructorStore.getState().reset();
+
+  useConstructorStore.getState().setExactModeEnabled(true);
+  let state = useConstructorStore.getState();
+  assert(state.exactModeEnabled === true, "setExactModeEnabled(true) should enable exact mode");
+  assert(state.advancedSizes === true, "setExactModeEnabled(true) should enable advanced sizes");
+  assert(state.advancedFill === true, "setExactModeEnabled(true) should enable advanced fill");
+
+  useConstructorStore.getState().setExactModeEnabled(false);
+  state = useConstructorStore.getState();
+  assert(state.exactModeEnabled === false, "setExactModeEnabled(false) should disable exact mode");
+  assert(state.advancedSizes === false, "setExactModeEnabled(false) should disable advanced sizes");
+  assert(state.advancedFill === false, "setExactModeEnabled(false) should disable advanced fill");
+
+  useConstructorStore.getState().setAdvancedSizes(true);
+  state = useConstructorStore.getState();
+  assert(state.exactModeEnabled === true, "setAdvancedSizes(true) should mirror exact mode");
+  assert(state.advancedSizes === true, "setAdvancedSizes(true) should stay enabled");
+  assert(state.advancedFill === true, "setAdvancedSizes(true) should mirror advanced fill");
+
+  useConstructorStore.getState().setAdvancedSizes(false);
+  state = useConstructorStore.getState();
+  assert(state.exactModeEnabled === false, "setAdvancedSizes(false) should mirror exact mode");
+  assert(state.advancedSizes === false, "setAdvancedSizes(false) should stay disabled");
+  assert(state.advancedFill === false, "setAdvancedSizes(false) should mirror advanced fill");
+
+  useConstructorStore.getState().setAdvancedFill(true);
+  state = useConstructorStore.getState();
+  assert(state.exactModeEnabled === true, "setAdvancedFill(true) should mirror exact mode");
+  assert(state.advancedSizes === true, "setAdvancedFill(true) should mirror advanced sizes");
+  assert(state.advancedFill === true, "setAdvancedFill(true) should stay enabled");
+
+  useConstructorStore.getState().setAdvancedFill(false);
+  state = useConstructorStore.getState();
+  assert(state.exactModeEnabled === false, "setAdvancedFill(false) should mirror exact mode");
+  assert(state.advancedSizes === false, "setAdvancedFill(false) should mirror advanced sizes");
+  assert(state.advancedFill === false, "setAdvancedFill(false) should stay disabled");
+});
+
+test("constructor store: reset clears the global professional mode mirrors", () => {
+  useConstructorStore.getState().reset();
+  useConstructorStore.getState().setExactModeEnabled(true);
+  useConstructorStore.getState().reset();
+
+  const state = useConstructorStore.getState();
+  assert(state.exactModeEnabled === false, "Reset should clear exact mode");
+  assert(state.advancedSizes === false, "Reset should clear advanced sizes");
+  assert(state.advancedFill === false, "Reset should clear advanced fill");
+});
+
 test("constructor store: production snapshot lifecycle is centralized and PII-free", () => {
   useConstructorStore.getState().reset();
   useConstructorStore.getState().setProductionSnapshotLoading();
