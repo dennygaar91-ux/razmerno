@@ -151,8 +151,13 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       clientIp: clientKey,
     })
     const dbResult = await insertOrderRecord(dbRecord)
-    if (!dbResult.ok) {
-      if (idempotencyKey && isDuplicateInsert(dbResult)) {
+if (dbResult.ok === false) {
+  const insertError = {
+    error: dbResult.error,
+    code: dbResult.code ?? null,
+  }
+
+  if (idempotencyKey && isDuplicateInsert(insertError)) {
         const existingOrder = await getOrderRecordByOrderId(orderId)
         if (!existingOrder.ok) {
           logEvent('error', 'orders.idempotency_read_failed', { requestId, orderId, reason: existingOrder.error })
