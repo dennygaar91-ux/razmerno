@@ -1159,7 +1159,7 @@ Closure condition:
 Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning/accepted-backlog-decisions-v1.md`, especially for pricing source of truth, idempotency, notification failure policy, Constructor3D/WebGL fallback boundaries, visual closure and the `8/10 strong MVP-ready` target itself.
 
 #### M8-P0-01 — Pricing parity closure plan
-- Status: open
+- Status: closed with evidence
 - Area: pricing
 - Product-visible: yes
 - Related existing task: P0-03, P0-13, PR #43 triage
@@ -1251,6 +1251,16 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Product-visible: no
 - Related existing task: P1-22, QA Release Maturity Matrix
 - Acceptance summary: preview/production deploy smoke path documented and executed after main merge; deployment evidence linked without treating dashboard status alone as product QA.
+- Closure evidence:
+  - post-deploy verification was completed after merge PR #90 into `main`;
+  - verified `main` commit: `0e97d4e5 docs: record M8-P1-03 pii logging evidence`;
+  - Vercel latest Production deployment for `main` commit `0e97d4e5` was confirmed as `Ready / Latest`;
+  - environment was confirmed as `Production / Current`;
+  - build/deployment logs showed completed deployment, build, and cache upload;
+  - live smoke `/configurator` was executed: the page opened, the constructor loaded, the UI was visible, and the scene showed `3D готово`;
+  - verification did not require reading or disclosing secrets or env values;
+  - dashboard status was not used as the only signal and was supplemented by live smoke `/configurator`;
+  - no runtime, test, package, workflow, API, pricing, Supabase, or order-flow changes were made for this closure update.
 - Suggested agent: 05 Infrastructure / QA Agent
 
 #### M8-P1-05 — MVP release candidate checklist
