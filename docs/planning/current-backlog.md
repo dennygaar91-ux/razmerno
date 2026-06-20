@@ -1257,7 +1257,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
   - PR #89 introduced no runtime, package, or workflow changes.
 
 #### M8-P1-04 — Vercel post-deploy verification
-- Status: open
+- Status: closed with evidence
 - Area: CI/CD / deploy
 - Product-visible: no
 - Related existing task: P1-22, QA Release Maturity Matrix
