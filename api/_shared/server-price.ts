@@ -123,6 +123,11 @@ export function withServerPrice(body: OrderRequest, price: CatalogPriceBreakdown
       services: price.services,
     },
     totalPrice: price.total,
+    delivery: {
+      ...body.delivery,
+      enabled: body.delivery?.enabled === true,
+      price: body.delivery?.enabled === true ? price.delivery : 0,
+    },
     assembly: {
       enabled: body.assembly?.enabled === true,
       price: price.assembly ?? 0,

@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import handler from "../api/orders";
 import { mapOrderRow, mapStatusEvent, isAdminOrderStatus } from "../api/_shared/admin-orders";
 import { toOrderDbInsert } from "../api/_shared/order-db";
-import { calculateServerPrice } from "../api/_shared/server-price";
+import { calculateServerPrice, withServerPrice } from "../api/_shared/server-price";
 import { validateOrder } from "../api/_shared/order-validation";
 import { insertOrderRecord, updateOrderEmailStatus } from "../api/_shared/supabase-orders";
 import type { OrderRequest } from "../api/_shared/order-types";
@@ -13,6 +13,7 @@ import { calculateCatalogPrice, type CatalogPriceInput } from "../src/pricing/en
 import { calculateAssemblyQuote } from "../src/pricing/assembly";
 import { calculateDeliveryQuote } from "../src/pricing/delivery";
 import { buildConstructorMaterialPricingContext } from "../src/pricing/materialPricing";
+import { buildProductionExportFromOrder } from "../src/constructor/production/orderExportPackage";
 import type { MaterialToken } from "../src/shared/materials/materialCatalog";
 import { submitOrder, validateCustomer } from "../src/shared/lib/order";
 import {
@@ -367,6 +368,14 @@ async function callOrderHandler(
   const { res, state } = makeRes();
   await handler(makeReq(body, options), res);
   return state;
+}
+
+function getOrdersInsertPayload(records: FetchRecord[]) {
+  const insertRequest = records.find(
+    (record) => record.url.includes("/rest/v1/orders") && record.method === "POST",
+  );
+  assert.ok(insertRequest?.body, "Expected Supabase orders insert request");
+  return JSON.parse(insertRequest.body) as Record<string, unknown>;
 }
 
 test("legacy checkout submit hook still delegates payload and validation", () => {
@@ -762,6 +771,150 @@ test("API order flow creates order, persists it and sends manager/customer notif
   assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.managerError ?? null, null);
   assert.ok(records.some((record) => record.url.includes("/rest/v1/orders") && record.method === "POST"));
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("P0-13 server-authoritative boundary: malicious lower client total and breakdown are overwritten before stored order insert", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const materials = {
+    bodyId: "ldsp-egger-u780-seryy-monumentalnyy-st9",
+    facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+  } satisfies { bodyId: MaterialToken; facadeId: MaterialToken };
+  const maliciousOrder = makeValidOrder({
+    orderId: "RZ-20260620-4101",
+    materials: {
+      bodyId: materials.bodyId,
+      facadeId: materials.facadeId,
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+    priceBreakdown: {
+      body: 10,
+      facades: 10,
+      filling: 10,
+      hardware: 10,
+      production: 10,
+      materials: 10,
+      edgeBanding: 10,
+      services: 10,
+      delivery: 10,
+      assembly: 10,
+    },
+    totalPrice: 101,
+  });
+
+  const serverPrice = calculateServerPrice(maliciousOrder);
+  const pricedOrder = withServerPrice(maliciousOrder, serverPrice);
+  const expectedProductionExport = buildProductionExportFromOrder(pricedOrder);
+
+  const result = await callOrderHandler(maliciousOrder, {
+    idempotencyKey: "RZ-20260620-4101",
+  });
+  const storedInsert = getOrdersInsertPayload(records);
+  const storedProductionExport = storedInsert.production_export as
+    | {
+        project?: {
+          dimensions?: { widthMm?: number; heightMm?: number; depthMm?: number };
+          structure?: { sectionCount?: number; hardwareMode?: string };
+          material?: { bodyMaterialId?: string; facadeMaterialId?: string };
+        };
+        source?: string;
+        schema?: string;
+      }
+    | null;
+
+  assert.equal(result.statusCode, 200);
+  assert.equal((result.json as { ok?: boolean }).ok, true);
+  assert.equal(storedInsert.total_price, serverPrice.total);
+  assert.notEqual(storedInsert.total_price, maliciousOrder.totalPrice);
+  assert.deepEqual(storedInsert.price_breakdown, pricedOrder.priceBreakdown);
+  assert.notDeepEqual(storedInsert.price_breakdown, maliciousOrder.priceBreakdown);
+  assert.equal(storedInsert.delivery_price, (storedInsert.price_breakdown as { delivery?: number }).delivery);
+  assert.equal(storedInsert.assembly_price, (storedInsert.price_breakdown as { assembly?: number }).assembly);
+  assert.ok(storedProductionExport);
+  assert.equal(storedProductionExport?.schema, expectedProductionExport.schema);
+  assert.equal(storedProductionExport?.source, expectedProductionExport.source);
+  assert.equal(
+    storedProductionExport?.project?.dimensions?.widthMm,
+    expectedProductionExport.project.dimensions.widthMm,
+  );
+  assert.equal(
+    storedProductionExport?.project?.dimensions?.heightMm,
+    expectedProductionExport.project.dimensions.heightMm,
+  );
+  assert.equal(
+    storedProductionExport?.project?.dimensions?.depthMm,
+    expectedProductionExport.project.dimensions.depthMm,
+  );
+  assert.equal(
+    storedProductionExport?.project?.structure?.sectionCount,
+    expectedProductionExport.project.structure.sectionCount,
+  );
+  assert.equal(
+    storedProductionExport?.project?.structure?.hardwareMode,
+    expectedProductionExport.project.structure.hardwareMode,
+  );
+  assert.equal(
+    storedProductionExport?.project?.material?.bodyMaterialId,
+    expectedProductionExport.project.material.bodyMaterialId,
+  );
+  assert.equal(
+    storedProductionExport?.project?.material?.facadeMaterialId,
+    expectedProductionExport.project.material.facadeMaterialId,
+  );
+  assert.doesNotMatch(JSON.stringify(storedProductionExport), /"totalPrice"|"priceBreakdown"/);
+});
+
+test("P0-13 stored order snapshot parity: delivery and assembly persistence must use server recalculation, not lower client payload", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const order = makeValidOrder({
+    orderId: "RZ-20260620-4102",
+    delivery: {
+      enabled: true,
+      address: "Московская область, Химки, за МКАД 20 км",
+      price: 1,
+    },
+    assembly: {
+      enabled: true,
+      price: 1,
+      rate: 0.1,
+      basePrice: 1,
+    },
+    totalPrice: 101,
+    priceBreakdown: {
+      body: 1,
+      facades: 1,
+      filling: 1,
+      hardware: 1,
+      production: 1,
+      materials: 1,
+      edgeBanding: 1,
+      services: 1,
+      delivery: 1,
+      assembly: 1,
+    },
+  });
+  const serverPrice = calculateServerPrice(order);
+  const pricedOrder = withServerPrice(order, serverPrice);
+
+  const result = await callOrderHandler(order, {
+    idempotencyKey: "RZ-20260620-4102",
+  });
+  const storedInsert = getOrdersInsertPayload(records);
+
+  assert.equal(result.statusCode, 200);
+  assert.equal((result.json as { ok?: boolean }).ok, true);
+  assert.equal(storedInsert.total_price, pricedOrder.totalPrice);
+  assert.deepEqual(storedInsert.price_breakdown, pricedOrder.priceBreakdown);
+  assert.equal(storedInsert.delivery_price, serverPrice.delivery);
+  assert.equal(storedInsert.assembly_price, serverPrice.assembly ?? 0);
+  assert.equal(storedInsert.assembly_rate, 0.1);
+  assert.equal(
+    storedInsert.assembly_base_price,
+    serverPrice.total - serverPrice.delivery - (serverPrice.assembly ?? 0),
+  );
 });
 
 test("API idempotency replay with same key and same payload returns the same order without duplicate notifications", async () => {
