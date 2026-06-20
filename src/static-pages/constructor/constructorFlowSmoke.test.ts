@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { validateOrderLayout } from "../../../api/_shared/layout-validation";
 import { buildConstructorDraft, buildOrderPayloadFromConstructor, type ConstructorSnapshot } from "./adapters/constructorPayload";
 import { stepOrder } from "./options";
@@ -89,6 +90,27 @@ function createSnapshot(): ConstructorSnapshot {
 
 test("constructor flow: step order stays sizes -> fill -> materials -> checkout", () => {
   assert(stepOrder.join(" > ") === "sizes > fill > materials > checkout", "Unexpected constructor step order");
+});
+
+test("constructor flow: Constructor3DPage keeps scene render mode store-owned", () => {
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8");
+
+  assert(
+    pageSource.includes('const [sceneRenderMode, setSceneRenderMode] = useState') === false,
+    "Constructor3DPage must not keep local sceneRenderMode state",
+  );
+  assert(
+    pageSource.includes("advancedFill,\n      sceneRenderMode,\n      deliveryEnabled,"),
+    "Constructor3DPage should read sceneRenderMode from useConstructorPageState values",
+  );
+  assert(
+    pageSource.includes("setFacadeMaterial,\n      setSceneRenderMode,\n      setSceneViewMode,"),
+    "Constructor3DPage should use store-owned setSceneRenderMode action",
+  );
+  assert(
+    pageSource.includes('setSceneRenderMode("svg");'),
+    "Constructor3DPage should switch fallback mode through store-owned svg render mode",
+  );
 });
 
 test("constructor flow: user can move through base wizard and keep configuration", () => {
