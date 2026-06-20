@@ -41,6 +41,10 @@ const ORIGINAL_FETCH = globalThis.fetch;
 let ipCounter = 10;
 
 function test(name: string, run: AsyncTest) {
+  const existingIndex = tests.findIndex((item) => item.name === name);
+  if (existingIndex >= 0) {
+    tests.splice(existingIndex, 1);
+  }
   tests.push({ name, run });
 }
 
@@ -782,7 +786,7 @@ test("API idempotency replay with same key and different payload returns 409 con
   const records = installServerFetchMock();
   const firstBody = makeValidOrder({ orderId: "RZ-20260620-4002" });
   const changedBody = makeValidOrder({
-    orderId: "RZ-20260620-9999",
+    orderId: "RZ-20260620-4002",
     customer: {
       name: "Иван Петров",
       phone: "+7 999 111-22-33",
@@ -812,6 +816,45 @@ test("API order flow without idempotency key keeps the existing safe behavior", 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("API idempotency replay with same key and different payload returns 409 conflict and does not resend notifications", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const firstBody = makeValidOrder({ orderId: "RZ-20260620-4002" });
+  const changedBody = makeValidOrder({
+    orderId: "RZ-20260620-4002",
+    customer: {
+      name: "Иван Петров",
+      phone: "+7 999 111-22-33",
+      email: "client@example.com",
+      comment: "Изменённый комментарий",
+    },
+  });
+
+  const first = await callOrderHandler(firstBody, { idempotencyKey: "RZ-20260620-4002" });
+  const conflict = await callOrderHandler(changedBody, { idempotencyKey: "RZ-20260620-4002" });
+
+  assert.equal(first.statusCode, 200);
+  assert.equal(conflict.statusCode, 409);
+  assert.equal((conflict.json as { ok?: boolean }).ok, false);
+  assert.match((conflict.json as { message?: string }).message ?? "", /conflict|idempotency|конфликт/i);
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("API rejects mismatched idempotency key and body orderId before persistence", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+
+  const result = await callOrderHandler(makeValidOrder({ orderId: "RZ-20260620-4004" }), {
+    idempotencyKey: "RZ-20260620-9999",
+  });
+
+  assert.equal(result.statusCode, 400);
+  assert.equal((result.json as { ok?: boolean }).ok, false);
+  assert.match((result.json as { message?: string }).message ?? "", /Idempotency-Key.*orderId/i);
+  assert.equal(records.filter((record) => record.url.includes("/rest/v1/orders")).length, 0);
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 0);
 });
 
 test("API order flow stays successful when customer notification fails after manager notification", async () => {
