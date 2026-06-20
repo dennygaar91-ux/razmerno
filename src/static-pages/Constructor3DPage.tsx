@@ -42,9 +42,6 @@ export default function Constructor3DPage() {
   const [threeFailureReason, setThreeFailureReason] =
     useState<ThreeRuntimeFailureReason | null>(null);
   const [forceReduced3D, setForceReduced3D] = useState(false);
-  const [sceneRenderMode, setSceneRenderMode] = useState<"three" | "blueprint">(
-    "three",
-  );
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [activeAddTarget, setActiveAddTarget] = useState<{
     sectionId: string;
@@ -53,11 +50,6 @@ export default function Constructor3DPage() {
   const webglDiagnostics = useWebGLDiagnostics();
   const detectedThreeQuality = useThreeSceneQuality();
   const threeQuality = forceReduced3D ? "reduced" : detectedThreeQuality;
-  const webglAvailable = webglDiagnostics.status === "available";
-  const canRenderThree =
-    sceneRenderMode === "three" && webglAvailable && !threeFailed;
-  const useBlueprintFallback =
-    sceneRenderMode === "blueprint" || !canRenderThree;
 
   const handleThreeRuntimeError = useCallback(
     (reason?: ThreeRuntimeFailureReason) => {
@@ -79,7 +71,7 @@ export default function Constructor3DPage() {
   }, []);
 
   const showBlueprintFallback = useCallback(() => {
-    setSceneRenderMode("blueprint");
+    setSceneRenderMode("svg");
   }, []);
 
   const {
@@ -109,6 +101,7 @@ export default function Constructor3DPage() {
       canonicalState,
       advancedSizes,
       advancedFill,
+      sceneRenderMode,
       deliveryEnabled,
       assemblyEnabled,
       deliveryAddress,
@@ -139,6 +132,7 @@ export default function Constructor3DPage() {
       setHandleless,
       setMaterial,
       setFacadeMaterial,
+      setSceneRenderMode,
       setSceneViewMode,
       setExactModeEnabled,
       setDeliveryEnabled,
@@ -153,6 +147,11 @@ export default function Constructor3DPage() {
     selectedFacadeMaterial,
     snapshot,
   } = useConstructorPageState();
+  const webglAvailable = webglDiagnostics.status === "available";
+  const canRenderThree =
+    sceneRenderMode === "three" && webglAvailable && !threeFailed;
+  const useBlueprintFallback =
+    sceneRenderMode === "svg" || !canRenderThree;
 
   const { quote, quoteError, quoteStatus } = useConstructorQuote({
     selectedFurniture,
@@ -514,7 +513,7 @@ export default function Constructor3DPage() {
                 canRenderThree={canRenderThree}
                 threeFailed={threeFailed}
                 failureReason={threeFailureReason}
-                renderMode={sceneRenderMode}
+                renderMode={sceneRenderMode === "three" ? "three" : "blueprint"}
                 quality={threeQuality}
                 quoteStatus={quoteStatus}
                 priceStatusLabel={priceStatusLabel}
