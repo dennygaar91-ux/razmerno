@@ -208,3 +208,100 @@ test("constructor store: filling is applied to selected compartment and totals s
   assert(state.selectedSectionId === sectionId, "Selected section should follow edited filling");
   assert(state.selectedCompartmentId === compartmentId, "Selected compartment should follow edited filling");
 });
+
+test("constructor store: section and layout normalization keep selected zone aliases synchronized", () => {
+  useConstructorStore.getState().reset();
+  useConstructorStore.getState().setSections(3);
+  useConstructorStore.getState().setCompartments(2);
+  let state = useConstructorStore.getState();
+  const targetSectionId = state.sectionLayout[2]?.id;
+  assert(targetSectionId, "Expected third section");
+  const targetZoneId = state.compartmentLayout[targetSectionId]?.[1]?.id;
+  assert(targetZoneId, "Expected second zone in third section");
+
+  useConstructorStore.getState().selectZone(targetSectionId, targetZoneId);
+  useConstructorStore.getState().selectSection("section-1");
+  state = useConstructorStore.getState();
+  assert(state.selectedSectionId === "section-1", "selectSection should update selectedSectionId");
+  assert(Boolean(state.selectedCompartmentId), "selectSection should keep a valid selectedCompartmentId");
+  assert(state.selectedCompartmentId === state.selectedZoneId, "selectSection should synchronize selected zone aliases");
+  assert(
+    (state.compartmentLayout["section-1"] ?? []).some(
+      (compartment) => compartment.id === state.selectedZoneId,
+    ),
+    "selectSection should keep selectedZoneId inside the selected section",
+  );
+
+  useConstructorStore.getState().setSections(1);
+  state = useConstructorStore.getState();
+  assert(state.selectedSectionId === "section-1", "setSections should keep selectedSectionId valid");
+  assert(state.selectedCompartmentId === state.selectedZoneId, "setSections should keep zone aliases synchronized");
+  assert(
+    (state.compartmentLayout["section-1"] ?? []).some(
+      (compartment) => compartment.id === state.selectedZoneId,
+    ),
+    "setSections should not leave selectedZoneId stale",
+  );
+
+  useConstructorStore.getState().setSections(3);
+  useConstructorStore.getState().selectZone("section-3", useConstructorStore.getState().compartmentLayout["section-3"]?.[1]?.id ?? "");
+  useConstructorStore.getState().equalizeSections();
+  state = useConstructorStore.getState();
+  assert(Boolean(state.selectedSectionId), "equalizeSections should keep a selected section");
+  assert(state.selectedCompartmentId === state.selectedZoneId, "equalizeSections should keep zone aliases synchronized");
+  assert(
+    (state.compartmentLayout[state.selectedSectionId ?? ""] ?? []).some(
+      (compartment) => compartment.id === state.selectedZoneId,
+    ),
+    "equalizeSections should not leave selectedZoneId stale",
+  );
+});
+
+test("constructor store: compartment layout normalization keeps selected zone aliases synchronized", () => {
+  useConstructorStore.getState().reset();
+  useConstructorStore.getState().setSections(2);
+  useConstructorStore.getState().setCompartments(3);
+  useConstructorStore.getState().selectZone(
+    "section-2",
+    useConstructorStore.getState().compartmentLayout["section-2"]?.[2]?.id ?? "",
+  );
+
+  useConstructorStore.getState().setCompartments(1);
+  let state = useConstructorStore.getState();
+  assert(state.selectedCompartmentId === state.selectedZoneId, "setCompartments should keep zone aliases synchronized");
+  assert(
+    (state.compartmentLayout[state.selectedSectionId ?? ""] ?? []).some(
+      (compartment) => compartment.id === state.selectedZoneId,
+    ),
+    "setCompartments should not leave selectedZoneId stale",
+  );
+
+  useConstructorStore.getState().setCompartments(3);
+  useConstructorStore.getState().selectZone(
+    "section-2",
+    useConstructorStore.getState().compartmentLayout["section-2"]?.[0]?.id ?? "",
+  );
+  useConstructorStore.getState().setCompartmentHeight(
+    "section-2",
+    useConstructorStore.getState().compartmentLayout["section-2"]?.[0]?.id ?? "",
+    1000,
+  );
+  state = useConstructorStore.getState();
+  assert(state.selectedCompartmentId === state.selectedZoneId, "setCompartmentHeight should keep zone aliases synchronized");
+  assert(
+    (state.compartmentLayout["section-2"] ?? []).some(
+      (compartment) => compartment.id === state.selectedZoneId,
+    ),
+    "setCompartmentHeight should not leave selectedZoneId stale",
+  );
+
+  useConstructorStore.getState().equalizeCompartments("section-2");
+  state = useConstructorStore.getState();
+  assert(state.selectedCompartmentId === state.selectedZoneId, "equalizeCompartments should keep zone aliases synchronized");
+  assert(
+    (state.compartmentLayout["section-2"] ?? []).some(
+      (compartment) => compartment.id === state.selectedZoneId,
+    ),
+    "equalizeCompartments should not leave selectedZoneId stale",
+  );
+});
