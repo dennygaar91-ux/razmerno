@@ -2,6 +2,12 @@ import facadeStyles from '../../src/config/facade-styles.json';
 import hardwareItems from '../../src/config/hardware.json';
 import { calculateCatalogPrice, type CatalogPriceBreakdown, type CatalogPriceInput } from '../../src/pricing/engine';
 import { buildConstructorMaterialPricingContext } from '../../src/pricing/materialPricing';
+import {
+  applyProductionPanelPricingToCatalogPrice,
+  summarizeProductionPanelPricing,
+  type ProductionPanelPriceApplication,
+} from '../../src/pricing/productionPanelPricing';
+import type { ProductionExportPackage } from '../../src/constructor/production/types';
 import { legacyMaterialAliases, materialCatalog, type MaterialToken } from '../../src/shared/materials/materialCatalog';
 import { calculateDeliveryQuote } from '../../src/pricing/delivery';
 import { calculateAssemblyQuote } from '../../src/pricing/assembly';
@@ -79,7 +85,7 @@ function materialPricingOverrides(body: OrderRequest): Partial<CatalogPriceInput
   return overrides;
 }
 
-export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown {
+export function calculateServerCatalogPrice(body: OrderRequest): CatalogPriceBreakdown {
   if (!body.productType) throw new Error('productType is missing');
   if (!body.dimensions) throw new Error('dimensions are missing');
   if (!body.filling) throw new Error('filling is missing');
@@ -96,6 +102,13 @@ export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown 
     facadeStyleMultiplier: facadeStyle.priceMultiplier,
     hardwareLevel: hardware.basePrice > 5000 ? 'comfort' : 'base',
   });
+  return basePrice;
+}
+
+export function applyServerDeliveryAndAssembly(
+  body: OrderRequest,
+  basePrice: CatalogPriceBreakdown,
+): CatalogPriceBreakdown {
   const deliveryQuote = calculateDeliveryQuote(body.delivery?.enabled === true, body.delivery?.address ?? '');
   const assemblyQuote = calculateAssemblyQuote(body.assembly?.enabled === true, basePrice.total);
 
@@ -105,6 +118,26 @@ export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown 
     assembly: assemblyQuote.price,
     total: basePrice.total + deliveryQuote.price + assemblyQuote.price,
   };
+}
+
+export function applyServerProductionPanelPrice(input: {
+  body: OrderRequest;
+  catalogPrice: CatalogPriceBreakdown;
+  productionExport: ProductionExportPackage;
+}): ProductionPanelPriceApplication {
+  const panelPricing = summarizeProductionPanelPricing({
+    productionExport: input.productionExport,
+    catalogMaterialsPrice: input.catalogPrice.materials,
+  });
+
+  return applyProductionPanelPricingToCatalogPrice({
+    catalogPrice: input.catalogPrice,
+    panelPricing,
+  });
+}
+
+export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown {
+  return applyServerDeliveryAndAssembly(body, calculateServerCatalogPrice(body));
 }
 
 export function withServerPrice(body: OrderRequest, price: CatalogPriceBreakdown): OrderRequest {

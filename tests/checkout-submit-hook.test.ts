@@ -5,7 +5,13 @@ import { readFileSync } from "node:fs";
 import handler from "../api/orders";
 import { mapOrderRow, mapStatusEvent, isAdminOrderStatus } from "../api/_shared/admin-orders";
 import { toOrderDbInsert } from "../api/_shared/order-db";
-import { calculateServerPrice, withServerPrice } from "../api/_shared/server-price";
+import {
+  applyServerDeliveryAndAssembly,
+  applyServerProductionPanelPrice,
+  calculateServerCatalogPrice,
+  calculateServerPrice,
+  withServerPrice,
+} from "../api/_shared/server-price";
 import { validateOrder } from "../api/_shared/order-validation";
 import { insertOrderRecord, updateOrderEmailStatus } from "../api/_shared/supabase-orders";
 import type { OrderRequest } from "../api/_shared/order-types";
@@ -376,6 +382,28 @@ function getOrdersInsertPayload(records: FetchRecord[]) {
   );
   assert.ok(insertRequest?.body, "Expected Supabase orders insert request");
   return JSON.parse(insertRequest.body) as Record<string, unknown>;
+}
+
+function calculateExpectedServerProductionPanelPrice(order: OrderRequest) {
+  const catalogPrice = calculateServerCatalogPrice(order);
+  const catalogServerPrice = applyServerDeliveryAndAssembly(order, catalogPrice);
+  const catalogPricedBody = withServerPrice(order, catalogServerPrice);
+  const initialProductionExport = buildProductionExportFromOrder(catalogPricedBody);
+  const finalBasePrice = applyServerProductionPanelPrice({
+    body: order,
+    catalogPrice,
+    productionExport: initialProductionExport,
+  }).price;
+  const finalServerPrice = applyServerDeliveryAndAssembly(order, finalBasePrice);
+
+  return {
+    catalogPrice,
+    catalogServerPrice,
+    initialProductionExport,
+    finalBasePrice,
+    finalServerPrice,
+    finalPricedBody: withServerPrice(order, finalServerPrice),
+  };
 }
 
 test("legacy checkout submit hook still delegates payload and validation", () => {
@@ -915,6 +943,136 @@ test("P0-13 stored order snapshot parity: delivery and assembly persistence must
     storedInsert.assembly_base_price,
     serverPrice.total - serverPrice.delivery - (serverPrice.assembly ?? 0),
   );
+});
+
+test("P0-13 production-panel parity: server persisted snapshot must use server-applied production panel price", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const order = makeValidOrder({
+    orderId: "RZ-20260620-4103",
+    source: "production-panels",
+    materials: {
+      bodyId: "ldsp-egger-u780-seryy-monumentalnyy-st9",
+      facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+    priceBreakdown: {
+      body: 1,
+      facades: 1,
+      filling: 1,
+      hardware: 1,
+      production: 1,
+      materials: 1,
+      edgeBanding: 1,
+      services: 1,
+      delivery: 1,
+      assembly: 1,
+    },
+    totalPrice: 101,
+  });
+  const expected = calculateExpectedServerProductionPanelPrice(order);
+  const expectedProductionExport = buildProductionExportFromOrder(expected.finalPricedBody);
+
+  const result = await callOrderHandler(order, {
+    idempotencyKey: "RZ-20260620-4103",
+  });
+  const storedInsert = getOrdersInsertPayload(records);
+  const storedProductionExport = storedInsert.production_export as
+    | {
+        schema?: string;
+        source?: string;
+        project?: {
+          dimensions?: { widthMm?: number; heightMm?: number; depthMm?: number };
+          structure?: { sectionCount?: number; hardwareMode?: string };
+          material?: { bodyMaterialId?: string; facadeMaterialId?: string };
+        };
+      }
+    | null;
+
+  assert.equal(result.statusCode, 200);
+  assert.equal((result.json as { ok?: boolean }).ok, true);
+  assert.equal(expected.finalBasePrice.source, "production-panels");
+  assert.deepEqual(storedInsert.price_breakdown, expected.finalPricedBody.priceBreakdown);
+  assert.equal(storedInsert.total_price, expected.finalPricedBody.totalPrice);
+  assert.equal(storedInsert.delivery_price, expected.finalServerPrice.delivery);
+  assert.equal(storedInsert.assembly_price, expected.finalServerPrice.assembly ?? 0);
+  assert.equal((storedInsert.price_breakdown as { body?: number }).body, expected.finalBasePrice.body);
+  assert.equal((storedInsert.price_breakdown as { facades?: number }).facades, expected.finalBasePrice.facades);
+  assert.equal((storedInsert.price_breakdown as { materials?: number }).materials, expected.finalBasePrice.materials);
+  assert.equal((storedInsert.price_breakdown as { edgeBanding?: number }).edgeBanding, expected.finalBasePrice.edgeBanding);
+  assert.equal((storedInsert.price_breakdown as { production?: number }).production, expected.finalBasePrice.production);
+  assert.notEqual(storedInsert.total_price, order.totalPrice);
+  assert.notDeepEqual(storedInsert.price_breakdown, order.priceBreakdown);
+  assert.ok(storedProductionExport);
+  assert.equal(storedProductionExport?.schema, expectedProductionExport.schema);
+  assert.equal(storedProductionExport?.source, expectedProductionExport.source);
+  assert.equal(storedProductionExport?.project?.dimensions?.widthMm, expectedProductionExport.project.dimensions.widthMm);
+  assert.equal(storedProductionExport?.project?.dimensions?.heightMm, expectedProductionExport.project.dimensions.heightMm);
+  assert.equal(storedProductionExport?.project?.dimensions?.depthMm, expectedProductionExport.project.dimensions.depthMm);
+  assert.equal(storedProductionExport?.project?.structure?.sectionCount, expectedProductionExport.project.structure.sectionCount);
+  assert.equal(storedProductionExport?.project?.structure?.hardwareMode, expectedProductionExport.project.structure.hardwareMode);
+  assert.equal(storedProductionExport?.project?.material?.bodyMaterialId, expectedProductionExport.project.material.bodyMaterialId);
+  assert.equal(storedProductionExport?.project?.material?.facadeMaterialId, expectedProductionExport.project.material.facadeMaterialId);
+});
+
+test("P0-13 production-panel parity: assembly base must use server production-panel base and ignore malicious client delivery and assembly", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const order = makeValidOrder({
+    orderId: "RZ-20260620-4104",
+    source: "production-panels",
+    materials: {
+      bodyId: "ldsp-egger-u780-seryy-monumentalnyy-st9",
+      facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+    delivery: {
+      enabled: true,
+      address: "Московская область, Химки, за МКАД 20 км",
+      price: 1,
+    },
+    assembly: {
+      enabled: true,
+      price: 1,
+      rate: 0.1,
+      basePrice: 1,
+    },
+    totalPrice: 101,
+    priceBreakdown: {
+      body: 1,
+      facades: 1,
+      filling: 1,
+      hardware: 1,
+      production: 1,
+      materials: 1,
+      edgeBanding: 1,
+      services: 1,
+      delivery: 1,
+      assembly: 1,
+    },
+  });
+  const expected = calculateExpectedServerProductionPanelPrice(order);
+
+  const result = await callOrderHandler(order, {
+    idempotencyKey: "RZ-20260620-4104",
+  });
+  const storedInsert = getOrdersInsertPayload(records);
+
+  assert.equal(result.statusCode, 200);
+  assert.equal((result.json as { ok?: boolean }).ok, true);
+  assert.equal(expected.finalBasePrice.source, "production-panels");
+  assert.equal(storedInsert.total_price, expected.finalPricedBody.totalPrice);
+  assert.equal(storedInsert.delivery_price, expected.finalServerPrice.delivery);
+  assert.equal(storedInsert.assembly_price, expected.finalServerPrice.assembly ?? 0);
+  assert.equal(storedInsert.assembly_rate, 0.1);
+  assert.equal(storedInsert.assembly_base_price, expected.finalBasePrice.total);
+  assert.notEqual(storedInsert.delivery_price, order.delivery?.price);
+  assert.notEqual(storedInsert.assembly_price, order.assembly?.price);
+  assert.notEqual(storedInsert.assembly_base_price, order.assembly?.basePrice);
 });
 
 test("API idempotency replay with same key and same payload returns the same order without duplicate notifications", async () => {
