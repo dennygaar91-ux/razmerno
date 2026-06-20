@@ -1227,12 +1227,23 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Accepted decisions note: evaluate against accepted Supabase/runtime catalog, notification failure and no-PII decision layer.
 
 #### M8-P1-03 — PII and logging audit
-- Status: open
+- Status: closed with evidence
 - Area: security / privacy
 - Product-visible: no
 - Related existing task: Live Provider / Supabase Order Flow Verification, order security docs
 - Acceptance summary: phone/email/address do not leak into logs, localStorage or unsafe errors; `safeErrorMessage` and request-id logging reviewed.
 - Suggested agent: 04 API / Orders Agent
+- Closure evidence:
+  - runtime-risk path is closed on `main`;
+  - `api/_shared/logger.ts` contains content-based redaction and `safeErrorMessage()` sanitization;
+  - `api/orders.ts` generic catch does not return raw `error.message` to the customer;
+  - `src/shared/lib/order.ts` submit-error analytics no longer sends `String(e)`;
+  - PR #89 `test: lock pii logging sanitization` was merged into `main`;
+  - main includes `40d5dbc9 test: lock pii logging sanitization (#89)`;
+  - PR #89 changed only `tests/pii-logging-sanitization.test.ts`;
+  - GitHub checks / Vercel success were confirmed before merge;
+  - tests now lock logger redaction, API generic error sanitization, and frontend analytics sanitization;
+  - PR #89 introduced no runtime, package, or workflow changes.
 
 #### M8-P1-04 — Vercel post-deploy verification
 - Status: open
