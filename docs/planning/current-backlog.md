@@ -1216,6 +1216,13 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Acceptance summary: safe repeated submit behavior defined, duplicate notifications prevented, frontend 409/replay handling verified.
 - Suggested agent: 04 API / Orders Agent
 - Accepted decisions note: same payload replay returns the same order/result; different payload replay returns `409 conflict`.
+- Partial evidence:
+  - local implementation on branch `fix/m8-p0-05-idempotency-policy` uses existing `orders.order_id` uniqueness plus canonical payload comparison for durable replay handling without schema migration;
+  - same `Idempotency-Key` + same payload now returns the same order/result and does not resend manager/customer notifications;
+  - same `Idempotency-Key` + different payload now returns `409 conflict`;
+  - missing `Idempotency-Key` keeps existing safe behavior;
+  - local focused QA passed: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`;
+  - closure still requires PR review, GitHub checks and main verification before status can move to `closed with evidence`.
 
 #### M8-P1-02 — Live provider and Supabase persistence verification
 - Status: open

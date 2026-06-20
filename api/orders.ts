@@ -1,22 +1,30 @@
 import type { OrderRequest } from './_shared/order-types'
 import { toOrderDbInsert } from './_shared/order-db'
-import { insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders'
-import { calculateServerPrice, withServerPrice } from './_shared/server-price'
-import { logEvent, safeErrorMessage } from './_shared/logger'
+import { isSameOrderPayload } from './_shared/order-idempotency'
+import { buildClientText, buildManagerAttachments, buildManagerText, sendEmail } from './_shared/order-email'
+import { applyCorsHeaders, getHeader, isAllowedOrigin } from './_shared/order-cors'
 import { assertServerEnvReady } from './_shared/env'
 import { applyNoStoreHeaders } from './_shared/headers'
-import { buildProductionExportFromOrder } from '../src/constructor/production/orderExportPackage'
-
-import { applyRequestIdHeader, getRequestId } from './_shared/request-context'
-import { buildClientText, buildManagerAttachments, buildManagerText, sendEmail } from './_shared/order-email'
-import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types'
-import { applyCorsHeaders, getHeader, isAllowedOrigin } from './_shared/order-cors'
+import { logEvent, safeErrorMessage } from './_shared/logger'
 import { getClientKey, isRateLimited } from './_shared/order-rate-limit'
+import { applyRequestIdHeader, getRequestId } from './_shared/request-context'
+import { calculateServerPrice, withServerPrice } from './_shared/server-price'
+import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types'
+import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders'
 import { validateOrder } from './_shared/order-validation'
+import { buildProductionExportFromOrder } from '../src/constructor/production/orderExportPackage'
 
 const MANAGER_NOTIFICATION_FAILED = 'manager_notification_failed'
 const CUSTOMER_NOTIFICATION_FAILED = 'customer_notification_failed'
+const IDEMPOTENCY_CONFLICT_MESSAGE = 'Конфликт повторной отправки: состав заявки изменился. Обновите заявку и отправьте снова.'
 const GENERIC_ORDER_SUBMIT_FAILED = 'Не удалось обработать заявку. Попробуйте ещё раз или свяжитесь с нами.'
+const RATE_LIMIT_MESSAGE = 'Слишком много запросов. Попробуйте позже.'
+const SERVER_PRICE_FAILED_MESSAGE = 'Не удалось пересчитать стоимость заявки.'
+const DB_INSERT_FAILED_MESSAGE = 'Не удалось сохранить заявку. Попробуйте позже.'
+const INVALID_IDEMPOTENCY_KEY_MESSAGE = 'Некорректный Idempotency-Key.'
+const ORDER_ID_MISMATCH_MESSAGE = 'Idempotency-Key должен совпадать с orderId заявки.'
+const INVALID_ORDER_ID_MESSAGE = 'Некорректный идентификатор заявки.'
+const ORDER_ID_PATTERN = /^RZ-\d{8}-\d{4}$/
 
 function safeOrderId(): string {
   const now = new Date()
@@ -27,10 +35,55 @@ function safeOrderId(): string {
   return `RZ-${yyyy}${mm}${dd}-${rand}`
 }
 
+function isSafeOrderId(value: string): boolean {
+  return value.length <= 32 && ORDER_ID_PATTERN.test(value)
+}
+
+function resolveOrderIdentity(bodyOrderId: string | undefined, headerIdempotencyKey: string | null) {
+  const normalizedBodyOrderId = bodyOrderId?.trim() || null
+  const normalizedHeaderKey = headerIdempotencyKey?.trim() || null
+
+  if (normalizedHeaderKey && !isSafeOrderId(normalizedHeaderKey)) {
+    return { ok: false as const, status: 400, message: INVALID_IDEMPOTENCY_KEY_MESSAGE }
+  }
+
+  if (normalizedBodyOrderId && !isSafeOrderId(normalizedBodyOrderId)) {
+    return { ok: false as const, status: 400, message: INVALID_ORDER_ID_MESSAGE }
+  }
+
+  if (normalizedHeaderKey && normalizedBodyOrderId && normalizedHeaderKey !== normalizedBodyOrderId) {
+    return { ok: false as const, status: 400, message: ORDER_ID_MISMATCH_MESSAGE }
+  }
+
+  return {
+    ok: true as const,
+    orderId: normalizedBodyOrderId || normalizedHeaderKey || safeOrderId(),
+    idempotencyKey: normalizedHeaderKey,
+  }
+}
+
 async function persistEmailPatch(orderId: string, patch: Parameters<typeof updateOrderEmailStatus>[1]) {
   const result = await updateOrderEmailStatus(orderId, patch)
   if (!result.ok) {
     logEvent('error', 'orders.email_status_update_failed', { orderId, reason: result.error })
+  }
+}
+
+function isDuplicateInsert(error: { error: string; code?: string | null }): boolean {
+  return error.code === '23505' || /duplicate key|unique/i.test(error.error)
+}
+
+function buildReplayResponse(row: NonNullable<Awaited<ReturnType<typeof getOrderRecordByOrderId>>['row']>) {
+  return {
+    ok: true,
+    orderId: row.order_id,
+    receivedAt: row.created_at,
+    email: {
+      manager: row.manager_email_status,
+      managerError: row.manager_email_error === MANAGER_NOTIFICATION_FAILED ? MANAGER_NOTIFICATION_FAILED : null,
+      customer: row.customer_email_status,
+      customerError: row.customer_email_error === CUSTOMER_NOTIFICATION_FAILED ? 'logged' : null,
+    },
   }
 }
 
@@ -57,13 +110,18 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
   const clientKey = getClientKey(req)
   if (await isRateLimited(clientKey)) {
-    return res.status(429).json({ ok: false, message: 'РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ Р·Р°РїСЂРѕСЃРѕРІ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·Р¶Рµ.' })
+    return res.status(429).json({ ok: false, message: RATE_LIMIT_MESSAGE })
   }
 
   const body = req.body as OrderRequest
   if (body.honeypot?.trim()) {
     logEvent('warn', 'orders.honeypot_rejected', { requestId, clientHash: clientKey })
     return res.status(200).json({ ok: true, orderId: safeOrderId(), receivedAt: new Date().toISOString(), spam: 'filtered' })
+  }
+
+  const orderIdentity = resolveOrderIdentity(body.orderId, getHeader(req, 'idempotency-key'))
+  if (!orderIdentity.ok) {
+    return res.status(orderIdentity.status).json({ ok: false, message: orderIdentity.message })
   }
 
   const validationError = validateOrder(body)
@@ -78,23 +136,45 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     pricedBody = { ...pricedBody, productionExport }
   } catch (error) {
     logEvent('error', 'orders.server_price_failed', { reason: safeErrorMessage(error) })
-    return res.status(400).json({ ok: false, message: 'РќРµ СѓРґР°Р»РѕСЃСЊ РїРµСЂРµСЃС‡РёС‚Р°С‚СЊ СЃС‚РѕРёРјРѕСЃС‚СЊ Р·Р°СЏРІРєРё.' })
+    return res.status(400).json({ ok: false, message: SERVER_PRICE_FAILED_MESSAGE })
   }
 
-  const orderId = body.orderId || safeOrderId()
+  const orderId = orderIdentity.orderId
+  const idempotencyKey = orderIdentity.idempotencyKey
   const managerEmail = process.env.ORDER_MANAGER_EMAIL
 
   try {
     const dbRecord = toOrderDbInsert({
       orderId,
-      body: pricedBody,
+      body: { ...pricedBody, orderId },
       userAgent: getHeader(req, 'user-agent'),
       clientIp: clientKey,
     })
     const dbResult = await insertOrderRecord(dbRecord)
-    if (!dbResult.ok) {
+if (dbResult.ok === false) {
+  const insertError = {
+    error: dbResult.error,
+    code: dbResult.code ?? null,
+  }
+
+  if (idempotencyKey && isDuplicateInsert(insertError)) {
+        const existingOrder = await getOrderRecordByOrderId(orderId)
+        if (!existingOrder.ok) {
+          logEvent('error', 'orders.idempotency_read_failed', { requestId, orderId, reason: existingOrder.error })
+          return res.status(502).json({ ok: false, message: GENERIC_ORDER_SUBMIT_FAILED })
+        }
+
+        if (existingOrder.row && isSameOrderPayload(dbRecord, existingOrder.row)) {
+          logEvent('info', 'orders.idempotent_replay', { requestId, orderId })
+          return res.status(200).json(buildReplayResponse(existingOrder.row))
+        }
+
+        logEvent('warn', 'orders.idempotency_conflict', { requestId, orderId })
+        return res.status(409).json({ ok: false, message: IDEMPOTENCY_CONFLICT_MESSAGE })
+      }
+
       logEvent('error', 'orders.db_insert_failed', { requestId, orderId, reason: dbResult.error })
-      return res.status(502).json({ ok: false, message: 'РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ Р·Р°СЏРІРєСѓ. РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·Р¶Рµ.' })
+      return res.status(502).json({ ok: false, message: DB_INSERT_FAILED_MESSAGE })
     }
 
     let managerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
@@ -106,7 +186,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       try {
         const result = await sendEmail(
           managerEmail,
-          `Р Р°Р·РјРµСЂРЅРѕ вЂ” Р·Р°СЏРІРєР° ${orderId}`,
+          `Размерно — заявка ${orderId}`,
           buildManagerText(orderId, pricedBody),
           buildManagerAttachments(orderId, pricedBody),
         )
@@ -133,7 +213,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
     if (pricedBody.customer?.email) {
       try {
-        const result = await sendEmail(pricedBody.customer.email, `Р Р°Р·РјРµСЂРЅРѕ вЂ” Р·Р°СЏРІРєР° ${orderId}`, buildClientText(orderId, pricedBody))
+        const result = await sendEmail(
+          pricedBody.customer.email,
+          `Размерно — заявка ${orderId}`,
+          buildClientText(orderId, pricedBody),
+        )
         customerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { customer_email_status: customerEmailStatus, customer_email_error: null })
       } catch (error) {

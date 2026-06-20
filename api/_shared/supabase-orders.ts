@@ -1,6 +1,40 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { OrderDbInsert } from "./order-types";
 
+export type StoredOrderRecord = {
+  order_id: string;
+  source: string;
+  product_type: OrderDbInsert["product_type"];
+  dimensions: OrderDbInsert["dimensions"];
+  sections: number;
+  filling: OrderDbInsert["filling"];
+  layout: OrderDbInsert["layout"];
+  materials: OrderDbInsert["materials"];
+  style: OrderDbInsert["style"];
+  price_breakdown: OrderDbInsert["price_breakdown"];
+  total_price: number;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+  customer_comment: string | null;
+  delivery_enabled: boolean;
+  delivery_address: string | null;
+  delivery_price: number;
+  assembly_enabled: boolean;
+  assembly_price: number;
+  assembly_rate: number;
+  assembly_base_price: number;
+  consent: OrderDbInsert["consent"];
+  config_version: string | null;
+  utm: OrderDbInsert["utm"];
+  manager_email_status: OrderDbInsert["manager_email_status"];
+  customer_email_status: OrderDbInsert["customer_email_status"];
+  manager_email_error: string | null;
+  customer_email_error: string | null;
+  production_export: unknown | null;
+  created_at: string;
+};
+
 let cachedClient: SupabaseClient | null = null;
 
 function getSupabaseClient(): SupabaseClient | null {
@@ -31,10 +65,42 @@ export async function insertOrderRecord(record: OrderDbInsert) {
   const { error } = await client.from("orders").insert(record);
 
   if (error) {
-    return { ok: false as const, skipped: false as const, error: error.message };
+    return {
+      ok: false as const,
+      skipped: false as const,
+      error: error.message,
+      code: typeof (error as { code?: unknown }).code === "string" ? (error as { code?: string }).code ?? null : null,
+    };
   }
 
   return { ok: true as const, skipped: false as const };
+}
+
+export async function getOrderRecordByOrderId(orderId: string) {
+  const client = getSupabaseClient();
+
+  if (!client) {
+    return { ok: true as const, skipped: true as const, reason: "supabase-env-missing", row: null };
+  }
+
+  const { data, error } = await client
+    .from("orders")
+    .select(
+      "order_id,source,product_type,dimensions,sections,filling,layout,materials,style,price_breakdown,total_price,customer_name,customer_phone,customer_email,customer_comment,delivery_enabled,delivery_address,delivery_price,assembly_enabled,assembly_price,assembly_rate,assembly_base_price,consent,config_version,utm,manager_email_status,customer_email_status,manager_email_error,customer_email_error,production_export,created_at",
+    )
+    .eq("order_id", orderId)
+    .limit(1);
+
+  if (error) {
+    return { ok: false as const, skipped: false as const, error: error.message, row: null };
+  }
+
+  const row = Array.isArray(data)
+    ? ((data[0] ?? null) as StoredOrderRecord | null)
+    : data
+      ? (data as StoredOrderRecord)
+      : null;
+  return { ok: true as const, skipped: false as const, row };
 }
 
 export async function updateOrderEmailStatus(

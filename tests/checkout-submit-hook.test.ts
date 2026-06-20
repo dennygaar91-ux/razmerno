@@ -27,6 +27,7 @@ type FetchRecord = {
   url: string;
   method: string;
   body: string | null;
+  headers: Record<string, string>;
 };
 type ConsoleCapture = {
   errors: string[];
@@ -40,6 +41,10 @@ const ORIGINAL_FETCH = globalThis.fetch;
 let ipCounter = 10;
 
 function test(name: string, run: AsyncTest) {
+  const existingIndex = tests.findIndex((item) => item.name === name);
+  if (existingIndex >= 0) {
+    tests.splice(existingIndex, 1);
+  }
   tests.push({ name, run });
 }
 
@@ -114,10 +119,12 @@ function installCheckoutFetchMock(response: Response): FetchRecord[] {
   const records: FetchRecord[] = [];
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    const headers = new Headers(init?.headers);
     records.push({
       url,
       method: init?.method ?? "GET",
       body: typeof init?.body === "string" ? init.body : null,
+      headers: Object.fromEntries(headers.entries()),
     });
     return response.clone();
   }) as typeof fetch;
@@ -133,21 +140,75 @@ function installServerFetchMock(options: {
 } = {}): FetchRecord[] {
   const records: FetchRecord[] = [];
   let resendCall = 0;
+  const orders = new Map<string, Record<string, unknown>>();
+
+  function findOrderId(url: URL): string | null {
+    const filter = url.searchParams.get("order_id");
+    if (!filter?.startsWith("eq.")) return null;
+    return decodeURIComponent(filter.slice(3));
+  }
 
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
     const method = init?.method ?? "GET";
+    const headers = new Headers(init?.headers);
     records.push({
       url,
       method,
       body: typeof init?.body === "string" ? init.body : null,
+      headers: Object.fromEntries(headers.entries()),
     });
 
     if (url.includes("supabase.example.test") && url.includes("/rest/v1/orders")) {
+      const parsedUrl = new URL(url);
+
       if (options.failSupabaseInsert && method === "POST") {
         return jsonResponse({ message: "insert failed" }, 500);
       }
-      return jsonResponse([], method === "POST" ? 201 : 200);
+
+      if (method === "POST") {
+        const payload = JSON.parse(String(init?.body ?? "{}")) as Record<string, unknown>;
+        const orderId = String(payload.order_id ?? "");
+
+        if (orders.has(orderId)) {
+          return jsonResponse(
+            {
+              code: "23505",
+              message: 'duplicate key value violates unique constraint "orders_order_id_key"',
+            },
+            409,
+          );
+        }
+
+        orders.set(orderId, {
+          ...payload,
+          created_at: "2026-06-20T04:00:00.000Z",
+          updated_at: "2026-06-20T04:00:00.000Z",
+        });
+        return jsonResponse([], 201);
+      }
+
+      if (method === "GET") {
+        const orderId = findOrderId(parsedUrl);
+        const order = orderId ? orders.get(orderId) : null;
+        return jsonResponse(order ? [order] : [], 200);
+      }
+
+      if (method === "PATCH") {
+        const orderId = findOrderId(parsedUrl);
+        const patch = JSON.parse(String(init?.body ?? "{}")) as Record<string, unknown>;
+        const current = orderId ? orders.get(orderId) : null;
+        if (orderId && current) {
+          orders.set(orderId, {
+            ...current,
+            ...patch,
+            updated_at: "2026-06-20T04:05:00.000Z",
+          });
+        }
+        return jsonResponse([], 200);
+      }
+
+      return jsonResponse([], 200);
     }
 
     if (url.includes("api.resend.com/emails")) {
@@ -167,14 +228,22 @@ function installServerFetchMock(options: {
   return records;
 }
 
-function makeReq(body: OrderRequest, options: { method?: string; ip?: string; origin?: string } = {}) {
+function makeReq(
+  body: OrderRequest,
+  options: { method?: string; ip?: string; origin?: string; idempotencyKey?: string | null } = {},
+) {
+  const headers: Record<string, string> = {
+    origin: options.origin ?? "http://localhost:5173",
+    "user-agent": "contract-test-agent",
+    "x-forwarded-for": options.ip ?? `198.51.100.${ipCounter++}`,
+  };
+  if (options.idempotencyKey !== null) {
+    headers["idempotency-key"] = options.idempotencyKey ?? body.orderId ?? "";
+  }
+
   return {
     method: options.method ?? "POST",
-    headers: {
-      origin: options.origin ?? "http://localhost:5173",
-      "user-agent": "contract-test-agent",
-      "x-forwarded-for": options.ip ?? `198.51.100.${ipCounter++}`,
-    },
+    headers,
     socket: { remoteAddress: options.ip ?? `198.51.100.${ipCounter++}` },
     body,
   };
@@ -291,7 +360,10 @@ function withMaterialPricingInput(input: CatalogPriceInput, materials: { bodyId:
   };
 }
 
-async function callOrderHandler(body: OrderRequest, options: { method?: string; ip?: string; origin?: string } = {}) {
+async function callOrderHandler(
+  body: OrderRequest,
+  options: { method?: string; ip?: string; origin?: string; idempotencyKey?: string | null } = {},
+) {
   const { res, state } = makeRes();
   await handler(makeReq(body, options), res);
   return state;
@@ -536,6 +608,7 @@ test("checkout submit sends API payload with idempotency key and returns success
   assert.equal(records.length, 1);
   assert.equal(records[0]?.url, "/api/orders");
   assert.equal(records[0]?.method, "POST");
+  assert.match(records[0]?.headers["idempotency-key"] ?? "", /^RZ-\d{8}-\d{4}$/);
 
   const body = JSON.parse(records[0]?.body ?? "{}");
   assert.match(body.orderId, /^RZ-\d{8}-\d{4}$/);
@@ -551,6 +624,15 @@ test("checkout submit returns validation/API failure without throwing", async ()
 
   assert.equal(result.ok, false);
   assert.match(result.error ?? "", /сохранить заявку/i);
+});
+
+test("checkout submit returns 409 conflict message without throwing", async () => {
+  installCheckoutFetchMock(jsonResponse({ ok: false, message: "Idempotency conflict: payload changed for this key." }, 409));
+
+  const result = await submitOrder(makeValidOrder() as Parameters<typeof submitOrder>[0]);
+
+  assert.equal(result.ok, false);
+  assert.equal(result.error, "Idempotency conflict: payload changed for this key.");
 });
 
 test("Supabase env-missing repository contract skips writes deterministically", async () => {
@@ -680,6 +762,99 @@ test("API order flow creates order, persists it and sends manager/customer notif
   assert.equal((result.json as { email?: { manager?: string; customer?: string; managerError?: string | null } }).email?.managerError ?? null, null);
   assert.ok(records.some((record) => record.url.includes("/rest/v1/orders") && record.method === "POST"));
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("API idempotency replay with same key and same payload returns the same order without duplicate notifications", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const body = makeValidOrder({ orderId: "RZ-20260620-4001" });
+
+  const first = await callOrderHandler(body, { idempotencyKey: "RZ-20260620-4001" });
+  const replay = await callOrderHandler(body, { idempotencyKey: "RZ-20260620-4001" });
+
+  assert.equal(first.statusCode, 200);
+  assert.equal(replay.statusCode, 200);
+  assert.equal((first.json as { orderId?: string }).orderId, "RZ-20260620-4001");
+  assert.equal((replay.json as { orderId?: string }).orderId, "RZ-20260620-4001");
+  assert.equal((replay.json as { email?: { manager?: string; customer?: string } }).email?.manager, "sent");
+  assert.equal((replay.json as { email?: { manager?: string; customer?: string } }).email?.customer, "sent");
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("API idempotency replay with same key and different payload returns 409 conflict and does not resend notifications", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const firstBody = makeValidOrder({ orderId: "RZ-20260620-4002" });
+  const changedBody = makeValidOrder({
+    orderId: "RZ-20260620-4002",
+    customer: {
+      name: "Иван Петров",
+      phone: "+7 999 111-22-33",
+      email: "client@example.com",
+      comment: "Изменённый комментарий",
+    },
+  });
+
+  const first = await callOrderHandler(firstBody, { idempotencyKey: "RZ-20260620-4002" });
+  const conflict = await callOrderHandler(changedBody, { idempotencyKey: "RZ-20260620-4002" });
+
+  assert.equal(first.statusCode, 200);
+  assert.equal(conflict.statusCode, 409);
+  assert.equal((conflict.json as { ok?: boolean }).ok, false);
+  assert.match((conflict.json as { message?: string }).message ?? "", /conflict|idempotency|конфликт/i);
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("API order flow without idempotency key keeps the existing safe behavior", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+
+  const result = await callOrderHandler(makeValidOrder({ orderId: "RZ-20260620-4003" }), {
+    idempotencyKey: null,
+  });
+
+  assert.equal(result.statusCode, 200);
+  assert.equal((result.json as { ok?: boolean }).ok, true);
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("API idempotency replay with same key and different payload returns 409 conflict and does not resend notifications", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const firstBody = makeValidOrder({ orderId: "RZ-20260620-4002" });
+  const changedBody = makeValidOrder({
+    orderId: "RZ-20260620-4002",
+    customer: {
+      name: "Иван Петров",
+      phone: "+7 999 111-22-33",
+      email: "client@example.com",
+      comment: "Изменённый комментарий",
+    },
+  });
+
+  const first = await callOrderHandler(firstBody, { idempotencyKey: "RZ-20260620-4002" });
+  const conflict = await callOrderHandler(changedBody, { idempotencyKey: "RZ-20260620-4002" });
+
+  assert.equal(first.statusCode, 200);
+  assert.equal(conflict.statusCode, 409);
+  assert.equal((conflict.json as { ok?: boolean }).ok, false);
+  assert.match((conflict.json as { message?: string }).message ?? "", /conflict|idempotency|конфликт/i);
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
+});
+
+test("API rejects mismatched idempotency key and body orderId before persistence", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+
+  const result = await callOrderHandler(makeValidOrder({ orderId: "RZ-20260620-4004" }), {
+    idempotencyKey: "RZ-20260620-9999",
+  });
+
+  assert.equal(result.statusCode, 400);
+  assert.equal((result.json as { ok?: boolean }).ok, false);
+  assert.match((result.json as { message?: string }).message ?? "", /Idempotency-Key.*orderId/i);
+  assert.equal(records.filter((record) => record.url.includes("/rest/v1/orders")).length, 0);
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 0);
 });
 
 test("API order flow stays successful when customer notification fails after manager notification", async () => {
