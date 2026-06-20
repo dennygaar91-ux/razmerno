@@ -8,7 +8,12 @@ import { applyNoStoreHeaders } from './_shared/headers'
 import { logEvent, safeErrorMessage } from './_shared/logger'
 import { getClientKey, isRateLimited } from './_shared/order-rate-limit'
 import { applyRequestIdHeader, getRequestId } from './_shared/request-context'
-import { calculateServerPrice, withServerPrice } from './_shared/server-price'
+import {
+  applyServerDeliveryAndAssembly,
+  applyServerProductionPanelPrice,
+  calculateServerCatalogPrice,
+  withServerPrice,
+} from './_shared/server-price'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types'
 import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders'
 import { validateOrder } from './_shared/order-validation'
@@ -130,7 +135,20 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   let serverPrice
   let pricedBody: OrderRequest
   try {
-    serverPrice = calculateServerPrice(body)
+    const catalogPrice = calculateServerCatalogPrice(body)
+    const catalogServerPrice = applyServerDeliveryAndAssembly(body, catalogPrice)
+    const catalogPricedBody = withServerPrice(body, catalogServerPrice)
+    const initialProductionExport = buildProductionExportFromOrder(catalogPricedBody)
+
+    const finalBasePrice = body.source === 'production-panels'
+      ? applyServerProductionPanelPrice({
+        body,
+        catalogPrice,
+        productionExport: initialProductionExport,
+      }).price
+      : catalogPrice
+
+    serverPrice = applyServerDeliveryAndAssembly(body, finalBasePrice)
     pricedBody = withServerPrice(body, serverPrice)
     const productionExport = buildProductionExportFromOrder(pricedBody)
     pricedBody = { ...pricedBody, productionExport }
