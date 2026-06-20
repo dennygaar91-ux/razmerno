@@ -1209,20 +1209,24 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Remaining out of scope: duplicate submit / payload-match idempotency remains open; manual retry remains open; automatic retry queue remains later; separate `order_status_events` notification event model remains out of scope.
 
 #### M8-P0-05 — Duplicate submit and idempotency policy
-- Status: open
+- Status: closed with evidence
 - Area: API / orders
 - Product-visible: no
 - Related existing task: Duplicate Submit / Payload-match Idempotency
 - Acceptance summary: safe repeated submit behavior defined, duplicate notifications prevented, frontend 409/replay handling verified.
 - Suggested agent: 04 API / Orders Agent
 - Accepted decisions note: same payload replay returns the same order/result; different payload replay returns `409 conflict`.
-- Partial evidence:
-  - local implementation on branch `fix/m8-p0-05-idempotency-policy` uses existing `orders.order_id` uniqueness plus canonical payload comparison for durable replay handling without schema migration;
-  - same `Idempotency-Key` + same payload now returns the same order/result and does not resend manager/customer notifications;
-  - same `Idempotency-Key` + different payload now returns `409 conflict`;
+- Closure evidence:
+  - PR #92 `fix: implement M8-P0-05 idempotency policy` was squash-merged into `main`;
+  - main includes `723a0351 fix: implement M8-P0-05 idempotency policy`;
+  - implementation uses existing `orders.order_id` uniqueness plus canonical payload comparison for durable replay handling without schema migration;
+  - same `Idempotency-Key` + same payload returns the same order/result and does not resend manager/customer notifications;
+  - same `Idempotency-Key` + different payload returns `409 conflict`;
+  - mismatched `Idempotency-Key` and `body.orderId` is rejected before persistence/notifications;
   - missing `Idempotency-Key` keeps existing safe behavior;
-  - local focused QA passed: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`;
-  - closure still requires PR review, GitHub checks and main verification before status can move to `closed with evidence`.
+  - focused QA passed before merge: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`;
+  - GitHub checks were green before merge;
+  - main verification passed after merge: local `main` fast-forwarded to `723a0351`, working tree clean.
 
 #### M8-P1-02 — Live provider and Supabase persistence verification
 - Status: open
