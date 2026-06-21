@@ -1,0 +1,117 @@
+/* P2-26A: Scene Overlay Marker Density Pass.
+   Presentation-only overrides for labels and selected-zone add marker.
+   Keep the furniture model visually dominant while preserving zone selection. */
+
+.rzm-3d-model-label,
+.rzm-3d-model-plus {
+  transition:
+    opacity .16s ease,
+    transform .16s ease,
+    background-color .16s ease,
+    box-shadow .16s ease,
+    border-color .16s ease;
+}
+
+/* Inactive zone markers should read as quiet wayfinding dots, not UI chips. */
+.rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
+  transform: scale(.86);
+  opacity: .34;
+  background: rgba(255, 255, 255, .42);
+  color: rgba(42, 44, 65, .4);
+  border-color: rgba(42, 44, 65, .06);
+  box-shadow: 0 3px 8px rgba(42, 44, 65, .035);
+}
+
+/* The selected zone stays discoverable, but does not compete with the model. */
+.rzm-3d-model-label.is-selected:not(.is-hovered) {
+  transform: scale(.94);
+  opacity: .76;
+  background: rgba(255, 255, 255, .78);
+  color: rgba(42, 44, 65, .78);
+  border-color: rgba(255, 114, 76, .18);
+  box-shadow: 0 5px 14px rgba(42, 44, 65, .06), inset 0 0 0 1px rgba(255, 114, 76, .12);
+}
+
+/* Full labels appear only on hover/focused exploration. */
+.rzm-3d-model-label.is-hovered {
+  transform: scale(1);
+  opacity: .96;
+  background: rgba(255, 255, 255, .9);
+  color: rgba(42, 44, 65, .9);
+  border-color: rgba(42, 44, 65, .1);
+  box-shadow: 0 8px 20px rgba(42, 44, 65, .08);
+}
+
+/* Add marker: smaller visual mass, still clearly tappable/clickable. */
+.rzm-3d-model-plus {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border: 1px solid rgba(255, 255, 255, .5);
+  background: linear-gradient(180deg, rgba(255, 137, 104, .95) 0%, rgba(255, 114, 76, .95) 100%);
+  font-size: 11px;
+  font-weight: 820;
+  box-shadow: 0 6px 16px rgba(255, 114, 76, .2), inset 0 0 0 1px rgba(255, 255, 255, .2);
+}
+
+.rzm-3d-model-plus:hover,
+.rzm-3d-model-plus:focus-visible {
+  transform: translateY(-1px) scale(1.06);
+  box-shadow: 0 10px 22px rgba(255, 114, 76, .28), inset 0 0 0 1px rgba(255, 255, 255, .32);
+}
+
+.rzm-3d-model-plus:focus-visible {
+  outline: 2px solid rgba(42, 44, 65, .86);
+  outline-offset: 3px;
+}
+
+@media (min-width: 1101px) {
+  .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
+    transform: scale(.82);
+    opacity: .3;
+  }
+
+  .rzm-3d-model-label.is-selected:not(.is-hovered) {
+    transform: scale(.9);
+    opacity: .72;
+  }
+
+  .rzm-3d-model-plus {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 760px) {
+  .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
+    transform: scale(.78);
+    opacity: .24;
+  }
+
+  .rzm-3d-model-label.is-selected:not(.is-hovered) {
+    transform: scale(.86);
+    opacity: .64;
+  }
+
+  .rzm-3d-model-label.is-hovered {
+    max-width: 48px;
+    opacity: .9;
+  }
+
+  .rzm-3d-model-plus {
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    font-size: 9px;
+    box-shadow: 0 4px 10px rgba(255, 114, 76, .18), inset 0 0 0 1px rgba(255, 255, 255, .18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rzm-3d-model-label,
+  .rzm-3d-model-plus {
+    transition: none;
+  }
+}
