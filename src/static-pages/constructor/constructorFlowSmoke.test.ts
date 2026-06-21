@@ -113,6 +113,23 @@ test("constructor flow: Constructor3DPage keeps scene render mode store-owned", 
   );
 });
 
+test("constructor flow: SceneRuntimeStatus uses actual active runtime render mode", () => {
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8");
+
+  assert(
+    pageSource.includes('const activeRuntimeRenderMode = canRenderThree ? "three" : "blueprint";'),
+    "Constructor3DPage should derive runtime status mode from the actual active scene branch",
+  );
+  assert(
+    pageSource.includes("renderMode={activeRuntimeRenderMode}"),
+    "SceneRuntimeStatus should receive active runtime render mode",
+  );
+  assert(
+    pageSource.includes('renderMode={sceneRenderMode === "three" ? "three" : "blueprint"}') === false,
+    "SceneRuntimeStatus must not derive renderMode from preferred sceneRenderMode only",
+  );
+  });
+
 test("constructor flow: user can move through base wizard and keep configuration", () => {
   const store = useConstructorStore.getState();
   store.reset();
