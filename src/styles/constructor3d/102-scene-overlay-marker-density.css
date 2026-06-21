@@ -14,10 +14,10 @@
 
 /* Labels stay as quiet numeric dots by default; full text is reserved for hover. */
 .rzm-3d-model-label {
-  width: 16px;
-  min-width: 16px;
-  height: 16px;
-  max-width: 16px;
+  width: 14px;
+  min-width: 14px;
+  height: 14px;
+  max-width: 14px;
   padding: 0;
   display: inline-grid;
   place-items: center;
@@ -25,72 +25,78 @@
   text-overflow: clip;
   white-space: nowrap;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .38);
-  color: rgba(42, 44, 65, .34);
-  border-color: rgba(42, 44, 65, .05);
-  box-shadow: 0 3px 8px rgba(42, 44, 65, .025);
-  font-size: 7px;
+  background: rgba(255, 255, 255, .3);
+  color: rgba(42, 44, 65, .28);
+  border-color: rgba(42, 44, 65, .04);
+  box-shadow: none;
+  font-size: 0;
   line-height: 1;
   font-weight: 820;
-  opacity: .32;
+  opacity: .18;
+  backdrop-filter: none;
 }
 
+/* Non-selected zones should not compete with the cabinet preview. */
 .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
-  transform: scale(.82);
+  opacity: .08;
+  transform: scale(.68);
 }
 
 /* Selected zone is discoverable, but still a compact marker, not a large chip. */
 .rzm-3d-model-label.is-selected:not(.is-hovered) {
-  width: 22px;
-  min-width: 22px;
-  height: 20px;
-  max-width: 22px;
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  max-width: 16px;
   padding: 0;
-  transform: scale(.88);
-  opacity: .7;
-  background: rgba(255, 255, 255, .66);
-  color: rgba(42, 44, 65, .62);
-  border-color: rgba(255, 114, 76, .16);
-  box-shadow: 0 5px 12px rgba(42, 44, 65, .035), inset 0 0 0 1px rgba(255, 114, 76, .08);
-  font-size: 8px;
+  transform: scale(.82);
+  opacity: .38;
+  background: rgba(255, 255, 255, .46);
+  color: rgba(42, 44, 65, .34);
+  border-color: rgba(255, 114, 76, .08);
+  box-shadow: none;
+  font-size: 0;
+  backdrop-filter: none;
 }
 
 /* Full label appears only while intentionally exploring the marker. */
 .rzm-3d-model-label.is-hovered {
   width: auto;
-  min-width: 20px;
-  height: 20px;
-  max-width: 96px;
-  padding: 0 7px;
-  transform: scale(.96);
-  opacity: .94;
-  background: rgba(255, 255, 255, .9);
-  color: rgba(42, 44, 65, .86);
-  border-color: rgba(42, 44, 65, .1);
-  box-shadow: 0 8px 20px rgba(42, 44, 65, .07);
-  font-size: 8px;
+  min-width: 18px;
+  height: 18px;
+  max-width: 88px;
+  padding: 0 6px;
+  transform: scale(.92);
+  opacity: .9;
+  background: rgba(255, 255, 255, .86);
+  color: rgba(42, 44, 65, .82);
+  border-color: rgba(42, 44, 65, .08);
+  box-shadow: 0 6px 14px rgba(42, 44, 65, .05);
+  font-size: 7px;
   text-overflow: ellipsis;
+  backdrop-filter: blur(8px);
 }
 
 /* Add marker: compact action target with less decorative mass. */
 .rzm-3d-model-plus {
-  width: 18px;
-  height: 18px;
-  min-width: 18px;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, .54);
-  background: linear-gradient(180deg, rgba(255, 137, 104, .94) 0%, rgba(255, 114, 76, .94) 100%);
+  border: 1px solid rgba(255, 255, 255, .62);
+  background: linear-gradient(180deg, rgba(255, 137, 104, .96) 0%, rgba(255, 114, 76, .96) 100%);
   color: #fff;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 820;
   line-height: 1;
-  box-shadow: 0 5px 12px rgba(255, 114, 76, .18), inset 0 0 0 1px rgba(255, 255, 255, .18);
+  box-shadow: 0 3px 8px rgba(255, 114, 76, .16), inset 0 0 0 1px rgba(255, 255, 255, .18);
+  backdrop-filter: none;
 }
 
 .rzm-3d-model-plus:hover,
 .rzm-3d-model-plus:focus-visible {
   transform: translateY(-1px) scale(1.06);
-  box-shadow: 0 8px 18px rgba(255, 114, 76, .24), inset 0 0 0 1px rgba(255, 255, 255, .28);
+  box-shadow: 0 6px 12px rgba(255, 114, 76, .22), inset 0 0 0 1px rgba(255, 255, 255, .26);
 }
 
 .rzm-3d-model-plus:focus-visible {
@@ -100,55 +106,63 @@
 
 @media (min-width: 1101px) {
   .rzm-3d-model-label {
+    width: 14px;
+    min-width: 14px;
+    height: 14px;
+    max-width: 14px;
+    opacity: .14;
+  }
+
+  .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
+    opacity: .06;
+  }
+
+  .rzm-3d-model-label.is-selected:not(.is-hovered) {
     width: 16px;
     min-width: 16px;
     height: 16px;
     max-width: 16px;
-    opacity: .28;
-  }
-
-  .rzm-3d-model-label.is-selected:not(.is-hovered) {
-    width: 22px;
-    min-width: 22px;
-    height: 20px;
-    max-width: 22px;
-    opacity: .66;
+    opacity: .34;
   }
 
   .rzm-3d-model-label.is-hovered {
-    max-width: 104px;
+    max-width: 96px;
   }
 
   .rzm-3d-model-plus {
-    width: 18px;
-    height: 18px;
-    min-width: 18px;
-    font-size: 11px;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    font-size: 9px;
   }
 }
 
 @media (max-width: 760px) {
   .rzm-3d-model-label {
+    width: 10px;
+    min-width: 10px;
+    height: 10px;
+    max-width: 10px;
+    font-size: 0;
+    opacity: .12;
+  }
+
+  .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
+    opacity: .04;
+  }
+
+  .rzm-3d-model-label.is-selected:not(.is-hovered) {
     width: 12px;
     min-width: 12px;
     height: 12px;
     max-width: 12px;
     font-size: 0;
-    opacity: .22;
-  }
-
-  .rzm-3d-model-label.is-selected:not(.is-hovered) {
-    width: 14px;
-    min-width: 14px;
-    height: 14px;
-    max-width: 14px;
-    font-size: 0;
-    opacity: .58;
+    opacity: .32;
   }
 
   .rzm-3d-model-label.is-hovered {
     width: auto;
-    min-width: 18px;
+    min-width: 16px;
     height: 16px;
     max-width: 58px;
     padding: 0 4px;
@@ -156,11 +170,11 @@
   }
 
   .rzm-3d-model-plus {
-    width: 15px;
-    height: 15px;
-    min-width: 15px;
-    font-size: 9px;
-    box-shadow: 0 4px 10px rgba(255, 114, 76, .16), inset 0 0 0 1px rgba(255, 255, 255, .16);
+    width: 13px;
+    height: 13px;
+    min-width: 13px;
+    font-size: 8px;
+    box-shadow: 0 3px 8px rgba(255, 114, 76, .14), inset 0 0 0 1px rgba(255, 255, 255, .16);
   }
 }
 
