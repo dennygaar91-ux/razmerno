@@ -138,6 +138,23 @@ Read-only audit means: no branch, no edits, no commits, no PR.
 
 ## 8. GitHub workflow
 
+### Manual mode / non-Codex file-reading rule
+
+When the user is working manually without Codex or another local coding agent, the assisting agent must be explicit about file-reading completeness before giving implementation instructions.
+
+The report must state one of these statuses for every critical file used in the decision:
+
+* `Read fully`: the whole file was read through the available tools.
+* `Read partially`: only named line ranges, search results, or relevant sections were read.
+* `Full file required from user`: the available tools cannot guarantee complete reading, and the user must provide the full file content before safe implementation advice can continue.
+
+If a critical file is large and the task depends on hidden context outside the already-read ranges, the agent must stop and ask the user to provide the full file or explicitly approve reading the file in chunks.
+
+The agent must not present a partial read as a complete audit.
+
+For manual implementation instructions, the agent must provide step-by-step commands and exact edit locations, not only a Codex-style prompt.
+
+
 - Work from GitHub `main` unless another base is explicitly named.
 - Create a feature/docs branch for any change.
 - Do not work directly on `main`.
