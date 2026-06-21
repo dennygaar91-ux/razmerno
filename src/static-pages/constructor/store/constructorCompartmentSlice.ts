@@ -49,7 +49,23 @@ export function createConstructorCompartmentActions(
           compartmentLayout,
         ),
       };
-      return { ...next, ...deriveFromState(next) };
+      const derived = deriveFromState(next);
+      const selectedSectionId = ensureSelectedSection(
+        state.selectedSectionId,
+        derived.sectionLayout,
+      );
+      const selectedZoneId = ensureSelectedCompartment(
+        selectedSectionId,
+        next.selectedCompartmentId,
+        derived.compartmentLayout,
+      );
+      return {
+        ...next,
+        ...derived,
+        selectedSectionId,
+        selectedCompartmentId: selectedZoneId,
+        selectedZoneId,
+      };
     }),
   setCompartmentHeight: (sectionId, compartmentId, heightMm) =>
     set((state) => {
@@ -73,7 +89,23 @@ export function createConstructorCompartmentActions(
           compartmentLayout,
         ),
       };
-      return { ...next, ...deriveFromState(next) };
+      const derived = deriveFromState(next);
+      const selectedSectionId = ensureSelectedSection(
+        next.selectedSectionId,
+        derived.sectionLayout,
+      );
+      const selectedZoneId = ensureSelectedCompartment(
+        selectedSectionId,
+        next.selectedCompartmentId,
+        derived.compartmentLayout,
+      );
+      return {
+        ...next,
+        ...derived,
+        selectedSectionId,
+        selectedCompartmentId: selectedZoneId,
+        selectedZoneId,
+      };
     }),
   equalizeCompartments: (sectionId) =>
     set((state) => {
@@ -101,7 +133,19 @@ export function createConstructorCompartmentActions(
           compartmentLayout,
         ),
       };
-      return { ...next, ...deriveFromState(next) };
+      const derived = deriveFromState(next);
+      const selectedZoneId = ensureSelectedCompartment(
+        targetSectionId,
+        next.selectedCompartmentId,
+        derived.compartmentLayout,
+      );
+      return {
+        ...next,
+        ...derived,
+        selectedSectionId: targetSectionId,
+        selectedCompartmentId: selectedZoneId,
+        selectedZoneId,
+      };
     }),
   selectCompartment: (sectionId, compartmentId) =>
     set((state) => {

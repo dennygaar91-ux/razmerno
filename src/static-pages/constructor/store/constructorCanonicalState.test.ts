@@ -78,6 +78,33 @@ test("canonical state: selectZone updates selectedSectionId and selectedZoneId",
   );
 });
 
+test("canonical state: selectSection keeps canonical selected zone inside canonical selected section", () => {
+  useConstructorStore.getState().reset();
+  useConstructorStore.getState().setSections(2);
+  useConstructorStore.getState().setCompartments(2);
+  const before = useConstructorStore.getState();
+  const staleSectionId = before.sectionLayout[1]?.id;
+  assert(staleSectionId, "Expected second section");
+  const staleZoneId = before.compartmentLayout[staleSectionId]?.[1]?.id;
+  assert(staleZoneId, "Expected second zone in second section");
+
+  useConstructorStore.getState().selectZone(staleSectionId, staleZoneId);
+  useConstructorStore.getState().selectSection("section-1");
+  const state = useConstructorStore.getState();
+  const canonical = selectCanonicalConstructorState(state);
+
+  assert(canonical.selectedSectionId === "section-1", "Expected canonical selected section to follow selectSection");
+  assert(Boolean(canonical.selectedZoneId), "Expected canonical selected zone after selectSection");
+  assert(
+    canonical.sections[0]?.zones.some((zone) => zone.id === canonical.selectedZoneId),
+    "Canonical selected zone should belong to canonical selected section",
+  );
+  assert(
+    canonical.sections[1]?.zones.some((zone) => zone.selected) !== true,
+    "A stale zone from another section must not stay selected canonically",
+  );
+});
+
 test("canonical state: exact mode is global for sizes and filling", () => {
   useConstructorStore.getState().reset();
   useConstructorStore.getState().setExactModeEnabled(true);

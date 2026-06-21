@@ -143,18 +143,21 @@ export function createConstructorFurnitureDimensionActions(
     set((state) => {
       const next = { ...state, height: Math.max(0, height) };
       const derived = deriveFromState(next);
+      const selectedSectionId = ensureSelectedSection(
+        state.selectedSectionId,
+        derived.sectionLayout,
+      );
+      const selectedZoneId = ensureSelectedCompartment(
+        selectedSectionId,
+        state.selectedCompartmentId,
+        derived.compartmentLayout,
+      );
       return {
         ...next,
         ...derived,
-        selectedSectionId: ensureSelectedSection(
-          state.selectedSectionId,
-          derived.sectionLayout,
-        ),
-        selectedCompartmentId: ensureSelectedCompartment(
-          state.selectedSectionId,
-          state.selectedCompartmentId,
-          derived.compartmentLayout,
-        ),
+        selectedSectionId,
+        selectedCompartmentId: selectedZoneId,
+        selectedZoneId,
       };
     }),
   setDepth: (depth) =>

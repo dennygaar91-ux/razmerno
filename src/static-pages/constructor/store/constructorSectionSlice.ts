@@ -60,7 +60,19 @@ export function createConstructorSectionActions(
           compartmentLayout,
         ),
       };
-      return { ...next, ...deriveFromState(next), selectedSectionId };
+      const derived = deriveFromState(next);
+      const selectedZoneId = ensureSelectedCompartment(
+        selectedSectionId,
+        next.selectedCompartmentId,
+        derived.compartmentLayout,
+      );
+      return {
+        ...next,
+        ...derived,
+        selectedSectionId,
+        selectedCompartmentId: selectedZoneId,
+        selectedZoneId,
+      };
     }),
   setSectionWidth: (sectionId, widthMm) =>
     set((state) => {
@@ -131,7 +143,19 @@ export function createConstructorSectionActions(
           compartmentLayout,
         ),
       };
-      return { ...next, ...deriveFromState(next), selectedSectionId };
+      const derived = deriveFromState(next);
+      const selectedZoneId = ensureSelectedCompartment(
+        selectedSectionId,
+        next.selectedCompartmentId,
+        derived.compartmentLayout,
+      );
+      return {
+        ...next,
+        ...derived,
+        selectedSectionId,
+        selectedCompartmentId: selectedZoneId,
+        selectedZoneId,
+      };
     }),
   selectSection: (sectionId) =>
     set((state) => {
@@ -139,13 +163,15 @@ export function createConstructorSectionActions(
         sectionId,
         state.sectionLayout,
       );
+      const selectedZoneId = ensureSelectedCompartment(
+        selectedSectionId,
+        state.selectedCompartmentId,
+        state.compartmentLayout,
+      );
       return {
         selectedSectionId,
-        selectedCompartmentId: ensureSelectedCompartment(
-          selectedSectionId,
-          state.selectedCompartmentId,
-          state.compartmentLayout,
-        ),
+        selectedCompartmentId: selectedZoneId,
+        selectedZoneId,
       };
     }),
   };
