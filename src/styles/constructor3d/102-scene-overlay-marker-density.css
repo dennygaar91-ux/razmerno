@@ -12,68 +12,111 @@
     border-color .16s ease;
 }
 
-/* Inactive zone markers should read as quiet wayfinding dots, not UI chips. */
+/* Labels stay as quiet numeric dots by default; full text is reserved for hover. */
+.rzm-3d-model-label {
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  max-width: 16px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .38);
+  color: rgba(42, 44, 65, .34);
+  border-color: rgba(42, 44, 65, .05);
+  box-shadow: 0 3px 8px rgba(42, 44, 65, .025);
+  font-size: 7px;
+  line-height: 1;
+  font-weight: 820;
+  opacity: .32;
+}
+
 .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
-  transform: scale(.86);
-  opacity: .34;
-  background: rgba(255, 255, 255, .42);
-  color: rgba(42, 44, 65, .4);
-  border-color: rgba(42, 44, 65, .06);
-  box-shadow: 0 3px 8px rgba(42, 44, 65, .035);
+  transform: scale(.82);
 }
 
-/* The selected zone stays discoverable, but does not compete with the model. */
+/* Selected zone is discoverable, but still a compact marker, not a large chip. */
 .rzm-3d-model-label.is-selected:not(.is-hovered) {
-  transform: scale(.94);
-  opacity: .76;
-  background: rgba(255, 255, 255, .78);
-  color: rgba(42, 44, 65, .78);
-  border-color: rgba(255, 114, 76, .18);
-  box-shadow: 0 5px 14px rgba(42, 44, 65, .06), inset 0 0 0 1px rgba(255, 114, 76, .12);
+  width: 22px;
+  min-width: 22px;
+  height: 20px;
+  max-width: 22px;
+  padding: 0;
+  transform: scale(.88);
+  opacity: .7;
+  background: rgba(255, 255, 255, .66);
+  color: rgba(42, 44, 65, .62);
+  border-color: rgba(255, 114, 76, .16);
+  box-shadow: 0 5px 12px rgba(42, 44, 65, .035), inset 0 0 0 1px rgba(255, 114, 76, .08);
+  font-size: 8px;
 }
 
-/* Full labels appear only on hover/focused exploration. */
+/* Full label appears only while intentionally exploring the marker. */
 .rzm-3d-model-label.is-hovered {
-  transform: scale(1);
-  opacity: .96;
+  width: auto;
+  min-width: 20px;
+  height: 20px;
+  max-width: 96px;
+  padding: 0 7px;
+  transform: scale(.96);
+  opacity: .94;
   background: rgba(255, 255, 255, .9);
-  color: rgba(42, 44, 65, .9);
+  color: rgba(42, 44, 65, .86);
   border-color: rgba(42, 44, 65, .1);
-  box-shadow: 0 8px 20px rgba(42, 44, 65, .08);
+  box-shadow: 0 8px 20px rgba(42, 44, 65, .07);
+  font-size: 8px;
+  text-overflow: ellipsis;
 }
 
-/* Add marker: smaller visual mass, still clearly tappable/clickable. */
+/* Add marker: compact action target with less decorative mass. */
 .rzm-3d-model-plus {
   width: 18px;
   height: 18px;
   min-width: 18px;
-  border: 1px solid rgba(255, 255, 255, .5);
-  background: linear-gradient(180deg, rgba(255, 137, 104, .95) 0%, rgba(255, 114, 76, .95) 100%);
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .54);
+  background: linear-gradient(180deg, rgba(255, 137, 104, .94) 0%, rgba(255, 114, 76, .94) 100%);
+  color: #fff;
   font-size: 11px;
   font-weight: 820;
-  box-shadow: 0 6px 16px rgba(255, 114, 76, .2), inset 0 0 0 1px rgba(255, 255, 255, .2);
+  line-height: 1;
+  box-shadow: 0 5px 12px rgba(255, 114, 76, .18), inset 0 0 0 1px rgba(255, 255, 255, .18);
 }
 
 .rzm-3d-model-plus:hover,
 .rzm-3d-model-plus:focus-visible {
   transform: translateY(-1px) scale(1.06);
-  box-shadow: 0 10px 22px rgba(255, 114, 76, .28), inset 0 0 0 1px rgba(255, 255, 255, .32);
+  box-shadow: 0 8px 18px rgba(255, 114, 76, .24), inset 0 0 0 1px rgba(255, 255, 255, .28);
 }
 
 .rzm-3d-model-plus:focus-visible {
-  outline: 2px solid rgba(42, 44, 65, .86);
+  outline: 2px solid rgba(42, 44, 65, .82);
   outline-offset: 3px;
 }
 
 @media (min-width: 1101px) {
-  .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
-    transform: scale(.82);
-    opacity: .3;
+  .rzm-3d-model-label {
+    width: 16px;
+    min-width: 16px;
+    height: 16px;
+    max-width: 16px;
+    opacity: .28;
   }
 
   .rzm-3d-model-label.is-selected:not(.is-hovered) {
-    transform: scale(.9);
-    opacity: .72;
+    width: 22px;
+    min-width: 22px;
+    height: 20px;
+    max-width: 22px;
+    opacity: .66;
+  }
+
+  .rzm-3d-model-label.is-hovered {
+    max-width: 104px;
   }
 
   .rzm-3d-model-plus {
@@ -85,19 +128,31 @@
 }
 
 @media (max-width: 760px) {
-  .rzm-3d-model-label:not(.is-selected):not(.is-hovered) {
-    transform: scale(.78);
-    opacity: .24;
+  .rzm-3d-model-label {
+    width: 12px;
+    min-width: 12px;
+    height: 12px;
+    max-width: 12px;
+    font-size: 0;
+    opacity: .22;
   }
 
   .rzm-3d-model-label.is-selected:not(.is-hovered) {
-    transform: scale(.86);
-    opacity: .64;
+    width: 14px;
+    min-width: 14px;
+    height: 14px;
+    max-width: 14px;
+    font-size: 0;
+    opacity: .58;
   }
 
   .rzm-3d-model-label.is-hovered {
-    max-width: 48px;
-    opacity: .9;
+    width: auto;
+    min-width: 18px;
+    height: 16px;
+    max-width: 58px;
+    padding: 0 4px;
+    font-size: 7px;
   }
 
   .rzm-3d-model-plus {
@@ -105,7 +160,7 @@
     height: 15px;
     min-width: 15px;
     font-size: 9px;
-    box-shadow: 0 4px 10px rgba(255, 114, 76, .18), inset 0 0 0 1px rgba(255, 255, 255, .18);
+    box-shadow: 0 4px 10px rgba(255, 114, 76, .16), inset 0 0 0 1px rgba(255, 255, 255, .16);
   }
 }
 
