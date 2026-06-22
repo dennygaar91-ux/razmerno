@@ -1,5 +1,5 @@
-import facadeStyles from '../../src/config/facade-styles.json';
-import hardwareItems from '../../src/config/hardware.json';
+import facadeStyles from '../../src/config/facade-styles.json' with { type: 'json' };
+import hardwareItems from '../../src/config/hardware.json' with { type: 'json' };
 import { calculateCatalogPrice, type CatalogPriceBreakdown, type CatalogPriceInput } from '../../src/pricing/engine.js';
 import { buildConstructorMaterialPricingContext } from '../../src/pricing/materialPricing.js';
 import {
