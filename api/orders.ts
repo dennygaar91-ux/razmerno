@@ -1,23 +1,21 @@
-import type { OrderRequest } from './_shared/order-types'
-import { toOrderDbInsert } from './_shared/order-db'
-import { isSameOrderPayload } from './_shared/order-idempotency'
-import { buildClientText, buildManagerAttachments, buildManagerText, sendEmail } from './_shared/order-email'
-import { applyCorsHeaders, getHeader, isAllowedOrigin } from './_shared/order-cors'
-import { assertServerEnvReady } from './_shared/env'
-import { applyNoStoreHeaders } from './_shared/headers'
-import { logEvent, safeErrorMessage } from './_shared/logger'
-import { getClientKey, isRateLimited } from './_shared/order-rate-limit'
-import { applyRequestIdHeader, getRequestId } from './_shared/request-context'
+import { toOrderDbInsert } from './_shared/order-db.js'
+import { isSameOrderPayload } from './_shared/order-idempotency.js'
+import { buildClientText, buildManagerAttachments, buildManagerText, sendEmail } from './_shared/order-email.js'
+import { applyCorsHeaders, getHeader, isAllowedOrigin } from './_shared/order-cors.js'
+import { assertServerEnvReady } from './_shared/env.js'
+import { applyNoStoreHeaders } from './_shared/headers.js'
+import { logEvent, safeErrorMessage } from './_shared/logger.js'
+import { getClientKey, isRateLimited } from './_shared/order-rate-limit.js'
+import { applyRequestIdHeader, getRequestId } from './_shared/request-context.js'
 import {
   applyServerDeliveryAndAssembly,
   applyServerProductionPanelPrice,
   calculateServerCatalogPrice,
   withServerPrice,
-} from './_shared/server-price'
-import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types'
-import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders'
-import { validateOrder } from './_shared/order-validation'
-import { buildProductionExportFromOrder } from '../src/constructor/production/orderExportPackage'
+} from './_shared/server-price.js'
+import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders.js'
+import { validateOrder } from './_shared/order-validation.js'
+import { buildProductionExportFromOrder } from '../src/constructor/production/orderExportPackage.js'
 
 const MANAGER_NOTIFICATION_FAILED = 'manager_notification_failed'
 const CUSTOMER_NOTIFICATION_FAILED = 'customer_notification_failed'
