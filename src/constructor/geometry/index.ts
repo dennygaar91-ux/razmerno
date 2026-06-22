@@ -1,9 +1,9 @@
 /**
  * Public API of the geometry engine.
  */
-export * from "./types";
-export { fromConfigState } from "./fromConfigState";
-export { buildCabinetGeometry } from "./buildCabinetGeometry";
-export { buildBasisExportPlan } from "./basisExportPlan";
-export { validateProductionModel } from "./validation";
-export { hingeCountForHeight } from "./buildHardware";
+export * from "./types.js";
+export { fromConfigState } from "./fromConfigState.js";
+export { buildCabinetGeometry } from "./buildCabinetGeometry.js";
+export { buildBasisExportPlan } from "./basisExportPlan.js";
+export { validateProductionModel } from "./validation.js";
+export { hingeCountForHeight } from "./buildHardware.js";

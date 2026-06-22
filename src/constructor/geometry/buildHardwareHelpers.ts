@@ -1,4 +1,4 @@
-import type { FurnitureProject, Panel } from './types'
+import type { FurnitureProject, Panel } from './types.js'
 
 export const PLINTH_HEIGHT_MM = 100
 

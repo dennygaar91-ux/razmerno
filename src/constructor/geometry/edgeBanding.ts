@@ -2,7 +2,7 @@
  * Кромка — 0.8 мм для корпусных деталей, 2 мм для фасадов.
  * Хранится по сторонам панели (front/back/left/right).
  */
-import type { EdgeBanding, EdgeSide } from "./types";
+import type { EdgeBanding, EdgeSide } from "./types.js";
 
 const BODY_EDGE_THK = 0.8;
 const FACADE_EDGE_THK = 2;

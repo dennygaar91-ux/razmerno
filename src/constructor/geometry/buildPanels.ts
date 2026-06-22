@@ -11,10 +11,10 @@
  * X — ширина (вправо), Y — высота (вверх), Z — глубина (назад, от наблюдателя).
  * position у панели — координата её нижнего-левого-переднего угла.
  */
-import type { FurnitureProject, Panel, ProductionModelWarning } from "./types";
-import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext";
-import { bodyEdgeAll, bodyEdgeFront } from "./edgeBanding";
-import { getSectionMetrics } from "./layoutMetrics";
+import type { FurnitureProject, Panel, ProductionModelWarning } from "./types.js";
+import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
+import { bodyEdgeAll, bodyEdgeFront } from "./edgeBanding.js";
+import { getSectionMetrics } from "./layoutMetrics.js";
 
 const PLINTH_HEIGHT_MM = 100; // высота цоколя у шкафа (MVP)
 

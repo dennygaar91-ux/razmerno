@@ -1,4 +1,4 @@
-import type { ProductionExportPackage } from "./types";
+import type { ProductionExportPackage } from "./types.js";
 
 type ProductionRevisionInput = Pick<ProductionExportPackage, "validation" | "rules" | "manufacturing">;
 

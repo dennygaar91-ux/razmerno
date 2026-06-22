@@ -1,4 +1,4 @@
-import type { ProductionExportPackage } from "./types";
+import type { ProductionExportPackage } from "./types.js";
 
 type ProductionExportDraft = Pick<ProductionExportPackage, "productionModel" | "rules">;
 

@@ -4,10 +4,10 @@
  * Если передан layout — ящики строятся в выбранных отсеках.
  * Если layout нет — используется legacy fallback: все ящики в первой секции.
  */
-import type { FurnitureProject, GeometryCompartment, Panel, ProductionModelWarning } from "./types";
-import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext";
-import { bodyEdgeAll, noEdge } from "./edgeBanding";
-import { getSectionMetrics } from "./layoutMetrics";
+import type { FurnitureProject, GeometryCompartment, Panel, ProductionModelWarning } from "./types.js";
+import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
+import { bodyEdgeAll, noEdge } from "./edgeBanding.js";
+import { getSectionMetrics } from "./layoutMetrics.js";
 
 const PLINTH_HEIGHT_MM = 100;
 const DRAWER_FRONT_MIN_HEIGHT_MM = 200;

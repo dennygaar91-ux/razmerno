@@ -3,9 +3,9 @@
  * Вставляется в паз / прибивается гвоздями, в зависимости от конструктива.
  * MVP: одна цельная ХДФ-плита на всю заднюю плоскость, отступ 5 мм от заднего края.
  */
-import type { FurnitureProject, Panel } from "./types";
-import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext";
-import { noEdge } from "./edgeBanding";
+import type { FurnitureProject, Panel } from "./types.js";
+import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
+import { noEdge } from "./edgeBanding.js";
 
 const PLINTH_HEIGHT_MM = 100;
 const BACK_GAP_MM = 5; // отступ ХДФ от задней грани шкафа

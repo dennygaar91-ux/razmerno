@@ -1,6 +1,6 @@
-import type { FurnitureProject, ProductionModel } from "../geometry/types";
-import type { ManufacturingRulesReport } from "./manufacturingRules";
-import type { ProductionRevision } from "./revisions";
+import type { FurnitureProject, ProductionModel } from "../geometry/types.js";
+import type { ManufacturingRulesReport } from "./manufacturingRules.js";
+import type { ProductionRevision } from "./revisions.js";
 
 export interface ProductionExportPackage {
   schema: "razmerno.production-export.v1";
