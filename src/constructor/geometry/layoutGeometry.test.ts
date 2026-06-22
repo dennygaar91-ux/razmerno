@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { buildCabinetGeometry, fromConfigState } from "./index";
-import type { ConfigState } from "../../configurator/context";
+import { buildCabinetGeometry, fromConfigState } from "./index.js";
+import type { ConfigState } from "../../configurator/context.js";
 
 type TestResult = { name: string; passed: boolean; error?: string };
 const results: TestResult[] = [];

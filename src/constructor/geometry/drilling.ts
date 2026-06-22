@@ -2,8 +2,8 @@
  * Drilling operations.
  * Все координаты на MVP — приближённые, требуют проверки технологом.
  */
-import type { DrillingOperation, DrillingPurpose, FaceSide } from "./types";
-import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext";
+import type { DrillingOperation, DrillingPurpose, FaceSide } from "./types.js";
+import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
 
 
 interface DrillArgs {

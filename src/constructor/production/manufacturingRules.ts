@@ -1,5 +1,5 @@
-import type { FactoryProfile } from "./factoryProfile";
-import type { ProductionModel } from "../geometry/types";
+import type { FactoryProfile } from "./factoryProfile.js";
+import type { ProductionModel } from "../geometry/types.js";
 
 export type ManufacturingRuleSeverity = "info" | "warning" | "reject";
 export type ManufacturingRuleAction = "auto-warning" | "auto-reject" | "auto-repair";

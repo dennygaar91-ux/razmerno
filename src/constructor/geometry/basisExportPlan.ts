@@ -16,7 +16,7 @@ import type {
   HardwareItem,
   Panel,
   ProductionModel,
-} from "./types";
+} from "./types.js";
 
 interface BuildPlanInput {
   panels: Panel[];

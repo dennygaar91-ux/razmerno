@@ -15,10 +15,10 @@ import type {
   HardwareItem,
   Panel,
   ProductionModelWarning,
-} from "./types";
-import { drilling, DRILL_SPEC } from "./drilling";
-import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext";
-import { getSectionMetrics } from "./layoutMetrics";
+} from "./types.js";
+import { drilling, DRILL_SPEC } from "./drilling.js";
+import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
+import { getSectionMetrics } from "./layoutMetrics.js";
 import {
   PLINTH_HEIGHT_MM,
   hingeCountForHeight,
@@ -26,8 +26,8 @@ import {
   isHiddenHandle,
   isPushToOpen,
   oppositeHandleX,
-} from "./buildHardwareHelpers";
-export { hingeCountForHeight } from "./buildHardwareHelpers";
+} from "./buildHardwareHelpers.js";
+export { hingeCountForHeight } from "./buildHardwareHelpers.js";
 
 interface BuildHardwareInput {
   project: FurnitureProject;

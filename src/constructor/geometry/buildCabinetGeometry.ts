@@ -18,15 +18,15 @@ import type {
   ProductionModelTotals,
   ProductionModelWarning,
   FurnitureProject,
-} from "./types";
-import { buildShellAndShelves } from "./buildPanels";
-import { buildBackPanel } from "./buildBackPanel";
-import { buildFacades } from "./buildFacades";
-import { buildDrawers } from "./buildDrawers";
-import { buildHardware } from "./buildHardware";
-import { validateProductionModel } from "./validation";
-import { buildBasisExportPlan } from "./basisExportPlan";
-import { createGeometryBuildContext } from "./buildContext";
+} from "./types.js";
+import { buildShellAndShelves } from "./buildPanels.js";
+import { buildBackPanel } from "./buildBackPanel.js";
+import { buildFacades } from "./buildFacades.js";
+import { buildDrawers } from "./buildDrawers.js";
+import { buildHardware } from "./buildHardware.js";
+import { validateProductionModel } from "./validation.js";
+import { buildBasisExportPlan } from "./basisExportPlan.js";
+import { createGeometryBuildContext } from "./buildContext.js";
 
 export function buildCabinetGeometry(project: FurnitureProject): ProductionModel {
   const buildContext = createGeometryBuildContext();

@@ -6,8 +6,8 @@
  * (простая модель: width, height, depth, sections (number), filling, ids)
  * в каноническую `FurnitureProject` (структурированная модель по спеку).
  */
-import type { ConfigState } from "../../configurator/context";
-import type { FurnitureProject, OpeningMode, ProductType } from "./types";
+import type { ConfigState } from "../../configurator/context.js";
+import type { FurnitureProject, OpeningMode, ProductType } from "./types.js";
 
 const BODY_THICKNESS_MM = 16;
 const LDSP_FACADE_THICKNESS_MM = 16;

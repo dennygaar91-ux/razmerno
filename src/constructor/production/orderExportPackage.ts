@@ -1,11 +1,11 @@
-import { buildCabinetGeometry } from "../geometry/buildCabinetGeometry";
-import type { FurnitureProject } from "../geometry/types";
-import type { OrderRequest } from "../../../api/_shared/order-types";
-import type { ProductionExportPackage } from "./types";
-import { buildProductionValidationReport } from "./validationReport";
-import { getDefaultFactoryProfile } from "./factoryProfile";
-import { evaluateManufacturingRules } from "./manufacturingRules";
-import { createInitialProductionRevision } from "./revisions";
+import { buildCabinetGeometry } from "../geometry/buildCabinetGeometry.js";
+import type { FurnitureProject } from "../geometry/types.js";
+import type { OrderRequest } from "../../../api/_shared/order-types.js";
+import type { ProductionExportPackage } from "./types.js";
+import { buildProductionValidationReport } from "./validationReport.js";
+import { getDefaultFactoryProfile } from "./factoryProfile.js";
+import { evaluateManufacturingRules } from "./manufacturingRules.js";
+import { createInitialProductionRevision } from "./revisions.js";
 
 export function buildProductionExportFromOrder(
   order: OrderRequest,

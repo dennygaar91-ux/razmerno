@@ -1,7 +1,7 @@
-import { fromConfigState } from "../geometry";
-import type { ConfigState } from "../../configurator/context";
-import type { ProductionExportPackage } from "./types";
-import { buildProductionExportPackage } from "./orderExportPackage";
+import { fromConfigState } from "../geometry/index.js";
+import type { ConfigState } from "../../configurator/context.js";
+import type { ProductionExportPackage } from "./types.js";
+import { buildProductionExportPackage } from "./orderExportPackage.js";
 
 export function buildProductionExportFromConfigState(
   state: ConfigState,
@@ -11,5 +11,5 @@ export function buildProductionExportFromConfigState(
   return buildProductionExportPackage(project, "configurator");
 }
 
-export { buildProductionExportFromOrder } from "./orderExportPackage";
-export type { ProductionExportPackage } from "./types";
+export { buildProductionExportFromOrder } from "./orderExportPackage.js";
+export type { ProductionExportPackage } from "./types.js";

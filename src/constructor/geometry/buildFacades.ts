@@ -6,10 +6,10 @@
  *  - режим "open" → фасадов нет
  *  - зазор между фасадами 3 мм
  */
-import type { FurnitureProject, Panel, ProductionModelWarning } from "./types";
-import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext";
-import { facadeEdgeAll } from "./edgeBanding";
-import { getSectionMetrics } from "./layoutMetrics";
+import type { FurnitureProject, Panel, ProductionModelWarning } from "./types.js";
+import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
+import { facadeEdgeAll } from "./edgeBanding.js";
+import { getSectionMetrics } from "./layoutMetrics.js";
 
 const PLINTH_HEIGHT_MM = 100;
 const FACADE_GAP_MM = 3;

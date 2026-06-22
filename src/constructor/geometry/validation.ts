@@ -8,7 +8,7 @@ import type {
   Panel,
   PanelRole,
   ProductionModelWarning,
-} from "./types";
+} from "./types.js";
 
 const REQUIRED_ROLES: PanelRole[] = ["side-left", "side-right", "top", "bottom", "back-panel"];
 

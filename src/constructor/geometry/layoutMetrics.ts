@@ -1,4 +1,4 @@
-import type { FurnitureProject, GeometrySection } from "./types";
+import type { FurnitureProject, GeometrySection } from "./types.js";
 
 export type SectionMetric = {
   section: GeometrySection | null;
