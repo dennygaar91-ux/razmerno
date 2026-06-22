@@ -1,7 +1,7 @@
-import type { OrderRequest } from './order-types'
-import { validateDelivery } from '../../src/pricing/delivery'
-import { validateAssembly } from '../../src/pricing/assembly'
-import { validateOrderLayout } from './layout-validation'
+import type { OrderRequest } from './order-types.js'
+import { validateDelivery } from '../../src/pricing/delivery.js'
+import { validateAssembly } from '../../src/pricing/assembly.js'
+import { validateOrderLayout } from './layout-validation.js'
 
 export function validateOrder(body: OrderRequest): string | null {
   const name = body.customer?.name?.trim() ?? ''

@@ -1,5 +1,5 @@
-import type { ProductionExportPackage } from "./types";
-import { buildProductionDocumentBundle } from "./productionDocuments";
+import type { ProductionExportPackage } from "./types.js";
+import { buildProductionDocumentBundle } from "./productionDocuments.js";
 
 export interface ProductionEmailAttachment {
   filename: string;

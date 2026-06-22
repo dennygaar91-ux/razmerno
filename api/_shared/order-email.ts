@@ -1,6 +1,6 @@
-import type { OrderRequest } from './order-types'
-import { buildProductionEmailAttachments } from '../../src/constructor/production/emailAttachments'
-import { logEvent } from './logger'
+import type { OrderRequest } from './order-types.js'
+import { buildProductionEmailAttachments } from '../../src/constructor/production/emailAttachments.js'
+import { logEvent } from './logger.js'
 
 export type ResendAttachment = {
   filename: string
