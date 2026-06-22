@@ -1,3 +1,4 @@
+import type { OrderRequest } from './_shared/order-types.js'
 import { toOrderDbInsert } from './_shared/order-db.js'
 import { isSameOrderPayload } from './_shared/order-idempotency.js'
 import { buildClientText, buildManagerAttachments, buildManagerText, sendEmail } from './_shared/order-email.js'
@@ -13,6 +14,7 @@ import {
   calculateServerCatalogPrice,
   withServerPrice,
 } from './_shared/server-price.js'
+import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types.js'
 import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders.js'
 import { validateOrder } from './_shared/order-validation.js'
 import { buildProductionExportFromOrder } from '../src/constructor/production/orderExportPackage.js'
