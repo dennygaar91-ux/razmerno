@@ -1,5 +1,5 @@
-import type { ServerlessRequest } from './serverless-types'
-import { logEvent, safeErrorMessage } from './logger'
+import type { ServerlessRequest } from './serverless-types.js'
+import { logEvent, safeErrorMessage } from './logger.js'
 
 const RATE_LIMIT_WINDOW_MS = 60_000
 const RATE_LIMIT_MAX = 8
