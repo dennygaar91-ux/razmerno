@@ -1,17 +1,17 @@
 import facadeStyles from '../../src/config/facade-styles.json';
 import hardwareItems from '../../src/config/hardware.json';
-import { calculateCatalogPrice, type CatalogPriceBreakdown, type CatalogPriceInput } from '../../src/pricing/engine';
-import { buildConstructorMaterialPricingContext } from '../../src/pricing/materialPricing';
+import { calculateCatalogPrice, type CatalogPriceBreakdown, type CatalogPriceInput } from '../../src/pricing/engine.js';
+import { buildConstructorMaterialPricingContext } from '../../src/pricing/materialPricing.js';
 import {
   applyProductionPanelPricingToCatalogPrice,
   summarizeProductionPanelPricing,
   type ProductionPanelPriceApplication,
-} from '../../src/pricing/productionPanelPricing';
-import type { ProductionExportPackage } from '../../src/constructor/production/types';
-import { legacyMaterialAliases, materialCatalog, type MaterialToken } from '../../src/shared/materials/materialCatalog';
-import { calculateDeliveryQuote } from '../../src/pricing/delivery';
-import { calculateAssemblyQuote } from '../../src/pricing/assembly';
-import type { OrderRequest } from './order-types';
+} from '../../src/pricing/productionPanelPricing.js';
+import type { ProductionExportPackage } from '../../src/constructor/production/types.js';
+import { legacyMaterialAliases, materialCatalog, type MaterialToken } from '../../src/shared/materials/materialCatalog.js';
+import { calculateDeliveryQuote } from '../../src/pricing/delivery.js';
+import { calculateAssemblyQuote } from '../../src/pricing/assembly.js';
+import type { OrderRequest } from './order-types.js';
 
 type FacadeStyle = {
   id: string;

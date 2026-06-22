@@ -1,4 +1,4 @@
-import type { OrderLayoutModel } from './order-types'
+import type { OrderLayoutModel } from './order-types.js'
 
 const MIN_COMPARTMENT_HEIGHT_MM = 300
 const ROD_DEFAULT_HEIGHT_MM = 1200

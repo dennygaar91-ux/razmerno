@@ -1,5 +1,5 @@
-import type { ProductionExportPackage } from "./types";
-import { buildBasisJsonScript } from "./basisJson";
+import type { ProductionExportPackage } from "./types.js";
+import { buildBasisJsonScript } from "./basisJson.js";
 
 export interface ProductionDocumentBundle {
   schema: "razmerno.production-documents.v1";
