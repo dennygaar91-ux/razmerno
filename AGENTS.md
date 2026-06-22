@@ -77,6 +77,14 @@ Before implementation, agents must also read this file if the task affects:
 
 If `current-backlog.md` and accepted decisions appear to conflict, the agent must stop and request reconciliation. The agent must not choose its own interpretation.
 
+### Missing or uncertain decision rule
+
+If a task does not have an accepted decision, or if the agent is not confident which decision applies, the agent must stop and ask the user a direct question before implementation.
+
+After the user answers, the accepted decision must be recorded in `docs/planning/current-backlog.md` in the relevant task section before implementation continues.
+
+The agent must not silently choose its own interpretation when a decision is missing, ambiguous, or product-significant.
+
 ## 5. Frozen decisions block
 
 Every implementation prompt must contain:
