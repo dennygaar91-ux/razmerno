@@ -1,6 +1,6 @@
-import { findBestPriceItem, type PriceCatalogQuery } from "./catalog";
-import { CLIENT_PRICE_MULTIPLIER } from "./pricingPolicy";
-import type { FurnitureType, PriceBreakdown } from "../shared/lib/pricing-core";
+import { findBestPriceItem, type PriceCatalogQuery } from "./catalog.js";
+import { CLIENT_PRICE_MULTIPLIER } from "./pricingPolicy.js";
+import type { FurnitureType, PriceBreakdown } from "../shared/lib/pricing-core.js";
 
 export interface CatalogPriceInput {
   type: FurnitureType;
