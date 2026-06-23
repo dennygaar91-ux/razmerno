@@ -4,7 +4,14 @@
 
 Этот документ фиксирует правила подготовки промптов для Codex / Cursor / AI-агентов проекта «Размерно».
 
-Цель: сократить расход токенов, уменьшить количество лишних итераций, запретить широкие неуправляемые аудиты и повысить безопасность изменений в репозитории.
+Цель:
+
+- сократить расход токенов;
+- уменьшить лишние итерации;
+- запретить широкие неуправляемые аудиты;
+- запретить принятие решений агентом без product approval;
+- повысить безопасность изменений в репозитории;
+- сохранить контроль над backlog, architecture, UX, pricing, production и release readiness.
 
 ## 2. Обязательные источники истины
 
@@ -12,11 +19,20 @@
 
 1. `docs/planning/current-backlog.md` — главный backlog source of truth.
 2. `docs/planning/accepted-backlog-decisions-v1.md` — обязательный decision layer.
-3. Этот файл — правила чтения, scope и подготовки prompts.
+3. `docs/planning/agent-prompt-rules-v1.md` — правила prompt, context, scope, stop conditions.
+4. `AGENTS.md` — короткие root-инструкции для агентов.
 
-Если `current-backlog.md`, `accepted-backlog-decisions-v1.md` и этот файл конфликтуют, агент должен остановиться и запросить reconciliation.
+Если `current-backlog.md`, `accepted-backlog-decisions-v1.md`, `agent-prompt-rules-v1.md` и `AGENTS.md` конфликтуют, агент должен остановиться и запросить reconciliation.
 
-Repo state и merged/main evidence имеют приоритет над session memory, local branch claims, open PR claims и предположениями агента.
+Repo state и merged/main evidence имеют приоритет над:
+
+- session ledger;
+- memory;
+- chat;
+- open PR claims;
+- draft PR claims;
+- branch-only claims;
+- local assumptions.
 
 ## 3. Product Decision Priority
 
@@ -47,7 +63,24 @@ Repo state и merged/main evidence имеют приоритет над session 
 
 Запрещено компенсировать отсутствие решения собственными предположениями.
 
-## 4. Anti-Assumption Rule
+## 4. Repo-First Context Rule
+
+Агент не должен использовать старый chat / memory как основной источник истины.
+
+Порядок источников:
+
+1. repo files;
+2. `docs/planning/current-backlog.md`;
+3. `docs/planning/accepted-backlog-decisions-v1.md`;
+4. current diff / git status;
+5. session ledger;
+6. chat memory only as secondary context.
+
+Если chat memory конфликтует с repo, repo wins.
+
+Если repo state неполный, агент должен запросить нужный файл, диапазон, diff или status.
+
+## 5. Anti-Assumption Rule
 
 Агенту запрещено придумывать данные.
 
@@ -66,13 +99,15 @@ Repo state и merged/main evidence имеют приоритет над session 
 - production rules;
 - Supabase / schema state;
 - user approval;
-- visual approval.
+- visual approval;
+- release readiness;
+- production readiness.
 
 Если доказательства нет, агент должен написать `not verified` и остановиться или запросить нужный источник.
 
-Запрещено использовать слова вроде `готово`, `закрыто`, `проверено`, `merged`, `success`, если это не подтверждено repo / GitHub / explicit user evidence.
+Запрещено использовать слова `готово`, `закрыто`, `проверено`, `merged`, `success`, `release-ready`, если это не подтверждено repo / GitHub / explicit user evidence.
 
-## 5. Anti-Overengineering Rule
+## 6. Anti-Overengineering Rule
 
 Агент должен менять только то, что входит в scope.
 
@@ -91,11 +126,45 @@ Default strategy: minimal safe diff.
 
 Любой cleanup, refactor или architecture improvement должен быть отдельной задачей с отдельным prompt.
 
-## 6. Главное правило экономии контекста
+## 7. Targeted Edit Rule
+
+Default edit strategy: targeted patch / localized replacement.
+
+Full-file rewrite запрещён для больших файлов и нежелателен для любых existing files.
+
+Full-file rewrite разрешён только если:
+
+- файл маленький;
+- меняется большая часть файла;
+- это явно разрешено prompt;
+- агент может доказать, что полный content актуален.
+
+Для больших файлов агент должен предпочитать:
+
+- локальный patch;
+- replace section;
+- replace task block;
+- append explicitly approved section;
+- small file split только при отдельном scope.
+
+## 8. File Creation Rule
+
+Перед созданием нового файла агент обязан проверить:
+
+- существует ли аналогичный файл;
+- разрешено ли создавать новый файл;
+- не нарушает ли это backlog / decision rules;
+- не создаёт ли это дубль planning/backlog source of truth.
+
+Запрещено создавать новые planning/backlog файлы без явного разрешения.
+
+Новые files должны иметь ясную роль и ссылку из relevant planning layer, если они становятся источником процесса.
+
+## 9. Главное правило экономии контекста
 
 Агенту запрещено читать весь репозиторий или весь большой файл без необходимости.
 
-По умолчанию промпт должен ограничивать чтение:
+По умолчанию prompt должен ограничивать чтение:
 
 - конкретным task block;
 - конкретным разделом документа;
@@ -105,7 +174,7 @@ Default strategy: minimal safe diff.
 
 Если информации недостаточно, агент должен остановиться и запросить дополнительный диапазон, файл или dependency scope.
 
-## 7. Session Memory / Run Ledger Rule
+## 10. Session Memory / Run Ledger Rule
 
 В рамках одного и того же agent chat/session агент не обязан перечитывать весь backlog и decision layer перед каждой итерацией, если scope, agent role и task family не менялись.
 
@@ -146,7 +215,23 @@ Session ledger не заменяет repo source of truth.
 
 Если ledger конфликтует с repository files, repo files win and agent must stop for reconciliation.
 
-## 8. Правила чтения больших файлов
+## 11. Task Checklist Rule
+
+Для каждой implementation-задачи агент ведёт короткий checklist:
+
+- read context;
+- verify decisions;
+- define scope;
+- implement;
+- run QA;
+- summarize diff;
+- update ledger.
+
+Checklist не заменяет QA/evidence.
+
+Checklist не должен превращаться в длинный план на несколько задач, если prompt ограничен одной задачей.
+
+## 12. Правила чтения больших файлов
 
 Большой файл — любой файл больше 1000 строк.
 
@@ -154,7 +239,7 @@ Session ledger не заменяет repo source of truth.
 
 Разрешённые стратегии:
 
-### 8.1. Чтение по task block
+### 12.1. Чтение по task block
 
 Использовать для backlog / planning docs.
 
@@ -166,7 +251,7 @@ Session ledger не заменяет repo source of truth.
 Не читать остальные разделы backlog.
 ```
 
-### 8.2. Чтение по заголовку раздела
+### 12.2. Чтение по заголовку раздела
 
 Пример:
 
@@ -174,7 +259,7 @@ Session ledger не заменяет repo source of truth.
 Прочитай только раздел "## Production Rules Discovery Block" в docs/planning/accepted-backlog-decisions-v1.md до следующего H2-заголовка.
 ```
 
-### 8.3. Чтение по диапазону строк
+### 12.3. Чтение по диапазону строк
 
 Пример:
 
@@ -183,7 +268,7 @@ Session ledger не заменяет repo source of truth.
 Не читать остальной файл.
 ```
 
-### 8.4. Чтение вокруг найденного совпадения
+### 12.4. Чтение вокруг найденного совпадения
 
 Пример:
 
@@ -192,7 +277,7 @@ Session ledger не заменяет repo source of truth.
 Прочитай 80 строк до и 120 строк после найденного места.
 ```
 
-## 9. Правила для кода
+## 13. Правила для кода
 
 Для TypeScript / React / API / production code чтение по строкам допустимо только если scope локальный.
 
@@ -223,7 +308,7 @@ Session ledger не заменяет repo source of truth.
 Проанализируй весь конструктор и исправь stepper.
 ```
 
-## 10. Scope по умолчанию
+## 14. Scope по умолчанию
 
 Одна задача = один узкий слой.
 
@@ -232,14 +317,14 @@ Session ledger не заменяет repo source of truth.
 - UI и pricing;
 - UI и API;
 - production logic и checkout UX;
-- Supabase schema и визуальные правки;
-- workflow/package изменения и runtime changes;
+- Supabase schema и visual fixes;
+- workflow/package changes и runtime changes;
 - admin UX и customer-facing constructor;
 - docs-only closure и implementation.
 
 Если задача требует нескольких слоёв, агент должен предложить split plan и остановиться до подтверждения.
 
-## 11. Stop conditions
+## 15. Stop Conditions
 
 Агент обязан остановиться, если:
 
@@ -261,9 +346,11 @@ Session ledger не заменяет repo source of truth.
 - тесты падают по причине вне scope;
 - агент не может доказать, какие файлы изменены и почему.
 
-Stop condition не означает провал. Агент должен вернуть краткий report и запросить отдельный prompt.
+Stop condition не означает провал.
 
-## 12. Правила для docs-only задач
+Агент должен вернуть краткий report и запросить отдельный prompt.
+
+## 16. Правила для docs-only задач
 
 Docs-only задача должна:
 
@@ -277,7 +364,7 @@ Docs-only задача должна:
 
 Для больших docs-файлов агент должен читать только целевой раздел и связанные decision rules.
 
-## 13. Правила для visual / UX задач
+## 17. Правила для visual / UX задач
 
 Visual closure невозможна без:
 
@@ -291,9 +378,9 @@ Visual closure невозможна без:
 
 Visual task cannot be closed by code changes alone.
 
-Если визуальная задача неоднозначна, сначала нужен decision prompt, затем implementation prompt.
+Если visual-задача неоднозначна, сначала нужен decision prompt, затем implementation prompt.
 
-## 14. Правила для production / manufacturing задач
+## 18. Правила для production / manufacturing задач
 
 Production / manufacturing задачи требуют отдельной осторожности.
 
@@ -311,7 +398,25 @@ Customer-facing Three.js preview не является production truth.
 
 Basis JSON не равен automatic `.b3d` generation.
 
-## 15. Autonomous Run Limit
+Production warnings и production critical errors должны проектироваться отдельно в production decision cycle, а не решаться внутри UI/API quick fix.
+
+## 19. Human Approval Rule
+
+Агент обязан запросить human approval перед:
+
+- visual closure;
+- release closure;
+- production readiness claim;
+- merge risky PR;
+- changing accepted decisions;
+- broad architecture migration;
+- deleting legacy code;
+- changing public UX behavior;
+- changing pricing/order/production semantics.
+
+Если approval отсутствует, статус `not approved`.
+
+## 20. Autonomous Run Limit
 
 Агенту запрещено автономно брать весь backlog без ограничений.
 
@@ -329,7 +434,37 @@ Basis JSON не равен automatic `.b3d` generation.
 - до 2 задач только для safe docs-only или test-only scope;
 - остановка при первой рискованной зависимости.
 
-## 16. Формат хорошего implementation prompt
+## 21. No Autonomous Merge Rule
+
+Агент не должен самостоятельно merge PR, если prompt явно не разрешает merge.
+
+Для merge требуется:
+
+- PR scope verified;
+- changed files verified;
+- required QA/checks green;
+- no stop conditions;
+- user or prompt permission;
+- expected head SHA if available;
+- main verification after merge.
+
+Open PR, draft PR, branch-only tests are not closure evidence.
+
+## 22. Proof Before Completion Rule
+
+Перед заявлением о completion агент должен предоставить proof:
+
+- changed files;
+- diff summary;
+- QA commands;
+- QA results;
+- relevant evidence;
+- remaining risks;
+- ledger update.
+
+Если proof неполный, задача не считается completed.
+
+## 23. Формат хорошего implementation prompt
 
 Каждый implementation prompt должен включать:
 
@@ -375,9 +510,11 @@ QA:
 - QA result
 - updated ledger
 - remaining risks
+
+Обращаться к агенту: <agent name>
 ```
 
-## 17. Формат хорошего read-only prompt
+## 24. Формат хорошего read-only prompt
 
 ```text
 Выполни read-only audit.
@@ -394,9 +531,11 @@ QA:
 - выявить зависимости;
 - предложить один safe implementation prompt;
 - перечислить stop conditions.
+
+Обращаться к агенту: <agent name>
 ```
 
-## 18. Когда нужен широкий аудит
+## 25. Когда нужен широкий аудит
 
 Широкий аудит разрешён только для:
 
@@ -410,7 +549,27 @@ QA:
 
 Даже в этих случаях агент должен сначала перечислить, какие директории и файлы он собирается читать, и почему.
 
-## 19. Агентские роли
+## 26. Agent Skills / Future Cursor Skills
+
+Допустимо позже создать `.cursor/skills/**`, если skills не дублируют backlog и не становятся новым source of truth.
+
+Потенциальные skills:
+
+- `safe-pr-review`
+- `visual-qa-review`
+- `backlog-task-runner`
+- `production-rules-audit`
+- `pricing-parity-check`
+- `release-candidate-check`
+
+Skills должны ссылаться на:
+
+- `AGENTS.md`;
+- `docs/planning/current-backlog.md`;
+- `docs/planning/accepted-backlog-decisions-v1.md`;
+- `docs/planning/agent-prompt-rules-v1.md`.
+
+## 27. Агентские роли
 
 Использовать только фиксированный список агентов проекта:
 
@@ -429,6 +588,6 @@ QA:
 Обращаться к агенту: <agent name>
 ```
 
-## 20. Короткое правило
+## 28. Короткое правило
 
 Если задачу можно решить чтением 1 раздела и 3 файлов, нельзя читать весь backlog и весь репозиторий.
