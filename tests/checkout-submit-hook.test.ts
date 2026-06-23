@@ -9,6 +9,7 @@ import {
   applyServerDeliveryAndAssembly,
   applyServerProductionPanelPrice,
   calculateServerCatalogPrice,
+  calculateServerCatalogPriceResolved,
   calculateServerPrice,
   withServerPrice,
 } from "../api/_shared/server-price";
@@ -42,10 +43,61 @@ type ConsoleCapture = {
   restore: () => void;
 };
 
+type SeedPriceItem = {
+  itemType: string;
+  producer?: string;
+  brand?: string;
+  collection?: string;
+  article?: string;
+  name: string;
+  decorName?: string;
+  texture?: string;
+  category?: string;
+  thicknessMm?: number;
+  widthMm?: number;
+  lengthMm?: number;
+  unit: string;
+  sourcePrice: number;
+  markupMultiplier: number;
+  retailPrice: number;
+  availabilityStatus?: string;
+  sourceSheet: string;
+  sourceRow: number;
+  sourceNote?: string;
+};
+
 const tests: Array<{ name: string; run: AsyncTest }> = [];
 const ORIGINAL_ENV = { ...process.env };
 const ORIGINAL_FETCH = globalThis.fetch;
 let ipCounter = 10;
+const PRICE_ITEMS_SEED = JSON.parse(
+  readFileSync("src/pricing/seed/price-items.json", "utf8"),
+) as SeedPriceItem[];
+
+function mapSeedPriceItemToDbRow(item: SeedPriceItem) {
+  return {
+    item_type: item.itemType,
+    producer: item.producer ?? null,
+    brand: item.brand ?? null,
+    collection: item.collection ?? null,
+    article: item.article ?? null,
+    name: item.name,
+    decor_name: item.decorName ?? null,
+    texture: item.texture ?? null,
+    category: item.category ?? null,
+    thickness_mm: item.thicknessMm ?? null,
+    width_mm: item.widthMm ?? null,
+    length_mm: item.lengthMm ?? null,
+    unit: item.unit,
+    source_price: item.sourcePrice,
+    markup_multiplier: item.markupMultiplier,
+    retail_price: item.retailPrice,
+    availability_status: item.availabilityStatus ?? null,
+    source_sheet: item.sourceSheet,
+    source_row: item.sourceRow,
+    source_note: item.sourceNote ?? null,
+  };
+}
 
 function test(name: string, run: AsyncTest) {
   const existingIndex = tests.findIndex((item) => item.name === name);
@@ -140,6 +192,7 @@ function installCheckoutFetchMock(response: Response): FetchRecord[] {
 
 function installServerFetchMock(options: {
   failSupabaseInsert?: boolean;
+  failSupabasePriceItems?: boolean;
   failManagerEmail?: boolean;
   failCustomerEmail?: boolean;
   managerEmailFailureText?: string;
@@ -216,6 +269,31 @@ function installServerFetchMock(options: {
       }
 
       return jsonResponse([], 200);
+    }
+
+    if (url.includes("supabase.example.test") && url.includes("/rest/v1/price_items")) {
+      if (method !== "GET") return jsonResponse([], 405);
+      if (options.failSupabasePriceItems) {
+        return jsonResponse({ message: "price items unavailable" }, 500);
+      }
+      const parsedUrl = new URL(url);
+      const itemType = parsedUrl.searchParams.get("item_type") ?? undefined;
+      const producer = parsedUrl.searchParams.get("producer") ?? undefined;
+      const thicknessRaw = parsedUrl.searchParams.get("thickness_mm");
+      const thicknessMm = thicknessRaw ? Number(thicknessRaw) : undefined;
+      const limitRaw = parsedUrl.searchParams.get("limit");
+      const limit = limitRaw ? Number(limitRaw) : 500;
+
+      const filtered = PRICE_ITEMS_SEED.filter((item) => {
+        if (itemType && item.itemType !== itemType) return false;
+        if (producer && item.producer !== producer) return false;
+        if (thicknessMm !== undefined && item.thicknessMm !== thicknessMm) return false;
+        return true;
+      })
+        .slice(0, Number.isFinite(limit) ? limit : 500)
+        .map((item) => mapSeedPriceItemToDbRow(item));
+
+      return jsonResponse(filtered, 200);
     }
 
     if (url.includes("api.resend.com/emails")) {
@@ -449,6 +527,37 @@ test("API validation rejects missing email and missing phone", () => {
 
   assert.equal(validateOrder(withoutEmail), "Укажите email");
   assert.equal(validateOrder(withoutPhone), "Укажите российский номер в формате +7");
+});
+
+test("server pricing source resolver prefers Supabase runtime catalog when available", async () => {
+  setRequiredServerEnv();
+  installServerFetchMock();
+
+  const result = await calculateServerCatalogPriceResolved(makeValidOrder());
+
+  assert.equal(result.source, "supabase");
+  assert.equal(result.fallbackReason, null);
+  assert.ok(result.itemCount > 0);
+});
+
+test("server pricing source resolver falls back to seed when Supabase env is missing", async () => {
+  clearRequiredServerEnv();
+
+  const result = await calculateServerCatalogPriceResolved(makeValidOrder());
+
+  assert.equal(result.source, "seed");
+  assert.equal(result.fallbackReason, "supabase_env_missing");
+  assert.ok(result.itemCount > 0);
+});
+
+test("server pricing source resolver falls back to seed when Supabase catalog fetch fails", async () => {
+  setRequiredServerEnv();
+  installServerFetchMock({ failSupabasePriceItems: true });
+
+  const result = await calculateServerCatalogPriceResolved(makeValidOrder());
+
+  assert.equal(result.source, "seed");
+  assert.equal(result.fallbackReason, "supabase_fetch_failed");
 });
 
 test("delivery and assembly enabled payloads pass validation when required fields are present", () => {

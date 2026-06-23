@@ -11,7 +11,7 @@ import { applyRequestIdHeader, getRequestId } from './_shared/request-context.js
 import {
   applyServerDeliveryAndAssembly,
   applyServerProductionPanelPrice,
-  calculateServerCatalogPrice,
+  calculateServerCatalogPriceResolved,
   withServerPrice,
 } from './_shared/server-price.js'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types.js'
@@ -135,7 +135,16 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   let serverPrice
   let pricedBody: OrderRequest
   try {
-    const catalogPrice = calculateServerCatalogPrice(body)
+    const catalogPriceResolution = await calculateServerCatalogPriceResolved(body)
+    const catalogPrice = catalogPriceResolution.price
+    if (catalogPriceResolution.source !== 'supabase') {
+      logEvent('warn', 'orders.pricing_catalog_fallback', {
+        requestId,
+        source: catalogPriceResolution.source,
+        reason: catalogPriceResolution.fallbackReason ?? 'unknown',
+        itemCount: catalogPriceResolution.itemCount,
+      })
+    }
     const catalogServerPrice = applyServerDeliveryAndAssembly(body, catalogPrice)
     const catalogPricedBody = withServerPrice(body, catalogServerPrice)
     const initialProductionExport = buildProductionExportFromOrder(catalogPricedBody)

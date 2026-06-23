@@ -128,3 +128,22 @@
 - Если `current-backlog.md` и `accepted-backlog-decisions-v1.md` конфликтуют, агент обязан остановиться и запросить reconciliation.
 - Агент не должен самостоятельно выбирать один источник против другого без явного planning decision.
 - Любая замена решения из этого документа должна быть оформлена как явное updated decision layer, а не как случайная правка backlog status.
+
+Pricing System Source-of-Truth Rule:
+
+Supabase/runtime catalog is primary source of truth.
+
+Seed files (seed/price-items.json) are fallback bootstrap only.
+
+In-memory stores are cache layer only and must never be treated as source of truth.
+
+Server pricing MUST resolve in this order:
+
+1. Supabase runtime catalog
+2. seed fallback (controlled, deterministic)
+3. failure state (no silent fallback)
+
+Any pricing computation MUST explicitly tag source:
+- supabase
+- seed-fallback
+- failed-resolution

@@ -1,6 +1,7 @@
 import facadeStyles from '../../src/config/facade-styles.json' with { type: 'json' };
 import hardwareItems from '../../src/config/hardware.json' with { type: 'json' };
 import { calculateCatalogPrice, type CatalogPriceBreakdown, type CatalogPriceInput } from '../../src/pricing/engine.js';
+import { withPriceCatalogItems } from '../../src/pricing/catalog.js';
 import { buildConstructorMaterialPricingContext } from '../../src/pricing/materialPricing.js';
 import {
   applyProductionPanelPricingToCatalogPrice,
@@ -12,6 +13,8 @@ import { legacyMaterialAliases, materialCatalog, type MaterialToken } from '../.
 import { calculateDeliveryQuote } from '../../src/pricing/delivery.js';
 import { calculateAssemblyQuote } from '../../src/pricing/assembly.js';
 import type { OrderRequest } from './order-types.js';
+import { fetchPriceItems } from './price-items-store.js';
+import type { RawPriceItem } from '../../src/pricing/types.js';
 
 type FacadeStyle = {
   id: string;
@@ -22,6 +25,15 @@ type Hardware = {
   id: string;
   basePrice: number;
   priceFactor: number;
+};
+
+export type ServerPricingCatalogSource = 'supabase' | 'seed';
+
+export type ServerCatalogPriceResolution = {
+  source: ServerPricingCatalogSource;
+  itemCount: number;
+  fallbackReason: string | null;
+  price: CatalogPriceBreakdown;
 };
 
 const materialFallbackId = 'ldsp-egger-w960-belyy-klassicheskiy-sm' satisfies MaterialToken;
@@ -103,6 +115,42 @@ export function calculateServerCatalogPrice(body: OrderRequest): CatalogPriceBre
     hardwareLevel: hardware.basePrice > 5000 ? 'comfort' : 'base',
   });
   return basePrice;
+}
+
+function calculateServerCatalogPriceFromItems(body: OrderRequest, items: RawPriceItem[]): CatalogPriceBreakdown {
+  return withPriceCatalogItems(items, () => calculateServerCatalogPrice(body));
+}
+
+export async function calculateServerCatalogPriceResolved(
+  body: OrderRequest,
+): Promise<ServerCatalogPriceResolution> {
+  try {
+    const runtime = await fetchPriceItems({ limit: 5000 });
+    if (runtime.source === 'supabase' && runtime.items.length > 0) {
+      return {
+        source: 'supabase',
+        itemCount: runtime.items.length,
+        fallbackReason: null,
+        price: calculateServerCatalogPriceFromItems(body, runtime.items),
+      };
+    }
+
+    return {
+      source: 'seed',
+      itemCount: runtime.items.length,
+      fallbackReason: runtime.source === 'supabase'
+        ? 'supabase_catalog_is_empty'
+        : 'supabase_env_missing',
+      price: calculateServerCatalogPriceFromItems(body, runtime.items),
+    };
+  } catch {
+    return {
+      source: 'seed',
+      itemCount: 0,
+      fallbackReason: 'supabase_fetch_failed',
+      price: calculateServerCatalogPrice(body),
+    };
+  }
 }
 
 export function applyServerDeliveryAndAssembly(
