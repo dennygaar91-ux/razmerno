@@ -305,7 +305,7 @@ export function buildOrderPayloadFromConstructor(
     acceptedAt?: string;
     source?: string;
   },
-): Omit<OrderPayload, "utm" | "source"> & { source?: string } {
+): OrderPayload {
   // State flow contract:
   // - payload = final submission layer
   // - payload must be assembled from snapshot (projection) + quote (derived pricing), not from ad-hoc UI values.
@@ -330,9 +330,9 @@ export function buildOrderPayloadFromConstructor(
     materials: {
       bodyId: selectedMaterial.materialId,
       facadeId: selectedFacadeMaterial.materialId,
-      facadeKind: selectedFacadeMaterial.kind === "mdf" ? "mdf" : "ldsp",
+      facadeKind: (selectedFacadeMaterial.kind === "mdf" ? "mdf" : "ldsp") as "ldsp" | "mdf",
       backPanelId: projectMaterials.backPanelMaterialId,
-      backPanelKind: "hdf",
+      backPanelKind: "hdf" as const,
     },
     style: {
       facadeStyleId: snapshot.handleless ? "no-handle" : "regular",

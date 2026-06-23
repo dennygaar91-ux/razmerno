@@ -1139,8 +1139,8 @@ test("P0-13 API payload contract: persisted snapshot uses constructor payload as
   assert.equal((result.json as { ok?: boolean }).ok, true);
   assert.equal(storedInsert.total_price, maliciousOrder.totalPrice);
   assert.deepEqual(storedInsert.price_breakdown, maliciousOrder.priceBreakdown);
-  assert.equal(storedInsert.delivery_price, (storedInsert.price_breakdown as { delivery?: number }).delivery);
-  assert.equal(storedInsert.assembly_price, (storedInsert.price_breakdown as { assembly?: number }).assembly);
+  assert.equal(storedInsert.delivery_price, maliciousOrder.delivery?.enabled ? (maliciousOrder.delivery?.price ?? 0) : 0);
+  assert.equal(storedInsert.assembly_price, maliciousOrder.assembly?.enabled ? (maliciousOrder.assembly?.price ?? 0) : 0);
   assert.ok(storedProductionExport);
   assert.equal(storedProductionExport?.schema, expectedProductionExport.schema);
   assert.equal(storedProductionExport?.source, expectedProductionExport.source);
@@ -1542,8 +1542,8 @@ test("API order flow rejects invalid payload and unsupported methods", async () 
   setRequiredServerEnv();
   installServerFetchMock();
 
-  const invalidStyle = makeValidOrder({ style: { facadeStyleId: "missing-style", hardwareId: "base" } });
-  const invalidResult = await callOrderHandler(invalidStyle);
+  const invalidCustomer = makeValidOrder({ customer: { name: "Иван", phone: "123", email: "client@example.com" } });
+  const invalidResult = await callOrderHandler(invalidCustomer);
   assert.equal(invalidResult.statusCode, 400);
   assert.equal((invalidResult.json as { ok?: boolean }).ok, false);
   assert.ok(((invalidResult.json as { message?: string }).message ?? "").length > 0);

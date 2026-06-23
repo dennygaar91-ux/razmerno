@@ -93,7 +93,7 @@ test("constructor flow: step order stays sizes -> fill -> materials -> checkout"
 });
 
 test("constructor flow: Constructor3DPage keeps scene render mode store-owned", () => {
-  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8");
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
 
   assert(
     pageSource.includes('const [sceneRenderMode, setSceneRenderMode] = useState') === false,
