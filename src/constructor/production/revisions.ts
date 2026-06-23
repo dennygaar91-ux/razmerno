@@ -1,6 +1,10 @@
 import type { ProductionExportPackage } from "./types.js";
 
 type ProductionRevisionInput = Pick<ProductionExportPackage, "validation" | "rules" | "manufacturing">;
+type InitialProductionRevisionOptions = {
+  createdAt?: string;
+  deterministicIdSeed?: string;
+};
 
 export type ProductionReviewStatus =
   | "auto-generated"
@@ -25,16 +29,24 @@ export interface ProductionRevision {
   }>;
 }
 
-export function createInitialProductionRevision(pack: ProductionRevisionInput): ProductionRevision {
+export function createInitialProductionRevision(
+  pack: ProductionRevisionInput,
+  options?: InitialProductionRevisionOptions,
+): ProductionRevision {
   const blocked = pack.validation.status === "blocked" || pack.rules.status === "blocked";
   const requiresReview = pack.manufacturing.requiresTechnologistCheck || pack.rules.autoWarnings.length > 0 || pack.rules.autoRepairs.length > 0;
 
+  const createdAt = options?.createdAt ?? new Date().toISOString();
+  const revisionId = options?.deterministicIdSeed
+    ? `production-rev-${options.deterministicIdSeed}-1`
+    : `production-rev-${Date.now()}-1`;
+
   return {
-    id: `production-rev-${Date.now()}-1`,
+    id: revisionId,
     version: 1,
     status: blocked ? "blocked" : requiresReview ? "requires-review" : "auto-generated",
     source: "auto",
-    createdAt: new Date().toISOString(),
+    createdAt,
     changedBy: "system",
     note: blocked
       ? "Автоматическая production model заблокирована правилами."

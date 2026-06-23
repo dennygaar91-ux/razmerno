@@ -7,55 +7,89 @@ import { getDefaultFactoryProfile } from "./factoryProfile.js";
 import { evaluateManufacturingRules } from "./manufacturingRules.js";
 import { createInitialProductionRevision } from "./revisions.js";
 
-export function buildProductionExportFromOrder(
-  order: OrderRequest,
-  configVersion = order.configVersion ?? "rzm.order.v1",
+type ProductionExportDeterministicOptions = {
+  createdAt?: string;
+  revisionIdSeed?: string;
+};
+
+function resolveDeterministicOptionsFromPayload(payload: OrderRequest): Required<ProductionExportDeterministicOptions> {
+  const createdAt = payload.consent?.acceptedAt ?? "1970-01-01T00:00:00.000Z";
+  const revisionIdSeed =
+    payload.orderId ??
+    [
+      payload.productType ?? "wardrobe",
+      payload.dimensions?.width ?? 1800,
+      payload.dimensions?.height ?? 2400,
+      payload.dimensions?.depth ?? 600,
+      payload.sections ?? 2,
+      payload.materials?.bodyId ?? "white-matt",
+      payload.materials?.facadeId ?? "oak-natural",
+      payload.style?.facadeStyleId ?? "regular",
+      payload.style?.hardwareId ?? "base",
+    ].join("-");
+
+  return { createdAt, revisionIdSeed };
+}
+
+export function buildProductionExportFromPayload(
+  payload: OrderRequest,
+  configVersion = payload.configVersion ?? "rzm.order.v1",
 ): ProductionExportPackage {
-  const facadeKind = order.materials?.facadeKind === "mdf" ? "mdf" : "ldsp";
+  const deterministic = resolveDeterministicOptionsFromPayload(payload);
+  const facadeKind = payload.materials?.facadeKind === "mdf" ? "mdf" : "ldsp";
   const facadeThicknessMm = facadeKind === "mdf" ? 18 : 16;
 
   const project: FurnitureProject = {
-    productType: order.productType ?? "wardrobe",
+    productType: payload.productType ?? "wardrobe",
     dimensions: {
-      widthMm: order.dimensions?.width ?? 1800,
-      heightMm: order.dimensions?.height ?? 2400,
-      depthMm: order.dimensions?.depth ?? 600,
+      widthMm: payload.dimensions?.width ?? 1800,
+      heightMm: payload.dimensions?.height ?? 2400,
+      depthMm: payload.dimensions?.depth ?? 600,
     },
     material: {
-      bodyMaterialId: order.materials?.bodyId ?? "white-matt",
-      facadeMaterialId: order.materials?.facadeId ?? "oak-natural",
-      backPanelMaterialId: order.materials?.backPanelId ?? order.materials?.bodyId ?? "white-matt",
+      bodyMaterialId: payload.materials?.bodyId ?? "white-matt",
+      facadeMaterialId: payload.materials?.facadeId ?? "oak-natural",
+      backPanelMaterialId: payload.materials?.backPanelId ?? payload.materials?.bodyId ?? "white-matt",
       edgeMaterialId: undefined,
       bodyThicknessMm: 16,
       facadeThicknessMm,
       backPanelThicknessMm: 3,
     },
     structure: {
-      sectionCount: order.sections ?? 2,
-      layout: order.layout ?? {
+      sectionCount: payload.sections ?? 2,
+      layout: payload.layout ?? {
         sections: [],
       },
-      shelves: order.filling?.shelves ?? 0,
-      drawers: order.filling?.drawers ?? 0,
-      hangingRod: order.filling?.hangingRod ?? false,
-      facadeMode: pickFacadeMode(order),
-      openingMode: pickOpeningMode(order.style?.facadeStyleId),
-      hardwareMode: order.style?.hardwareId === "comfort" ? "comfort" : "base",
+      shelves: payload.filling?.shelves ?? 0,
+      drawers: payload.filling?.drawers ?? 0,
+      hangingRod: payload.filling?.hangingRod ?? false,
+      facadeMode: pickFacadeMode(payload),
+      openingMode: pickOpeningMode(payload.style?.facadeStyleId),
+      hardwareMode: payload.style?.hardwareId === "comfort" ? "comfort" : "base",
     },
     meta: {
       schemaVersion: 3,
       configVersion,
-      createdAt: new Date().toISOString(),
+      createdAt: deterministic.createdAt,
     },
   };
 
-  return buildProductionExportPackage(project, "api-order");
+  return buildProductionExportPackage(project, "api-order", deterministic);
+}
+
+export function buildProductionExportFromOrder(
+  order: OrderRequest,
+  configVersion = order.configVersion ?? "rzm.order.v1",
+): ProductionExportPackage {
+  return buildProductionExportFromPayload(order, configVersion);
 }
 
 export function buildProductionExportPackage(
   project: FurnitureProject,
   source: ProductionExportPackage["source"],
+  deterministic?: ProductionExportDeterministicOptions,
 ): ProductionExportPackage {
+  const createdAt = deterministic?.createdAt ?? new Date().toISOString();
   const productionModel = buildCabinetGeometry(project);
   const factoryProfile = getDefaultFactoryProfile();
   const requiresTechnologistCheck =
@@ -82,7 +116,7 @@ export function buildProductionExportPackage(
       title: factoryProfile.title,
     },
     meta: {
-      createdAt: new Date().toISOString(),
+      createdAt,
       configVersion: project.meta.configVersion,
     },
   };
@@ -95,7 +129,10 @@ export function buildProductionExportPackage(
     rules,
     validation,
   };
-  const initialRevision = createInitialProductionRevision(packageWithValidation);
+  const initialRevision = createInitialProductionRevision(packageWithValidation, {
+    createdAt,
+    deterministicIdSeed: deterministic?.revisionIdSeed,
+  });
 
   return {
     ...packageWithValidation,
