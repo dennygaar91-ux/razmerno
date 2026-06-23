@@ -25,6 +25,9 @@
 
 - Q8: `Supabase/runtime catalog` является главным источником цены для MVP.
 - Pricing решения в backlog не должны противоречить этому правилу без явного reconciliation.
+- Итоговая цена в customer-facing constructor / checkout округляется до 1 ₽.
+- Цена должна восприниматься как результат точной спецификации и системы расчёта, а не как маркетинговая округлённая оценка.
+- Минимальная стоимость заказа для MVP: 10 000 ₽.
 
 ## 5. API / Orders / Idempotency Decisions
 
@@ -39,6 +42,13 @@
 - Active customer-facing path должен оставаться вокруг Constructor3D, а не legacy Constructor.
 - Legacy Constructor не должен тихо возвращаться в активный scope.
 - Constructor3D state ownership требует отдельного документа, а не неявного решения в feature PR.
+- В 3D-режиме пользователь не должен видеть labels, markers или технические overlay-подсказки.
+- 3D-режим является чистым customer-facing preview: модель должна быть главным визуальным элементом и не должна конкурировать с интерфейсными подсказками.
+- Labels и markers разрешены в 2D-режиме.
+- 2D-режим не должен выглядеть как инженерный чертёж; он должен быть визуальным 2D-preview с выбранными материалами и декорами.
+- Mobile constructor должен оставаться 3D-first: 3D/preview сверху, настройки — через bottom sheet / мобильную панель, без превращения сценария в длинную форму.
+- На desktop stepper показывает полные названия шагов.
+- На mobile неактивные и завершённые шаги показываются только номером; активный шаг показывает полное название.
 
 ## 7. Three.js / WebGL / Fallback Decisions
 
@@ -52,36 +62,63 @@
 - Q24: фасады используют кромку 2 мм в круг.
 - Для MVP нельзя обещать automatic `.b3d` export для БАЗИС-Мебельщик.
 - Разрешён только JSON/intermediate handoff до отдельного подтверждённого implementation cycle.
+- Клиент не должен видеть production warnings, manufacturing details или технические ошибки, связанные с кромкой, присадкой, HDF, фурнитурой, Basis JSON, factory profile, SKU или технологическими операциями.
+- Production validation является отдельным внутренним слоем и не должна превращаться в customer-facing complexity.
+- Internal production warnings должны быть отдельно проработаны как крупный production rules / Basis JSON decision block перед глубокой реализацией manufacturing engine.
 
 ## 9. Visual QA / Design System Decisions
 
 - Visual closure требует fresh screenshots и явный visual review.
 - Screenshot artifact сам по себе не закрывает visual task без review decision.
+- В UX/UI конфликте модель/preview важнее декоративных подсказок: интерфейсные элементы не должны перекрывать или визуально подавлять мебель.
 
-## 10. Live Provider / Supabase / PII Decisions
+## 10. Customer-facing Validation Decisions
+
+- Клиентские critical errors блокируют отправку заявки.
+- Критичными customer-facing errors являются: размеры вне допустимого диапазона, слишком узкая секция, слишком маленькая зона, незаполненные или невалидные обязательные контакты, отсутствие согласия на обработку персональных данных, сумма заказа ниже минимального порога.
+- Клиенту разрешено показывать только простые и понятные ошибки: слишком узко, слишком широко, слишком высоко, слишком низко, слишком глубоко, слишком мелко, заполните телефон, заполните email, примите согласие, минимальная сумма заказа 10 000 ₽.
+- Клиент отвечает только за размеры, конфигурацию, материалы, контактные данные, согласие и отправку заявки.
+- Система отвечает за производственную валидность, Basis JSON, кромку, присадку, HDF, фурнитуру, технологические ограничения, production warnings и ручную проверку в админке.
+
+## 11. Production Rules Discovery Block
+
+- Требуется отдельный production decision cycle для формирования production rules engine и Basis JSON specification.
+- Этот цикл должен быть выполнен до заявлений о factory-ready production handoff.
+- В рамках production decision cycle должны быть отдельно определены: production warnings, production critical errors, auto-repair rules, manual review rules, Basis JSON validation rules, panel generation rules, edge banding rules, drilling rules, hardware rules, hinge rules, drawer slide rules, rod rules, HDF rules, factory profile rules, SKU/article mapping и production export requirements.
+- Этот блок требует отдельного сбора технической документации и проектирования, потому что на его основе будет формироваться Basis JSON и дальнейшая производственная логика.
+
+## 12. Admin / Operations Decisions
+
+- Минимальная рабочая админка входит в MVP scope.
+- MVP admin scope: список заявок, детали заявки, статус, production JSON / intermediate handoff, базовая ручная проверка.
+- Manager notes нужны в MVP как простое текстовое поле для внутреннего контекста заявки.
+
+## 13. Live Provider / Supabase / PII Decisions
 
 - Live pricing/catalog baseline для MVP опирается на `Supabase/runtime catalog`.
 - Failures в notification flow должны логироваться без превращения customer-success path в ложный hard failure там, где это уже запрещено принятыми решениями.
 
-## 11. Release Maturity Decisions
+## 14. Release Maturity Decisions
 
 - Цель ближайшего цикла: выйти на состояние `8/10 strong MVP-ready`.
 - Это означает приоритет устойчивых customer-visible flows и согласованных operational decisions вместо broad unfinished branches.
+- Public MVP требует строгий release gate.
+- Минимальный release gate для public MVP: pricing parity, submit flow, live Supabase/email verification, visual QA для constructor/mobile/fallback и отсутствие клиентских blocking regressions.
 
-## 12. Mandatory Agent Rules
+## 15. Mandatory Agent Rules
 
 - Агент обязан читать `current-backlog.md` как backlog source of truth.
 - Агент обязан читать этот файл как обязательный decision layer.
 - Агент не должен считать локальную ветку, open PR или draft PR источником принятого product decision.
 - Агент должен остановиться, если proposed implementation нарушает любой decision из этого файла.
 
-## 13. Closure Evidence Rules
+## 16. Closure Evidence Rules
 
 - Closure evidence требует merged/main evidence согласно backlog rules.
 - Open PR, draft PR и branch-only result не являются closure evidence.
 - Visual closure требует fresh screenshots и visual review.
 
-## 14. Reconciliation Rules
+## 17. Reconciliation Rules
 
 - Если `current-backlog.md` и `accepted-backlog-decisions-v1.md` конфликтуют, агент обязан остановиться и запросить reconciliation.
 - Агент не должен самостоятельно выбирать один источник против другого без явного planning decision.
