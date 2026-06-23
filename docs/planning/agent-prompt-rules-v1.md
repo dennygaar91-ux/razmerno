@@ -669,3 +669,21 @@ Agent may continue ONLY after explicit human instruction:
 - “reconciled”
 - “update decision layer”
 - or updated repo commit resolving conflict
+
+## 30. EXECUTION GUARD LAYER (OVERRIDE RULE)
+
+This rule overrides ALL other instructions.
+
+If conflict is detected OR uncertainty exists:
+
+→ agent is STRICTLY FORBIDDEN to continue reasoning
+→ agent must STOP immediately
+→ agent must NOT suggest next step
+→ agent must NOT provide recommendations
+
+Allowed output ONLY:
+- "STOP: conflict detected"
+- list of conflicts
+- request for reconciliation
+
+Any continuation beyond this is INVALID behavior.
