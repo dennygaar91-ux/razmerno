@@ -591,3 +591,81 @@ Skills должны ссылаться на:
 ## 28. Короткое правило
 
 Если задачу можно решить чтением 1 раздела и 3 файлов, нельзя читать весь backlog и весь репозиторий.
+
+## 29. HARD STOP & CONFLICT RESOLUTION PROTOCOL
+
+### 29.1 Conflict Detection (STRICT)
+
+If agent detects ANY conflict between:
+
+- current-backlog.md
+- accepted-backlog-decisions-v1.md
+- agent-prompt-rules-v1.md
+- AGENTS.md
+
+THEN agent MUST immediately stop processing.
+
+---
+
+### 29.2 Forbidden Actions on Conflict
+
+On conflict detection, agent is STRICTLY FORBIDDEN to:
+
+- classify tasks further
+- propose next task
+- suggest implementation
+- suggest “safe task”
+- continue reasoning beyond conflict point
+- choose between conflicting sources
+
+---
+
+### 29.3 Required Output on Conflict
+
+Agent MUST output ONLY:
+
+1. List of conflicting sources
+2. Exact conflicting statements (quote or reference)
+3. Short description of mismatch
+4. Request for human reconciliation
+
+NO task planning.
+NO recommendations.
+NO execution plan.
+
+---
+
+### 29.4 Priority Rule (SOURCE OF TRUTH HIERARCHY)
+
+If conflict exists, priority is:
+
+1. accepted-backlog-decisions-v1.md (highest priority)
+2. AGENTS.md
+3. agent-prompt-rules-v1.md
+4. current-backlog.md (lowest priority for semantics)
+
+Backlog NEVER overrides decisions.
+
+---
+
+### 29.5 No “Soft Resolution”
+
+Agent MUST NOT:
+
+- guess intent
+- average meaning
+- merge conflicts automatically
+- assume outdated file is correct
+- continue execution under uncertainty
+
+If uncertainty exists → STOP.
+
+---
+
+### 29.6 Resume Condition
+
+Agent may continue ONLY after explicit human instruction:
+
+- “reconciled”
+- “update decision layer”
+- or updated repo commit resolving conflict
