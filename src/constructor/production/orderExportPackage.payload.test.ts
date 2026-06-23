@@ -141,6 +141,35 @@ function assertProductionV3GoldenInvariants(productionExport: ProductionExportPa
   assert.equal(revisions.length, 1);
   assertProductionV3HdfThickness(productionExport);
   assertProductionV3EdgeBandingPolicy(productionExport);
+  assertProductionV3BasisBoundary(productionExport);
+}
+
+const FORBIDDEN_BASIS_AUTO_B3D_CLAIMS = [
+  "document:create-b3d",
+  '"documentType":"b3d"',
+  "'documentType': 'b3d'",
+  "автоматической генерации .b3d",
+  "автоматической генерации",
+] as const;
+
+function assertProductionV3BasisBoundary(productionExport: ProductionExportPackage) {
+  assert.equal(productionExport.basis.status, "manual-json-ready");
+  const serialized = JSON.stringify(productionExport);
+  for (const forbidden of FORBIDDEN_BASIS_AUTO_B3D_CLAIMS) {
+    assert.ok(
+      !serialized.includes(forbidden),
+      `production export must not claim auto .b3d: "${forbidden}"`,
+    );
+  }
+  assert.ok(!serialized.includes("create-b3d"), "production export must not reference create-b3d");
+  for (const step of productionExport.basis.plan) {
+    const stepSerialized = JSON.stringify(step);
+    assert.ok(!stepSerialized.includes("create-b3d"), "basis plan step must not reference create-b3d");
+    assert.ok(
+      !stepSerialized.includes("автоматической генерации"),
+      "basis plan step must not claim automatic .b3d generation",
+    );
+  }
 }
 
 const EDGE_SIDES = ["front", "back", "left", "right"] as const;

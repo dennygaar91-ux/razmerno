@@ -1,6 +1,26 @@
 import assert from "node:assert/strict";
 import { buildProductionExportFromOrder } from "../src/constructor/production/orderExportPackage";
 
+const FORBIDDEN_BASIS_AUTO_B3D_CLAIMS = [
+  "document:create-b3d",
+  '"documentType":"b3d"',
+  "'documentType': 'b3d'",
+  "автоматической генерации .b3d",
+  "автоматической генерации",
+] as const;
+
+function assertBasisManualJsonBoundary(
+  serialized: string,
+  basisStatus: string,
+  label: string,
+) {
+  assert.equal(basisStatus, "manual-json-ready", `${label}: basis.status`);
+  for (const forbidden of FORBIDDEN_BASIS_AUTO_B3D_CLAIMS) {
+    assert.ok(!serialized.includes(forbidden), `${label}: forbidden auto-b3d claim "${forbidden}"`);
+  }
+  assert.ok(!serialized.includes("create-b3d"), `${label}: must not reference create-b3d command id`);
+}
+
 const order = {
   productType: "wardrobe" as const,
   dimensions: { width: 1800, height: 2400, depth: 600 },
@@ -34,6 +54,7 @@ assert.ok(pack.productionModel.panels.length > 0);
 assert.ok(pack.productionModel.edgeBanding.length > 0);
 assert.ok(pack.productionModel.basisExportPlan.length > 0);
 assert.equal(pack.basis.status, "manual-json-ready");
+assertBasisManualJsonBoundary(JSON.stringify(pack), pack.basis.status, "production export");
 assert.equal(pack.validation.schema, "razmerno.production-validation.v1");
 assert.ok(pack.validation.summary.panels > 0);
 assert.ok(typeof pack.manufacturing.requiresTechnologistCheck === "boolean");
