@@ -6,7 +6,7 @@ export interface FactoryProfile {
   materials: {
     body: { material: "ldsp"; thicknessMm: 16 };
     facade: Array<{ material: "ldsp" | "mdf"; thicknessMm: 16 | 18 }>;
-    backPanel: { material: "hdf"; thicknessMm: 4 };
+    backPanel: { material: "hdf"; thicknessMm: 3 };
   };
   edgeBanding: {
     facadeThicknessMm: 2;
@@ -41,7 +41,7 @@ export const DEFAULT_FACTORY_PROFILE: FactoryProfile = {
       { material: "ldsp", thicknessMm: 16 },
       { material: "mdf", thicknessMm: 18 },
     ],
-    backPanel: { material: "hdf", thicknessMm: 4 },
+    backPanel: { material: "hdf", thicknessMm: 3 },
   },
   edgeBanding: {
     facadeThicknessMm: 2,

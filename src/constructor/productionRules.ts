@@ -9,7 +9,7 @@ export const RAZMERNO_PRODUCTION_RULES = {
   },
   backPanel: {
     material: 'hdf',
-    thicknessMm: 4,
+    thicknessMm: 3,
     installation: 'groove',
     grooveDepthMm: 8,
     grooveOffsetMm: 10,

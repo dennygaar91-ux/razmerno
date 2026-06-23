@@ -12,7 +12,7 @@ import type { FurnitureProject, OpeningMode, ProductType } from "./types.js";
 const BODY_THICKNESS_MM = 16;
 const LDSP_FACADE_THICKNESS_MM = 16;
 const MDF_FACADE_THICKNESS_MM = 18;
-const BACK_PANEL_THICKNESS_MM = 4;
+const BACK_PANEL_THICKNESS_MM = 3;
 
 export function fromConfigState(state: ConfigState, configVersion: string): FurnitureProject {
   // Защищаемся от состояния без выбранного типа

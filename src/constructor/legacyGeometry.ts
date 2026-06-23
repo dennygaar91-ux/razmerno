@@ -43,7 +43,7 @@ export interface ProjectGeometry {
   }
 }
 
-const BACK_PANEL_THICKNESS_MM = 4
+const BACK_PANEL_THICKNESS_MM = 3
 const BACK_GAP_MM = 20
 const FACADE_GAP_MM = 3
 const DRAWER_RUNNER_CLEARANCE_MM = 60

@@ -139,6 +139,29 @@ function assertProductionV3GoldenInvariants(productionExport: ProductionExportPa
   assert.ok(validation.summary.edgeBandingLengthMm > 0);
   assert.ok(validation.summary.basisSteps > 0);
   assert.equal(revisions.length, 1);
+  assertProductionV3HdfThickness(productionExport);
+}
+
+function assertProductionV3HdfThickness(productionExport: ProductionExportPackage) {
+  const hdfPanels = productionExport.productionModel.panels.filter(
+    (panel) => panel.materialType === "hdf",
+  );
+
+  assert.ok(hdfPanels.length > 0, "expected HDF panels in production v3 export");
+
+  for (const panel of hdfPanels) {
+    assert.equal(panel.thicknessMm, 3, `expected HDF panel ${panel.role} to be 3 mm`);
+  }
+
+  for (const panel of productionExport.productionModel.panels.filter((item) => item.role === "back-panel")) {
+    assert.equal(panel.thicknessMm, 3, "expected back-panel to be 3 mm");
+  }
+
+  for (const panel of productionExport.productionModel.panels.filter((item) => item.role === "drawer-bottom")) {
+    assert.equal(panel.thicknessMm, 3, "expected drawer-bottom to be 3 mm");
+  }
+
+  assert.equal(productionExport.project.material.backPanelThicknessMm, 3);
 }
 
 function assertDeterministicAndPricingIndependent(payload: OrderRequest) {

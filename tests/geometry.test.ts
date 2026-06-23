@@ -31,7 +31,7 @@ function project(overrides: Partial<FurnitureProject> = {}): FurnitureProject {
       backPanelMaterialId: "white-matt",
       bodyThicknessMm: 16,
       facadeThicknessMm: 18,
-      backPanelThicknessMm: 4,
+      backPanelThicknessMm: 3,
     },
     structure: {
       sectionCount: 2,
