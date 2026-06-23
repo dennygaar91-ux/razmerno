@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { submitOrder, validateCustomer } from "../../../shared/lib/order";
 import { buildOrderPayloadFromConstructor, type ConstructorSnapshot } from "../adapters/constructorPayload";
 import { loadPricingModules } from "../pricingLoader";
+import { warnConstructorSystemConsistencyInDev } from "../validation";
 import type {
   ConstructorFormErrors,
   QuoteState,
@@ -91,6 +92,7 @@ export function useConstructorSubmit({
     const payload = buildOrderPayloadFromConstructor(snapshot, quote, {
       source: "constructor-store-adapter",
     });
+    warnConstructorSystemConsistencyInDev(snapshot, quote, payload);
 
     const result = await submitOrder(payload);
 

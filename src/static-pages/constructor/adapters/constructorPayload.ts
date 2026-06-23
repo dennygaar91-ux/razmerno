@@ -95,23 +95,29 @@ export function buildConstructorFilling(
     | "fillingLayout"
   >,
 ): ConstructorFilling {
-  const layoutTotals = snapshot.fillingLayout
-    ? Object.values(snapshot.fillingLayout).reduce(
-        (totals, section) => {
-          for (const filling of Object.values(section)) {
-            totals.shelves += Math.max(0, filling.shelvesCount ?? 0);
-            totals.drawers += Math.max(0, filling.drawersCount ?? 0);
-            totals.rods += Math.max(0, filling.rodsCount ?? 0);
-          }
-          return totals;
-        },
-        { shelves: 0, drawers: 0, rods: 0 },
-      )
-    : { shelves: 0, drawers: 0, rods: 0 };
+  if (snapshot.fillingLayout) {
+    const layoutTotals = Object.values(snapshot.fillingLayout).reduce(
+      (totals, section) => {
+        for (const filling of Object.values(section)) {
+          totals.shelves += Math.max(0, filling.shelvesCount ?? 0);
+          totals.drawers += Math.max(0, filling.drawersCount ?? 0);
+          totals.rods += Math.max(0, filling.rodsCount ?? 0);
+        }
+        return totals;
+      },
+      { shelves: 0, drawers: 0, rods: 0 },
+    );
 
-  const shelvesCount = layoutTotals.shelves || snapshot.shelvesCount || 0;
-  const drawersCount = layoutTotals.drawers || snapshot.drawersCount || 0;
-  const rodsCount = layoutTotals.rods || snapshot.rodsCount || 0;
+    return {
+      shelves: layoutTotals.shelves,
+      drawers: layoutTotals.drawers,
+      hangingRod: layoutTotals.rods > 0,
+    };
+  }
+
+  const shelvesCount = snapshot.shelvesCount || 0;
+  const drawersCount = snapshot.drawersCount || 0;
+  const rodsCount = snapshot.rodsCount || 0;
   const hasExplicitCounts =
     shelvesCount > 0 || drawersCount > 0 || rodsCount > 0;
   if (hasExplicitCounts) {
@@ -300,6 +306,9 @@ export function buildOrderPayloadFromConstructor(
     source?: string;
   },
 ): Omit<OrderPayload, "utm" | "source"> & { source?: string } {
+  // State flow contract:
+  // - payload = final submission layer
+  // - payload must be assembled from snapshot (projection) + quote (derived pricing), not from ad-hoc UI values.
   const selectedFurniture = getSelectedFurniture(snapshot);
   const selectedMaterial = getSelectedMaterial(snapshot);
   const selectedFacadeMaterial = getSelectedFacadeMaterial(snapshot);
@@ -308,8 +317,7 @@ export function buildOrderPayloadFromConstructor(
     facadeMaterialId: selectedFacadeMaterial.materialId,
   });
   const filling = buildConstructorFilling(snapshot);
-
-  return {
+  const payload = {
     productType: selectedFurniture.productType,
     dimensions: {
       width: snapshot.width,
@@ -369,4 +377,6 @@ export function buildOrderPayloadFromConstructor(
     source: options?.source ?? "constructor-store-adapter",
     honeypot: snapshot.contact.company,
   };
+
+  return payload;
 }
