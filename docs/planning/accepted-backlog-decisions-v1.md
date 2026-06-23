@@ -46,9 +46,12 @@
 - 3D-режим является чистым customer-facing preview: модель должна быть главным визуальным элементом и не должна конкурировать с интерфейсными подсказками.
 - Labels и markers разрешены в 2D-режиме.
 - 2D-режим не должен выглядеть как инженерный чертёж; он должен быть визуальным 2D-preview с выбранными материалами и декорами.
-- Mobile constructor должен оставаться 3D-first: 3D/preview сверху, настройки — через bottom sheet / мобильную панель, без превращения сценария в длинную форму.
+- Current implementation focus: desktop / website experience first.
+- Mobile layout / mobile constructor redesign is out of current implementation scope unless explicitly requested by the user.
+- Future mobile version should be designed as a smartphone-app-like experience, not as a compressed desktop website.
+- Existing mobile behavior may be preserved or minimally guarded from breakage, but agents must not spend current scope redesigning mobile layout.
 - На desktop stepper показывает полные названия шагов.
-- На mobile неактивные и завершённые шаги показываются только номером; активный шаг показывает полное название.
+- Mobile stepper/app navigation decisions are deferred to the future mobile app-like design cycle, except for preventing obvious regressions if touched by desktop changes.
 
 ## 7. Three.js / WebGL / Fallback Decisions
 
@@ -71,6 +74,7 @@
 - Visual closure требует fresh screenshots и явный visual review.
 - Screenshot artifact сам по себе не закрывает visual task без review decision.
 - В UX/UI конфликте модель/preview важнее декоративных подсказок: интерфейсные элементы не должны перекрывать или визуально подавлять мебель.
+- Current visual/design-system implementation focus is desktop / website. Mobile redesign is postponed to a separate future mobile app-like design cycle.
 
 ## 10. Customer-facing Validation Decisions
 
@@ -103,7 +107,8 @@
 - Цель ближайшего цикла: выйти на состояние `8/10 strong MVP-ready`.
 - Это означает приоритет устойчивых customer-visible flows и согласованных operational decisions вместо broad unfinished branches.
 - Public MVP требует строгий release gate.
-- Минимальный release gate для public MVP: pricing parity, submit flow, live Supabase/email verification, visual QA для constructor/mobile/fallback и отсутствие клиентских blocking regressions.
+- Минимальный release gate для public MVP: pricing parity, submit flow, live Supabase/email verification, desktop / website visual QA for constructor and core site, fallback usability, and absence of customer blocking regressions.
+- Mobile app-like design is not part of current release gate unless explicitly re-scoped by the user.
 
 ## 15. Mandatory Agent Rules
 
