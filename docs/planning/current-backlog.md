@@ -68,7 +68,7 @@ For production:
 The following PRs must not be treated as closure evidence until merged and verified:
 
 - PR #41 — dependency recovery: open/draft/not merged; P0-19 remains disputed until closure evidence is reconciled.
-- PR #43 — pricing parity: open/draft/not merged; cannot close P0-13.
+- PR #43 — pricing parity: stale/obsolete after PR #77–#79; must not be used as active triage source and cannot close P0-13.
 - PR #51 — production golden snapshots: open/not merged; not closure-ready because package scripts are not committed and snapshots target legacy v2 while active export uses v3.
 - PR #52 — API notification failure contracts: open/not merged; useful branch work, but wording must be corrected from idempotent replay to safe 409 conflict unless true idempotency is implemented.
 
@@ -258,7 +258,7 @@ Implementation evidence candidate:
 
 Required sub-work:
 
-- PR #43 triage: rebase/fix/continue or replace;
+- PR #43 stale reference: do not rebase/fix/continue; use only as obsolete branch-only evidence and replace with current pricing source-of-truth / parity work;
 - golden pricing fixtures in main;
 - material-aware client/server parity;
 - production-panel pricing parity;
