@@ -22,7 +22,7 @@ export const RAZMERNO_PRODUCTION_RULES = {
     edgeThicknessMm: 2,
   },
   bodyEdge: {
-    thicknessMm: 0.8,
+    thicknessMm: 1,
     sides: ['front', 'back', 'left', 'right'] as const,
   },
   shelves: {

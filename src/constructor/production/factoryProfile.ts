@@ -10,7 +10,7 @@ export interface FactoryProfile {
   };
   edgeBanding: {
     facadeThicknessMm: 2;
-    otherThicknessMm: 0.8;
+    otherThicknessMm: 1;
     edgeAllSides: true;
   };
   shelves: {
@@ -45,7 +45,7 @@ export const DEFAULT_FACTORY_PROFILE: FactoryProfile = {
   },
   edgeBanding: {
     facadeThicknessMm: 2,
-    otherThicknessMm: 0.8,
+    otherThicknessMm: 1,
     edgeAllSides: true,
   },
   shelves: {

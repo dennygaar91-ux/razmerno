@@ -6,7 +6,7 @@
  */
 import type { FurnitureProject, GeometryCompartment, Panel, ProductionModelWarning } from "./types.js";
 import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
-import { bodyEdgeAll, noEdge } from "./edgeBanding.js";
+import { bodyEdgeAll, facadeEdgeAll, noEdge } from "./edgeBanding.js";
 import { getSectionMetrics } from "./layoutMetrics.js";
 
 const PLINTH_HEIGHT_MM = 100;
@@ -187,7 +187,7 @@ function buildDrawerStack({
       position: { xMm: target.sectionXStart + FACADE_GAP_MM, yMm: yBottom + FACADE_GAP_MM, zMm: -facadeThicknessMm },
       rotation: { x: 0, y: 0, z: 0 },
       faceSide: "front",
-      edgeBanding: bodyEdgeAll(matFacade, facadeWidth, facadeHeight),
+      edgeBanding: facadeEdgeAll(matFacade, facadeWidth, facadeHeight),
       visible: true,
       selectable: true,
       basis: {

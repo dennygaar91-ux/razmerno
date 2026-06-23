@@ -1,10 +1,10 @@
 /**
- * Кромка — 0.8 мм для корпусных деталей, 2 мм для фасадов.
+ * Кромка — 1 мм для корпусных деталей, 2 мм для фасадов.
  * Хранится по сторонам панели (front/back/left/right).
  */
 import type { EdgeBanding, EdgeSide } from "./types.js";
 
-const BODY_EDGE_THK = 0.8;
+const BODY_EDGE_THK = 1;
 const FACADE_EDGE_THK = 2;
 
 function side(
@@ -17,7 +17,7 @@ function side(
 }
 
 /**
- * Корпусная панель — 0.8 мм по всему периметру.
+ * Корпусная панель — 1 мм по всему периметру.
  * widthMm — большой размер плоской панели (X), heightMm — второй (Y).
  */
 export function bodyEdgeAll(
@@ -34,7 +34,7 @@ export function bodyEdgeAll(
 }
 
 /**
- * Полка — 0.8 мм только по переднему ребру (видимая часть).
+ * Корпусная панель — 1 мм только по переднему ребру (legacy helper).
  */
 export function bodyEdgeFront(
   materialId: string,

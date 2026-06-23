@@ -140,6 +140,63 @@ function assertProductionV3GoldenInvariants(productionExport: ProductionExportPa
   assert.ok(validation.summary.basisSteps > 0);
   assert.equal(revisions.length, 1);
   assertProductionV3HdfThickness(productionExport);
+  assertProductionV3EdgeBandingPolicy(productionExport);
+}
+
+const EDGE_SIDES = ["front", "back", "left", "right"] as const;
+const BODY_EDGE_ROLES = new Set([
+  "side-left",
+  "side-right",
+  "top",
+  "bottom",
+  "vertical-partition",
+  "shelf",
+  "plinth",
+  "drawer-side",
+  "drawer-back",
+]);
+const FACADE_EDGE_ROLES = new Set(["facade-door", "drawer-front"]);
+const NO_EDGE_ROLES = new Set(["back-panel", "drawer-bottom"]);
+
+function assertProductionV3EdgeBandingPolicy(productionExport: ProductionExportPackage) {
+  const panelById = new Map(
+    productionExport.productionModel.panels.map((panel) => [panel.id, panel]),
+  );
+
+  for (const panel of productionExport.productionModel.panels) {
+    const edgeBanding = panel.edgeBanding ?? {};
+
+    if (BODY_EDGE_ROLES.has(panel.role)) {
+      for (const side of EDGE_SIDES) {
+        assert.ok(edgeBanding[side], `expected ${panel.role} ${panel.id} edge on ${side}`);
+        assert.equal(edgeBanding[side]!.thicknessMm, 1, `expected body edge 1 mm on ${panel.role}`);
+      }
+      continue;
+    }
+
+    if (FACADE_EDGE_ROLES.has(panel.role)) {
+      for (const side of EDGE_SIDES) {
+        assert.ok(edgeBanding[side], `expected ${panel.role} ${panel.id} edge on ${side}`);
+        assert.equal(edgeBanding[side]!.thicknessMm, 2, `expected facade edge 2 mm on ${panel.role}`);
+      }
+      continue;
+    }
+
+    if (NO_EDGE_ROLES.has(panel.role)) {
+      assert.equal(Object.keys(edgeBanding).length, 0, `expected no edge on ${panel.role}`);
+    }
+  }
+
+  for (const edge of productionExport.productionModel.edgeBanding) {
+    const panel = panelById.get(edge.panelId);
+    assert.ok(panel, `edge references missing panel ${edge.panelId}`);
+    const expected =
+      panel!.role === "facade-door" || panel!.role === "drawer-front" ? 2 : 1;
+    if (panel!.role === "back-panel" || panel!.role === "drawer-bottom") {
+      continue;
+    }
+    assert.equal(edge.thicknessMm, expected, `edge total thickness for ${panel!.role}`);
+  }
 }
 
 function assertProductionV3HdfThickness(productionExport: ProductionExportPackage) {
@@ -346,16 +403,16 @@ runGoldenCase("base wardrobe payload", baseWardrobePayload, {
   panels: 13,
   hardware: 32,
   drilling: 32,
-  edgeBanding: 27,
+  edgeBanding: 48,
   warnings: 6,
-  basisSteps: 158,
+  basisSteps: 179,
   review: "requires-review",
   validation: "ready-for-review",
   totals: {
     panelCount: 13,
     drillingCount: 32,
     hardwareCount: 32,
-    edgeBandingLengthMm: 32708,
+    edgeBandingLengthMm: 58252,
     bodyAreaM2: 7.44,
     facadeAreaM2: 3.98,
     backPanelAreaM2: 4.12,
@@ -375,16 +432,16 @@ runGoldenCase("multi-section payload", multiSectionPayload, {
   panels: 18,
   hardware: 48,
   drilling: 48,
-  edgeBanding: 38,
+  edgeBanding: 68,
   warnings: 9,
-  basisSteps: 227,
+  basisSteps: 257,
   review: "requires-review",
   validation: "ready-for-review",
   totals: {
     panelCount: 18,
     drillingCount: 48,
     hardwareCount: 48,
-    edgeBandingLengthMm: 47397,
+    edgeBandingLengthMm: 82959,
     bodyAreaM2: 10.37,
     facadeAreaM2: 5.3,
     backPanelAreaM2: 5.5,
@@ -407,16 +464,16 @@ runGoldenCase(
     panels: 25,
     hardware: 41,
     drilling: 42,
-    edgeBanding: 61,
+    edgeBanding: 88,
     warnings: 3,
-    basisSteps: 281,
+    basisSteps: 308,
     review: "blocked",
     validation: "blocked",
     totals: {
       panelCount: 25,
       drillingCount: 42,
       hardwareCount: 41,
-      edgeBandingLengthMm: 50124,
+      edgeBandingLengthMm: 79740,
       bodyAreaM2: 9.9,
       facadeAreaM2: 4.3,
       backPanelAreaM2: 5.07,
@@ -453,16 +510,16 @@ runGoldenCase(
     panels: 13,
     hardware: 32,
     drilling: 28,
-    edgeBanding: 27,
+    edgeBanding: 48,
     warnings: 6,
-    basisSteps: 154,
+    basisSteps: 175,
     review: "requires-review",
     validation: "ready-for-review",
     totals: {
       panelCount: 13,
       drillingCount: 28,
       hardwareCount: 32,
-      edgeBandingLengthMm: 32708,
+      edgeBandingLengthMm: 58252,
       bodyAreaM2: 7.44,
       facadeAreaM2: 3.98,
       backPanelAreaM2: 4.12,

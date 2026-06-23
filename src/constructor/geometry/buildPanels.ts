@@ -13,7 +13,7 @@
  */
 import type { FurnitureProject, Panel, ProductionModelWarning } from "./types.js";
 import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
-import { bodyEdgeAll, bodyEdgeFront } from "./edgeBanding.js";
+import { bodyEdgeAll } from "./edgeBanding.js";
 import { getSectionMetrics } from "./layoutMetrics.js";
 
 const PLINTH_HEIGHT_MM = 100; // высота цоколя у шкафа (MVP)
@@ -117,7 +117,7 @@ export function buildShellAndShelves(
       position: { xMm: 0, yMm: plinthH, zMm: 0 },
       rotation: { x: 0, y: Math.PI / 2, z: 0 }, // лежит вдоль Z
       faceSide: "right", // лицевая сторона смотрит внутрь шкафа
-      edgeBanding: bodyEdgeFront(matId, D), // только переднее ребро
+      edgeBanding: bodyEdgeAll(matId, D, H - plinthH),
       article: "BD-SIDE-L",
     }),
   );
@@ -132,7 +132,7 @@ export function buildShellAndShelves(
       position: { xMm: W - T, yMm: plinthH, zMm: 0 },
       rotation: { x: 0, y: Math.PI / 2, z: 0 },
       faceSide: "left",
-      edgeBanding: bodyEdgeFront(matId, D),
+      edgeBanding: bodyEdgeAll(matId, D, H - plinthH),
       article: "BD-SIDE-R",
     }),
   );
@@ -150,7 +150,7 @@ export function buildShellAndShelves(
       position: { xMm: T, yMm: plinthH, zMm: 0 },
       rotation: { x: Math.PI / 2, y: 0, z: 0 },
       faceSide: "top",
-      edgeBanding: bodyEdgeFront(matId, W - T * 2),
+      edgeBanding: bodyEdgeAll(matId, W - T * 2, D),
       article: "BD-BOTTOM",
     }),
   );
@@ -167,7 +167,7 @@ export function buildShellAndShelves(
       position: { xMm: T, yMm: H - T, zMm: 0 },
       rotation: { x: Math.PI / 2, y: 0, z: 0 },
       faceSide: "top",
-      edgeBanding: bodyEdgeFront(matId, W - T * 2),
+      edgeBanding: bodyEdgeAll(matId, W - T * 2, D),
       article: "BD-TOP",
     }),
   );
@@ -218,7 +218,7 @@ export function buildShellAndShelves(
           position: { xMm, yMm: plinthH + T, zMm: 0 },
           rotation: { x: 0, y: Math.PI / 2, z: 0 },
           faceSide: "right",
-          edgeBanding: bodyEdgeFront(matId, D),
+          edgeBanding: bodyEdgeAll(matId, D, H - plinthH - T * 2),
           article: `BD-PART-${i}`,
         }),
       );
@@ -265,7 +265,7 @@ export function buildShellAndShelves(
                 position: { xMm: sectionXStart, yMm, zMm: 0 },
                 rotation: { x: Math.PI / 2, y: 0, z: 0 },
                 faceSide: "top",
-                edgeBanding: bodyEdgeFront(matId, sectionInnerW),
+                edgeBanding: bodyEdgeAll(matId, sectionInnerW, shelfDepth),
                 article: `IN-SHELF-${s + 1}-${c + 1}-${i + 1}`,
               }),
             );
@@ -319,7 +319,7 @@ export function buildShellAndShelves(
               position: { xMm: sectionXStart, yMm, zMm: 0 },
               rotation: { x: Math.PI / 2, y: 0, z: 0 },
               faceSide: "top",
-              edgeBanding: bodyEdgeFront(matId, sectionInnerW),
+              edgeBanding: bodyEdgeAll(matId, sectionInnerW, shelfDepth),
               article: `IN-SHELF-${s + 1}-${i + 1}`,
             }),
           );

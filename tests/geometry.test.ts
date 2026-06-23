@@ -20,6 +20,7 @@ import {
   type FurnitureProject,
 } from "../src/constructor/geometry";
 import type { ConfigState } from "../src/configurator/context";
+import type { EdgeBanding } from "../src/constructor/geometry/types.js";
 
 function project(overrides: Partial<FurnitureProject> = {}): FurnitureProject {
   return {
@@ -113,6 +114,75 @@ test("Шкаф: basisExportPlan содержит create-panel и set-edge для
   assert.equal(createPanelSteps.length, pm.panels.length);
   const setEdgeSteps = pm.basisExportPlan.filter((s) => s.action === "set-edge");
   assert.ok(setEdgeSteps.length > 0, "no set-edge steps in plan");
+});
+
+const EDGE_SIDES = ["front", "back", "left", "right"] as const;
+const BODY_EDGE_ROLES = new Set([
+  "side-left",
+  "side-right",
+  "top",
+  "bottom",
+  "vertical-partition",
+  "shelf",
+  "plinth",
+  "drawer-side",
+  "drawer-back",
+]);
+const FACADE_EDGE_ROLES = new Set(["facade-door", "drawer-front"]);
+const NO_EDGE_ROLES = new Set(["back-panel", "drawer-bottom"]);
+
+function assertEdgeAllSides(edgeBanding: EdgeBanding, thicknessMm: number, label: string) {
+  for (const side of EDGE_SIDES) {
+    assert.ok(edgeBanding[side], `${label}: missing edge on ${side}`);
+    assert.equal(edgeBanding[side]!.thicknessMm, thicknessMm, `${label}: ${side} thickness`);
+  }
+}
+
+function assertNoEdgeBanding(edgeBanding: EdgeBanding, label: string) {
+  assert.equal(Object.keys(edgeBanding).length, 0, `${label}: expected no edge banding`);
+}
+
+function assertEdgeBandingPolicy(panels: ReturnType<typeof buildCabinetGeometry>["panels"]) {
+  for (const panel of panels) {
+    if (BODY_EDGE_ROLES.has(panel.role)) {
+      assertEdgeAllSides(panel.edgeBanding, 1, panel.role);
+      continue;
+    }
+    if (FACADE_EDGE_ROLES.has(panel.role)) {
+      assertEdgeAllSides(panel.edgeBanding, 2, panel.role);
+      continue;
+    }
+    if (NO_EDGE_ROLES.has(panel.role)) {
+      assertNoEdgeBanding(panel.edgeBanding, panel.role);
+    }
+  }
+}
+
+test("Edge policy: wardrobe body/shelves 1 mm all-around, facades 2 mm, HDF noEdge", () => {
+  const pm = buildCabinetGeometry(project());
+  assertEdgeBandingPolicy(pm.panels);
+});
+
+test("Edge policy: dresser drawer-front 2 mm, drawer box 1 mm, bottom noEdge", () => {
+  const pm = buildCabinetGeometry(
+    project({
+      productType: "dresser",
+      dimensions: { widthMm: 1200, heightMm: 900, depthMm: 450 },
+      structure: {
+        sectionCount: 1,
+        shelves: 0,
+        drawers: 4,
+        hangingRod: false,
+        facadeMode: "drawers",
+        openingMode: "handle-soft-close",
+        hardwareMode: "comfort",
+      },
+    }),
+  );
+  assertEdgeBandingPolicy(pm.panels);
+  assert.ok(pm.panels.some((panel) => panel.role === "drawer-front"));
+  assert.ok(pm.panels.some((panel) => panel.role === "drawer-side"));
+  assert.ok(pm.panels.some((panel) => panel.role === "drawer-bottom"));
 });
 
 // ─────────────────────────────────────────────────────────────
