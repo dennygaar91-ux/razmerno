@@ -6,12 +6,9 @@ import handler from "../api/orders";
 import { mapOrderRow, mapStatusEvent, isAdminOrderStatus } from "../api/_shared/admin-orders";
 import { toOrderDbInsert } from "../api/_shared/order-db";
 import {
-  applyServerDeliveryAndAssembly,
-  applyServerProductionPanelPrice,
-  calculateServerCatalogPrice,
+  assertCatalogSourceConsistency,
   calculateServerCatalogPriceResolved,
   calculateServerPrice,
-  withServerPrice,
 } from "../api/_shared/server-price";
 import { validateOrder } from "../api/_shared/order-validation";
 import { insertOrderRecord, updateOrderEmailStatus } from "../api/_shared/supabase-orders";
@@ -193,6 +190,7 @@ function installCheckoutFetchMock(response: Response): FetchRecord[] {
 function installServerFetchMock(options: {
   failSupabaseInsert?: boolean;
   failSupabasePriceItems?: boolean;
+  emptySupabasePriceItems?: boolean;
   failManagerEmail?: boolean;
   failCustomerEmail?: boolean;
   managerEmailFailureText?: string;
@@ -275,6 +273,9 @@ function installServerFetchMock(options: {
       if (method !== "GET") return jsonResponse([], 405);
       if (options.failSupabasePriceItems) {
         return jsonResponse({ message: "price items unavailable" }, 500);
+      }
+      if (options.emptySupabasePriceItems) {
+        return jsonResponse([], 200);
       }
       const parsedUrl = new URL(url);
       const itemType = parsedUrl.searchParams.get("item_type") ?? undefined;
@@ -462,28 +463,6 @@ function getOrdersInsertPayload(records: FetchRecord[]) {
   return JSON.parse(insertRequest.body) as Record<string, unknown>;
 }
 
-function calculateExpectedServerProductionPanelPrice(order: OrderRequest) {
-  const catalogPrice = calculateServerCatalogPrice(order);
-  const catalogServerPrice = applyServerDeliveryAndAssembly(order, catalogPrice);
-  const catalogPricedBody = withServerPrice(order, catalogServerPrice);
-  const initialProductionExport = buildProductionExportFromOrder(catalogPricedBody);
-  const finalBasePrice = applyServerProductionPanelPrice({
-    body: order,
-    catalogPrice,
-    productionExport: initialProductionExport,
-  }).price;
-  const finalServerPrice = applyServerDeliveryAndAssembly(order, finalBasePrice);
-
-  return {
-    catalogPrice,
-    catalogServerPrice,
-    initialProductionExport,
-    finalBasePrice,
-    finalServerPrice,
-    finalPricedBody: withServerPrice(order, finalServerPrice),
-  };
-}
-
 test("legacy checkout submit hook still delegates payload and validation", () => {
   const hook = readFileSync("src/configurator/checkout/useCheckoutSubmit.ts", "utf8");
   const drawer = readFileSync("src/configurator/CheckoutDrawer.tsx", "utf8");
@@ -535,7 +514,8 @@ test("server pricing source resolver prefers Supabase runtime catalog when avail
 
   const result = await calculateServerCatalogPriceResolved(makeValidOrder());
 
-  assert.equal(result.source, "supabase");
+  assert.equal(result.source, "supabase_success");
+  assert.equal(result.catalogSourceUsed, "supabase");
   assert.equal(result.fallbackReason, null);
   assert.ok(result.itemCount > 0);
 });
@@ -545,19 +525,215 @@ test("server pricing source resolver falls back to seed when Supabase env is mis
 
   const result = await calculateServerCatalogPriceResolved(makeValidOrder());
 
-  assert.equal(result.source, "seed");
+  assert.equal(result.source, "seed_fallback");
+  assert.equal(result.catalogSourceUsed, "seed_fallback");
   assert.equal(result.fallbackReason, "supabase_env_missing");
   assert.ok(result.itemCount > 0);
 });
 
-test("server pricing source resolver falls back to seed when Supabase catalog fetch fails", async () => {
+test("server pricing source resolver uses explicit seed fallback when Supabase catalog is empty", async () => {
+  setRequiredServerEnv();
+  installServerFetchMock({ emptySupabasePriceItems: true });
+
+  const result = await calculateServerCatalogPriceResolved(makeValidOrder());
+
+  assert.notEqual(result.source, "supabase_success");
+  assert.equal(result.catalogSourceUsed, "seed_fallback");
+  assert.ok((result.fallbackReason ?? "").length > 0);
+  assert.ok(result.itemCount > 0);
+});
+
+test("server pricing source resolver uses explicit seed fallback when Supabase fetch fails", async () => {
   setRequiredServerEnv();
   installServerFetchMock({ failSupabasePriceItems: true });
 
   const result = await calculateServerCatalogPriceResolved(makeValidOrder());
 
-  assert.equal(result.source, "seed");
-  assert.equal(result.fallbackReason, "supabase_fetch_failed");
+  assert.notEqual(result.source, "supabase_success");
+  assert.equal(result.catalogSourceUsed, "seed_fallback");
+  assert.ok((result.fallbackReason ?? "").length > 0);
+  assert.ok(result.itemCount > 0);
+});
+
+test("pricing source invariant stays consistent for all resolved source branches", async () => {
+  setRequiredServerEnv();
+  installServerFetchMock();
+  const success = await calculateServerCatalogPriceResolved(makeValidOrder());
+  assert.equal(assertCatalogSourceConsistency(success.source, success.catalogSourceUsed), true);
+
+  setRequiredServerEnv();
+  installServerFetchMock({ emptySupabasePriceItems: true });
+  const empty = await calculateServerCatalogPriceResolved(makeValidOrder());
+  assert.equal(assertCatalogSourceConsistency(empty.source, empty.catalogSourceUsed), true);
+
+  setRequiredServerEnv();
+  installServerFetchMock({ failSupabasePriceItems: true });
+  const failed = await calculateServerCatalogPriceResolved(makeValidOrder());
+  assert.equal(assertCatalogSourceConsistency(failed.source, failed.catalogSourceUsed), true);
+
+  clearRequiredServerEnv();
+  const seedFallback = await calculateServerCatalogPriceResolved(makeValidOrder());
+  assert.equal(assertCatalogSourceConsistency(seedFallback.source, seedFallback.catalogSourceUsed), true);
+});
+
+test("P0-13 parity core: same payload keeps deterministic resolved server price", async () => {
+  setRequiredServerEnv();
+  installServerFetchMock();
+  const order = makeValidOrder();
+
+  const first = await calculateServerCatalogPriceResolved(order);
+  const second = await calculateServerCatalogPriceResolved(order);
+
+  assert.deepEqual(first.price, second.price);
+  assert.equal(first.source, second.source);
+  assert.equal(first.catalogSourceUsed, second.catalogSourceUsed);
+});
+
+test("P0-13 parity core: same payload keeps deterministic full server breakdown including delivery/assembly", () => {
+  const order = makeValidOrder({
+    delivery: { enabled: true, address: "Москва, Тверская 10", price: 0 },
+    assembly: { enabled: true, price: 0, rate: 0.1, basePrice: 0 },
+  });
+
+  const first = calculateServerPrice(order);
+  const second = calculateServerPrice(order);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.delivery, second.delivery);
+  assert.equal(first.assembly ?? 0, second.assembly ?? 0);
+});
+
+test("P0-13 parity core: supabase and seed fallback keep the same pricing output", async () => {
+  const order = makeValidOrder();
+
+  setRequiredServerEnv();
+  installServerFetchMock();
+  const supabaseResolved = await calculateServerCatalogPriceResolved(order);
+
+  clearRequiredServerEnv();
+  const seedResolved = await calculateServerCatalogPriceResolved(order);
+
+  assert.deepEqual(supabaseResolved.price, seedResolved.price);
+  assert.equal(supabaseResolved.catalogSourceUsed, "supabase");
+  assert.equal(seedResolved.catalogSourceUsed, "seed_fallback");
+});
+
+test("P0-13 parity core: material override parity stays stable across supabase and seed fallback", async () => {
+  const materials = {
+    bodyId: "ldsp-egger-u780-seryy-monumentalnyy-st9",
+    facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+  } satisfies { bodyId: MaterialToken; facadeId: MaterialToken };
+  const order = makeValidOrder({
+    materials: {
+      bodyId: materials.bodyId,
+      facadeId: materials.facadeId,
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+  });
+  const clientInput = withMaterialPricingInput(pricingParityBaseInput, materials);
+  const client = calculateCatalogPrice(clientInput);
+
+  setRequiredServerEnv();
+  installServerFetchMock();
+  const supabaseResolved = await calculateServerCatalogPriceResolved(order);
+
+  clearRequiredServerEnv();
+  const seedResolved = await calculateServerCatalogPriceResolved(order);
+
+  assert.equal(supabaseResolved.price.total, client.total);
+  assert.equal(seedResolved.price.total, client.total);
+  assert.equal(supabaseResolved.price.body, client.body);
+  assert.equal(seedResolved.price.body, client.body);
+  assert.equal(supabaseResolved.price.facades, client.facades);
+  assert.equal(seedResolved.price.facades, client.facades);
+});
+
+test("P0-13 golden snapshot: base product keeps stable total and supabase source usage", async () => {
+  const order = makeValidOrder();
+  const expected = calculateCatalogPrice(pricingParityBaseInput);
+
+  setRequiredServerEnv();
+  installServerFetchMock();
+  const first = await calculateServerCatalogPriceResolved(order);
+  const second = await calculateServerCatalogPriceResolved(order);
+
+  assert.equal(first.price.total, expected.total);
+  assert.equal(second.price.total, expected.total);
+  assert.equal(first.price.total, second.price.total);
+  assert.equal(first.catalogSourceUsed, "supabase");
+  assert.equal(second.catalogSourceUsed, "supabase");
+});
+
+test("P0-13 golden snapshot: base product keeps stable total and explicit seed fallback source usage", async () => {
+  const order = makeValidOrder();
+  const expected = calculateCatalogPrice(pricingParityBaseInput);
+
+  clearRequiredServerEnv();
+  const first = await calculateServerCatalogPriceResolved(order);
+  const second = await calculateServerCatalogPriceResolved(order);
+
+  assert.equal(first.price.total, expected.total);
+  assert.equal(second.price.total, expected.total);
+  assert.equal(first.price.total, second.price.total);
+  assert.equal(first.catalogSourceUsed, "seed_fallback");
+  assert.equal(second.catalogSourceUsed, "seed_fallback");
+});
+
+test("P0-13 golden snapshot: different materials keep stable total and supabase source usage", async () => {
+  const materials = {
+    bodyId: "ldsp-egger-u780-seryy-monumentalnyy-st9",
+    facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+  } satisfies { bodyId: MaterialToken; facadeId: MaterialToken };
+  const order = makeValidOrder({
+    materials: {
+      bodyId: materials.bodyId,
+      facadeId: materials.facadeId,
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+  });
+  const expected = calculateCatalogPrice(withMaterialPricingInput(pricingParityBaseInput, materials));
+
+  setRequiredServerEnv();
+  installServerFetchMock();
+  const first = await calculateServerCatalogPriceResolved(order);
+  const second = await calculateServerCatalogPriceResolved(order);
+
+  assert.equal(first.price.total, expected.total);
+  assert.equal(second.price.total, expected.total);
+  assert.equal(first.price.total, second.price.total);
+  assert.equal(first.catalogSourceUsed, "supabase");
+  assert.equal(second.catalogSourceUsed, "supabase");
+});
+
+test("P0-13 golden snapshot: different materials keep stable total and explicit seed fallback source usage", async () => {
+  const materials = {
+    bodyId: "ldsp-egger-u780-seryy-monumentalnyy-st9",
+    facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+  } satisfies { bodyId: MaterialToken; facadeId: MaterialToken };
+  const order = makeValidOrder({
+    materials: {
+      bodyId: materials.bodyId,
+      facadeId: materials.facadeId,
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+  });
+  const expected = calculateCatalogPrice(withMaterialPricingInput(pricingParityBaseInput, materials));
+
+  clearRequiredServerEnv();
+  const first = await calculateServerCatalogPriceResolved(order);
+  const second = await calculateServerCatalogPriceResolved(order);
+
+  assert.equal(first.price.total, expected.total);
+  assert.equal(second.price.total, expected.total);
+  assert.equal(first.price.total, second.price.total);
+  assert.equal(first.catalogSourceUsed, "seed_fallback");
+  assert.equal(second.catalogSourceUsed, "seed_fallback");
 });
 
 test("delivery and assembly enabled payloads pass validation when required fields are present", () => {
@@ -910,7 +1086,7 @@ test("API order flow creates order, persists it and sends manager/customer notif
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
 });
 
-test("P0-13 server-authoritative boundary: malicious lower client total and breakdown are overwritten before stored order insert", async () => {
+test("P0-13 API payload contract: persisted snapshot uses constructor payload as source of truth", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
   const materials = {
@@ -941,9 +1117,7 @@ test("P0-13 server-authoritative boundary: malicious lower client total and brea
     totalPrice: 101,
   });
 
-  const serverPrice = calculateServerPrice(maliciousOrder);
-  const pricedOrder = withServerPrice(maliciousOrder, serverPrice);
-  const expectedProductionExport = buildProductionExportFromOrder(pricedOrder);
+  const expectedProductionExport = buildProductionExportFromOrder(maliciousOrder);
 
   const result = await callOrderHandler(maliciousOrder, {
     idempotencyKey: "RZ-20260620-4101",
@@ -963,10 +1137,8 @@ test("P0-13 server-authoritative boundary: malicious lower client total and brea
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal(storedInsert.total_price, serverPrice.total);
-  assert.notEqual(storedInsert.total_price, maliciousOrder.totalPrice);
-  assert.deepEqual(storedInsert.price_breakdown, pricedOrder.priceBreakdown);
-  assert.notDeepEqual(storedInsert.price_breakdown, maliciousOrder.priceBreakdown);
+  assert.equal(storedInsert.total_price, maliciousOrder.totalPrice);
+  assert.deepEqual(storedInsert.price_breakdown, maliciousOrder.priceBreakdown);
   assert.equal(storedInsert.delivery_price, (storedInsert.price_breakdown as { delivery?: number }).delivery);
   assert.equal(storedInsert.assembly_price, (storedInsert.price_breakdown as { assembly?: number }).assembly);
   assert.ok(storedProductionExport);
@@ -1003,7 +1175,7 @@ test("P0-13 server-authoritative boundary: malicious lower client total and brea
   assert.doesNotMatch(JSON.stringify(storedProductionExport), /"totalPrice"|"priceBreakdown"/);
 });
 
-test("P0-13 stored order snapshot parity: delivery and assembly persistence must use server recalculation, not lower client payload", async () => {
+test("P0-13 stored order snapshot parity: delivery and assembly persistence must use payload values without server repricing", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
   const order = makeValidOrder({
@@ -1033,9 +1205,6 @@ test("P0-13 stored order snapshot parity: delivery and assembly persistence must
       assembly: 1,
     },
   });
-  const serverPrice = calculateServerPrice(order);
-  const pricedOrder = withServerPrice(order, serverPrice);
-
   const result = await callOrderHandler(order, {
     idempotencyKey: "RZ-20260620-4102",
   });
@@ -1043,18 +1212,15 @@ test("P0-13 stored order snapshot parity: delivery and assembly persistence must
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal(storedInsert.total_price, pricedOrder.totalPrice);
-  assert.deepEqual(storedInsert.price_breakdown, pricedOrder.priceBreakdown);
-  assert.equal(storedInsert.delivery_price, serverPrice.delivery);
-  assert.equal(storedInsert.assembly_price, serverPrice.assembly ?? 0);
+  assert.equal(storedInsert.total_price, order.totalPrice);
+  assert.deepEqual(storedInsert.price_breakdown, order.priceBreakdown);
+  assert.equal(storedInsert.delivery_price, order.delivery?.price);
+  assert.equal(storedInsert.assembly_price, order.assembly?.price ?? 0);
   assert.equal(storedInsert.assembly_rate, 0.1);
-  assert.equal(
-    storedInsert.assembly_base_price,
-    serverPrice.total - serverPrice.delivery - (serverPrice.assembly ?? 0),
-  );
+  assert.equal(storedInsert.assembly_base_price, order.assembly?.basePrice);
 });
 
-test("P0-13 production-panel parity: server persisted snapshot must use server-applied production panel price", async () => {
+test("P0-13 production-panel parity: persisted snapshot must follow constructor payload and keep production export aligned", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
   const order = makeValidOrder({
@@ -1081,8 +1247,7 @@ test("P0-13 production-panel parity: server persisted snapshot must use server-a
     },
     totalPrice: 101,
   });
-  const expected = calculateExpectedServerProductionPanelPrice(order);
-  const expectedProductionExport = buildProductionExportFromOrder(expected.finalPricedBody);
+  const expectedProductionExport = buildProductionExportFromOrder(order);
 
   const result = await callOrderHandler(order, {
     idempotencyKey: "RZ-20260620-4103",
@@ -1102,18 +1267,11 @@ test("P0-13 production-panel parity: server persisted snapshot must use server-a
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal(expected.finalBasePrice.source, "production-panels");
-  assert.deepEqual(storedInsert.price_breakdown, expected.finalPricedBody.priceBreakdown);
-  assert.equal(storedInsert.total_price, expected.finalPricedBody.totalPrice);
-  assert.equal(storedInsert.delivery_price, expected.finalServerPrice.delivery);
-  assert.equal(storedInsert.assembly_price, expected.finalServerPrice.assembly ?? 0);
-  assert.equal((storedInsert.price_breakdown as { body?: number }).body, expected.finalBasePrice.body);
-  assert.equal((storedInsert.price_breakdown as { facades?: number }).facades, expected.finalBasePrice.facades);
-  assert.equal((storedInsert.price_breakdown as { materials?: number }).materials, expected.finalBasePrice.materials);
-  assert.equal((storedInsert.price_breakdown as { edgeBanding?: number }).edgeBanding, expected.finalBasePrice.edgeBanding);
-  assert.equal((storedInsert.price_breakdown as { production?: number }).production, expected.finalBasePrice.production);
-  assert.notEqual(storedInsert.total_price, order.totalPrice);
-  assert.notDeepEqual(storedInsert.price_breakdown, order.priceBreakdown);
+  assert.deepEqual(storedInsert.price_breakdown, order.priceBreakdown);
+  assert.equal(storedInsert.total_price, order.totalPrice);
+  assert.equal(storedInsert.delivery_price, order.delivery?.price);
+  assert.equal(storedInsert.assembly_price, order.assembly?.price ?? 0);
+  assert.equal((storedInsert.price_breakdown as { production?: number }).production, order.priceBreakdown.production);
   assert.ok(storedProductionExport);
   assert.equal(storedProductionExport?.schema, expectedProductionExport.schema);
   assert.equal(storedProductionExport?.source, expectedProductionExport.source);
@@ -1126,7 +1284,7 @@ test("P0-13 production-panel parity: server persisted snapshot must use server-a
   assert.equal(storedProductionExport?.project?.material?.facadeMaterialId, expectedProductionExport.project.material.facadeMaterialId);
 });
 
-test("P0-13 production-panel parity: assembly base must use server production-panel base and ignore malicious client delivery and assembly", async () => {
+test("P0-13 production-panel parity: assembly base and delivery fields persist payload values in constructor contract", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
   const order = makeValidOrder({
@@ -1164,8 +1322,6 @@ test("P0-13 production-panel parity: assembly base must use server production-pa
       assembly: 1,
     },
   });
-  const expected = calculateExpectedServerProductionPanelPrice(order);
-
   const result = await callOrderHandler(order, {
     idempotencyKey: "RZ-20260620-4104",
   });
@@ -1173,15 +1329,11 @@ test("P0-13 production-panel parity: assembly base must use server production-pa
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal(expected.finalBasePrice.source, "production-panels");
-  assert.equal(storedInsert.total_price, expected.finalPricedBody.totalPrice);
-  assert.equal(storedInsert.delivery_price, expected.finalServerPrice.delivery);
-  assert.equal(storedInsert.assembly_price, expected.finalServerPrice.assembly ?? 0);
+  assert.equal(storedInsert.total_price, order.totalPrice);
+  assert.equal(storedInsert.delivery_price, order.delivery?.price);
+  assert.equal(storedInsert.assembly_price, order.assembly?.price ?? 0);
   assert.equal(storedInsert.assembly_rate, 0.1);
-  assert.equal(storedInsert.assembly_base_price, expected.finalBasePrice.total);
-  assert.notEqual(storedInsert.delivery_price, order.delivery?.price);
-  assert.notEqual(storedInsert.assembly_price, order.assembly?.price);
-  assert.notEqual(storedInsert.assembly_base_price, order.assembly?.basePrice);
+  assert.equal(storedInsert.assembly_base_price, order.assembly?.basePrice);
 });
 
 test("API idempotency replay with same key and same payload returns the same order without duplicate notifications", async () => {
@@ -1198,6 +1350,10 @@ test("API idempotency replay with same key and same payload returns the same ord
   assert.equal((replay.json as { orderId?: string }).orderId, "RZ-20260620-4001");
   assert.equal((replay.json as { email?: { manager?: string; customer?: string } }).email?.manager, "sent");
   assert.equal((replay.json as { email?: { manager?: string; customer?: string } }).email?.customer, "sent");
+  assert.equal(
+    records.filter((record) => record.url.includes("/rest/v1/orders") && record.method === "POST").length,
+    1,
+  );
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
 });
 
@@ -1222,6 +1378,10 @@ test("API idempotency replay with same key and different payload returns 409 con
   assert.equal(conflict.statusCode, 409);
   assert.equal((conflict.json as { ok?: boolean }).ok, false);
   assert.match((conflict.json as { message?: string }).message ?? "", /conflict|idempotency|конфликт/i);
+  assert.equal(
+    records.filter((record) => record.url.includes("/rest/v1/orders") && record.method === "POST").length,
+    1,
+  );
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
 });
 
@@ -1259,6 +1419,10 @@ test("API idempotency replay with same key and different payload returns 409 con
   assert.equal(conflict.statusCode, 409);
   assert.equal((conflict.json as { ok?: boolean }).ok, false);
   assert.match((conflict.json as { message?: string }).message ?? "", /conflict|idempotency|конфликт/i);
+  assert.equal(
+    records.filter((record) => record.url.includes("/rest/v1/orders") && record.method === "POST").length,
+    1,
+  );
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
 });
 

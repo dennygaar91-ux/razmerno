@@ -8,23 +8,17 @@ import { applyNoStoreHeaders } from './_shared/headers.js'
 import { logEvent, safeErrorMessage } from './_shared/logger.js'
 import { getClientKey, isRateLimited } from './_shared/order-rate-limit.js'
 import { applyRequestIdHeader, getRequestId } from './_shared/request-context.js'
-import {
-  applyServerDeliveryAndAssembly,
-  applyServerProductionPanelPrice,
-  calculateServerCatalogPriceResolved,
-  withServerPrice,
-} from './_shared/server-price.js'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types.js'
 import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders.js'
 import { validateOrder } from './_shared/order-validation.js'
-import { buildProductionExportFromOrder } from '../src/constructor/production/orderExportPackage.js'
+import { buildProductionExportFromPayload } from '../src/constructor/production/orderExportPackage.js'
 
 const MANAGER_NOTIFICATION_FAILED = 'manager_notification_failed'
 const CUSTOMER_NOTIFICATION_FAILED = 'customer_notification_failed'
 const IDEMPOTENCY_CONFLICT_MESSAGE = 'Конфликт повторной отправки: состав заявки изменился. Обновите заявку и отправьте снова.'
 const GENERIC_ORDER_SUBMIT_FAILED = 'Не удалось обработать заявку. Попробуйте ещё раз или свяжитесь с нами.'
 const RATE_LIMIT_MESSAGE = 'Слишком много запросов. Попробуйте позже.'
-const SERVER_PRICE_FAILED_MESSAGE = 'Не удалось пересчитать стоимость заявки.'
+const ORDER_PREPARATION_FAILED_MESSAGE = 'Не удалось подготовить заявку.'
 const DB_INSERT_FAILED_MESSAGE = 'Не удалось сохранить заявку. Попробуйте позже.'
 const INVALID_IDEMPOTENCY_KEY_MESSAGE = 'Некорректный Idempotency-Key.'
 const ORDER_ID_MISMATCH_MESSAGE = 'Idempotency-Key должен совпадать с orderId заявки.'
@@ -132,38 +126,17 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   const validationError = validateOrder(body)
   if (validationError) return res.status(400).json({ ok: false, message: validationError })
 
-  let serverPrice
-  let pricedBody: OrderRequest
+  let orderBodyForPersistence: OrderRequest
   try {
-    const catalogPriceResolution = await calculateServerCatalogPriceResolved(body)
-    const catalogPrice = catalogPriceResolution.price
-    if (catalogPriceResolution.source !== 'supabase') {
-      logEvent('warn', 'orders.pricing_catalog_fallback', {
-        requestId,
-        source: catalogPriceResolution.source,
-        reason: catalogPriceResolution.fallbackReason ?? 'unknown',
-        itemCount: catalogPriceResolution.itemCount,
-      })
-    }
-    const catalogServerPrice = applyServerDeliveryAndAssembly(body, catalogPrice)
-    const catalogPricedBody = withServerPrice(body, catalogServerPrice)
-    const initialProductionExport = buildProductionExportFromOrder(catalogPricedBody)
-
-    const finalBasePrice = body.source === 'production-panels'
-      ? applyServerProductionPanelPrice({
-        body,
-        catalogPrice,
-        productionExport: initialProductionExport,
-      }).price
-      : catalogPrice
-
-    serverPrice = applyServerDeliveryAndAssembly(body, finalBasePrice)
-    pricedBody = withServerPrice(body, serverPrice)
-    const productionExport = buildProductionExportFromOrder(pricedBody)
-    pricedBody = { ...pricedBody, productionExport }
+    // API order contract lock:
+    // use constructor payload as the single source of truth.
+    // No server-side pricing recomputation in API layer.
+    const bodyWithOrderId = { ...body, orderId: orderIdentity.orderId }
+    const productionExport = buildProductionExportFromPayload(bodyWithOrderId)
+    orderBodyForPersistence = { ...bodyWithOrderId, productionExport }
   } catch (error) {
-    logEvent('error', 'orders.server_price_failed', { reason: safeErrorMessage(error) })
-    return res.status(400).json({ ok: false, message: SERVER_PRICE_FAILED_MESSAGE })
+    logEvent('error', 'orders.order_preparation_failed', { reason: safeErrorMessage(error) })
+    return res.status(400).json({ ok: false, message: ORDER_PREPARATION_FAILED_MESSAGE })
   }
 
   const orderId = orderIdentity.orderId
@@ -173,10 +146,29 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   try {
     const dbRecord = toOrderDbInsert({
       orderId,
-      body: { ...pricedBody, orderId },
+      body: orderBodyForPersistence,
       userAgent: getHeader(req, 'user-agent'),
       clientIp: clientKey,
     })
+
+    if (idempotencyKey) {
+      const existingOrder = await getOrderRecordByOrderId(orderId)
+      if (!existingOrder.ok) {
+        logEvent('error', 'orders.idempotency_read_failed', { requestId, orderId, reason: existingOrder.error })
+        return res.status(502).json({ ok: false, message: GENERIC_ORDER_SUBMIT_FAILED })
+      }
+
+      if (existingOrder.row && isSameOrderPayload(dbRecord, existingOrder.row)) {
+        logEvent('info', 'orders.idempotent_replay', { requestId, orderId })
+        return res.status(200).json(buildReplayResponse(existingOrder.row))
+      }
+
+      if (existingOrder.row) {
+        logEvent('warn', 'orders.idempotency_conflict', { requestId, orderId })
+        return res.status(409).json({ ok: false, message: IDEMPOTENCY_CONFLICT_MESSAGE })
+      }
+    }
+
     const dbResult = await insertOrderRecord(dbRecord)
 if (dbResult.ok === false) {
   const insertError = {
@@ -214,8 +206,8 @@ if (dbResult.ok === false) {
         const result = await sendEmail(
           managerEmail,
           `Размерно — заявка ${orderId}`,
-          buildManagerText(orderId, pricedBody),
-          buildManagerAttachments(orderId, pricedBody),
+          buildManagerText(orderId, orderBodyForPersistence),
+          buildManagerAttachments(orderId, orderBodyForPersistence),
         )
         managerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { manager_email_status: managerEmailStatus, manager_email_error: null })
@@ -238,12 +230,12 @@ if (dbResult.ok === false) {
       await persistEmailPatch(orderId, { manager_email_status: 'skipped', manager_email_error: 'ORDER_MANAGER_EMAIL is not set' })
     }
 
-    if (pricedBody.customer?.email) {
+    if (orderBodyForPersistence.customer?.email) {
       try {
         const result = await sendEmail(
-          pricedBody.customer.email,
+          orderBodyForPersistence.customer.email,
           `Размерно — заявка ${orderId}`,
-          buildClientText(orderId, pricedBody),
+          buildClientText(orderId, orderBodyForPersistence),
         )
         customerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { customer_email_status: customerEmailStatus, customer_email_error: null })
