@@ -23,12 +23,17 @@ const probeAttributes: WebGLContextAttributes = {
 function isLocalhostFallbackProbeEnabled() {
   if (typeof window === "undefined") return false;
 
-  const host = window.location.hostname;
-  const isLocalhost =
-    host === "localhost" || host === "127.0.0.1" || host === "::1";
-  if (!isLocalhost) return false;
+  try {
+    const host = window.location.hostname;
+    const isLocalhost =
+      host === "localhost" || host === "127.0.0.1" || host === "::1";
+    if (!isLocalhost) return false;
 
-  return new URLSearchParams(window.location.search).get("rzm_webgl") === "off";
+    return new URLSearchParams(window.location.search).get("rzm_webgl") === "off";
+  } catch {
+    // Probe flag check must never crash runtime detection.
+    return false;
+  }
 }
 
 function getRendererInfo(context: WebGLRenderingContext | WebGL2RenderingContext) {

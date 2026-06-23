@@ -27,4 +27,6 @@ test("three scene safety: quality guard exists", () => {
   assert.ok(quality.includes("hardwareConcurrency"));
   assert.ok(viewer.includes("quality: ThreeSceneQuality"));
   assert.ok(viewer.includes("shadows={!isReduced}"));
+  assert.ok(viewer.includes('canvas.addEventListener("webglcontextlost"'));
+  assert.ok(viewer.includes("onContextLost?.()"));
 });
