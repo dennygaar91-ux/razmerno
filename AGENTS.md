@@ -1,179 +1,263 @@
-# AGENTS.md
+# AGENTS.md — Размерно
 
-Practical rules for all agents working on the Razmerno project.
+## Purpose
 
-## 1. Project identity
+Mandatory root instructions for Codex / Cursor / AI agents working in the `razmerno` repository.
 
-- Project: `Razmerno` / `Размерно`.
-- Product: online constructor for cabinet furniture.
-- User-facing language: Russian.
-- Source of truth: GitHub `main` plus `docs/planning/current-backlog.md`.
-- Operational backlog source of truth: `docs/planning/current-backlog.md` only.
-- `docs/planning/current-backlog-kanban-v1.md` is an operational kanban view only.
-- Old ZIP archives, local branches, closed PRs, draft PRs and branch-only reports are not source of truth unless the user explicitly says so.
+Follow this file before any code, docs, QA, planning, PR or merge work.
 
-## 2. Fixed agent list
+## Source of Truth
 
-Use only these agent names in task prompts and reports:
+Mandatory files:
 
-1. `01 Product / Planning Agent`
-2. `02 Constructor Agent`
-3. `03 Pricing Agent`
-4. `04 API / Orders Agent`
-5. `05 Infrastructure / QA Agent`
-6. `06 Three.js / Visualization Agent`
-7. `07 Production / Manufacturing Agent`
-8. `08 UX/UI / Design System Agent`
+1. `docs/planning/current-backlog.md`
+2. `docs/planning/accepted-backlog-decisions-v1.md`
+3. `docs/planning/agent-prompt-rules-v1.md`
 
-Every task prompt must end with:
+Rules:
 
-```text
-Обращаться к агенту: <agent name>
-```
+- `current-backlog.md` = task scope / status / evidence source of truth.
+- `accepted-backlog-decisions-v1.md` = product / UX / architecture / pricing / production decision layer.
+- `agent-prompt-rules-v1.md` = prompt, context, scope and stop-condition rules.
+- `AGENTS.md` = short root operating rules.
+- If files conflict, stop and request reconciliation.
+- Repo state and merged/main evidence beat memory, chat, open PRs, draft PRs, branch-only reports and local claims.
+- Old ZIP archives and local branches are not source of truth unless the user explicitly says so.
 
-## 3. Current baseline
+## Language
 
-- Current accepted GitHub baseline after PR #79: `b5065571 test: add delivery assembly pricing parity matrix`.
-- PR #80 `ui: refine constructor 3d client shell` was closed without merge after failed visual review.
-- Do not reuse, cherry-pick or continue PR #80 unless the user explicitly requests forensic analysis.
+Use Russian for reports, planning, backlog notes and user-facing explanations.
 
-## 4. Default workflow
+Keep code, filenames, class names, scripts, CLI commands, API names and technical identifiers in English when appropriate.
 
-Do not jump from a problem statement directly into implementation when the task is risky or ambiguous.
+## Do Not Use GitHub Issues
 
-Default sequence:
+Do not create, update, close, edit or comment on GitHub issues.
+
+Forbidden:
+
+- `update_issue`
+- `update_issue_comment`
+- changing issue state
+- using GitHub issues as backlog source of truth
+
+Use only repository files and PRs.
+
+## Core Workflow
+
+Default workflow:
 
 1. Read `AGENTS.md`.
-2. Read the relevant section of `docs/planning/current-backlog.md`.
-3. Read the relevant accepted product decisions.
-4. Decide whether the task requires read-only audit first.
-5. Freeze the scope.
-6. Execute one narrow change only.
-7. Report evidence and limits.
+2. Read only relevant task block from `current-backlog.md`.
+3. Read only relevant accepted decision section.
+4. Read relevant prompt rules.
+5. Decide whether read-only audit is required.
+6. Freeze scope.
+7. Read only target files and direct dependencies.
+8. Make minimal safe diff.
+9. Run scoped QA.
+10. Report changed files, reason, QA result and risks.
+11. Update session ledger.
+12. Stop at first risky dependency.
 
-## Accepted Backlog Decisions Layer
+## Product Decision Priority
 
-Before changing `docs/planning/current-backlog.md`, agents must read:
+Do not invent or change product decisions.
 
-- `docs/planning/accepted-backlog-decisions-v1.md`
+Forbidden without explicit accepted decision:
 
-Before implementation, agents must also read this file if the task affects:
+- UX-flow changes
+- Constructor3D / 2D behavior changes
+- labels / markers behavior changes
+- mobile UX changes
+- stepper behavior changes
+- pricing source-of-truth changes
+- pricing rounding changes
+- minimum order changes
+- customer-facing validation changes
+- production validation boundary changes
+- Basis JSON / production export changes
+- admin MVP scope changes
+- release gate changes
 
-- pricing;
-- API/orders;
-- idempotency;
-- Supabase verification;
-- production materials;
-- HDF;
-- edge banding;
-- Constructor3D;
-- WebGL fallback;
-- visual QA;
-- release maturity.
+If decision is missing or conflicting:
 
-`docs/planning/current-backlog.md` remains the main backlog source of truth.
+- stop;
+- ask exact question;
+- do not code;
+- do not create PR.
 
-`docs/planning/accepted-backlog-decisions-v1.md` does not replace the backlog. It is a mandatory decision layer for interpreting backlog tasks.
+## Anti-Assumption Rule
 
-If `current-backlog.md` and accepted decisions appear to conflict, the agent must stop and request reconciliation. The agent must not choose its own interpretation.
+Do not invent facts.
 
-### Missing or uncertain decision rule
+Forbidden to invent:
 
-If a task does not have an accepted decision, or if the agent is not confident which decision applies, the agent must stop and ask the user a direct question before implementation.
+- backlog status
+- closure evidence
+- PR merge status
+- GitHub Actions status
+- Vercel status
+- file contents
+- dependencies
+- product approval
+- visual approval
+- release readiness
+- production readiness
 
-After the user answers, the accepted decision must be recorded in `docs/planning/current-backlog.md` in the relevant task section before implementation continues.
+If not verified, say `not verified`.
 
-The agent must not silently choose its own interpretation when a decision is missing, ambiguous, or product-significant.
+## Anti-Overengineering Rule
 
-## 5. Frozen decisions block
+Default strategy: minimal safe diff.
 
-Every implementation prompt must contain:
+Forbidden without explicit scope:
+
+- broad refactor
+- unrelated cleanup
+- full-file rewrite
+- changing unrelated files
+- new abstraction
+- new architecture layer
+- legacy/dead code removal
+- package/workflow changes
+- UX redesign
+- production logic redesign
+
+## Large File Rule
+
+Files over 1000 lines are large.
+
+Do not start with full-file read.
+
+Use:
+
+- task block
+- section heading
+- line range
+- search result neighborhood
+- direct dependency scope
+
+Examples:
 
 ```text
-Already accepted decisions that must not be violated
+Read only P0-13 block.
+Read only lines 1180–2001.
+Read only section "## Production Rules Discovery Block".
+Find "manager_notification_failed" and read 80 lines before / 120 lines after.
 ```
 
-Typical protected decisions:
+## Session Ledger Rule
 
-- 3D / visual constructor is the core customer-facing experience.
-- The scene or fallback preview must not become a cramped side preview unless explicitly scoped.
-- Settings/forms support the scene; they must not dominate by accident.
-- Price is exact, not preliminary.
-- Warnings are about validation/manufacturability, not about approximate pricing.
-- UI tasks must not change checkout/order flow, API, pricing, Supabase or production/manufacturing layers.
-- Do not expose complex production internals to customers unless explicitly scoped.
-- Do not revive legacy Constructor or weaken Constructor3D guard boundaries.
+Within same agent chat/session, do not reread full backlog each iteration if role, scope and task family stay same.
 
-If a task conflicts with these decisions, stop and ask.
+First run must create compact ledger:
 
-## 6. Scope discipline
+- source files read
+- accepted decisions used
+- active task
+- closed tasks in session
+- changed files
+- QA commands run
+- remaining risks
+- next allowed scope
 
-One task means one narrow layer.
+Every follow-up must update ledger.
 
-Good scopes:
+Reread relevant backlog/decisions if:
 
-- `Only stepper readability`.
-- `Only one pricing parity fixture group`.
-- `Only stale PR triage documentation`.
-- `Only one API failure policy decision`.
+- new chat/session
+- agent role changed
+- task family changed
+- new main commit appeared
+- pricing/API/Supabase/production/Basis/package/workflow touched
+- stop condition hit
+- ledger conflicts with repo
+- closure evidence needed
 
-Bad scopes:
+Ledger never replaces repo source of truth.
 
-- `Improve constructor UI`.
-- `Clean CSS`.
-- `Stabilize backend`.
-- `Fix pricing`.
-- `Make it production-ready`.
+## Read-only Audit First
 
-Split broad tasks before implementation.
+Start with read-only audit unless implementation scope is already frozen and narrow for:
 
-## 7. Read-only audit first for risky areas
-
-Start with read-only audit unless implementation scope is already frozen and narrow:
-
-- Constructor layout or state model.
-- Three.js scene, camera, fallback, markers or overlays.
-- Pricing engine or client/server parity.
-- API/order submit behavior.
-- Notification failure or idempotency policy.
-- Supabase/live provider checks.
-- Production/manufacturing export, drilling, hardware, Basis boundary.
-- `package.json`, `package-lock.json`, `.github/**`.
-- Global CSS/design-system cleanup.
-- Routing, app shell or deployment workflow.
+- Constructor layout or state model
+- Three.js scene, camera, fallback, markers or overlays
+- Pricing engine or client/server parity
+- API/order submit behavior
+- Notification failure or idempotency policy
+- Supabase/live provider checks
+- Production/manufacturing export, drilling, hardware, Basis boundary
+- `package.json`, `package-lock.json`, `.github/**`
+- Global CSS/design-system cleanup
+- Routing, app shell or deployment workflow
 
 Read-only audit means: no branch, no edits, no commits, no PR.
 
-## 8. GitHub workflow
+## Stop Conditions
 
-### Manual mode / non-Codex file-reading rule
+Stop if task needs:
 
-When the user is working manually without Codex or another local coding agent, the assisting agent must be explicit about file-reading completeness before giving implementation instructions.
+- `package.json`
+- `package-lock.json`
+- `.github/**`
+- Supabase schema / migrations / RLS
+- pricing formulas
+- API order flow
+- idempotency / notification semantics
+- production export / Basis JSON rules
+- product decision not in accepted decisions
+- visual approval
+- UX-flow / layout / interaction model change
+- full-file rewrite of large file
+- diff beyond scope
+- tests failing outside scope
 
-The report must state one of these statuses for every critical file used in the decision:
+Return short stop report. Do not improvise.
 
-* `Read fully`: the whole file was read through the available tools.
-* `Read partially`: only named line ranges, search results, or relevant sections were read.
-* `Full file required from user`: the available tools cannot guarantee complete reading, and the user must provide the full file content before safe implementation advice can continue.
+## Visual / UX Rules
 
-If a critical file is large and the task depends on hidden context outside the already-read ranges, the agent must stop and ask the user to provide the full file or explicitly approve reading the file in chunks.
+Visual closure requires:
 
-The agent must not present a partial read as a complete audit.
+- fresh screenshots
+- explicit visual review
+- explicit human visual approval
+- desktop/tablet/mobile coverage if responsive
+- confirmation screenshot artifact is not closure by itself
 
-For manual implementation instructions, the agent must provide step-by-step commands and exact edit locations, not only a Codex-style prompt.
+Code changes alone cannot close visual task.
 
+Do not change visual concept without accepted decision.
+
+## Production / Manufacturing Rules
+
+Customer-facing Three.js preview is not production truth.
+
+Basis JSON is not automatic `.b3d`.
+
+Do not claim factory-ready handoff without:
+
+- production rules
+- Basis JSON specification
+- validation rules
+- SKU/article mapping if hardware involved
+- drilling/edge/HDF rules
+- tests / golden snapshots
+- merged/main evidence
+
+## GitHub Workflow
 
 - Work from GitHub `main` unless another base is explicitly named.
 - Create a feature/docs branch for any change.
-- Do not work directly on `main`.
+- Do not work directly on `main` in local agent workflows.
 - Prefer small PRs.
 - Do not merge a PR unless the user explicitly says to merge.
 - Close failed broad PRs instead of repeatedly patching them when returning to `main` is safer.
 - Do not touch GitHub issues. Do not use issue update tools.
 
-## 9. Closure evidence rules
+## Closure Evidence Rules
 
-A task can be marked closed only when current-backlog closure rules are satisfied:
+Task can be marked closed only when current-backlog closure rules are satisfied:
 
 - merged PR or direct main evidence;
 - GitHub QA success for technical tasks;
@@ -190,98 +274,78 @@ Not closure evidence by itself:
 - screenshot capture success without visual review;
 - local/manual claim without CI or artifact evidence.
 
-## 10. Must-not-touch rules
+## Autonomous Run Limit
 
-Do not change without separate explicit scope:
+Do not take whole backlog autonomously.
 
-- GitHub issues;
-- `package.json`;
-- `package-lock.json`;
-- `.github/**`;
-- API/order flow;
-- pricing engine/runtime;
-- Supabase/RLS/storage contracts;
-- production/manufacturing exports;
-- admin operations;
-- global CSS/design-system layers;
-- routing/app shell;
-- dependencies.
+Default:
 
-Do not run `npm audit fix`. Do not commit generated dependency/build folders or environment files.
+- 1 task per implementation prompt
+- max 2 tasks only for safe docs-only/test-only scope
+- stop at first risky dependency
 
-## 11. QA policy
+Autonomous run must define:
 
-Use QA according to scope. Do not run every command automatically.
+- allowed categories
+- forbidden categories
+- max task count
+- stop conditions
 
-- Docs-only: inspect diff; runtime QA is normally not required.
-- Runtime/TypeScript: targeted tests plus `npm run typecheck` and `npm run build` where available.
-- Pricing: pricing-specific tests and checkout/order boundary tests when affected.
-- API/orders: order/API tests and typecheck/build where available.
-- Constructor/Three.js: constructor store/flow/three/fallback tests where relevant.
-- Visual closure: fresh screenshot evidence plus explicit visual review.
+## QA
 
-If checks cannot be run, state that clearly and rely on GitHub Actions after PR creation.
+Run only scoped QA unless prompt says otherwise.
 
-## 12. Visual work rules
+Common commands may include:
 
-- Visual tasks require explicit route, viewport and state scope.
-- Do not perform broad layout rewrites.
-- Do not make scene/fallback secondary unless explicitly scoped.
-- Successful build or screenshot capture does not prove visual closure.
-- Production URL can verify merged/deployed work only.
-- PR work needs preview evidence when visual closure is claimed.
+```bash
+npm run typecheck
+npm run build
+npm run test:constructor-flow
+npm run test:constructor-store
+npm run test:checkout-submit-hook
+npm run test:pricing-engine
+npm run test:pricing-final
+git diff --check
+git status --short --branch
+```
 
-## 13. Reporting format
+Use exact commands required by task.
 
-Every work report must include:
+If command unavailable or fails outside scope, stop and report.
 
-- Summary.
-- Branch.
-- PR number/link if created.
-- Files changed.
-- What changed.
-- What was intentionally not touched.
-- QA/checks run or not run.
-- Risks/limitations.
-- Next recommended step.
+## Report Format
 
-## 14. Stop conditions
+Every implementation report must include:
 
-Stop and ask if:
+- task
+- files read
+- changed files
+- why each file changed
+- diff summary
+- QA commands and results
+- updated session ledger
+- remaining risks
+- stop conditions hit, if any
 
-- The task is ambiguous.
-- The task conflicts with accepted decisions.
-- The diff becomes broad.
-- The task crosses multiple domains unexpectedly.
-- The task requires package/workflow changes.
-- The task requires closing backlog status without evidence.
-- Visual results cannot be verified for a visual closure claim.
-- API/pricing/order/Supabase/production changes appear in a UI task.
-- UI/layout changes appear in a pricing/API task.
-- GitHub tool output indicates stale branch, merge conflict, truncation risk or blocked action.
+## Agent Roles
 
-## 15. Token efficiency
+Use only fixed project agents:
 
-- Read only relevant sections first.
-- Do not summarize the whole project unless asked.
-- Do not paste large files in responses.
-- Prefer targeted search over broad scans.
-- Prefer narrow docs-only or test-only PRs when possible.
-- Ask before another iteration if a PR already looks structurally wrong.
+1. `01 Product / Planning Agent`
+2. `02 Constructor Agent`
+3. `03 Pricing Agent`
+4. `04 API / Orders Agent`
+5. `05 Infrastructure / QA Agent`
+6. `06 Three.js / Visualization Agent`
+7. `07 Production / Manufacturing Agent`
+8. `08 UX/UI / Design System Agent`
 
-## 16. GitHub tool safety rules
+Every prompt must end with:
 
-- GitHub tool blocks are safety-layer events, not necessarily repository permission failures.
-- If a GitHub write action is blocked once, stop repeating the same action and report the manual fallback.
-- Prefer GitHub tools for reading files, creating branches, small file edits, and comparing branches.
-- Avoid large write payloads in tool calls.
-- Avoid long PR bodies, large markdown tables, and large code fences in `create_pull_request` calls.
-- If `create_pull_request` is blocked, leave the branch ready and ask the user to open the PR manually through GitHub UI.
-- Manual PR fallback format: base `main`, compare the prepared branch, short title, short docs-only/runtime scope summary.
-- Keep commits small and file changes narrow to reduce connector risk.
-- Do not replace very large files through `update_file` unless there is no safer option.
-- Prefer creating small new docs files over rewriting large existing docs files.
-- If an update to a large file is required, first fetch the current file, keep the replacement minimal, and stop if GitHub reports truncation or blocked action.
-- After any blocked GitHub action, do not attempt workaround loops that repeatedly call the same blocked tool.
-- Always run or request `compare_commits` after connector-based edits to verify changed files and branch distance from `main`.
-- PR creation and merge can be manual user actions; agent work is still valid if branch commits and compare evidence exist.
+```text
+Обращаться к агенту: <agent name>
+```
+
+## Short Rule
+
+If task can be solved by reading 1 section and 3 files, do not read whole backlog or whole repo.
