@@ -24,6 +24,7 @@ import type {
 } from "./types.js";
 import { deriveTextureDirectionFromPanelSize } from "./materialPolicy.js";
 import { PRODUCTION_JSON_V4_SCHEMA } from "./types.js";
+import { buildAssemblyPolicySnapshot } from "./assemblyPolicy.js";
 
 const HDF_PANEL_ROLES = new Set<PanelRoleV4>(["back-panel", "drawer-bottom"]);
 
@@ -710,7 +711,7 @@ export function buildProductionJsonV4FromV3(input: ProductionExportPackage): Pro
 
   const validation = mapValidationIssues(input, adapterWarnings);
 
-  return {
+  const model: ProductionJsonV4 = {
     schema: PRODUCTION_JSON_V4_SCHEMA,
     meta: {
       orderId: resolveOrderId(input),
@@ -789,5 +790,10 @@ export function buildProductionJsonV4FromV3(input: ProductionExportPackage): Pro
       label: revision.note,
       status: mapReviewStatus(revision.status),
     })),
+  };
+
+  return {
+    ...model,
+    assemblyPolicySnapshot: buildAssemblyPolicySnapshot(model),
   };
 }

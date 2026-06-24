@@ -367,6 +367,27 @@ export interface RevisionV4 {
   status: ReviewStatusV4;
 }
 
+export interface AssemblyPolicySnapshotV4 {
+  bodyConstruction: BodyConstructionV4;
+  topPanelPlacement: TopPanelPlacementV4;
+  supportMode: SupportModeV4;
+  supportHeightMm: number;
+  customerHeightMm: number;
+  carcassHeightMm: number;
+  heightIncludesSupportMm: boolean;
+  shelfFrontInsetMm: number;
+  facadeGapMm: number;
+  pairedFacadeCenterGapMm: number;
+  facadeOpening?: {
+    openingWidthMm: number;
+    openingHeightMm: number;
+    doorWidthMm: number;
+    doorHeightMm: number;
+    sideGapMm: number;
+    centerGapMm: number;
+  };
+}
+
 export interface ProductionJsonV4 {
   schema: ProductionJsonV4Schema;
   meta: ProductionV4Meta;
@@ -386,6 +407,7 @@ export interface ProductionJsonV4 {
   validation: ValidationV4;
   review: ReviewV4;
   revisions: RevisionV4[];
+  assemblyPolicySnapshot?: AssemblyPolicySnapshotV4;
 }
 
 export interface ProductionJsonV4ValidationIssue {
