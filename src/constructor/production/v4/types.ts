@@ -38,6 +38,12 @@ export type EdgeBandingSideV4 = "front" | "back" | "left" | "right" | "top" | "b
 
 export type EdgeBandingCoverageV4 = "all-around" | "none";
 
+export type EdgePolicyClassV4 = "body-1mm-all-around" | "facade-2mm-all-around" | "no-edge";
+
+export type GroovePurposeV4 = "back-panel-insert" | "drawer-bottom-insert";
+
+export type GrooveConfidenceV4 = "placeholder" | "final" | "approved";
+
 export type BodyConstructionV4 = "side-panels-on-bottom";
 
 export type TopPanelPlacementV4 = "between-sides";
@@ -281,6 +287,20 @@ export interface AssemblyV4 {
   contacts: AssemblyContactV4[];
 }
 
+export interface EdgeBandingSemanticProjectionV4 {
+  policyClass: EdgePolicyClassV4;
+  expectedThicknessMm: number | null;
+  coverage: EdgeBandingCoverageV4;
+}
+
+export interface ExpectedEdgeBandingPolicyV4 {
+  policyClass: EdgePolicyClassV4;
+  coverage: EdgeBandingCoverageV4;
+  expectedThicknessMm: number | null;
+  requiredSides: EdgeBandingSideV4[];
+  alternateRequiredSides?: EdgeBandingSideV4[];
+}
+
 export interface EdgeBandingV4 {
   id: string;
   objectType: "edgeBanding";
@@ -293,13 +313,21 @@ export interface EdgeBandingV4 {
   trimAllowanceMm?: number;
   cutAllowanceMm?: number;
   basisOperation?: "apply-edge";
+  semantics?: EdgeBandingSemanticProjectionV4;
+}
+
+export interface GrooveSemanticProjectionV4 {
+  purpose: GroovePurposeV4 | "unknown";
+  confidence: GrooveConfidenceV4;
+  dimensionsFinal: false;
+  requiresTechnologistCheck: true;
 }
 
 export interface GrooveV4 {
   id: string;
   objectType: "groove";
   panelId: string;
-  purpose: "back-panel-insert" | "drawer-bottom-insert";
+  purpose: GroovePurposeV4;
   side: string;
   widthMm: number;
   depthMm: number;
@@ -308,6 +336,8 @@ export interface GrooveV4 {
   startMm?: number;
   endMm?: number;
   requiresTechnologistCheck: true;
+  confidence?: GrooveConfidenceV4;
+  semantics?: GrooveSemanticProjectionV4;
 }
 
 export interface HardwareV4 {
