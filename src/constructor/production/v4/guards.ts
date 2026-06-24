@@ -2,11 +2,11 @@ import {
   PRODUCTION_JSON_V4_SCHEMA,
   type DrillingV4,
   type PanelRoleV4,
-  type PanelV4,
   type ProductionJsonV4,
   type ProductionJsonV4ValidationIssue,
   type ValidationResult,
 } from "./types.js";
+import { validateMaterialPolicyV4 } from "./materialPolicy.js";
 
 const FORBIDDEN_B3D_CLAIMS = [
   "document:create-b3d",
@@ -18,25 +18,6 @@ const FORBIDDEN_B3D_CLAIMS = [
   "generate-b3d",
   "auto-b3d",
 ] as const;
-
-const BODY_PANEL_ROLES = new Set<PanelRoleV4>([
-  "side-left",
-  "side-right",
-  "bottom",
-  "top",
-  "vertical-partition",
-  "shelf",
-  "drawer-side-left",
-  "drawer-side-right",
-  "drawer-back",
-  "plinth",
-]);
-
-const FACADE_LDSP_ROLES = new Set<PanelRoleV4>(["facade-door"]);
-
-const FACADE_MDF_ROLES = new Set<PanelRoleV4>(["facade-door"]);
-
-const DRAWER_FRONT_ROLE: PanelRoleV4 = "drawer-front";
 
 const HDF_PANEL_ROLES = new Set<PanelRoleV4>(["back-panel", "drawer-bottom"]);
 
@@ -57,14 +38,6 @@ const FACADE_EDGE_ROLES = new Set<PanelRoleV4>(["facade-door", "drawer-front"]);
 
 function issue(code: string, message: string, path?: string): ProductionJsonV4ValidationIssue {
   return { code, message, path };
-}
-
-function expectedTextureDirection(panel: PanelV4): "vertical" | "horizontal" | "none" {
-  if (panel.materialKind === "hdf" || panel.role === "back-panel" || panel.role === "drawer-bottom") {
-    return "none";
-  }
-  const { widthMm, heightMm } = panel.dimensions;
-  return widthMm >= heightMm ? "horizontal" : "vertical";
 }
 
 function hasCoordinateDecision(drill: DrillingV4): boolean {
@@ -187,72 +160,7 @@ function collectReferenceErrors(model: ProductionJsonV4): ProductionJsonV4Valida
 }
 
 function collectMaterialErrors(model: ProductionJsonV4): ProductionJsonV4ValidationIssue[] {
-  const errors: ProductionJsonV4ValidationIssue[] = [];
-  const materialById = new Map(model.materials.map((material) => [material.id, material]));
-
-  for (const panel of model.panels) {
-    const material = materialById.get(panel.materialRef);
-
-    if (BODY_PANEL_ROLES.has(panel.role)) {
-      if (panel.materialKind !== "ldsp" || panel.thicknessMm !== 16) {
-        errors.push(issue("panel.body.material.invalid", `Body panel ${panel.id} must be LDSP 16 mm`, `panels.${panel.id}`));
-      }
-      if (material && (material.kind !== "ldsp" || material.thicknessMm !== 16)) {
-        errors.push(issue("panel.body.materialRef.invalid", `Body panel ${panel.id} materialRef must be LDSP 16 mm`, `panels.${panel.id}.materialRef`));
-      }
-    }
-
-    if (FACADE_LDSP_ROLES.has(panel.role) && panel.materialKind === "ldsp") {
-      if (panel.thicknessMm !== 16) {
-        errors.push(issue("panel.facade.ldsp.thickness.invalid", `Facade LDSP panel ${panel.id} must be 16 mm`, `panels.${panel.id}.thicknessMm`));
-      }
-      if (material && material.thicknessMm !== 16) {
-        errors.push(issue("panel.facade.ldsp.materialRef.invalid", `Facade LDSP panel ${panel.id} materialRef must be 16 mm`, `panels.${panel.id}.materialRef`));
-      }
-    }
-
-    if (FACADE_MDF_ROLES.has(panel.role) && panel.materialKind === "mdf") {
-      if (panel.thicknessMm !== 18) {
-        errors.push(issue("panel.facade.mdf.thickness.invalid", `Facade MDF panel ${panel.id} must be 18 mm`, `panels.${panel.id}.thicknessMm`));
-      }
-      if (material && material.thicknessMm !== 18) {
-        errors.push(issue("panel.facade.mdf.materialRef.invalid", `Facade MDF panel ${panel.id} materialRef must be 18 mm`, `panels.${panel.id}.materialRef`));
-      }
-    }
-
-    if (panel.role === DRAWER_FRONT_ROLE && panel.materialKind === "ldsp" && panel.thicknessMm !== 16) {
-      errors.push(issue("panel.drawer-front.thickness.invalid", `Drawer front ${panel.id} LDSP must be 16 mm`, `panels.${panel.id}.thicknessMm`));
-    }
-
-    if (HDF_PANEL_ROLES.has(panel.role)) {
-      if (panel.materialKind !== "hdf" || panel.thicknessMm !== 3) {
-        errors.push(issue("panel.hdf.invalid", `HDF panel ${panel.id} must be HDF 3 mm`, `panels.${panel.id}`));
-      }
-      if (material && (material.kind !== "hdf" || material.thicknessMm !== 3)) {
-        errors.push(issue("panel.hdf.materialRef.invalid", `HDF panel ${panel.id} materialRef must be HDF 3 mm`, `panels.${panel.id}.materialRef`));
-      }
-      if (panel.textureDirection !== "none") {
-        errors.push(issue("panel.hdf.textureDirection.invalid", `HDF panel ${panel.id} textureDirection must be none`, `panels.${panel.id}.textureDirection`));
-      }
-    }
-
-    if (panel.materialKind === "hdf" && panel.textureDirection !== "none") {
-      errors.push(issue("panel.hdf.textureDirection.invalid", `HDF material panel ${panel.id} textureDirection must be none`, `panels.${panel.id}.textureDirection`));
-    }
-
-    const expectedTexture = expectedTextureDirection(panel);
-    if (panel.textureDirection !== expectedTexture && !HDF_PANEL_ROLES.has(panel.role)) {
-      errors.push(
-        issue(
-          "panel.textureDirection.invalid",
-          `Panel ${panel.id} textureDirection must follow longest side (${expectedTexture})`,
-          `panels.${panel.id}.textureDirection`,
-        ),
-      );
-    }
-  }
-
-  return errors;
+  return validateMaterialPolicyV4(model).errors;
 }
 
 function collectEdgeBandingErrors(model: ProductionJsonV4): ProductionJsonV4ValidationIssue[] {

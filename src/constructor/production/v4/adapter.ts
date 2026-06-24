@@ -22,6 +22,7 @@ import type {
   TextureDirectionV4,
   ValidationIssueV4,
 } from "./types.js";
+import { deriveTextureDirectionFromPanelSize } from "./materialPolicy.js";
 import { PRODUCTION_JSON_V4_SCHEMA } from "./types.js";
 
 const HDF_PANEL_ROLES = new Set<PanelRoleV4>(["back-panel", "drawer-bottom"]);
@@ -140,10 +141,11 @@ function textureDirectionForPanel(
   kind: MaterialKindV4,
   role: PanelRoleV4,
 ): TextureDirectionV4 {
-  if (kind === "hdf" || HDF_PANEL_ROLES.has(role)) {
-    return "none";
-  }
-  return widthMm >= heightMm ? "horizontal" : "vertical";
+  return deriveTextureDirectionFromPanelSize({
+    dimensions: { widthMm, heightMm, thicknessMm: kind === "hdf" ? 3 : kind === "mdf" ? 18 : 16 },
+    materialKind: kind,
+    role,
+  });
 }
 
 function mapFaceSide(role: PanelRoleV4, faceSide: FaceSide): PanelFaceSideV4 | undefined {
