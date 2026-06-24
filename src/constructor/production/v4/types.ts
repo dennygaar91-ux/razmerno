@@ -204,6 +204,38 @@ export interface PanelReviewV4 {
   visibleToClient: false;
 }
 
+export type PanelRoleClassV4 = "body" | "facade" | "drawer-front" | "drawer-box" | "hdf" | "plinth";
+
+export interface PanelLocalSizeV4 {
+  uMm: number;
+  vMm: number;
+  thicknessMm: number;
+}
+
+export interface PanelWorldBoundingBoxV4 {
+  widthMm: number;
+  heightMm: number;
+  depthMm: number;
+}
+
+export interface PanelLocalAxesV4 {
+  uAxis: "x" | "y" | "z";
+  vAxis: "x" | "y" | "z";
+  thicknessAxis: "x" | "y" | "z";
+  drawerLocalOrientationProvisional?: boolean;
+}
+
+export interface PanelSemanticProjectionV4 {
+  roleClass: PanelRoleClassV4;
+  basisPanelKind: BasisPanelKindV4;
+  plane: PanelPlaneV4;
+  localAxes: PanelLocalAxesV4;
+  localSize: PanelLocalSizeV4;
+  worldBoundingBox: PanelWorldBoundingBoxV4;
+  includeInDocumentation: boolean;
+  faceSideKnown: boolean;
+}
+
 export interface PanelV4 {
   id: string;
   objectType: "panel";
@@ -228,6 +260,7 @@ export interface PanelV4 {
   hardwareRefs?: string[];
   drillingRefs?: string[];
   review?: PanelReviewV4;
+  semantics?: PanelSemanticProjectionV4;
 }
 
 export interface AssemblyContactV4 {
