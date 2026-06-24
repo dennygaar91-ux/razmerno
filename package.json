@@ -183,6 +183,7 @@
     "check:stage12-visualization-final": "node scripts/check-stage12-visualization-final.mjs",
     "check:stage13-production-export": "node scripts/check-stage13-production-export.mjs",
     "test:production-export": "node --no-warnings --import tsx tests/production-export.test.ts",
+    "test:production-json-v4": "node --no-warnings --import tsx tests/production-json-v4.test.ts",
     "qa:stage13": "npm run check:stage13-production-export && npm run test:production-export && npm run typecheck && npm run typecheck:api && npm run check:stage13-production-validation-report && npm run check:stage13-production-logic-final",
     "check:stage13-production-validation-report": "node scripts/check-stage13-production-validation-report.mjs",
     "check:stage13-production-logic-final": "node scripts/check-stage13-production-logic-final.mjs",
