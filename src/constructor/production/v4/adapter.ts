@@ -25,6 +25,7 @@ import type {
 import { deriveTextureDirectionFromPanelSize } from "./materialPolicy.js";
 import { PRODUCTION_JSON_V4_SCHEMA } from "./types.js";
 import { buildAssemblyPolicySnapshot } from "./assemblyPolicy.js";
+import { enrichHardwareSemanticsV4 } from "./hardwarePolicy.js";
 import { enrichPanelSemanticsV4 } from "./panelProjection.js";
 
 const HDF_PANEL_ROLES = new Set<PanelRoleV4>(["back-panel", "drawer-bottom"]);
@@ -793,7 +794,7 @@ export function buildProductionJsonV4FromV3(input: ProductionExportPackage): Pro
     })),
   };
 
-  const enriched = enrichPanelSemanticsV4(model);
+  const enriched = enrichHardwareSemanticsV4(enrichPanelSemanticsV4(model));
 
   return {
     ...enriched,

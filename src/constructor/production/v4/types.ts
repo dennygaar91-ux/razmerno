@@ -331,6 +331,41 @@ export interface HardwareV4 {
   minCupDepthMm?: number;
   drillingRefs?: string[];
   requiresTechnologistCheck: boolean;
+  semantics?: HardwareSemanticProjectionV4;
+}
+
+export type HardwareSkuStatusV4 = "not-final" | "final";
+
+export type HardwareDrillingTemplateStatusV4 = "not-final" | "final";
+
+export type HardwareClassificationV4 = HardwareTypeV4 | "fastener-placeholder";
+
+export interface HingeSemanticBaselineV4 {
+  openingAngleDeg: 105;
+  cupDiameterMm: 35;
+  minCupDepthMm: 12;
+  facadeThicknessRangeMm: { min: 14; max: 24 };
+}
+
+export interface ConcealedSlideSemanticBaselineV4 {
+  mounting: "concealed-full-extension";
+  drawerWidthFormula: "SKW = LW - 42";
+  standardBoxDepthFormula: "LT = NL + 5";
+  maxBoardThicknessMm: 16;
+  availableLengthsMm: [250, 300, 350, 400, 450, 500, 550, 600];
+}
+
+export interface HardwareSemanticProjectionV4 {
+  semanticType: HardwareTypeV4;
+  classification: HardwareClassificationV4;
+  skuStatus: HardwareSkuStatusV4;
+  drillingTemplateStatus: HardwareDrillingTemplateStatusV4;
+  requiresSkuMapping: boolean;
+  requiresTechnologistCheck: boolean;
+  supplierFamily?: string;
+  seriesFamily?: string;
+  hingeBaseline?: HingeSemanticBaselineV4;
+  slideBaseline?: ConcealedSlideSemanticBaselineV4;
 }
 
 export interface DrillingCoordinatesV4 {
