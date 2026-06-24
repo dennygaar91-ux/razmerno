@@ -54,6 +54,39 @@ export type SupportModeV4 =
   | "metal-spiked-adjustable-support"
   | "no-support-on-bottom";
 
+export type SupportLineV4 = "front" | "rear";
+
+export interface SupportPlacementRulesV4 {
+  requiredCount: number;
+  frontLineCount: number;
+  rearLineCount: number;
+  symmetric: true;
+  widthExceedsMatrix: boolean;
+  requiresTechnologistReview: boolean;
+}
+
+export interface SupportCountResultV4 {
+  requiredCount: number;
+  widthExceedsMatrix: boolean;
+  requiresTechnologistReview: boolean;
+}
+
+export interface SupportPositionV4 {
+  line: SupportLineV4;
+  xMm: number;
+  zMm: number;
+  index: number;
+}
+
+export interface SupportSemanticProjectionV4 {
+  classification: SupportModeV4;
+  lockedHeightMm: number | null;
+  placementRules: SupportPlacementRulesV4;
+  position?: SupportPositionV4;
+  carcassHeightMm: number;
+  requiresTechnologistCheck: boolean;
+}
+
 export type HardwareTypeV4 =
   | "hinge"
   | "concealed-slide"
@@ -205,6 +238,52 @@ export interface FacadeGapsV4 {
   leftMm: number;
 }
 
+export type FacadeOpeningTypeV4 = "single" | "paired-left" | "paired-right" | "drawer-front";
+
+export type FacadeDoorTypeV4 = "overlay" | "half-overlay" | "inset";
+
+export type FacadeOpeningModeV4 = "regular-handle" | "no-handle" | "push-to-open" | "hidden-handle";
+
+export interface FacadeGapPolicyV4 {
+  sideGapMm: 1.5;
+  pairedCenterGapMm: 3;
+  topGapMm: 1.5;
+  bottomGapMm: 1.5;
+  leftGapMm: 1.5;
+  rightGapMm: 1.5;
+}
+
+export interface FacadeOpeningSizeInputV4 {
+  widthMm: number;
+  heightMm: number;
+}
+
+export interface FacadeSizeV4 {
+  widthMm: number;
+  heightMm: number;
+}
+
+export interface FacadePanelClassificationV4 {
+  roleClass: "facade" | "drawer-front";
+  isFacadeClass: true;
+  materialKind: MaterialKindV4;
+  expectedThicknessMm: number;
+  materialCompatible: boolean;
+}
+
+export interface FacadeSemanticProjectionV4 {
+  roleClass: "facade" | "drawer-front";
+  gapPolicy: FacadeGapPolicyV4;
+  openingType?: FacadeOpeningTypeV4;
+  doorType?: FacadeDoorTypeV4;
+  openingMode?: FacadeOpeningModeV4;
+  expectedThicknessMm: number;
+  materialKind: MaterialKindV4;
+  materialCompatible: boolean;
+  calculatedWidthMm?: number;
+  calculatedHeightMm?: number;
+}
+
 export interface PanelReviewV4 {
   requiresTechnologistCheck: boolean;
   visibleToClient: false;
@@ -267,6 +346,7 @@ export interface PanelV4 {
   drillingRefs?: string[];
   review?: PanelReviewV4;
   semantics?: PanelSemanticProjectionV4;
+  facadeSemantics?: FacadeSemanticProjectionV4;
 }
 
 export interface AssemblyContactV4 {
@@ -429,6 +509,7 @@ export interface SupportV4 {
   affectsBodyGeometry: boolean;
   requiresTechnologistCheck?: boolean;
   mountingPanelId?: string;
+  semantics?: SupportSemanticProjectionV4;
 }
 
 export interface BasisManualPlanStepV4 {

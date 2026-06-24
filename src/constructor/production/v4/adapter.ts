@@ -25,7 +25,9 @@ import type {
 import { deriveTextureDirectionFromPanelSize } from "./materialPolicy.js";
 import { PRODUCTION_JSON_V4_SCHEMA } from "./types.js";
 import { buildAssemblyPolicySnapshot } from "./assemblyPolicy.js";
+import { enrichSupportSemanticsV4 } from "./supportPolicy.js";
 import { enrichEdgeGrooveSemanticsV4 } from "./edgeGroovePolicy.js";
+import { enrichFacadeSemanticsV4 } from "./facadePolicy.js";
 import { enrichHardwareSemanticsV4 } from "./hardwarePolicy.js";
 import { enrichPanelSemanticsV4 } from "./panelProjection.js";
 
@@ -795,8 +797,12 @@ export function buildProductionJsonV4FromV3(input: ProductionExportPackage): Pro
     })),
   };
 
-  const enriched = enrichEdgeGrooveSemanticsV4(
-    enrichHardwareSemanticsV4(enrichPanelSemanticsV4(model)),
+  const enriched = enrichSupportSemanticsV4(
+    enrichEdgeGrooveSemanticsV4(
+      enrichFacadeSemanticsV4(
+        enrichHardwareSemanticsV4(enrichPanelSemanticsV4(model)),
+      ),
+    ),
   );
 
   return {
