@@ -74,6 +74,7 @@ type ProductionV3GoldenSnapshot = {
   shelves: number;
   drawers: number;
   hangingRod: boolean;
+  facadeMode?: ProductionExportPackage["project"]["structure"]["facadeMode"];
 };
 
 function normalizeMaterialAreaM2(
@@ -110,6 +111,7 @@ function extractProductionV3GoldenSnapshot(
     shelves: productionExport.project.structure.shelves,
     drawers: productionExport.project.structure.drawers,
     hangingRod: productionExport.project.structure.hangingRod,
+    facadeMode: productionExport.project.structure.facadeMode,
   };
 }
 
@@ -139,6 +141,8 @@ function assertProductionV3GoldenInvariants(productionExport: ProductionExportPa
   assert.ok(validation.summary.edgeBandingLengthMm > 0);
   assert.ok(validation.summary.basisSteps > 0);
   assert.equal(revisions.length, 1);
+  assert.equal(review.visibleToClient, false);
+  assert.equal(typeof productionExport.manufacturing.requiresTechnologistCheck, "boolean");
   assertProductionV3HdfThickness(productionExport);
   assertProductionV3EdgeBandingPolicy(productionExport);
   assertProductionV3BasisBoundary(productionExport);
@@ -455,6 +459,7 @@ runGoldenCase("base wardrobe payload", baseWardrobePayload, {
   shelves: 2,
   drawers: 0,
   hangingRod: false,
+  facadeMode: "hinged",
 });
 
 runGoldenCase("multi-section payload", multiSectionPayload, {
@@ -484,6 +489,7 @@ runGoldenCase("multi-section payload", multiSectionPayload, {
   shelves: 2,
   drawers: 0,
   hangingRod: false,
+  facadeMode: "hinged",
 });
 
 runGoldenCase(
@@ -524,6 +530,7 @@ runGoldenCase(
     shelves: 4,
     drawers: 2,
     hangingRod: true,
+    facadeMode: "hinged",
   },
   (productionExport) => {
     assert.ok(productionExport.productionModel.hardware.some((item) => item.type === "rod"));
@@ -562,11 +569,358 @@ runGoldenCase(
     shelves: 2,
     drawers: 0,
     hangingRod: false,
+    facadeMode: "hinged",
   },
   (productionExport) => {
     assert.equal(productionExport.project.structure.openingMode, "push-to-open");
     assert.equal(productionExport.project.structure.hardwareMode, "comfort");
     assert.ok(productionExport.productionModel.hardware.some((item) => item.type === "push-to-open"));
     assert.equal(productionExport.project.material.facadeThicknessMm, 18);
+  },
+);
+
+const minimalWardrobePayload = makePayload({
+  orderId: "RZ-20260623-9101",
+  dimensions: { width: 1000, height: 1800, depth: 300 },
+  sections: 1,
+  filling: { shelves: 0, drawers: 0, hangingRod: false },
+  materials: {
+    bodyId: "white-matt",
+    facadeId: "white-matt",
+    facadeKind: "ldsp",
+    backPanelId: "white-matt",
+    backPanelKind: "hdf",
+  },
+  style: { facadeStyleId: "regular", hardwareId: "base" },
+});
+
+const maximumWardrobePayload = makePayload({
+  orderId: "RZ-20260623-9102",
+  dimensions: { width: 5400, height: 2700, depth: 900 },
+  sections: 6,
+  filling: { shelves: 0, drawers: 0, hangingRod: false },
+  layout: {
+    sections: Array.from({ length: 6 }, (_, index) => ({
+      id: `section-${index + 1}`,
+      widthMm: 900,
+      compartments: [
+        {
+          id: `section-${index + 1}-compartment-1`,
+          kind: "shelves" as const,
+          heightMm: 2700,
+          shelves: 0,
+          drawers: 0,
+          hasRod: false,
+        },
+      ],
+    })),
+  },
+});
+
+const manySectionsPayload = makePayload({
+  orderId: "RZ-20260623-9103",
+  dimensions: { width: 4500, height: 2400, depth: 600 },
+  sections: 5,
+  filling: { shelves: 0, drawers: 0, hangingRod: false },
+  layout: {
+    sections: Array.from({ length: 5 }, (_, index) => ({
+      id: `section-${index + 1}`,
+      widthMm: 900,
+      compartments: [
+        {
+          id: `section-${index + 1}-compartment-1`,
+          kind: "shelves" as const,
+          heightMm: 2400,
+          shelves: 1,
+          drawers: 0,
+          hasRod: false,
+        },
+      ],
+    })),
+  },
+});
+
+const manyShelvesPayload = makePayload({
+  orderId: "RZ-20260623-9104",
+  filling: { shelves: 12, drawers: 0, hangingRod: false },
+  layout: {
+    sections: [
+      {
+        id: "section-1",
+        widthMm: 900,
+        compartments: [
+          {
+            id: "section-1-compartment-1",
+            kind: "shelves",
+            heightMm: 2400,
+            shelves: 6,
+            drawers: 0,
+            hasRod: false,
+          },
+        ],
+      },
+      {
+        id: "section-2",
+        widthMm: 900,
+        compartments: [
+          {
+            id: "section-2-compartment-1",
+            kind: "shelves",
+            heightMm: 2400,
+            shelves: 6,
+            drawers: 0,
+            hasRod: false,
+          },
+        ],
+      },
+    ],
+  },
+});
+
+const manyDrawersDresserPayload = makePayload({
+  orderId: "RZ-20260623-9105",
+  productType: "dresser",
+  dimensions: { width: 1200, height: 900, depth: 450 },
+  sections: 1,
+  filling: { shelves: 0, drawers: 4, hangingRod: false },
+  layout: {
+    sections: [
+      {
+        id: "section-1",
+        widthMm: 1200,
+        compartments: [
+          {
+            id: "section-1-compartment-1",
+            kind: "drawers",
+            heightMm: 900,
+            shelves: 0,
+            drawers: 4,
+            hasRod: false,
+          },
+        ],
+      },
+    ],
+  },
+});
+
+const drawersFacadeNightstandPayload = makePayload({
+  orderId: "RZ-20260623-9106",
+  productType: "nightstand",
+  dimensions: { width: 500, height: 550, depth: 400 },
+  sections: 1,
+  filling: { shelves: 0, drawers: 2, hangingRod: false },
+  layout: {
+    sections: [
+      {
+        id: "section-1",
+        widthMm: 500,
+        compartments: [
+          {
+            id: "section-1-compartment-1",
+            kind: "drawers",
+            heightMm: 550,
+            shelves: 0,
+            drawers: 2,
+            hasRod: false,
+          },
+        ],
+      },
+    ],
+  },
+});
+
+runGoldenCase("minimal wardrobe payload", minimalWardrobePayload, {
+  panels: 8,
+  hardware: 14,
+  drilling: 14,
+  edgeBanding: 28,
+  warnings: 0,
+  basisSteps: 97,
+  review: "requires-review",
+  validation: "ready-for-review",
+  totals: {
+    panelCount: 8,
+    drillingCount: 14,
+    hardwareCount: 14,
+    edgeBandingLengthMm: 23966,
+    bodyAreaM2: 1.7,
+    facadeAreaM2: 1.62,
+    backPanelAreaM2: 1.69,
+    materialAreaM2: { ldsp: 3.33, hdf: 1.69 },
+  },
+  hardwareTypes: ["confirmat", "handle", "hinge"],
+  facadeThickness: 16,
+  bodyMaterial: "white-matt",
+  facadeMaterial: "white-matt",
+  sections: 1,
+  shelves: 0,
+  drawers: 0,
+  hangingRod: false,
+  facadeMode: "hinged",
+});
+
+runGoldenCase("maximum supported wardrobe payload", maximumWardrobePayload, {
+  panels: 23,
+  hardware: 76,
+  drilling: 76,
+  edgeBanding: 88,
+  warnings: 18,
+  basisSteps: 371,
+  review: "requires-review",
+  validation: "ready-for-review",
+  totals: {
+    panelCount: 23,
+    drillingCount: 76,
+    hardwareCount: 76,
+    edgeBandingLengthMm: 157476,
+    bodyAreaM2: 26.44,
+    facadeAreaM2: 13.58,
+    backPanelAreaM2: 14.01,
+    materialAreaM2: { ldsp: 26.44, mdf: 13.58, hdf: 14.01 },
+  },
+  hardwareTypes: ["confirmat", "handle", "hinge"],
+  facadeThickness: 18,
+  bodyMaterial: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+  facadeMaterial: "mdf-egger-r010-seryy-grafitovyy-ms",
+  sections: 6,
+  shelves: 0,
+  drawers: 0,
+  hangingRod: false,
+  facadeMode: "hinged",
+});
+
+runGoldenCase("many sections payload", manySectionsPayload, {
+  panels: 25,
+  hardware: 74,
+  drilling: 74,
+  edgeBanding: 96,
+  warnings: 15,
+  basisSteps: 377,
+  review: "requires-review",
+  validation: "ready-for-review",
+  totals: {
+    panelCount: 25,
+    drillingCount: 74,
+    hardwareCount: 74,
+    edgeBandingLengthMm: 133222,
+    bodyAreaM2: 16.57,
+    facadeAreaM2: 10,
+    backPanelAreaM2: 10.32,
+    materialAreaM2: { ldsp: 16.57, mdf: 10, hdf: 10.32 },
+  },
+  hardwareTypes: ["confirmat", "handle", "hinge", "shelf-support"],
+  facadeThickness: 18,
+  bodyMaterial: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+  facadeMaterial: "mdf-egger-r010-seryy-grafitovyy-ms",
+  sections: 5,
+  shelves: 0,
+  drawers: 0,
+  hangingRod: false,
+  facadeMode: "hinged",
+});
+
+runGoldenCase("many shelves payload", manyShelvesPayload, {
+  panels: 23,
+  hardware: 52,
+  drilling: 52,
+  edgeBanding: 88,
+  warnings: 6,
+  basisSteps: 299,
+  review: "requires-review",
+  validation: "ready-for-review",
+  totals: {
+    panelCount: 23,
+    drillingCount: 52,
+    hardwareCount: 52,
+    edgeBandingLengthMm: 87372,
+    bodyAreaM2: 12.52,
+    facadeAreaM2: 3.98,
+    backPanelAreaM2: 4.12,
+    materialAreaM2: { ldsp: 12.52, mdf: 3.98, hdf: 4.12 },
+  },
+  hardwareTypes: ["confirmat", "handle", "hinge", "shelf-support"],
+  facadeThickness: 18,
+  bodyMaterial: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+  facadeMaterial: "mdf-egger-r010-seryy-grafitovyy-ms",
+  sections: 2,
+  shelves: 12,
+  drawers: 0,
+  hangingRod: false,
+  facadeMode: "hinged",
+});
+
+runGoldenCase(
+  "many drawers dresser payload",
+  manyDrawersDresserPayload,
+  {
+    panels: 25,
+    hardware: 12,
+    drilling: 16,
+    edgeBanding: 80,
+    warnings: 0,
+    basisSteps: 255,
+    review: "blocked",
+    validation: "blocked",
+    totals: {
+      panelCount: 25,
+      drillingCount: 16,
+      hardwareCount: 12,
+      edgeBandingLengthMm: 43200,
+      bodyAreaM2: 3.38,
+      facadeAreaM2: 1.02,
+      backPanelAreaM2: 2.94,
+      materialAreaM2: { ldsp: 3.38, mdf: 1.02, hdf: 2.94 },
+    },
+    hardwareTypes: ["confirmat", "drawer-slide", "handle"],
+    facadeThickness: 18,
+    bodyMaterial: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+    facadeMaterial: "mdf-egger-r010-seryy-grafitovyy-ms",
+    sections: 1,
+    shelves: 0,
+    drawers: 4,
+    hangingRod: false,
+    facadeMode: "drawers",
+  },
+  (productionExport) => {
+    assert.equal(productionExport.project.structure.facadeMode, "drawers");
+    assert.ok(productionExport.productionModel.panels.some((panel) => panel.role === "drawer-front"));
+  },
+);
+
+runGoldenCase(
+  "drawers facade mode nightstand payload",
+  drawersFacadeNightstandPayload,
+  {
+    panels: 15,
+    hardware: 8,
+    drilling: 10,
+    edgeBanding: 48,
+    warnings: 0,
+    basisSteps: 151,
+    review: "requires-review",
+    validation: "ready-for-review",
+    totals: {
+      panelCount: 15,
+      drillingCount: 10,
+      hardwareCount: 8,
+      edgeBandingLengthMm: 17736,
+      bodyAreaM2: 1.38,
+      facadeAreaM2: 0.25,
+      backPanelAreaM2: 0.59,
+      materialAreaM2: { ldsp: 1.38, mdf: 0.25, hdf: 0.59 },
+    },
+    hardwareTypes: ["confirmat", "drawer-slide", "handle"],
+    facadeThickness: 18,
+    bodyMaterial: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+    facadeMaterial: "mdf-egger-r010-seryy-grafitovyy-ms",
+    sections: 1,
+    shelves: 0,
+    drawers: 2,
+    hangingRod: false,
+    facadeMode: "drawers",
+  },
+  (productionExport) => {
+    assert.equal(productionExport.project.productType, "nightstand");
+    assert.equal(productionExport.project.structure.facadeMode, "drawers");
   },
 );

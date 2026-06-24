@@ -58,5 +58,13 @@ assertBasisManualJsonBoundary(JSON.stringify(pack), pack.basis.status, "producti
 assert.equal(pack.validation.schema, "razmerno.production-validation.v1");
 assert.ok(pack.validation.summary.panels > 0);
 assert.ok(typeof pack.manufacturing.requiresTechnologistCheck === "boolean");
+assert.equal(pack.review.visibleToClient, false);
+assert.equal(pack.revisions.length, 1);
+assert.ok(pack.productionModel.drilling.every((operation) => operation.panelId));
+assert.ok(
+  pack.productionModel.hardware.every((item) =>
+    item.drillingRefs.every((ref) => pack.productionModel.drilling.some((drill) => drill.id === ref)),
+  ),
+);
 
 console.log("Production export package test passed.");

@@ -182,3 +182,20 @@ test("validateConstructorSystemConsistency detects production export drift from 
   const issues = validateConstructorSystemConsistency(canonical);
   assert.ok(issues.some((issue) => issue.code === "production_export_drift"));
 });
+
+test("canonical contract: production export replay fingerprint is stable", () => {
+  const payload = buildAlignedPayload();
+  const firstExport = buildProductionExportFromPayload(payload as OrderRequest);
+  const secondExport = buildProductionExportFromPayload(payload as OrderRequest);
+  assert.deepEqual(
+    extractProductionConfigFingerprint(firstExport),
+    extractProductionConfigFingerprint(secondExport),
+  );
+});
+
+test("canonical contract: aligned export keeps basis manual-json-ready boundary", () => {
+  const payload = buildAlignedPayload();
+  const productionExport = buildProductionExportFromPayload(payload as OrderRequest);
+  assert.equal(productionExport.basis.status, "manual-json-ready");
+  assert.equal(productionExport.review.visibleToClient, false);
+});
