@@ -12,6 +12,7 @@ import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless
 import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders.js'
 import { validateOrder } from './_shared/order-validation.js'
 import { buildProductionExportFromPayload } from '../src/constructor/production/orderExportPackage.js'
+import { calculateServerOrderPriceResolved, withServerPrice } from './_shared/server-price.js'
 
 const MANAGER_NOTIFICATION_FAILED = 'manager_notification_failed'
 const CUSTOMER_NOTIFICATION_FAILED = 'customer_notification_failed'
@@ -128,12 +129,16 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
   let orderBodyForPersistence: OrderRequest
   try {
-    // API order contract lock:
-    // use constructor payload as the single source of truth.
-    // No server-side pricing recomputation in API layer.
     const bodyWithOrderId = { ...body, orderId: orderIdentity.orderId }
     const productionExport = buildProductionExportFromPayload(bodyWithOrderId)
-    orderBodyForPersistence = { ...bodyWithOrderId, productionExport }
+    const resolvedPricing = await calculateServerOrderPriceResolved({
+      body: bodyWithOrderId,
+      productionExport,
+    })
+    orderBodyForPersistence = withServerPrice(
+      { ...bodyWithOrderId, productionExport },
+      resolvedPricing.price,
+    )
   } catch (error) {
     logEvent('error', 'orders.order_preparation_failed', { reason: safeErrorMessage(error) })
     return res.status(400).json({ ok: false, message: ORDER_PREPARATION_FAILED_MESSAGE })

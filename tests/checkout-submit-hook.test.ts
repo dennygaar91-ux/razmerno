@@ -8,6 +8,7 @@ import { toOrderDbInsert } from "../api/_shared/order-db";
 import {
   assertCatalogSourceConsistency,
   calculateServerCatalogPriceResolved,
+  calculateServerOrderPriceResolved,
   calculateServerPrice,
 } from "../api/_shared/server-price";
 import { validateOrder } from "../api/_shared/order-validation";
@@ -1086,7 +1087,7 @@ test("API order flow creates order, persists it and sends manager/customer notif
   assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 2);
 });
 
-test("P0-13 API payload contract: persisted snapshot uses constructor payload as source of truth", async () => {
+test("P0-13 API payload contract: persisted snapshot uses constructor payload for config but server pricing for final snapshot", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
   const materials = {
@@ -1118,6 +1119,10 @@ test("P0-13 API payload contract: persisted snapshot uses constructor payload as
   });
 
   const expectedProductionExport = buildProductionExportFromOrder(maliciousOrder);
+  const expectedServerPrice = await calculateServerOrderPriceResolved({
+    body: maliciousOrder,
+    productionExport: expectedProductionExport,
+  });
 
   const result = await callOrderHandler(maliciousOrder, {
     idempotencyKey: "RZ-20260620-4101",
@@ -1137,10 +1142,23 @@ test("P0-13 API payload contract: persisted snapshot uses constructor payload as
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal(storedInsert.total_price, maliciousOrder.totalPrice);
-  assert.deepEqual(storedInsert.price_breakdown, maliciousOrder.priceBreakdown);
-  assert.equal(storedInsert.delivery_price, maliciousOrder.delivery?.enabled ? (maliciousOrder.delivery?.price ?? 0) : 0);
-  assert.equal(storedInsert.assembly_price, maliciousOrder.assembly?.enabled ? (maliciousOrder.assembly?.price ?? 0) : 0);
+  assert.notEqual(storedInsert.total_price, maliciousOrder.totalPrice);
+  assert.notDeepEqual(storedInsert.price_breakdown, maliciousOrder.priceBreakdown);
+  assert.equal(storedInsert.total_price, expectedServerPrice.price.total);
+  assert.deepEqual(storedInsert.price_breakdown, {
+    body: expectedServerPrice.price.body,
+    facades: expectedServerPrice.price.facades,
+    filling: expectedServerPrice.price.filling,
+    hardware: expectedServerPrice.price.hardware,
+    production: expectedServerPrice.price.production,
+    delivery: expectedServerPrice.price.delivery,
+    assembly: expectedServerPrice.price.assembly ?? 0,
+    materials: expectedServerPrice.price.materials,
+    edgeBanding: expectedServerPrice.price.edgeBanding,
+    services: expectedServerPrice.price.services,
+  });
+  assert.equal(storedInsert.delivery_price, expectedServerPrice.price.delivery);
+  assert.equal(storedInsert.assembly_price, expectedServerPrice.price.assembly ?? 0);
   assert.ok(storedProductionExport);
   assert.equal(storedProductionExport?.schema, expectedProductionExport.schema);
   assert.equal(storedProductionExport?.source, expectedProductionExport.source);
@@ -1175,7 +1193,7 @@ test("P0-13 API payload contract: persisted snapshot uses constructor payload as
   assert.doesNotMatch(JSON.stringify(storedProductionExport), /"totalPrice"|"priceBreakdown"/);
 });
 
-test("P0-13 stored order snapshot parity: delivery and assembly persistence must use payload values without server repricing", async () => {
+test("P0-13 stored order snapshot parity: delivery and assembly persistence must use server recomputation", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
   const order = makeValidOrder({
@@ -1205,6 +1223,10 @@ test("P0-13 stored order snapshot parity: delivery and assembly persistence must
       assembly: 1,
     },
   });
+  const expectedServerPrice = await calculateServerOrderPriceResolved({
+    body: order,
+    productionExport: buildProductionExportFromOrder(order),
+  });
   const result = await callOrderHandler(order, {
     idempotencyKey: "RZ-20260620-4102",
   });
@@ -1212,15 +1234,30 @@ test("P0-13 stored order snapshot parity: delivery and assembly persistence must
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal(storedInsert.total_price, order.totalPrice);
-  assert.deepEqual(storedInsert.price_breakdown, order.priceBreakdown);
-  assert.equal(storedInsert.delivery_price, order.delivery?.price);
-  assert.equal(storedInsert.assembly_price, order.assembly?.price ?? 0);
+  assert.notEqual(storedInsert.total_price, order.totalPrice);
+  assert.equal(storedInsert.total_price, expectedServerPrice.price.total);
+  assert.deepEqual(storedInsert.price_breakdown, {
+    body: expectedServerPrice.price.body,
+    facades: expectedServerPrice.price.facades,
+    filling: expectedServerPrice.price.filling,
+    hardware: expectedServerPrice.price.hardware,
+    production: expectedServerPrice.price.production,
+    delivery: expectedServerPrice.price.delivery,
+    assembly: expectedServerPrice.price.assembly ?? 0,
+    materials: expectedServerPrice.price.materials,
+    edgeBanding: expectedServerPrice.price.edgeBanding,
+    services: expectedServerPrice.price.services,
+  });
+  assert.equal(storedInsert.delivery_price, expectedServerPrice.price.delivery);
+  assert.equal(storedInsert.assembly_price, expectedServerPrice.price.assembly ?? 0);
   assert.equal(storedInsert.assembly_rate, 0.1);
-  assert.equal(storedInsert.assembly_base_price, order.assembly?.basePrice);
+  assert.equal(
+    storedInsert.assembly_base_price,
+    expectedServerPrice.price.total - expectedServerPrice.price.delivery - (expectedServerPrice.price.assembly ?? 0),
+  );
 });
 
-test("P0-13 production-panel parity: persisted snapshot must follow constructor payload and keep production export aligned", async () => {
+test("P0-13 production-panel parity: persisted snapshot must use material-aware server calculation and keep production export aligned", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
   const order = makeValidOrder({
@@ -1248,6 +1285,10 @@ test("P0-13 production-panel parity: persisted snapshot must follow constructor 
     totalPrice: 101,
   });
   const expectedProductionExport = buildProductionExportFromOrder(order);
+  const expectedServerPrice = await calculateServerOrderPriceResolved({
+    body: order,
+    productionExport: expectedProductionExport,
+  });
 
   const result = await callOrderHandler(order, {
     idempotencyKey: "RZ-20260620-4103",
@@ -1267,11 +1308,13 @@ test("P0-13 production-panel parity: persisted snapshot must follow constructor 
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.deepEqual(storedInsert.price_breakdown, order.priceBreakdown);
-  assert.equal(storedInsert.total_price, order.totalPrice);
-  assert.equal(storedInsert.delivery_price, order.delivery?.price);
-  assert.equal(storedInsert.assembly_price, order.assembly?.price ?? 0);
-  assert.equal((storedInsert.price_breakdown as { production?: number }).production, order.priceBreakdown.production);
+  assert.notDeepEqual(storedInsert.price_breakdown, order.priceBreakdown);
+  assert.notEqual(storedInsert.total_price, order.totalPrice);
+  assert.equal(storedInsert.total_price, expectedServerPrice.price.total);
+  assert.equal(storedInsert.delivery_price, expectedServerPrice.price.delivery);
+  assert.equal(storedInsert.assembly_price, expectedServerPrice.price.assembly ?? 0);
+  assert.equal((storedInsert.price_breakdown as { production?: number }).production, expectedServerPrice.price.production);
+  assert.equal((storedInsert.price_breakdown as { materials?: number }).materials, expectedServerPrice.price.materials);
   assert.ok(storedProductionExport);
   assert.equal(storedProductionExport?.schema, expectedProductionExport.schema);
   assert.equal(storedProductionExport?.source, expectedProductionExport.source);
@@ -1284,7 +1327,7 @@ test("P0-13 production-panel parity: persisted snapshot must follow constructor 
   assert.equal(storedProductionExport?.project?.material?.facadeMaterialId, expectedProductionExport.project.material.facadeMaterialId);
 });
 
-test("P0-13 production-panel parity: assembly base and delivery fields persist payload values in constructor contract", async () => {
+test("P0-13 production-panel parity: assembly base and delivery fields persist server-computed values in constructor contract", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
   const order = makeValidOrder({
@@ -1322,6 +1365,10 @@ test("P0-13 production-panel parity: assembly base and delivery fields persist p
       assembly: 1,
     },
   });
+  const expectedServerPrice = await calculateServerOrderPriceResolved({
+    body: order,
+    productionExport: buildProductionExportFromOrder(order),
+  });
   const result = await callOrderHandler(order, {
     idempotencyKey: "RZ-20260620-4104",
   });
@@ -1329,11 +1376,14 @@ test("P0-13 production-panel parity: assembly base and delivery fields persist p
 
   assert.equal(result.statusCode, 200);
   assert.equal((result.json as { ok?: boolean }).ok, true);
-  assert.equal(storedInsert.total_price, order.totalPrice);
-  assert.equal(storedInsert.delivery_price, order.delivery?.price);
-  assert.equal(storedInsert.assembly_price, order.assembly?.price ?? 0);
+  assert.equal(storedInsert.total_price, expectedServerPrice.price.total);
+  assert.equal(storedInsert.delivery_price, expectedServerPrice.price.delivery);
+  assert.equal(storedInsert.assembly_price, expectedServerPrice.price.assembly ?? 0);
   assert.equal(storedInsert.assembly_rate, 0.1);
-  assert.equal(storedInsert.assembly_base_price, order.assembly?.basePrice);
+  assert.equal(
+    storedInsert.assembly_base_price,
+    expectedServerPrice.price.total - expectedServerPrice.price.delivery - (expectedServerPrice.price.assembly ?? 0),
+  );
 });
 
 test("API idempotency replay with same key and same payload returns the same order without duplicate notifications", async () => {

@@ -90,6 +90,11 @@ export type ServerCatalogPriceResolution =
     catalogSourceUsed: 'seed_fallback';
   });
 
+export type ServerFinalPriceResolution = ServerCatalogPriceResolutionBase & {
+  source: ServerCatalogPriceResolution["source"];
+  catalogSourceUsed: ServerCatalogPriceResolution["catalogSourceUsed"];
+};
+
 export function assertCatalogSourceConsistency(
   source: ServerPricingCatalogSource,
   catalogSourceUsed: 'supabase' | 'seed_fallback',
@@ -297,6 +302,28 @@ export function applyServerProductionPanelPrice(input: {
 
 export function calculateServerPrice(body: OrderRequest): CatalogPriceBreakdown {
   return applyServerDeliveryAndAssembly(body, calculateServerCatalogPrice(body));
+}
+
+export async function calculateServerOrderPriceResolved(input: {
+  body: OrderRequest;
+  productionExport?: ProductionExportPackage | null;
+}): Promise<ServerFinalPriceResolution> {
+  const { body, productionExport } = input;
+  const resolved = await calculateServerCatalogPriceResolved(body);
+
+  let basePrice = resolved.price;
+  if (body.source === "production-panels" && productionExport) {
+    basePrice = applyServerProductionPanelPrice({
+      body,
+      catalogPrice: basePrice,
+      productionExport,
+    }).price;
+  }
+
+  return {
+    ...resolved,
+    price: applyServerDeliveryAndAssembly(body, basePrice),
+  };
 }
 
 export function withServerPrice(body: OrderRequest, price: CatalogPriceBreakdown): OrderRequest {
