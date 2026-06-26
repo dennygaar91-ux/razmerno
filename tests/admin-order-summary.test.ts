@@ -205,6 +205,62 @@ test("admin summary does not recalculate pricing", () => {
   assert.equal(summary.priceBreakdownSummary, "stored breakdown keys: body, facades, delivery, assembly");
 });
 
+test("admin summary parity: mapped API order preserves stored snapshot semantics end-to-end", () => {
+  const row = mapApiOrder({
+    id: "RZ-20260626-5003",
+    status: "new",
+    createdAt: "2026-06-26T10:00:00.000Z",
+    product: "РЁРєР°С„ 1800Г—2400Г—600",
+    totalPrice: 99550,
+    priceBreakdown: {
+      body: 12000,
+      facades: 21000,
+      filling: 3500,
+      hardware: 4200,
+      production: 5000,
+      delivery: 6000,
+      assembly: 9050,
+      materials: 37000,
+      edgeBanding: 800,
+      services: 1000,
+    },
+    delivery: { enabled: true, price: 6000, addressMasked: "РђРґСЂРµСЃ СЃРєСЂС‹С‚" },
+    assembly: { enabled: true, price: 9050, basePrice: 84500 },
+    pricing: { status: "final server snapshot", source: "source attribution not persisted" },
+    customer: { nameMasked: "РвЂўвЂўвЂў", phoneMasked: "+7 *** ***-33", emailMasked: "c***@example.com" },
+    email: { manager: "sent", customer: "sent" },
+    production: { status: "requires-review", warnings: 0, rejects: 0, repairs: 0, revision: 1, manualAllowed: false },
+  });
+
+  const summary = summarizeOrderForAdmin(row);
+
+  assert.equal(normalizeSpaces(summary.totalPrice), "99 550 ₽");
+  assert.equal(normalizeSpaces(summary.deliverySummary), "6 000 ₽ · РђРґСЂРµСЃ СЃРєСЂС‹С‚");
+  assert.equal(normalizeSpaces(summary.assemblySummary), "9 050 ₽");
+  assert.equal(normalizeSpaces(summary.assemblyBasePriceSummary), "84 500 ₽");
+  assert.equal(summary.pricingLabel, "final server snapshot");
+  assert.equal(summary.pricingSource, "source attribution not persisted");
+  assert.equal(summary.pricingSnapshotSummary, "persisted total/delivery/assembly from stored order snapshot");
+  assert.equal(summary.priceBreakdownSummary, "stored breakdown keys: body, facades, filling, hardware, production, delivery, assembly, materials, edgeBanding, services");
+});
+
+test("admin fallback guard: local/demo rows keep non-authoritative pricing semantics", () => {
+  const summary = summarizeOrderForAdmin(
+    makeOrder({
+      pricingLabel: "demo / not verified",
+      pricingSource: "pricing source not verified",
+      pricingSnapshotSummary: "pricing snapshot details not available",
+      priceBreakdownSummary: "stored breakdown not available in current admin payload",
+      total: "86 400 в‚Ѕ",
+    }),
+  );
+
+  assert.equal(summary.pricingLabel, "demo / not verified");
+  assert.equal(summary.pricingSource, "pricing source not verified");
+  assert.notEqual(summary.pricingLabel, "final server snapshot");
+  assert.notEqual(summary.pricingSource, "source attribution not persisted");
+});
+
 test("summarizeOrderForAdmin parses dimensions from product label", () => {
   const summary = summarizeOrderForAdmin(makeOrder({ dimensions: undefined, productType: undefined }));
   assert.equal(summary.dimensionsSummary, "1800×2400×600 мм");

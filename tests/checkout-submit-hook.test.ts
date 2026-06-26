@@ -1209,6 +1209,42 @@ test("P0-13 API payload contract: persisted snapshot uses constructor payload fo
   assert.doesNotMatch(JSON.stringify(storedProductionExport), /"totalPrice"|"priceBreakdown"/);
 });
 
+test("P0-13 stored order snapshot parity: normal order flow keeps quote, order and stored snapshot aligned after server recompute", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const order = makeValidOrder({
+    orderId: "RZ-20260620-4101",
+  });
+  const expectedServerPrice = await calculateServerOrderPriceResolved({
+    body: order,
+    productionExport: buildProductionExportFromOrder(order),
+  });
+
+  const result = await callOrderHandler(order, {
+    idempotencyKey: "RZ-20260620-4101",
+  });
+  const storedInsert = getOrdersInsertPayload(records);
+
+  assert.equal(result.statusCode, 200);
+  assert.equal((result.json as { ok?: boolean }).ok, true);
+  assert.equal(storedInsert.total_price, expectedServerPrice.price.total);
+  assert.deepEqual(storedInsert.price_breakdown, {
+    body: expectedServerPrice.price.body,
+    facades: expectedServerPrice.price.facades,
+    filling: expectedServerPrice.price.filling,
+    hardware: expectedServerPrice.price.hardware,
+    production: expectedServerPrice.price.production,
+    delivery: expectedServerPrice.price.delivery,
+    assembly: expectedServerPrice.price.assembly ?? 0,
+    materials: expectedServerPrice.price.materials,
+    edgeBanding: expectedServerPrice.price.edgeBanding,
+    services: expectedServerPrice.price.services,
+  });
+  assert.equal(storedInsert.delivery_price, expectedServerPrice.price.delivery);
+  assert.equal(storedInsert.assembly_price, expectedServerPrice.price.assembly ?? 0);
+  assert.equal(storedInsert.assembly_base_price, order.assembly?.enabled ? expectedServerPrice.price.total - expectedServerPrice.price.delivery - (expectedServerPrice.price.assembly ?? 0) : 0);
+});
+
 test("P0-13 stored order snapshot parity: delivery and assembly persistence must use server recomputation", async () => {
   setRequiredServerEnv();
   const records = installServerFetchMock();
@@ -1271,6 +1307,108 @@ test("P0-13 stored order snapshot parity: delivery and assembly persistence must
     storedInsert.assembly_base_price,
     expectedServerPrice.price.total - expectedServerPrice.price.delivery - (expectedServerPrice.price.assembly ?? 0),
   );
+});
+
+test("P0-13 stored order snapshot parity: delivery and assembly matrix persists server recomputation across core scenarios", async () => {
+  setRequiredServerEnv();
+
+  const scenarios = [
+    {
+      name: "no delivery/no assembly",
+      orderId: "RZ-20260620-4110",
+      overrides: {
+        delivery: { enabled: false, address: "", price: 999 },
+        assembly: { enabled: false, price: 999, rate: 0.1, basePrice: 999 },
+        totalPrice: 1,
+      },
+    },
+    {
+      name: "delivery only",
+      orderId: "RZ-20260620-4111",
+      overrides: {
+        delivery: {
+          enabled: true,
+          address: "Москва, в пределах МКАД",
+          price: 1,
+        },
+        assembly: { enabled: false, price: 999, rate: 0.1, basePrice: 999 },
+        totalPrice: 2,
+      },
+    },
+    {
+      name: "assembly only",
+      orderId: "RZ-20260620-4112",
+      overrides: {
+        delivery: { enabled: false, address: "", price: 999 },
+        assembly: { enabled: true, price: 1, rate: 0.1, basePrice: 1 },
+        totalPrice: 3,
+      },
+    },
+    {
+      name: "delivery + assembly",
+      orderId: "RZ-20260620-4113",
+      overrides: {
+        delivery: {
+          enabled: true,
+          address: "Московская область, Химки, за МКАД 20 км",
+          price: 1,
+        },
+        assembly: { enabled: true, price: 1, rate: 0.1, basePrice: 1 },
+        totalPrice: 4,
+      },
+    },
+  ] as const;
+
+  for (const scenario of scenarios) {
+    const records = installServerFetchMock();
+    const order = makeValidOrder({
+      orderId: scenario.orderId,
+      ...scenario.overrides,
+      priceBreakdown: {
+        body: 1,
+        facades: 1,
+        filling: 1,
+        hardware: 1,
+        production: 1,
+        materials: 1,
+        edgeBanding: 1,
+        services: 1,
+        delivery: 1,
+        assembly: 1,
+      },
+    });
+    const expectedServerPrice = await calculateServerOrderPriceResolved({
+      body: order,
+      productionExport: buildProductionExportFromOrder(order),
+    });
+
+    const result = await callOrderHandler(order, {
+      idempotencyKey: scenario.orderId,
+    });
+    const storedInsert = getOrdersInsertPayload(records);
+
+    assert.equal(result.statusCode, 200, `${scenario.name}: expected success`);
+    assert.equal(storedInsert.total_price, expectedServerPrice.price.total, `${scenario.name}: total_price must follow server recompute`);
+    assert.equal(storedInsert.delivery_price, expectedServerPrice.price.delivery, `${scenario.name}: delivery_price must follow server recompute`);
+    assert.equal(storedInsert.assembly_price, expectedServerPrice.price.assembly ?? 0, `${scenario.name}: assembly_price must follow server recompute`);
+    assert.equal(
+      storedInsert.assembly_base_price,
+      order.assembly?.enabled
+        ? expectedServerPrice.price.total - expectedServerPrice.price.delivery - (expectedServerPrice.price.assembly ?? 0)
+        : 0,
+      `${scenario.name}: assembly_base_price must follow server recompute`,
+    );
+    assert.equal(
+      (storedInsert.price_breakdown as { delivery?: number }).delivery,
+      expectedServerPrice.price.delivery,
+      `${scenario.name}: stored breakdown delivery must follow server recompute`,
+    );
+    assert.equal(
+      (storedInsert.price_breakdown as { assembly?: number }).assembly,
+      expectedServerPrice.price.assembly ?? 0,
+      `${scenario.name}: stored breakdown assembly must follow server recompute`,
+    );
+  }
 });
 
 test("P0-13 production-panel parity: persisted snapshot must use material-aware server calculation and keep production export aligned", async () => {
@@ -1400,6 +1538,83 @@ test("P0-13 production-panel parity: assembly base and delivery fields persist s
     storedInsert.assembly_base_price,
     expectedServerPrice.price.total - expectedServerPrice.price.delivery - (expectedServerPrice.price.assembly ?? 0),
   );
+});
+
+test("P0-13 stored order snapshot parity: material-aware persisted snapshot follows server recomputation for body and facade material paths", async () => {
+  setRequiredServerEnv();
+
+  const scenarios = [
+    {
+      name: "body material path",
+      orderId: "RZ-20260620-4114",
+      materials: {
+        bodyId: "ldsp-egger-u961-chernyy-grafit-st7" as MaterialToken,
+        facadeId: "white-matt" as MaterialToken,
+        facadeKind: "ldsp" as const,
+        backPanelId: "white-matt",
+        backPanelKind: "hdf" as const,
+      },
+    },
+    {
+      name: "facade material path",
+      orderId: "RZ-20260620-4115",
+      materials: {
+        bodyId: "white-matt" as MaterialToken,
+        facadeId: "mdf-egger-r010-seryy-grafitovyy-ms" as MaterialToken,
+        facadeKind: "mdf" as const,
+        backPanelId: "white-matt",
+        backPanelKind: "hdf" as const,
+      },
+    },
+  ] as const;
+
+  for (const scenario of scenarios) {
+    const records = installServerFetchMock();
+    const order = makeValidOrder({
+      orderId: scenario.orderId,
+      materials: scenario.materials,
+      totalPrice: 101,
+      priceBreakdown: {
+        body: 1,
+        facades: 1,
+        filling: 1,
+        hardware: 1,
+        production: 1,
+        materials: 1,
+        edgeBanding: 1,
+        services: 1,
+        delivery: 1,
+        assembly: 1,
+      },
+    });
+    const expectedServerPrice = await calculateServerOrderPriceResolved({
+      body: order,
+      productionExport: buildProductionExportFromOrder(order),
+    });
+
+    const result = await callOrderHandler(order, {
+      idempotencyKey: scenario.orderId,
+    });
+    const storedInsert = getOrdersInsertPayload(records);
+
+    assert.equal(result.statusCode, 200, `${scenario.name}: expected success`);
+    assert.equal(storedInsert.total_price, expectedServerPrice.price.total, `${scenario.name}: total must follow server recompute`);
+    assert.equal(
+      (storedInsert.price_breakdown as { body?: number }).body,
+      expectedServerPrice.price.body,
+      `${scenario.name}: stored body price must follow server recompute`,
+    );
+    assert.equal(
+      (storedInsert.price_breakdown as { facades?: number }).facades,
+      expectedServerPrice.price.facades,
+      `${scenario.name}: stored facade price must follow server recompute`,
+    );
+    assert.equal(
+      (storedInsert.price_breakdown as { materials?: number }).materials,
+      expectedServerPrice.price.materials,
+      `${scenario.name}: stored materials total must follow server recompute`,
+    );
+  }
 });
 
 test("API idempotency replay with same key and same payload returns the same order without duplicate notifications", async () => {
