@@ -41,6 +41,7 @@ export default function Constructor3DPage() {
   const [threeFailed, setThreeFailed] = useState(false);
   const [threeFailureReason, setThreeFailureReason] =
     useState<ThreeRuntimeFailureReason | null>(null);
+  const [threeRecoveryAttempt, setThreeRecoveryAttempt] = useState(0);
   const [forceReduced3D, setForceReduced3D] = useState(false);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [activeAddTarget, setActiveAddTarget] = useState<{
@@ -61,17 +62,7 @@ export default function Constructor3DPage() {
 
   const handleThreeReady = useCallback(() => {
     setThreeFailureReason(null);
-  }, []);
-
-  const retryThreeScene = useCallback((reduced = false) => {
-    setForceReduced3D(reduced);
-    setSceneRenderMode("three");
-    setThreeFailureReason(null);
     setThreeFailed(false);
-  }, []);
-
-  const showBlueprintFallback = useCallback(() => {
-    setSceneRenderMode("svg");
   }, []);
 
   const {
@@ -147,6 +138,19 @@ export default function Constructor3DPage() {
     selectedFacadeMaterial,
     snapshot,
   } = useConstructorPageState();
+
+  const retryThreeScene = useCallback((reduced = false) => {
+    setForceReduced3D(reduced);
+    setSceneRenderMode("three");
+    setThreeFailureReason(null);
+    setThreeFailed(false);
+    setThreeRecoveryAttempt((attempt) => attempt + 1);
+  }, [setSceneRenderMode]);
+
+  const showBlueprintFallback = useCallback(() => {
+    setSceneRenderMode("svg");
+  }, [setSceneRenderMode]);
+
   const webglAvailable = webglDiagnostics.status === "available";
   const canRenderThree =
     sceneRenderMode === "three" && webglAvailable && !threeFailed;
@@ -257,6 +261,7 @@ export default function Constructor3DPage() {
     setActiveAddTarget(null);
     setThreeFailed(false);
     setThreeFailureReason(null);
+    setThreeRecoveryAttempt(0);
     setForceReduced3D(false);
     setResetDialogOpen(false);
   };
@@ -541,6 +546,7 @@ export default function Constructor3DPage() {
                     input={threeInput}
                     viewMode={sceneViewMode}
                     quality={threeQuality}
+                    recoveryKey={threeRecoveryAttempt}
                     fallback={<ThreeSceneLoading quality={threeQuality} />}
                     onError={handleThreeRuntimeError}
                     onReady={handleThreeReady}

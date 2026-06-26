@@ -5,6 +5,7 @@ export class ThreeSceneBoundary extends Component<
     children: ReactNode;
     fallback: ReactNode;
     onError?: (error: Error, info: ErrorInfo) => void;
+    onRecovered?: () => void;
     resetKey?: string | number;
   },
   { hasError: boolean }
@@ -23,10 +24,12 @@ export class ThreeSceneBoundary extends Component<
     children: ReactNode;
     fallback: ReactNode;
     onError?: (error: Error, info: ErrorInfo) => void;
+    onRecovered?: () => void;
     resetKey?: string | number;
   }) {
     if (previousProps.resetKey !== this.props.resetKey && this.state.hasError) {
       this.setState({ hasError: false });
+      this.props.onRecovered?.();
     }
   }
 

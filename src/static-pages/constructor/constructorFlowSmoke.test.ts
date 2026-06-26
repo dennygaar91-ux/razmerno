@@ -247,6 +247,57 @@ test("constructor flow: switching WebGL fallback mode does not mutate committed 
   assert(after.handleless === before.handleless, "Fallback render mode must not mutate style state");
 });
 
+test("constructor flow: three runtime retry path only touches runtime UI state", () => {
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+  const retryMatch = pageSource.match(
+    /const retryThreeScene = useCallback\(\(reduced = false\) => \{([\s\S]*?)\}, \[setSceneRenderMode\]\);/,
+  );
+
+  assert(retryMatch, "Constructor3DPage should define retryThreeScene recovery callback");
+  const retryBody = retryMatch![1];
+  assert(retryBody.includes("setForceReduced3D"), "Retry should optionally switch reduced 3D quality");
+  assert(retryBody.includes('setSceneRenderMode("three")'), "Retry should re-enable three render mode");
+  assert(retryBody.includes("setThreeFailureReason(null)"), "Retry should clear failure reason");
+  assert(retryBody.includes("setThreeFailed(false)"), "Retry should clear failure flag");
+  assert(retryBody.includes("setThreeRecoveryAttempt"), "Retry should bump recovery remount key");
+  assert(!retryBody.includes("setWidth"), "Retry must not mutate width");
+  assert(!retryBody.includes("setMaterial"), "Retry must not mutate material");
+  assert(!retryBody.includes("canonicalState"), "Retry must not touch committed canonical state");
+});
+
+test("constructor flow: three runtime failure handlers do not mutate committed constructor domain state", () => {
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+  const errorMatch = pageSource.match(
+    /const handleThreeRuntimeError = useCallback\(\s*\(reason\?: ThreeRuntimeFailureReason\) => \{([\s\S]*?)\},\s*\[\],\s*\);/,
+  );
+  const readyMatch = pageSource.match(
+    /const handleThreeReady = useCallback\(\(\) => \{([\s\S]*?)\}, \[\]\);/,
+  );
+
+  assert(errorMatch, "Constructor3DPage should define handleThreeRuntimeError");
+  assert(readyMatch, "Constructor3DPage should define handleThreeReady");
+  const errorBody = errorMatch![1];
+  const readyBody = readyMatch![1];
+  assert(errorBody.includes("setThreeFailed(true)"), "Runtime error should mark three as failed");
+  assert(errorBody.includes("setThreeFailureReason"), "Runtime error should record failure reason");
+  assert(!errorBody.includes("setWidth"), "Runtime error must not mutate width");
+  assert(!errorBody.includes("setSections"), "Runtime error must not mutate sections");
+  assert(readyBody.includes("setThreeFailed(false)"), "Ready should clear runtime failure");
+  assert(!readyBody.includes("setMaterial"), "Ready must not mutate material");
+
+  const store = useConstructorStore.getState();
+  store.reset();
+  store.setWidth(1980);
+  store.setSections(4);
+  store.setMaterial("graphite");
+  const before = createSnapshot();
+  store.setSceneRenderMode("three");
+  const after = createSnapshot();
+  assert(after.width === before.width, "Three render mode preference must not mutate width");
+  assert(after.sections === before.sections, "Three render mode preference must not mutate sections");
+  assert(after.material === before.material, "Three render mode preference must not mutate material");
+});
+
 test("constructor flow: checkout snapshot creates production-safe order payload", () => {
   prepareSubmitReadyState();
   const snapshot = createSnapshot();

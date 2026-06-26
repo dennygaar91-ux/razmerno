@@ -134,6 +134,8 @@ function ThreeCanvasRuntimeGuard({
     onReady?.();
     const canvas = gl.domElement;
     const handleContextLost = (event: Event) => {
+      // preventDefault keeps the browser context restorable, but recovery is explicit
+      // via 2D fallback + retryThreeScene — no webglcontextrestored auto-remount.
       event.preventDefault();
       onContextLost?.();
     };
