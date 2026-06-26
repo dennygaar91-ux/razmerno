@@ -142,6 +142,7 @@ Committed evidence note:
 - Current schema has no persisted source/fallback attribution field, so admin wording remains limited to safe semantics such as `final server snapshot` and `source attribution not persisted`.
 - `P0-03` remains open: pricing formulas were not changed, parity closure still depends on `P0-13`, GitHub QA/main verification and remaining source/fallback evidence.
 - QA note for `799b6f89`: local task evidence covered checkout pricing persistence tests and typecheck, but `typecheck:api` is `not verified` in this backlog note due the Windows/glob issue called out in the implementation report.
+- `338976f3` (`test: add pricing parity evidence pack`) adds branch-only parity evidence in `tests/checkout-submit-hook.test.ts` and `tests/admin-order-summary.test.ts` for stored snapshot recompute, delivery/assembly matrix persistence, material-aware snapshot paths and admin stored-snapshot semantics. `P0-03` remains open; GitHub QA/main verification `not verified`.
 
 Объём: M. Зависимости: price sources, delivery, assembly, P0-13. Независимо: частично.
 
@@ -163,6 +164,11 @@ Reconciliation note: contract-scope закрыт через P0-11/P0-12. Ост�
 
 Риск: пользователь видит сломанный продукт.
 
+Committed evidence note:
+
+- `d3f4eb06` (`feat: harden Three.js runtime recovery`) adds branch-only runtime recovery hardening in `Constructor3DPage.tsx`, `LazyThreeFurnitureViewer.tsx`, `ThreeSceneBoundary.tsx` and `ThreeFurnitureViewer.tsx`: explicit recovery reasons (`three-boundary-error`, `three-load-timeout`, `three-context-lost`), `recoveryKey` remount on retry, load-timeout cancel on ready, boundary reset via `resetKey`, context-lost fallback without `webglcontextrestored` auto-remount.
+- Local QA evidence: `test:constructor-flow`, `test:constructor-three-safety`, `typecheck` — pass on branch; GitHub QA/main verification `not verified`; visual review and browser E2E for recovery paths `not verified`.
+
 Объём: XL. Зависимости: scene adapter, state model. Независимо: нет.
 
 ### P0-06 WebGL / 2D Fallback
@@ -172,6 +178,11 @@ Reconciliation note: contract-scope закрыт через P0-11/P0-12. Ост�
 Зачем: пользователь должен продолжить настройку, если WebGL недоступен.
 
 Риск: часть пользователей не сможет отправить заявку.
+
+Committed evidence note:
+
+- `d3f4eb06` (`feat: harden Three.js runtime recovery`) keeps full 2D fallback (`TwoDFallbackScene`) on boundary/timeout/context-lost failures; retry path clears runtime failure flags and remounts Three.js without mutating committed constructor domain state (covered by `constructorFlowSmoke.test.ts` and `threeSceneSafety.test.ts`).
+- `P0-06` remains open: existing WebGL fallback E2E (`tests/browser/webgl-fallback.spec.ts`) was not re-run; browser E2E alignment for new recovery contract `not verified`; GitHub QA/main verification `not verified`.
 
 Объём: M. Зависимости: P0-05. Независимо: нет.
 
@@ -299,6 +310,7 @@ Committed evidence note:
 - `b433fa2e` (`fix: align admin pricing with stored snapshot`) adds committed runtime evidence that admin list/detail use stored server-owned order snapshot fields and safe wording when source attribution is unavailable.
 - Source/fallback attribution is still not persisted in schema, so parity evidence may only claim `source attribution not persisted`, not a stronger source/fallback label.
 - `P0-13` still stays open until material-aware parity, delivery/assembly matrix coverage, quote/order/stored snapshot parity, admin summary parity, GitHub QA success and main verification are all satisfied together.
+- `338976f3` (`test: add pricing parity evidence pack`) adds branch-only evidence in `tests/checkout-submit-hook.test.ts`: stored order snapshot parity for normal order flow, delivery/assembly matrix server recompute, material-aware body/facade snapshot paths; and in `tests/admin-order-summary.test.ts`: admin stored-snapshot parity end-to-end plus local/demo fallback guard. Pricing formulas unchanged; GitHub QA/main verification `not verified`; `P0-13` remains open.
 
 Объём: L. Зависимости: P0-03, pricing sources, client/server parity fixtures.
 
@@ -1226,6 +1238,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Acceptance summary: error boundary, loading state, camera reset, reduced-quality path and fallback UX verified without weakening existing WebGL fallback E2E.
 - Suggested agent: 06 Three.js / Visualization Agent
 - Accepted decisions note: fallback must remain a полноценный SVG/2D mode, not a degraded pseudo-preview.
+- Committed evidence note: `d3f4eb06` (`feat: harden Three.js runtime recovery`) adds branch-only recovery contract — boundary error, load timeout and WebGL context lost map to full 2D fallback; explicit retry remount via `threeRecoveryAttempt`/`recoveryKey`; recovery handlers do not mutate committed constructor snapshot fields. Local tests: `constructorFlowSmoke.test.ts`, `threeSceneSafety.test.ts`. Status remains `open`: camera reset, reduced-quality UX verification, visual review and browser E2E (`tests/browser/webgl-fallback.spec.ts`) `not verified`; GitHub QA/main verification `not verified`.
 
 #### M8-P0-04 — Notification failure policy
 - Status: closed with evidence
