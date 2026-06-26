@@ -78,3 +78,36 @@ test("three runtime recovery: successful ready clears runtime failure flags", ()
   assert.ok(page.includes("setThreeFailed(false)"));
   assert.ok(page.includes("setThreeFailureReason(null)"));
 });
+
+test("three reduced-quality: fallback CTA activates reduced mode through retryThreeScene(true)", () => {
+  const page = read("src/static-pages/Constructor3DPage.tsx");
+  const qualityHook = read("src/static-pages/constructor/three/useThreeSceneQuality.ts");
+
+  assert.ok(page.includes("onUseReducedModel={() => retryThreeScene(true)}"));
+  assert.ok(page.includes("setForceReduced3D(reduced)"));
+  assert.ok(page.includes('forceReduced3D ? "reduced" : detectedThreeQuality'));
+  assert.ok(qualityHook.includes('export type ThreeSceneQuality = "standard" | "reduced"'));
+  assert.ok(qualityHook.includes("shouldUseReducedQuality"));
+});
+
+test("three reduced-quality: WebGL-available path still mounts LazyThreeFurnitureViewer", () => {
+  const page = read("src/static-pages/Constructor3DPage.tsx");
+  const viewer = read("src/static-pages/constructor/three/ThreeFurnitureViewer.tsx");
+
+  assert.ok(page.includes('sceneRenderMode === "three" && webglAvailable && !threeFailed'));
+  assert.ok(page.includes("{canRenderThree ? ("));
+  assert.ok(page.includes("<LazyThreeFurnitureViewer"));
+  assert.ok(page.includes("quality={threeQuality}"));
+  assert.ok(viewer.includes('quality === "reduced"'));
+  assert.ok(viewer.includes("shadows={!isReduced}"));
+});
+
+test("three reduced-quality: reduced 3D failure still keeps full 2D fallback with retry actions", () => {
+  const page = read("src/static-pages/Constructor3DPage.tsx");
+
+  assert.ok(page.includes("<TwoDFallbackScene"));
+  assert.ok(page.includes("onRetry3D={() => retryThreeScene(false)}"));
+  assert.ok(page.includes("onUseReducedModel={() => retryThreeScene(true)}"));
+  assert.ok(page.includes("handleThreeRuntimeError"));
+  assert.ok(page.includes(") : ("));
+});

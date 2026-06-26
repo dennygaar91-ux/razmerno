@@ -263,6 +263,52 @@ test("constructor flow: three runtime retry path only touches runtime UI state",
   assert(!retryBody.includes("setWidth"), "Retry must not mutate width");
   assert(!retryBody.includes("setMaterial"), "Retry must not mutate material");
   assert(!retryBody.includes("canonicalState"), "Retry must not touch committed canonical state");
+  assert(retryBody.includes("setForceReduced3D(reduced)"), "Retry should pass reduced flag into page-local quality override");
+});
+
+test("constructor flow: reduced-quality activation keeps runtime override in page state only", () => {
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+
+  assert(
+    pageSource.includes("const [forceReduced3D, setForceReduced3D] = useState(false)"),
+    "Reduced-quality override should stay in Constructor3DPage runtime state",
+  );
+  assert(
+    pageSource.includes('const threeQuality = forceReduced3D ? "reduced" : detectedThreeQuality'),
+    "Reduced-quality retry should override detected quality without a new quality model",
+  );
+  assert(
+    pageSource.includes("onUseReducedModel={() => retryThreeScene(true)}"),
+    "2D fallback should activate reduced 3D through the existing retry path",
+  );
+  const valuesBlock = pageSource.match(/values:\s*\{([\s\S]*?)\},\s*actions:/)?.[1] ?? "";
+  assert(
+    !valuesBlock.includes("forceReduced3D"),
+    "Constructor store values must not own forceReduced3D",
+  );
+
+  const store = useConstructorStore.getState();
+  store.reset();
+  store.setWidth(2010);
+  store.setHeight(2360);
+  store.setDepth(620);
+  store.setSections(3);
+  store.setCompartments(2);
+  store.setMaterial("graphite");
+  store.setFacadeMaterial("mdf-egger-r010-seryy-grafitovyy-ms");
+  store.setHandleless(true);
+
+  const before = createSnapshot();
+  store.setSceneRenderMode("three");
+  const after = createSnapshot();
+
+  assert(after.width === before.width, "Reduced-quality retry store touch must not mutate width");
+  assert(after.height === before.height, "Reduced-quality retry store touch must not mutate height");
+  assert(after.depth === before.depth, "Reduced-quality retry store touch must not mutate depth");
+  assert(after.sections === before.sections, "Reduced-quality retry store touch must not mutate sections");
+  assert(after.compartments === before.compartments, "Reduced-quality retry store touch must not mutate compartments");
+  assert(after.material === before.material, "Reduced-quality retry store touch must not mutate body material");
+  assert(after.handleless === before.handleless, "Reduced-quality retry store touch must not mutate style state");
 });
 
 test("constructor flow: three runtime failure handlers do not mutate committed constructor domain state", () => {
