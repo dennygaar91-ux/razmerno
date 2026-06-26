@@ -88,6 +88,30 @@ function createSnapshot(): ConstructorSnapshot {
   };
 }
 
+function prepareSubmitReadyState() {
+  useConstructorStore.getState().reset();
+  useConstructorStore.getState().setWidth(2100);
+  useConstructorStore.getState().setHeight(2450);
+  useConstructorStore.getState().setDepth(650);
+  useConstructorStore.getState().setStep("fill");
+  useConstructorStore.getState().setSections(4);
+  useConstructorStore.getState().setCompartments(3);
+  useConstructorStore.getState().setFill("drawers");
+  useConstructorStore.getState().setHandleless(true);
+  useConstructorStore.getState().setStep("materials");
+  useConstructorStore.getState().setMaterial("graphite");
+  useConstructorStore.getState().setStep("checkout");
+  useConstructorStore.getState().setDeliveryEnabled(true);
+  useConstructorStore.getState().setDeliveryAddress("РњРѕСЃРєРІР°, РІ РїСЂРµРґРµР»Р°С… РњРљРђР”");
+  useConstructorStore.getState().setContact({
+    name: "РРІР°РЅ",
+    phone: "+7 (999) 111-22-33",
+    email: "ivan@example.ru",
+    company: "",
+  });
+  useConstructorStore.getState().setConsent(true);
+}
+
 test("constructor flow: step order stays sizes -> fill -> materials -> checkout", () => {
   assert(stepOrder.join(" > ") === "sizes > fill > materials > checkout", "Unexpected constructor step order");
 });
@@ -128,7 +152,28 @@ test("constructor flow: SceneRuntimeStatus uses actual active runtime render mod
     pageSource.includes('renderMode={sceneRenderMode === "three" ? "three" : "blueprint"}') === false,
     "SceneRuntimeStatus must not derive renderMode from preferred sceneRenderMode only",
   );
-  });
+});
+
+test("constructor flow: submit success keeps model/configuration and does not reset store state", () => {
+  const submitHookSource = readFileSync(new URL("./hooks/useConstructorSubmit.ts", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+
+  assert(
+    submitHookSource.includes("if (result.ok) {\n      setSubmitStatus(\"success\");"),
+    "useConstructorSubmit should keep an explicit success branch",
+  );
+  assert(
+    submitHookSource.includes("onDraftSave();\n      return;"),
+    "Successful submit should save draft state and return without reset side effects",
+  );
+  assert(
+    submitHookSource.includes("useConstructorStore.getState().reset()") === false,
+    "Submit success must not reset constructor store",
+  );
+  assert(
+    submitHookSource.includes(".reset();") === false,
+    "Submit success path must not call a reset helper",
+  );
+});
 
 test("constructor flow: user can move through base wizard and keep configuration", () => {
   const store = useConstructorStore.getState();
@@ -176,15 +221,42 @@ test("constructor flow: user can move through base wizard and keep configuration
   assert(snapshot.consent === true, "Consent should be true for submit-ready state");
 });
 
+test("constructor flow: switching WebGL fallback mode does not mutate committed constructor domain state", () => {
+  const store = useConstructorStore.getState();
+  store.reset();
+  store.setWidth(2050);
+  store.setHeight(2500);
+  store.setDepth(650);
+  store.setSections(3);
+  store.setCompartments(2);
+  store.setMaterial("graphite");
+  store.setFacadeMaterial("mdf-egger-r010-seryy-grafitovyy-ms");
+  store.setHandleless(true);
+
+  const before = createSnapshot();
+  store.setSceneRenderMode("svg");
+  store.setSceneViewMode("front");
+  const after = createSnapshot();
+
+  assert(after.width === before.width, "Fallback render mode must not mutate width");
+  assert(after.height === before.height, "Fallback render mode must not mutate height");
+  assert(after.depth === before.depth, "Fallback render mode must not mutate depth");
+  assert(after.sections === before.sections, "Fallback render mode must not mutate sections");
+  assert(after.compartments === before.compartments, "Fallback render mode must not mutate compartments");
+  assert(after.material === before.material, "Fallback render mode must not mutate body material");
+  assert(after.handleless === before.handleless, "Fallback render mode must not mutate style state");
+});
+
 test("constructor flow: checkout snapshot creates production-safe order payload", () => {
+  prepareSubmitReadyState();
   const snapshot = createSnapshot();
   const payload = buildOrderPayloadFromConstructor(snapshot, quote, {
     source: "constructor-flow-smoke",
   });
 
-  assert(payload.customer.name === "Иван", "Order payload should include customer name");
-  assert(payload.customer.phone === "+7 (999) 111-22-33", "Order payload should include customer phone");
-  assert(payload.customer.email === "ivan@example.ru", "Order payload should include customer email");
+  assert(payload.customer.name === snapshot.contact.name, "Order payload should include committed customer name");
+  assert(payload.customer.phone === snapshot.contact.phone, "Order payload should include committed customer phone");
+  assert(payload.customer.email === snapshot.contact.email, "Order payload should include committed customer email");
   assert(payload.productType === "wardrobe", "Order payload should use wardrobe product type");
   assert(payload.dimensions.width === 2100, "Order payload should keep width");
   assert(payload.filling.drawers === 4, "Drawers should follow sections for drawer filling");
@@ -197,6 +269,7 @@ test("constructor flow: checkout snapshot creates production-safe order payload"
 });
 
 test("constructor flow: draft from checkout snapshot excludes PII", () => {
+  prepareSubmitReadyState();
   const snapshot = createSnapshot();
   const draft = buildConstructorDraft(snapshot);
   const draftText = JSON.stringify(draft);
