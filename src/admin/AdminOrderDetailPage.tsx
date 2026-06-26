@@ -90,8 +90,11 @@ export function AdminOrderDetailPage({
         <DetailRow label="Сумма" value={summary.totalPrice} />
         <DetailRow label="Pricing status" value={summary.pricingLabel} />
         <DetailRow label="Pricing source" value={summary.pricingSource} />
+        <DetailRow label="Pricing snapshot" value={summary.pricingSnapshotSummary} />
+        <DetailRow label="Pricing breakdown" value={summary.priceBreakdownSummary} />
         <DetailRow label="Доставка" value={summary.deliverySummary} />
         <DetailRow label="Сборка" value={summary.assemblySummary} />
+        <DetailRow label="Assembly base" value={summary.assemblyBasePriceSummary} />
       </div>
 
       <div className="rzm-card p-4 md:p-5">

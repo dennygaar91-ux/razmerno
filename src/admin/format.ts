@@ -14,6 +14,7 @@ export function formatDate(value: string | null): string {
 
 export function mapApiOrder(order: AdminApiOrder): AdminOrderRow {
   const dimensions = parseDimensionsFromProduct(order.product);
+  const breakdownKeys = Object.keys(order.priceBreakdown ?? {});
 
   return {
     id: order.id,
@@ -25,12 +26,17 @@ export function mapApiOrder(order: AdminApiOrder): AdminOrderRow {
     productType: parseProductTypeLabel(order.product),
     dimensions,
     materialsSummary: "not available in current admin payload",
-    pricingLabel: "final server snapshot",
-    pricingSource: "server-stored order total",
+    pricingLabel: order.pricing.status,
+    pricingSource: order.pricing.source,
+    pricingSnapshotSummary: "persisted total/delivery/assembly from stored order snapshot",
+    priceBreakdownSummary: breakdownKeys.length > 0
+      ? `stored breakdown keys: ${breakdownKeys.join(", ")}`
+      : "stored breakdown not available in current admin payload",
     total: formatPrice(order.totalPrice),
     createdAt: formatDate(order.createdAt),
     delivery: order.delivery.enabled ? `${formatPrice(order.delivery.price)} · ${order.delivery.addressMasked ?? "адрес скрыт"}` : "нет",
     assembly: order.assembly.enabled ? formatPrice(order.assembly.price) : "нет",
+    assemblyBasePrice: order.assembly.basePrice === null ? undefined : formatPrice(order.assembly.basePrice),
     managerEmail: order.email.manager,
     customerEmail: order.email.customer,
     production: `${order.production.status} · W${order.production.warnings}/R${order.production.rejects}/A${order.production.repairs} · rev.${order.production.revision}`,

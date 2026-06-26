@@ -15,8 +15,11 @@ export type AdminOrderDetailSummary = {
   totalPrice: string;
   pricingLabel: string;
   pricingSource: string;
+  pricingSnapshotSummary: string;
+  priceBreakdownSummary: string;
   deliverySummary: string;
   assemblySummary: string;
+  assemblyBasePriceSummary: string;
   productionReviewStatus: string;
   basisStatus: string;
   validationErrorsCount: number;
@@ -26,6 +29,7 @@ export type AdminOrderDetailSummary = {
 const DIMENSIONS_PATTERN = /(\d+)\s*[\u00D7x]\s*(\d+)\s*[\u00D7x]\s*(\d+)/u;
 const MATERIALS_NOT_AVAILABLE = "not available in current admin payload";
 const PRICING_NOT_VERIFIED = "pricing source not verified";
+const PRICING_SNAPSHOT_NOT_AVAILABLE = "pricing snapshot details not available";
 const BASIS_NOT_VERIFIED = "not verified";
 const BASIS_MANUAL_REVIEW = "manual review required";
 
@@ -130,8 +134,11 @@ export function summarizeOrderForAdmin(
     totalPrice: order.total,
     pricingLabel: order.pricingLabel ?? "demo / not verified",
     pricingSource: order.pricingSource ?? PRICING_NOT_VERIFIED,
+    pricingSnapshotSummary: order.pricingSnapshotSummary ?? PRICING_SNAPSHOT_NOT_AVAILABLE,
+    priceBreakdownSummary: order.priceBreakdownSummary ?? "stored breakdown not available in current admin payload",
     deliverySummary: order.delivery,
     assemblySummary: order.assembly,
+    assemblyBasePriceSummary: order.assemblyBasePrice ?? "not available in current admin payload",
     ...production,
   };
 }

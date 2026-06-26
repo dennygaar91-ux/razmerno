@@ -29,10 +29,13 @@ const DEMO_ORDERS: AdminOrderRow[] = [
     materialsSummary: "not available in current admin payload",
     pricingLabel: "demo / not verified",
     pricingSource: "pricing source not verified",
+    pricingSnapshotSummary: "pricing snapshot details not available",
+    priceBreakdownSummary: "stored breakdown not available in current admin payload",
     total: "86 400 ₽",
     createdAt: "demo",
     delivery: "МКАД",
     assembly: "да",
+    assemblyBasePrice: "not available in current admin payload",
     managerEmail: "demo",
     customerEmail: "demo",
     production: "requires-review · W0/R0/A0 · rev.1",
@@ -285,8 +288,8 @@ function AdminOrdersDashboard({
               <p className="mt-2 text-[13px] text-[var(--rzm-text-muted)]">Read-only detail для заявки {routeOrderId}.</p>
             )}
             <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[var(--rzm-text-muted)]">
-              Админка читает masked summary через server API. Финальная цена может считаться authoritative только для строк с
-              пометкой final server snapshot; demo и fallback остаются not verified.
+              Админка читает masked summary через server API. Для API-строк финальной считается только persisted server snapshot; source attribution
+              отдельно не хранится в текущей схеме и показывается как not persisted.
             </p>
           </div>
           <div className="flex gap-2">
@@ -397,6 +400,7 @@ function AdminOrdersDashboard({
                       <div>{order.total}</div>
                       <div className="mt-1 text-[11px] text-[var(--rzm-text-muted)]">{order.pricingLabel ?? "demo / not verified"}</div>
                       <div className="text-[11px] text-[var(--rzm-text-muted)]">{order.pricingSource ?? "pricing source not verified"}</div>
+                      <div className="text-[11px] text-[var(--rzm-text-muted)]">{order.pricingSnapshotSummary ?? "pricing snapshot details not available"}</div>
                     </Td>
                     <Td>{order.createdAt}</Td>
                   </tr>

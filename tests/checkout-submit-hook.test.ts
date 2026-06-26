@@ -1022,11 +1022,18 @@ test("Supabase read/status repository contracts map admin rows and status transi
     product_type: "wardrobe",
     dimensions: { width: 1800, height: 2200, depth: 600 },
     total_price: 79_800,
+    price_breakdown: {
+      body: 10_000,
+      facades: 20_000,
+      delivery: 6_000,
+      assembly: 7_980,
+    },
     delivery_enabled: true,
     delivery_price: 6000,
     delivery_address: "Москва, ул. Тверская, 1",
     assembly_enabled: true,
     assembly_price: 7980,
+    assembly_base_price: 71_820,
     customer_name: "Иван Петров",
     customer_phone: "+7 999 111-22-33",
     customer_email: "client@example.com",
@@ -1045,6 +1052,15 @@ test("Supabase read/status repository contracts map admin rows and status transi
   assert.equal(row.customer.emailMasked, "c***@example.com");
   assert.equal(row.email.manager, "sent");
   assert.equal(row.email.customer, "failed");
+  assert.deepEqual(row.priceBreakdown, {
+    body: 10_000,
+    facades: 20_000,
+    delivery: 6_000,
+    assembly: 7_980,
+  });
+  assert.equal(row.assembly.basePrice, 71_820);
+  assert.equal(row.pricing.status, "final server snapshot");
+  assert.equal(row.pricing.source, "source attribution not persisted");
   assert.equal(row.production.warnings, 1);
   assert.equal(row.production.repairs, 1);
   assert.equal(row.production.revision, 2);

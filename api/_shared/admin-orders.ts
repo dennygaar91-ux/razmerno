@@ -6,6 +6,7 @@ export type AdminOrderSummary = {
   createdAt: string | null
   product: string
   totalPrice: number
+  priceBreakdown: Record<string, number> | null
   delivery: {
     enabled: boolean
     price: number
@@ -14,6 +15,11 @@ export type AdminOrderSummary = {
   assembly: {
     enabled: boolean
     price: number
+    basePrice: number | null
+  }
+  pricing: {
+    status: 'final server snapshot'
+    source: 'source attribution not persisted'
   }
   customer: {
     nameMasked: string
@@ -41,11 +47,13 @@ type OrderDbRow = {
   product_type: string | null
   dimensions: { width?: number; height?: number; depth?: number } | null
   total_price: number | null
+  price_breakdown: Record<string, number> | null
   delivery_enabled: boolean | null
   delivery_price: number | null
   delivery_address: string | null
   assembly_enabled: boolean | null
   assembly_price: number | null
+  assembly_base_price: number | null
   customer_name: string | null
   customer_phone: string | null
   customer_email: string | null
@@ -93,7 +101,6 @@ function maskAddress(value: string | null): string | null {
   if (clean.toLowerCase().includes('мкад')) return 'Адрес за МКАД скрыт'
   return 'Адрес скрыт'
 }
-
 
 function productionSummary(value: unknown): AdminOrderSummary['production'] {
   const fallback = {
@@ -148,6 +155,7 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
     createdAt: row.created_at ?? null,
     product: productLabel(row),
     totalPrice: row.total_price ?? 0,
+    priceBreakdown: row.price_breakdown ?? null,
     delivery: {
       enabled: row.delivery_enabled === true,
       price: row.delivery_price ?? 0,
@@ -156,6 +164,11 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
     assembly: {
       enabled: row.assembly_enabled === true,
       price: row.assembly_price ?? 0,
+      basePrice: row.assembly_base_price ?? null,
+    },
+    pricing: {
+      status: 'final server snapshot',
+      source: 'source attribution not persisted',
     },
     customer: {
       nameMasked: maskName(row.customer_name),
@@ -175,7 +188,7 @@ export async function listAdminOrders(limit = 50): Promise<AdminOrderSummary[]> 
 
   const { data, error } = await supabase
     .from('orders')
-    .select('order_id,status,created_at,product_type,dimensions,total_price,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export')
+    .select('order_id,status,created_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export')
     .order('created_at', { ascending: false })
     .limit(Math.min(Math.max(limit, 1), 100))
 
@@ -183,8 +196,6 @@ export async function listAdminOrders(limit = 50): Promise<AdminOrderSummary[]> 
 
   return (data ?? []).map((row) => mapOrderRow(row as OrderDbRow))
 }
-
-
 
 export type AdminProductionDetail = {
   orderId: string
@@ -235,7 +246,6 @@ export async function updateAdminOrderStatus(orderId: string, status: AdminOrder
   if (auditError) throw new Error(auditError.message)
 }
 
-
 export type AdminStatusEvent = {
   id: number
   orderId: string
@@ -278,7 +288,6 @@ export async function listAdminStatusEvents(limit = 50): Promise<AdminStatusEven
 
   return (data ?? []).map((row) => mapStatusEvent(row as OrderStatusEventRow))
 }
-
 
 export async function getAdminProductionDetail(orderId: string): Promise<AdminProductionDetail> {
   const supabase = getSupabaseAdminClient()
