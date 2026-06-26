@@ -311,6 +311,38 @@ test("constructor flow: reduced-quality activation keeps runtime override in pag
   assert(after.handleless === before.handleless, "Reduced-quality retry store touch must not mutate style state");
 });
 
+test("constructor flow: scene view mode changes do not mutate committed constructor domain state", () => {
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+
+  assert(
+    pageSource.includes("onClick={() => setSceneViewMode(mode)}"),
+    "Constructor3DPage should reframe the scene through store-owned sceneViewMode",
+  );
+
+  const store = useConstructorStore.getState();
+  store.reset();
+  store.setWidth(1980);
+  store.setHeight(2420);
+  store.setDepth(640);
+  store.setSections(4);
+  store.setCompartments(3);
+  store.setMaterial("graphite");
+  store.setHandleless(true);
+
+  const before = createSnapshot();
+  store.setSceneViewMode("front");
+  store.setSceneViewMode("side");
+  store.setSceneViewMode("top");
+  const after = createSnapshot();
+
+  assert(!("sceneViewMode" in before), "Committed snapshot must not include UI-only scene view mode");
+  assert(after.width === before.width, "Scene view mode must not mutate width");
+  assert(after.height === before.height, "Scene view mode must not mutate height");
+  assert(after.depth === before.depth, "Scene view mode must not mutate depth");
+  assert(after.sections === before.sections, "Scene view mode must not mutate sections");
+  assert(after.material === before.material, "Scene view mode must not mutate material");
+});
+
 test("constructor flow: three runtime failure handlers do not mutate committed constructor domain state", () => {
   const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
   const errorMatch = pageSource.match(

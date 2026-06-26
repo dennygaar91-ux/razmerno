@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { getCameraPosition, getOrbitTarget } from "./threeCamera";
 
 function read(file: string) {
   return readFileSync(file, "utf8");
@@ -110,4 +111,67 @@ test("three reduced-quality: reduced 3D failure still keeps full 2D fallback wit
   assert.ok(page.includes("onUseReducedModel={() => retryThreeScene(true)}"));
   assert.ok(page.includes("handleThreeRuntimeError"));
   assert.ok(page.includes(") : ("));
+});
+
+test("three camera framing: same dimensions and view mode produce deterministic camera pose", () => {
+  const dimensions: [number, number, number] = [1.8, 2.4, 0.6];
+  const sceneMode = "fill" as const;
+
+  const positionA = getCameraPosition("front", dimensions, sceneMode);
+  const positionB = getCameraPosition("front", dimensions, sceneMode);
+  const targetA = getOrbitTarget(dimensions, sceneMode);
+  const targetB = getOrbitTarget(dimensions, sceneMode);
+
+  assert.deepEqual(positionA, positionB);
+  assert.deepEqual(targetA, targetB);
+});
+
+test("three camera framing: dimension changes shift camera pose predictably", () => {
+  const compact: [number, number, number] = [1.2, 2.0, 0.5];
+  const enlarged: [number, number, number] = [2.4, 2.8, 0.8];
+  const sceneMode = "fill" as const;
+
+  const compactPosition = getCameraPosition("free", compact, sceneMode);
+  const enlargedPosition = getCameraPosition("free", enlarged, sceneMode);
+  const compactTarget = getOrbitTarget(compact, sceneMode);
+  const enlargedTarget = getOrbitTarget(enlarged, sceneMode);
+
+  assert.notDeepEqual(compactPosition, enlargedPosition);
+  assert.notDeepEqual(compactTarget, enlargedTarget);
+  assert.ok(enlargedPosition[1] > compactPosition[1], "camera height should follow model height");
+  assert.ok(enlargedTarget[1] > compactTarget[1], "orbit target height should follow model height");
+});
+
+test("three camera framing: view mode changes reframe without a separate reset hook", () => {
+  const dimensions: [number, number, number] = [1.8, 2.4, 0.6];
+  const sceneMode = "sizes" as const;
+  const viewModes = ["free", "front", "side", "top"] as const;
+  const positions = viewModes.map((viewMode) => getCameraPosition(viewMode, dimensions, sceneMode));
+
+  assert.equal(new Set(positions.map((position) => position.join(","))).size, viewModes.length);
+});
+
+test("three camera framing: viewer uses canonical model dimensions for camera pose", () => {
+  const page = read("src/static-pages/Constructor3DPage.tsx");
+  const viewer = read("src/static-pages/constructor/three/ThreeFurnitureViewer.tsx");
+  const adapter = read("src/static-pages/constructor/three/threeSceneAdapter.ts");
+
+  assert.ok(page.includes("widthMm: canonicalState.dimensions.widthMm"));
+  assert.ok(page.includes("heightMm: canonicalState.dimensions.heightMm"));
+  assert.ok(page.includes("depthMm: canonicalState.dimensions.depthMm"));
+  assert.ok(viewer.includes("getCameraPosition(viewMode, model.dimensions, sceneMode)"));
+  assert.ok(viewer.includes("getOrbitTarget(model.dimensions, sceneMode)"));
+  assert.ok(adapter.includes("dimensions: [width, height, depth]"));
+  assert.ok(!page.includes("widthMm: width,"));
+  assert.ok(!page.includes("heightMm: height,"));
+  assert.ok(!page.includes("depthMm: depth,"));
+});
+
+test("three camera framing: explicit runtime reset hook is not present", () => {
+  const page = read("src/static-pages/Constructor3DPage.tsx");
+  const viewer = read("src/static-pages/constructor/three/ThreeFurnitureViewer.tsx");
+
+  assert.ok(page.includes("setSceneViewMode(mode)"));
+  assert.ok(!page.match(/resetCamera|cameraReset|reset.*camera/i));
+  assert.ok(!viewer.match(/resetCamera|cameraReset|reset.*camera/i));
 });
