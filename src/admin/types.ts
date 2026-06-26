@@ -5,6 +5,11 @@ export type AdminOrderRow = {
   phone: string;
   email: string;
   product: string;
+  productType?: string;
+  dimensions?: { widthMm: number; heightMm: number; depthMm: number };
+  materialsSummary?: string;
+  pricingLabel?: string;
+  pricingSource?: string;
   total: string;
   createdAt: string;
   delivery: string;

@@ -192,6 +192,7 @@
     "test:production-json-v4-edge-groove-policy": "node --no-warnings --import tsx tests/production-json-v4-edge-groove-policy.test.ts",
     "test:production-json-v4-facade-policy": "node --no-warnings --import tsx tests/production-json-v4-facade-policy.test.ts",
     "test:production-json-v4-support-policy": "node --no-warnings --import tsx tests/production-json-v4-support-policy.test.ts",
+    "test:admin-order-summary": "node --no-warnings --import tsx tests/admin-order-summary.test.ts",
     "qa:stage13": "npm run check:stage13-production-export && npm run test:production-export && npm run typecheck && npm run typecheck:api && npm run check:stage13-production-validation-report && npm run check:stage13-production-logic-final",
     "check:stage13-production-validation-report": "node scripts/check-stage13-production-validation-report.mjs",
     "check:stage13-production-logic-final": "node scripts/check-stage13-production-logic-final.mjs",

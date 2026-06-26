@@ -7,8 +7,8 @@ function pass(m){ console.log(`✓ ${m}`) }
 function read(rel){ return fs.readFileSync(path.join(root, rel), 'utf8') }
 
 for (const [rel,tokens] of [
-  ['src/admin/AdminOrderDetailPage.tsx',['AdminOrderDetailPage','Admin order detail','ProductionReviewPanel']],
-  ['src/admin/AdminOrdersPage.tsx',['AdminOrderDetailPage','routeOrderId && selectedProductionOrderId']]
+  ['src/admin/AdminOrderDetailPage.tsx',['AdminOrderDetailPage','Admin order detail','Read-only']],
+  ['src/admin/AdminOrdersPage.tsx',['AdminOrderDetailPage','routeOrderId','summarizeOrderForAdmin']]
 ]) {
   const file = path.join(root, rel)
   if (!fs.existsSync(file)) { fail(`${rel} missing`); continue }

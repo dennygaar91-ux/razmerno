@@ -1,9 +1,20 @@
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import type { AdminOrderRow, AdminStatusEventRow, AdminProductionDetail, ProductionReviewStatus } from "./types";
-import { ADMIN_SESSION_KEY, loginAdmin, fetchAdminOrders, updateOrderStatus, loadProductionDetail, updateProductionReview, ADMIN_STATUS_EVENTS_API_URL } from "./adminClient";
+import {
+  ADMIN_SESSION_KEY,
+  loginAdmin,
+  fetchAdminOrders,
+  updateOrderStatus,
+  loadProductionDetail,
+  updateProductionReview,
+  ADMIN_STATUS_EVENTS_API_URL,
+} from "./adminClient";
 import { formatDate, mapApiOrder } from "./format";
 import { ProductionReviewPanel } from "./ProductionReviewPanel";
 import { AdminOrderDetailPage } from "./AdminOrderDetailPage";
+import { summarizeOrderForAdmin } from "./orderSummary";
+import type { AdminOrderDetailSummary } from "./orderSummary";
 
 const DEMO_ORDERS: AdminOrderRow[] = [
   {
@@ -13,6 +24,11 @@ const DEMO_ORDERS: AdminOrderRow[] = [
     phone: "+7 *** ***-**-**",
     email: "e***@mail.ru",
     product: "Шкаф 1800×2400×600",
+    productType: "Шкаф",
+    dimensions: { widthMm: 1800, heightMm: 2400, depthMm: 600 },
+    materialsSummary: "not available in current admin payload",
+    pricingLabel: "demo / not verified",
+    pricingSource: "pricing source not verified",
     total: "86 400 ₽",
     createdAt: "demo",
     delivery: "МКАД",
@@ -32,18 +48,24 @@ export function AdminOrdersPage({ routePath = "/admin" }: { routePath?: string }
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const unlocked = token.trim().length > 0;
 
-  if (unlocked) return <AdminOrdersDashboard adminKey={token} routeOrderId={routeOrderId} onLogout={() => {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    setToken("");
-  }} />;
+  if (unlocked) {
+    return (
+      <AdminOrdersDashboard
+        adminKey={token}
+        routeOrderId={routeOrderId}
+        onLogout={() => {
+          sessionStorage.removeItem(ADMIN_SESSION_KEY);
+          setToken("");
+        }}
+      />
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-[var(--rzm-surface-canvas)] text-[var(--rzm-text-main)] grid place-items-center px-4">
-      <section className="w-full max-w-[480px] rzm-card p-5 md:p-6">
+    <main className="grid min-h-screen place-items-center bg-[var(--rzm-surface-canvas)] px-4 text-[var(--rzm-text-main)]">
+      <section className="rzm-card w-full max-w-[480px] p-5 md:p-6">
         <div className="eyebrow mb-4">Admin access</div>
-        <h1 className="font-display text-[30px] md:text-[38px] font-bold tracking-[-0.04em] leading-[1]">
-          Доступ к заявкам
-        </h1>
+        <h1 className="font-display text-[30px] font-bold leading-[1] tracking-[-0.04em] md:text-[38px]">Доступ к заявкам</h1>
         <p className="mt-3 text-[14px] leading-[1.55] text-[var(--rzm-text-muted)]">
           Введите admin-пароль. Проверка выполняется на сервере, после входа создаётся временная сессия.
         </p>
@@ -91,7 +113,15 @@ export function AdminOrdersPage({ routePath = "/admin" }: { routePath?: string }
   );
 }
 
-function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: string; routeOrderId: string | null; onLogout: () => void }) {
+function AdminOrdersDashboard({
+  adminKey,
+  routeOrderId,
+  onLogout,
+}: {
+  adminKey: string;
+  routeOrderId: string | null;
+  onLogout: () => void;
+}) {
   const [orders, setOrders] = useState<AdminOrderRow[]>(DEMO_ORDERS);
   const [source, setSource] = useState<"api" | "demo">("demo");
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +133,8 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
   const [productionNote, setProductionNote] = useState("Проверено вручную");
   const [productionStatus, setProductionStatus] = useState<ProductionReviewStatus>("requires-review");
   const [productionLoading, setProductionLoading] = useState(false);
+  const [detailSummary, setDetailSummary] = useState<AdminOrderDetailSummary | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   async function loadStatusEvents() {
     try {
@@ -111,7 +143,7 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
           Authorization: `Bearer ${adminKey}`,
         },
       });
-      const data = await response.json() as { ok?: boolean; events?: AdminStatusEventRow[]; message?: string };
+      const data = (await response.json()) as { ok?: boolean; events?: AdminStatusEventRow[]; message?: string };
       if (!response.ok || data.ok !== true) throw new Error(data.message || `HTTP ${response.status}`);
       setStatusEvents(data.events ?? []);
     } catch {
@@ -143,6 +175,49 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adminKey]);
 
+  useEffect(() => {
+    if (!routeOrderId) {
+      setDetailSummary(null);
+      return;
+    }
+
+    const activeOrderId = routeOrderId;
+    const order = orders.find((item) => item.id === activeOrderId) ?? null;
+    if (!order) {
+      setDetailSummary(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadDetail() {
+      const activeOrder = order!;
+      setDetailLoading(true);
+      try {
+        let nextProductionDetail: AdminProductionDetail | null = null;
+        if (source === "api") {
+          nextProductionDetail = await loadProductionDetail(adminKey, activeOrderId);
+        }
+        if (!cancelled) {
+          setDetailSummary(summarizeOrderForAdmin(activeOrder, nextProductionDetail));
+        }
+      } catch {
+        if (!cancelled) {
+          setDetailSummary(summarizeOrderForAdmin(activeOrder));
+        }
+      } finally {
+        if (!cancelled) {
+          setDetailLoading(false);
+        }
+      }
+    }
+
+    void loadDetail();
+    return () => {
+      cancelled = true;
+    };
+  }, [adminKey, orders, routeOrderId, source]);
+
   const totalOrders = orders.length;
   const inProgress = orders.filter((item) => item.status === "in_progress").length;
   const assemblyCount = orders.filter((item) => item.assembly !== "нет").length;
@@ -154,7 +229,7 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
 
     try {
       await updateOrderStatus(adminKey, orderId, status);
-      setOrders((current) => current.map((item) => item.id === orderId ? { ...item, status } : item));
+      setOrders((current) => current.map((item) => (item.id === orderId ? { ...item, status } : item)));
       await loadStatusEvents();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Не удалось обновить статус");
@@ -201,26 +276,29 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
 
   return (
     <main className="min-h-screen bg-[var(--rzm-surface-canvas)] text-[var(--rzm-text-main)]">
-      <section className="section-pad pt-24 md:pt-28 pb-16">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+      <section className="section-pad pb-16 pt-24 md:pt-28">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="eyebrow mb-4">Admin MVP</div>
             <h1 className="h-section">{routeOrderId ? "Детальная заявка" : "Мониторинг заявок"}</h1>
             {routeOrderId && (
-              <p className="mt-2 text-[13px] text-[var(--rzm-text-muted)]">
-                Открыта production-проверка по заявке {routeOrderId}.
-              </p>
+              <p className="mt-2 text-[13px] text-[var(--rzm-text-muted)]">Read-only detail для заявки {routeOrderId}.</p>
             )}
             <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[var(--rzm-text-muted)]">
-              Админка читает masked summary из Supabase через server API. Полные PII-данные не раскрываются в таблице.
+              Админка читает masked summary через server API. Финальная цена может считаться authoritative только для строк с
+              пометкой final server snapshot; demo и fallback остаются not verified.
             </p>
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={() => void loadOrders()} className="btn btn-outline focus-ring w-fit">
               Обновить
             </button>
-            <button type="button" onClick={onLogout} className="btn btn-outline focus-ring w-fit">Выйти</button>
-            <a href="/" className="btn btn-outline focus-ring w-fit">На лендинг</a>
+            <button type="button" onClick={onLogout} className="btn btn-outline focus-ring w-fit">
+              Выйти
+            </button>
+            <a href="/" className="btn btn-outline focus-ring w-fit">
+              На лендинг
+            </a>
           </div>
         </div>
 
@@ -230,8 +308,8 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
           </div>
         )}
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-3">
-          <Metric label="Источник" value={source === "api" ? "Supabase" : "Demo"} />
+        <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-4">
+          <Metric label="Источник" value={source === "api" ? "Server API" : "Demo"} />
           <Metric label="Заявки" value={String(totalOrders)} />
           <Metric label="В работе" value={String(inProgress)} />
           <Metric label="Сборка" value={`${assemblyCount}`} />
@@ -239,14 +317,14 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
         </div>
 
         <div className="mt-6 rzm-card overflow-hidden">
-          <div className="px-4 md:px-5 py-4 border-b border-[var(--rzm-line-soft)] flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="flex flex-col gap-3 border-b border-[var(--rzm-line-soft)] px-4 py-4 md:flex-row md:items-center md:justify-between md:px-5">
             <div>
               <div className="font-semibold">Последние заявки</div>
               <div className="mt-1 text-[13px] text-[var(--rzm-text-muted)]">
                 PII в списке маскируется по умолчанию. {isLoading ? "Загрузка..." : "Данные обновлены."}
               </div>
             </div>
-            <div className="rzm-chip">{source === "api" ? "Supabase connected" : "Demo fallback"}</div>
+            <div className="rzm-chip">{source === "api" ? "Server API connected" : "Demo fallback"}</div>
           </div>
 
           <div className="overflow-x-auto">
@@ -284,9 +362,7 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
                       {statusUpdatingId === order.id && (
                         <div className="mt-1 text-[11px] text-[var(--rzm-text-muted)]">Сохраняю...</div>
                       )}
-                      {source !== "api" && (
-                        <div className="mt-1 text-[11px] text-[var(--rzm-text-muted)]">demo readonly</div>
-                      )}
+                      {source !== "api" && <div className="mt-1 text-[11px] text-[var(--rzm-text-muted)]">demo readonly</div>}
                     </Td>
                     <Td>
                       <div className="font-medium">{order.customer}</div>
@@ -313,14 +389,15 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
                       >
                         Проверить
                       </button>
-                      <a
-                        href={`/admin/orders/${order.id}`}
-                        className="mt-2 ml-2 inline-flex btn btn-outline btn-sm focus-ring"
-                      >
+                      <a href={`/admin/orders/${order.id}`} className="ml-2 mt-2 inline-flex btn btn-outline btn-sm focus-ring">
                         Открыть detail
                       </a>
                     </Td>
-                    <Td mono>{order.total}</Td>
+                    <Td mono>
+                      <div>{order.total}</div>
+                      <div className="mt-1 text-[11px] text-[var(--rzm-text-muted)]">{order.pricingLabel ?? "demo / not verified"}</div>
+                      <div className="text-[11px] text-[var(--rzm-text-muted)]">{order.pricingSource ?? "pricing source not verified"}</div>
+                    </Td>
                     <Td>{order.createdAt}</Td>
                   </tr>
                 ))}
@@ -329,20 +406,13 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
           </div>
         </div>
 
-        {routeOrderId && selectedProductionOrderId ? (
+        {routeOrderId ? (
           <AdminOrderDetailPage
-            orderId={routeOrderId}
-            detail={productionDetail}
-            status={productionStatus}
-            note={productionNote}
-            loading={productionLoading}
-            onStatusChange={setProductionStatus}
-            onNoteChange={setProductionNote}
-            onSave={() => void handleSaveProductionReview()}
-            onClose={() => {
+            summary={detailSummary}
+            loading={detailLoading || isLoading}
+            onBack={() => {
               window.history.pushState({}, "", "/admin");
-              setSelectedProductionOrderId(null);
-              setProductionDetail(null);
+              setDetailSummary(null);
             }}
           />
         ) : (
@@ -381,9 +451,7 @@ function AdminOrdersDashboard({ adminKey, routeOrderId, onLogout }: { adminKey: 
         </div>
 
         <div className="mt-5 rzm-status" data-status="warning">
-          <span>
-            Текущий доступ всё ещё MVP-gate. Для production нужен server-side auth и role-based access.
-          </span>
+          <span>Текущий доступ всё ещё MVP-gate. Для production нужен server-side auth и role-based access.</span>
         </div>
       </section>
     </main>
@@ -399,10 +467,10 @@ function Metric({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 md:px-5 py-3 font-semibold">{children}</th>;
+function Th({ children }: { children: ReactNode }) {
+  return <th className="px-4 py-3 font-semibold md:px-5">{children}</th>;
 }
 
-function Td({ children, mono }: { children: React.ReactNode; mono?: boolean }) {
-  return <td className={["px-4 md:px-5 py-3 align-top", mono ? "font-mono tabular-nums" : ""].join(" ")}>{children}</td>;
+function Td({ children, mono }: { children: ReactNode; mono?: boolean }) {
+  return <td className={["px-4 py-3 align-top md:px-5", mono ? "font-mono tabular-nums" : ""].join(" ")}>{children}</td>;
 }
