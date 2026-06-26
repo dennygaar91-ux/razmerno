@@ -105,6 +105,11 @@ Each PR requires one decision:
 
 Audit follow-up: требуется зафиксировать ownership contract для `sceneRenderMode`, exact/advanced flags, `selectedZoneId` / `selectedCompartmentId` bridge и snapshot/payload boundary. Не закрывать через visual QA или generic Constructor E2E.
 
+Committed evidence note:
+
+- `9e4a2f13` (`docs: define constructor state ownership contract`) adds `docs/planning/constructor-state-ownership-contract-v1.md` and documents active Constructor3D ownership, active-vs-legacy boundary, snapshot/payload boundary and closure evidence requirements.
+- This is documentation-layer evidence only. `P0-02` stays open until focused runtime state-transition tests, constructor payload tests, GitHub QA and main verification are recorded.
+
 Объём: L. Зависимости: P0-01. Независимо: нет.
 
 ### P0-03 Pricing Engine Validation
@@ -128,6 +133,15 @@ Audit follow-ups:
 These follow-ups must not be mixed with Production or API implementation PRs unless explicitly scoped.
 
 Accepted decisions note: interpret this task together with Q8 in `accepted-backlog-decisions-v1.md`, where `Supabase/runtime catalog` is the primary MVP price source.
+
+Committed evidence note:
+
+- `a5263615` (`docs: lock pricing source of truth`) adds `docs/planning/pricing-source-of-truth-lock-v1.md` and locks the hierarchy `Supabase/runtime catalog -> server authoritative calculation -> client preview as non-authoritative estimate -> seed/bundled fallback -> stored order snapshot as immutable audit record`.
+- `799b6f89` (`fix: persist server-authoritative order pricing`) records runtime evidence that order submit persists server-resolved `total_price` and pricing breakdown instead of trusting client-provided final pricing.
+- `b433fa2e` (`fix: align admin pricing with stored snapshot`) records runtime evidence that admin list/detail read persisted order snapshot semantics and do not recalculate pricing in admin UI.
+- Current schema has no persisted source/fallback attribution field, so admin wording remains limited to safe semantics such as `final server snapshot` and `source attribution not persisted`.
+- `P0-03` remains open: pricing formulas were not changed, parity closure still depends on `P0-13`, GitHub QA/main verification and remaining source/fallback evidence.
+- QA note for `799b6f89`: local task evidence covered checkout pricing persistence tests and typecheck, but `typecheck:api` is `not verified` in this backlog note due the Windows/glob issue called out in the implementation report.
 
 Объём: M. Зависимости: price sources, delivery, assembly, P0-13. Независимо: частично.
 
@@ -186,6 +200,14 @@ Implementation evidence candidate:
 - Documentation sync is limited to planning docs and does not touch runtime, package/workflow, API, pricing, admin, Supabase, or order flow.
 
 Audit follow-up: open PR triage for #41, #43, #51 and #52 must be coordinated here, but domain-specific implementation remains with 05, 03, 07 and 04 respectively.
+
+Post-closure maintenance evidence:
+
+- `e7d16e97` (`docs: add RPES role-based audits`) adds role-based findings docs under `docs/audits/role-audits/`.
+- `de3c7c80` (`docs: reconcile role audit findings`) adds `docs/planning/role-audit-reconciliation-v1.md`.
+- `84330efa` (`docs: update agent operating rules`) updates `AGENTS.md` to the current RPES + role-audit structure.
+- `a5263615` and `9e4a2f13` add the pricing source lock and constructor state ownership contract as active planning references.
+- These commits reinforce documentation sync and active source hierarchy, but do not reopen or re-close `P0-07`.
 
 Объём: M. Зависимости: audits, backlog. Независимо: да.
 
@@ -268,6 +290,15 @@ Required sub-work:
 Do not close until final tests are merged and verified on main.
 
 Accepted decisions note: interpret parity closure together with Q8 and the explicit PR #43 decision in `accepted-backlog-decisions-v1.md`; branch-only pricing evidence still cannot close this task.
+
+Committed evidence note:
+
+- `a5263615` (`docs: lock pricing source of truth`) defines the parity evidence model for quote/order/stored snapshot parity, admin summary parity and legacy/demo pricing path guard without closing `P0-13`.
+- `799b6f89` (`fix: persist server-authoritative order pricing`) adds committed runtime evidence that stored `total_price`, breakdown, delivery and assembly values follow the existing server pricing stack rather than client-submitted totals.
+- `020ba133` (`feat: add safe admin order summary`) adds a safer admin summary baseline for masked PII and explicit `not verified` states.
+- `b433fa2e` (`fix: align admin pricing with stored snapshot`) adds committed runtime evidence that admin list/detail use stored server-owned order snapshot fields and safe wording when source attribution is unavailable.
+- Source/fallback attribution is still not persisted in schema, so parity evidence may only claim `source attribution not persisted`, not a stronger source/fallback label.
+- `P0-13` still stays open until material-aware parity, delivery/assembly matrix coverage, quote/order/stored snapshot parity, admin summary parity, GitHub QA success and main verification are all satisfied together.
 
 Объём: L. Зависимости: P0-03, pricing sources, client/server parity fixtures.
 
@@ -1166,6 +1197,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Acceptance summary: golden fixtures, material-aware client/server parity, delivery/assembly matrix, quote/order/stored price parity verified on main.
 - Suggested agent: 03 Pricing Agent
 - Accepted decisions note: use Q8 pricing source-of-truth rules and the PR #43 stale-branch decision.
+- Follow-up evidence note: `a5263615` adds the planning source-of-truth lock; `799b6f89` and `b433fa2e` add committed runtime evidence for server-owned order snapshot persistence and admin snapshot semantics. The plan task stays closed as planning, while `P0-03` and `P0-13` remain open until their own closure rules are met.
 
 #### M8-P1-01 — Visual QA execution gate
 - Status: open
@@ -1184,6 +1216,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Acceptance summary: dimensions, sections, zones, filling, facades, materials, checkout and validation ownership documented and covered by focused state-transition tests.
 - Suggested agent: 02 Constructor Agent
 - Accepted decisions note: Constructor3D state ownership is expected to remain an explicit separate document boundary.
+- Committed evidence note: `9e4a2f13` creates `docs/planning/constructor-state-ownership-contract-v1.md`. Status remains `open` because runtime-focused state-transition tests, payload tests, GitHub QA and main verification are still required.
 
 #### M8-P0-03 — Three.js runtime stability and fallback readiness
 - Status: open
@@ -1299,6 +1332,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Related existing task: P2-25, TASK 08-UX-04, P2-09
 - Acceptance summary: real order list/detail, status change, manager notes, auth hardening and basic audit trail are usable for MVP operations.
 - Suggested agent: 04 API / Orders Agent
+- Committed evidence note: `020ba133` adds a safe admin order summary baseline, and `b433fa2e` aligns admin pricing semantics with persisted stored snapshot fields. This is partial evidence only; status change, manager notes, auth hardening and audit trail closure evidence are still `not verified`.
 
 #### M9-P1-03 — Email retry and failure queue
 - Status: open
