@@ -6,3 +6,8 @@ export { createInitialProductionRevision, createManualProductionRevision, type P
 export { buildBasisJsonScript, serializeBasisJson, type BasisJsonScript } from "./basisJson.js";
 export { buildProductionDocumentBundle, type ProductionDocumentBundle } from "./productionDocuments.js";
 export { buildProductionEmailAttachments, type ProductionEmailAttachment } from "./emailAttachments.js";
+export {
+  buildManufacturingSpecificationFromProductionExport,
+  type ManufacturingSpecification,
+  type ManufacturingCutListItem,
+} from "./manufacturingSpecification.js";
