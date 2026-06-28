@@ -267,6 +267,83 @@ function assertManufacturingDocumentInvariants(
   assertBasisManualJsonBoundary(markdown, document.sections.basisChecklist.status, `${label} markdown`);
 }
 
+function assertProductionPipelineInvariants(
+  payload: OrderRequest,
+  label: string,
+) {
+  const productionExport = buildProductionExportFromPayload(payload);
+  const specification = buildManufacturingSpecificationFromProductionExport(productionExport);
+  const document = buildManufacturingDocumentFromSpecification(specification);
+  const markdown = serializeManufacturingDocumentMarkdown(document);
+  const productionSerialized = JSON.stringify(productionExport);
+  const specificationSerialized = JSON.stringify(specification);
+  const documentSerialized = JSON.stringify(document);
+
+  assert.equal(productionExport.schema, "razmerno.production-export.v1");
+  assert.equal(productionExport.productionModel.schema, "razmerno.production-model.v3");
+  assert.equal(specification.schema, "razmerno.manufacturing-spec.v1");
+  assert.equal(document.schema, "razmerno.manufacturing-document.v1");
+  assert.equal(specification.derivedFrom.productionExportSchema, productionExport.schema);
+  assert.equal(specification.derivedFrom.productionModelSchema, productionExport.productionModel.schema);
+  assert.equal(specification.derivedFrom.basisBoundary, "manual-json");
+  assert.equal(document.derivedFrom.manufacturingSpecificationSchema, specification.schema);
+  assert.equal(document.derivedFrom.basisBoundary, "manual-json");
+  assert.equal(productionExport.basis.status, "manual-json-ready");
+  assert.equal(specification.basisManualJson.status, "manual-json-ready");
+  assert.equal(document.sections.basisChecklist.status, "manual-json-ready");
+
+  assert.equal(specification.cutList.totalPanels, productionExport.productionModel.panels.length);
+  assert.equal(document.sections.cutList.totalPanels, specification.cutList.totalPanels);
+  assert.equal(specification.edgeBanding.totalEdges, productionExport.productionModel.edgeBanding.length);
+  assert.equal(document.sections.edgeBanding.totalEdges, specification.edgeBanding.totalEdges);
+  assert.equal(specification.hardware.totalItems, productionExport.productionModel.hardware.length);
+  assert.equal(document.sections.hardware.totalItems, specification.hardware.totalItems);
+  assert.equal(specification.drilling.totalOperations, productionExport.productionModel.drilling.length);
+  assert.equal(document.sections.drillingAndOperations.totalOperations, specification.drilling.totalOperations);
+  assert.equal(specification.operations.basisManualPlanStepCount, productionExport.basis.plan.length);
+  assert.equal(document.sections.basisChecklist.manualPlanStepCount, specification.operations.basisManualPlanStepCount);
+  assert.equal(specification.validation.status, productionExport.validation.status);
+  assert.equal(document.sections.validation.status, specification.validation.status);
+  assert.equal(document.sections.validation.reviewStatus, specification.review.status);
+
+  assert.ok(
+    markdown.includes(`Total panels: ${document.sections.cutList.totalPanels}`),
+    `${label}: markdown must include total panels`,
+  );
+  assert.ok(
+    markdown.includes(`Total edges: ${document.sections.edgeBanding.totalEdges}`),
+    `${label}: markdown must include total edges`,
+  );
+  assert.ok(
+    markdown.includes(`Total hardware items: ${document.sections.hardware.totalItems}`),
+    `${label}: markdown must include total hardware items`,
+  );
+  assert.ok(
+    markdown.includes(`Total drilling operations: ${document.sections.drillingAndOperations.totalOperations}`),
+    `${label}: markdown must include total drilling operations`,
+  );
+
+  assert.ok(!productionSerialized.includes("client@example.com"), `${label}: production export must exclude customer email`);
+  assert.ok(!productionSerialized.includes("+7 999"), `${label}: production export must exclude customer phone`);
+  assert.ok(!productionSerialized.includes("РРІР°РЅ"), `${label}: production export must exclude customer name`);
+  assert.ok(!productionSerialized.includes("acceptedAt"), `${label}: production export must exclude acceptedAt field`);
+
+  for (const serialized of [specificationSerialized, documentSerialized, markdown]) {
+    assert.ok(!serialized.includes("client@example.com"), `${label}: must exclude customer email`);
+    assert.ok(!serialized.includes("+7 999"), `${label}: must exclude customer phone`);
+    assert.ok(!serialized.includes("РРІР°РЅ"), `${label}: must exclude customer name`);
+    assert.ok(!serialized.includes("RZ-20260623"), `${label}: must exclude order ids`);
+    assert.ok(!serialized.includes("acceptedAt"), `${label}: must exclude acceptedAt`);
+    assert.ok(!serialized.includes("createdAt"), `${label}: must exclude createdAt`);
+  }
+
+  assertBasisManualJsonBoundary(specificationSerialized, specification.basisManualJson.status, `${label} specification`);
+  assertBasisManualJsonBoundary(documentSerialized, document.sections.basisChecklist.status, `${label} document`);
+  assertBasisManualJsonBoundary(markdown, document.sections.basisChecklist.status, `${label} markdown`);
+
+  return { productionExport, specification, document, markdown };
+}
+
 test("production export package baseline invariants stay valid", () => {
   const order = {
     productType: "wardrobe" as const,
@@ -971,6 +1048,127 @@ test("manufacturing document: material-aware case keeps body and facade material
   assert.ok(snapshot.cutList.firstItem?.material.includes(":white-matt"));
   assert.ok(markdown.includes("- Body material: ldsp-egger-w960-belyy-klassicheskiy-sm"));
   assert.ok(markdown.includes("- Facade material: mdf-egger-r010-seryy-grafitovyy-ms"));
+});
+
+test("production pipeline integration: baseline wardrobe chain is internally consistent", () => {
+  const payload = makePayload({ orderId: "RZ-20260623-9401" });
+  const { productionExport, specification, document, markdown } = assertProductionPipelineInvariants(
+    payload,
+    "baseline pipeline",
+  );
+
+  assert.equal(productionExport.validation.status, "ready-for-review");
+  assert.equal(specification.review.status, "requires-review");
+  assert.equal(document.sections.validation.reviewStatus, "requires-review");
+  assert.ok(markdown.includes("Validation status: ready-for-review"));
+  assert.ok(markdown.includes("Review status: requires-review"));
+});
+
+test("production pipeline integration: mixed blocked case keeps totals and blocked review aligned", () => {
+  const payload = makePayload({
+    orderId: "RZ-20260623-9402",
+    filling: { shelves: 4, drawers: 2, hangingRod: true },
+    layout: {
+      sections: [
+        {
+          id: "section-1",
+          widthMm: 900,
+          compartments: [
+            {
+              id: "section-1-compartment-1",
+              kind: "drawers" as const,
+              heightMm: 800,
+              shelves: 0,
+              drawers: 2,
+              hasRod: false,
+            },
+            {
+              id: "section-1-compartment-2",
+              kind: "rod" as const,
+              heightMm: 1600,
+              shelves: 0,
+              drawers: 0,
+              hasRod: true,
+            },
+          ],
+        },
+        {
+          id: "section-2",
+          widthMm: 900,
+          compartments: [
+            {
+              id: "section-2-compartment-1",
+              kind: "shelves" as const,
+              heightMm: 2400,
+              shelves: 4,
+              drawers: 0,
+              hasRod: false,
+            },
+          ],
+        },
+      ],
+    },
+  });
+  const { productionExport, specification, document, markdown } = assertProductionPipelineInvariants(
+    payload,
+    "mixed blocked pipeline",
+  );
+
+  assert.equal(productionExport.validation.status, "blocked");
+  assert.equal(specification.validation.status, "blocked");
+  assert.equal(specification.review.status, "blocked");
+  assert.equal(document.sections.validation.status, "blocked");
+  assert.equal(document.sections.validation.reviewStatus, "blocked");
+  assert.ok(markdown.includes("Validation status: blocked"));
+  assert.ok(markdown.includes("Review status: blocked"));
+});
+
+test("production pipeline integration: material-aware chain is deterministic across PII and pricing changes", () => {
+  const first = makePayload({
+    orderId: "RZ-20260623-9403",
+    materials: {
+      bodyId: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+      facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+    customer: { name: "РџРµСЂРІС‹Р№", phone: "+7 911 000 00 01", email: "first@example.com" },
+    totalPrice: 654321,
+    consent: { personalData: true, privacyVersion: "2026-05-24", acceptedAt: "2026-06-20T10:00:00.000Z" },
+  });
+  const second = makePayload({
+    orderId: "RZ-20260623-9404",
+    materials: {
+      bodyId: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+      facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+    customer: { name: "Р’С‚РѕСЂРѕР№", phone: "+7 922 000 00 02", email: "second@example.com" },
+    totalPrice: 1,
+    priceBreakdown: {
+      body: 1,
+      facades: 1,
+      filling: 1,
+      hardware: 1,
+      production: 1,
+      materials: 1,
+      edgeBanding: 1,
+      services: 1,
+      delivery: 1,
+      assembly: 1,
+    },
+    consent: { personalData: true, privacyVersion: "2026-05-24", acceptedAt: "2026-06-22T22:22:22.000Z" },
+  });
+
+  const firstPipeline = assertProductionPipelineInvariants(first, "material-aware pipeline first");
+  const secondPipeline = assertProductionPipelineInvariants(second, "material-aware pipeline second");
+
+  assert.deepEqual(firstPipeline.specification, secondPipeline.specification);
+  assert.deepEqual(firstPipeline.document, secondPipeline.document);
+  assert.equal(firstPipeline.markdown, secondPipeline.markdown);
 });
 
 console.log("Production export package test passed.");
