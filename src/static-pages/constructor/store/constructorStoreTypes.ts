@@ -160,6 +160,7 @@ export interface ConstructorStoreState {
     furniture: FurnitureKey;
     material: MaterialToken;
     facadeMaterial?: MaterialToken;
+    handleless?: boolean;
   }) => void;
   reset: () => void;
 }

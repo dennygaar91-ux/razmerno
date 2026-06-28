@@ -80,6 +80,7 @@ test("constructor draft: save excludes PII", () => {
   const raw = storage.getItem(CONSTRUCTOR_DRAFT_STORAGE_KEY) ?? "";
 
   assert(draft.dimensions[0] === 1900, "Expected width in draft");
+  assert(draft.handleless === true, "Expected handleless style in draft");
   assert(!raw.includes("ivan@example.ru"), "Draft must not include email");
   assert(!raw.includes("+7"), "Draft must not include phone");
   assert(!raw.includes("Москва"), "Draft must not include delivery address");
@@ -107,6 +108,7 @@ test("constructor draft: restore writes safe fields to store", () => {
   assert(state.width === 1900, "Expected restored width");
   assert(state.sections === 4, "Expected restored sections");
   assert(state.fill === "drawers", "Expected restored filling");
+  assert(state.handleless === true, "Expected restored handleless style");
   assert(state.material === "ldsp-egger-u780-seryy-monumentalnyy-st9", "Expected restored real material id");
   assert(state.contact.email === "", "Contact email must not be restored");
   assert(state.deliveryAddress === "", "Delivery address must not be restored");
@@ -137,6 +139,10 @@ test("constructor draft: restore keeps manual layouts, filling, facades and faca
   useConstructorStore.getState().setSectionFacadeMode("section-1", "hinged");
   useConstructorStore
     .getState()
+    .setZoneFacadeMode("section-1", "section-1-compartment-1", "open");
+  useConstructorStore.getState().setHandleless(true);
+  useConstructorStore
+    .getState()
     .setFacadeMaterial("mdf-egger-r010-seryy-grafitovyy-ms");
 
   saveConstructorDraft(useConstructorStore.getState(), storage);
@@ -161,6 +167,11 @@ test("constructor draft: restore keeps manual layouts, filling, facades and faca
   );
   assert(state.facadeLayout["section-1"] === "hinged", "Expected restored hinged facade");
   assert(state.facadeLayout["section-2"] === "open", "Expected restored open facade");
+  assert(
+    state.zoneFacadeLayout["section-1"]?.["section-1-compartment-1"] === "open",
+    "Expected restored zone facade override",
+  );
+  assert(state.handleless === true, "Expected restored handleless choice");
   assert(
     state.facadeMaterial === "mdf-egger-r010-seryy-grafitovyy-ms",
     "Expected restored facade material id",

@@ -102,10 +102,12 @@ export function restoreConstructorDraftToStore(storage: Storage = window.localSt
     compartmentLayout: draft.compartmentLayout,
     fillingLayout: draft.fillingLayout,
     facadeLayout: draft.facadeLayout,
+    zoneFacadeLayout: draft.zoneFacadeLayout,
     filling,
     furniture,
     material,
     facadeMaterial,
+    handleless: draft.handleless,
   });
 
   return draft;

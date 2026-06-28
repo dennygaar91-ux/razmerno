@@ -103,6 +103,7 @@ export type ConstructorDraft = {
   material: string;
   materialId?: MaterialToken;
   facadeMaterialId?: MaterialToken;
+  handleless?: boolean;
   sections: number;
   compartments?: number;
   sectionLayout?: ConstructorSection[];

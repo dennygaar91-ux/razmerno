@@ -208,6 +208,47 @@ test("constructor flow: submit success keeps model/configuration and does not re
   );
 });
 
+test("constructor flow: active Constructor3D exposes local draft controls through the active draft lifecycle hook", () => {
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+  const draftHookSource = readFileSync(new URL("./hooks/useConstructorDraftLifecycle.ts", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+  const draftRowSource = readFileSync(new URL("./components/ConstructorDraftRow.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+
+  assert(
+    pageSource.includes('import { ConstructorDraftRow } from "./constructor/components/ConstructorDraftRow";'),
+    "Constructor3DPage should render the active draft controls row",
+  );
+  assert(
+    pageSource.includes("} = useConstructorDraftLifecycle(snapshot);"),
+    "Constructor3DPage should bind the active draft lifecycle to the current snapshot",
+  );
+  assert(
+    pageSource.includes("onDraftSave: () => {\n      saveDraft();\n    },"),
+    "Submit success should persist the current local draft through the active draft lifecycle",
+  );
+  assert(
+    pageSource.includes("<ConstructorDraftRow"),
+    "Constructor3DPage should expose customer-facing draft controls",
+  );
+  assert(
+    draftHookSource.includes("saveConstructorDraft(snapshot)"),
+    "Active draft lifecycle should use the existing local save function",
+  );
+  assert(
+    draftHookSource.includes("restoreConstructorDraftToStore()"),
+    "Active draft lifecycle should use the existing local restore function",
+  );
+  assert(
+    draftHookSource.includes("clearConstructorDraft()"),
+    "Active draft lifecycle should use the existing local clear function",
+  );
+  assert(
+    draftRowSource.includes("Сохранить проект") &&
+      draftRowSource.includes("Восстановить проект") &&
+      draftRowSource.includes("Очистить черновик"),
+    "Draft row should expose save, restore and clear controls",
+  );
+});
+
 test("constructor flow: user can move through base wizard and keep configuration", () => {
   const store = useConstructorStore.getState();
   store.reset();

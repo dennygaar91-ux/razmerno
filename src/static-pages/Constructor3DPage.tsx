@@ -4,6 +4,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { ConstructorDraftRow } from "./constructor/components/ConstructorDraftRow";
 import { ConstructorHeader } from "./constructor/components/ConstructorHeader";
 import { ConstructorDrawerFooter } from "./constructor/components/ConstructorDrawerFooter";
 import { ConstructorStagebar } from "./constructor/components/ConstructorStagebar";
@@ -26,6 +27,7 @@ import {
   LazyThreeFurnitureViewer,
   type ThreeRuntimeFailureReason,
 } from "./constructor/components/LazyThreeFurnitureViewer";
+import { useConstructorDraftLifecycle } from "./constructor/hooks/useConstructorDraftLifecycle";
 import { useWebGLDiagnostics } from "./constructor/three/useWebGLAvailable";
 import { useThreeSceneQuality } from "./constructor/three/useThreeSceneQuality";
 import { useConstructorPageState } from "./constructor/hooks/useConstructorPageState";
@@ -138,6 +140,13 @@ export default function Constructor3DPage() {
     selectedFacadeMaterial,
     snapshot,
   } = useConstructorPageState();
+  const {
+    draftStatus,
+    hasStoredDraft,
+    saveDraft,
+    restoreDraft,
+    clearDraft,
+  } = useConstructorDraftLifecycle(snapshot);
 
   const retryThreeScene = useCallback((reduced = false) => {
     setForceReduced3D(reduced);
@@ -189,7 +198,9 @@ export default function Constructor3DPage() {
     snapshot,
     quote,
     onStepChange: setStep,
-    onDraftSave: () => undefined,
+    onDraftSave: () => {
+      saveDraft();
+    },
   });
   const formatPrice = quote?.formatPrice ?? formatFallbackPrice;
   const currentStepIndex = stepOrder.indexOf(step);
@@ -434,6 +445,19 @@ export default function Constructor3DPage() {
                 onAssemblyEnabledChange={setAssemblyEnabled}
                 onDeliveryAddressChange={setDeliveryAddress}
                 onContactChange={setContact}
+              />
+              <ConstructorDraftRow
+                draftStatus={draftStatus}
+                hasStoredDraft={hasStoredDraft}
+                onSaveDraft={() => {
+                  saveDraft();
+                }}
+                onRestoreDraft={() => {
+                  restoreDraft();
+                }}
+                onClearDraft={() => {
+                  clearDraft();
+                }}
               />
 
               <ConstructorDrawerFooter
