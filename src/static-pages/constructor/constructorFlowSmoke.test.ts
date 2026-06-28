@@ -116,6 +116,39 @@ test("constructor flow: step order stays sizes -> fill -> materials -> checkout"
   assert(stepOrder.join(" > ") === "sizes > fill > materials > checkout", "Unexpected constructor step order");
 });
 
+test("constructor flow: public active constructor route resolves to Constructor3DPage, not legacy ConstructorPage", () => {
+  const appSource = readFileSync(new URL("../../App.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+
+  assert(appSource.includes('pathname === "/configurator-3d"'), "App route map should keep /configurator-3d as active Constructor3D alias");
+  assert(appSource.includes('pathname === "/constructor-legacy" || pathname === "/configurator-legacy"'), "App route map should isolate legacy aliases behind constructorLegacy route");
+  assert(appSource.includes('staticPage === "constructor" ? LazyConstructor3DPage'), "Active constructor route should render LazyConstructor3DPage");
+  assert(appSource.includes('staticPage === "constructorLegacy" ? LazyConstructorPage'), "Legacy constructor route should stay on isolated LazyConstructorPage");
+});
+
+test("constructor flow: active Constructor3D runtime stays isolated from legacy constructor runtime and configurator state", () => {
+  const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+  const stateHookSource = readFileSync(new URL("./hooks/useConstructorPageState.ts", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+  const storeSource = readFileSync(new URL("./store/constructorStore.ts", import.meta.url), "utf8").replace(/\r\n/g, "\n");
+
+  const forbiddenLegacyTokens = [
+    "src/configurator/",
+    'from "@/configurator/',
+    "../configurator/",
+    'from "./configurator/',
+    "../ConstructorPage",
+    "./static-pages/ConstructorPage",
+    "legacyGeometry",
+    "productionModel",
+    "quickEstimate",
+  ];
+
+  for (const token of forbiddenLegacyTokens) {
+    assert(!pageSource.includes(token), `Constructor3DPage must stay isolated from legacy token: ${token}`);
+    assert(!stateHookSource.includes(token), `useConstructorPageState must stay isolated from legacy token: ${token}`);
+    assert(!storeSource.includes(token), `constructorStore must stay isolated from legacy token: ${token}`);
+  }
+});
+
 test("constructor flow: Constructor3DPage keeps scene render mode store-owned", () => {
   const pageSource = readFileSync(new URL("../Constructor3DPage.tsx", import.meta.url), "utf8").replace(/\r\n/g, "\n");
 
