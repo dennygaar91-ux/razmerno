@@ -85,6 +85,512 @@ function normalizeMaterialAreaM2(
   ) as ProductionExportPackage["productionModel"]["totals"]["materialAreaM2"];
 }
 
+const IMPORTANT_PANEL_ROLES = [
+  "side-left",
+  "top",
+  "back-panel",
+  "facade-door",
+  "drawer-front",
+  "drawer-bottom",
+  "shelf",
+] as const;
+
+function countBy<T>(items: T[], key: (item: T) => string) {
+  const counts: Record<string, number> = {};
+  for (const item of items) {
+    const bucket = key(item);
+    counts[bucket] = (counts[bucket] ?? 0) + 1;
+  }
+
+  return Object.fromEntries(
+    Object.entries(counts).sort(([left], [right]) => left.localeCompare(right)),
+  );
+}
+
+function extractPanelEdgeSignature(
+  panel: ProductionExportPackage["productionModel"]["panels"][number],
+) {
+  return Object.fromEntries(
+    Object.entries(panel.edgeBanding ?? {}).map(([side, meta]) => [side, meta?.thicknessMm ?? null]),
+  );
+}
+
+function extractPanelSample(
+  panel: ProductionExportPackage["productionModel"]["panels"][number] | undefined,
+) {
+  if (!panel) return null;
+
+  return {
+    id: panel.id,
+    role: panel.role,
+    materialType: panel.materialType,
+    materialId: panel.materialId,
+    thicknessMm: panel.thicknessMm,
+    widthMm: panel.widthMm,
+    heightMm: panel.heightMm,
+    faceSide: panel.faceSide,
+    edge: extractPanelEdgeSignature(panel),
+  };
+}
+
+function extractHardwareSample(
+  item: ProductionExportPackage["productionModel"]["hardware"][number] | undefined,
+) {
+  if (!item) return null;
+
+  return {
+    id: item.id,
+    type: item.type,
+    linkedPanelIds: item.linkedPanelIds,
+    drillingRefs: item.drillingRefs,
+    visibleInViewer: item.visibleInViewer,
+    includeInDocs: item.includeInDocs,
+  };
+}
+
+function extractDrillingSample(
+  item: ProductionExportPackage["productionModel"]["drilling"][number] | undefined,
+) {
+  if (!item) return null;
+
+  return {
+    id: item.id,
+    panelId: item.panelId,
+    purpose: item.purpose,
+    diameterMm: item.diameterMm,
+    depthMm: item.depthMm,
+    side: item.side,
+    through: item.through,
+    requiresTechnologistCheck: item.requiresTechnologistCheck,
+  };
+}
+
+function extractProductionV3CanonicalSnapshot(productionExport: ProductionExportPackage) {
+  const panelSamples = Object.fromEntries(
+    IMPORTANT_PANEL_ROLES.map((role) => [
+      role,
+      extractPanelSample(
+        productionExport.productionModel.panels.find((panel) => panel.role === role),
+      ),
+    ]).filter(([, sample]) => sample !== null),
+  );
+
+  const hardwareTypes = [...new Set(productionExport.productionModel.hardware.map((item) => item.type))].sort();
+  const drillingPurposes = [...new Set(productionExport.productionModel.drilling.map((item) => item.purpose))].sort();
+
+  return {
+    project: {
+      bodyMaterialId: productionExport.project.material.bodyMaterialId,
+      facadeMaterialId: productionExport.project.material.facadeMaterialId,
+      facadeThicknessMm: productionExport.project.material.facadeThicknessMm,
+      sectionCount: productionExport.project.structure.sectionCount,
+      shelves: productionExport.project.structure.shelves,
+      drawers: productionExport.project.structure.drawers,
+      hangingRod: productionExport.project.structure.hangingRod,
+      openingMode: productionExport.project.structure.openingMode,
+      hardwareMode: productionExport.project.structure.hardwareMode,
+    },
+    panels: {
+      countByRole: countBy(productionExport.productionModel.panels, (item) => item.role),
+      countByMaterialType: countBy(productionExport.productionModel.panels, (item) => item.materialType),
+      important: panelSamples,
+    },
+    edgeBanding: {
+      count: productionExport.productionModel.edgeBanding.length,
+      countByThickness: countBy(productionExport.productionModel.edgeBanding, (item) => String(item.thicknessMm)),
+      sample: productionExport.productionModel.edgeBanding.slice(0, 4).map((item) => ({
+        panelId: item.panelId,
+        side: item.side,
+        materialId: item.materialId,
+        thicknessMm: item.thicknessMm,
+        lengthMm: item.lengthMm,
+      })),
+    },
+    hardware: {
+      countByType: countBy(productionExport.productionModel.hardware, (item) => item.type),
+      sampleByType: Object.fromEntries(
+        hardwareTypes.map((type) => [
+          type,
+          extractHardwareSample(
+            productionExport.productionModel.hardware.find((item) => item.type === type),
+          ),
+        ]),
+      ),
+    },
+    drilling: {
+      countByPurpose: countBy(productionExport.productionModel.drilling, (item) => item.purpose),
+      sampleByPurpose: Object.fromEntries(
+        drillingPurposes.map((purpose) => [
+          purpose,
+          extractDrillingSample(
+            productionExport.productionModel.drilling.find((item) => item.purpose === purpose),
+          ),
+        ]),
+      ),
+    },
+    warnings: productionExport.productionModel.warnings.map((item) => ({
+      code: item.code,
+      severity: item.severity,
+      panelId: item.panelId ?? null,
+    })),
+    validation: {
+      status: productionExport.validation.status,
+      errorCount: productionExport.validation.errors.length,
+      warningCount: productionExport.validation.warnings.length,
+      summary: productionExport.validation.summary,
+    },
+    review: productionExport.review,
+    basis: {
+      status: productionExport.basis.status,
+      actionCounts: countBy(productionExport.basis.plan, (item) => item.action),
+      firstStep: {
+        action: productionExport.basis.plan[0]?.action,
+        targetId: productionExport.basis.plan[0]?.targetId,
+        status: productionExport.basis.plan[0]?.status,
+        note: productionExport.basis.plan[0]?.note,
+      },
+      lastStep: {
+        action: productionExport.basis.plan.at(-1)?.action,
+        targetId: productionExport.basis.plan.at(-1)?.targetId,
+        status: productionExport.basis.plan.at(-1)?.status,
+        note: productionExport.basis.plan.at(-1)?.note,
+      },
+    },
+  };
+}
+
+const REQUIRED_V3_CANONICAL_SNAPSHOTS = {
+  "base wardrobe payload": {
+    project: {
+      bodyMaterialId: "white-matt",
+      facadeMaterialId: "white-matt",
+      facadeThicknessMm: 16,
+      sectionCount: 2,
+      shelves: 2,
+      drawers: 0,
+      hangingRod: false,
+      openingMode: "handle-soft-close",
+      hardwareMode: "base",
+    },
+    panels: {
+      countByRole: {
+        "back-panel": 1,
+        bottom: 1,
+        "facade-door": 4,
+        plinth: 1,
+        shelf: 2,
+        "side-left": 1,
+        "side-right": 1,
+        top: 1,
+        "vertical-partition": 1,
+      },
+      countByMaterialType: { hdf: 1, ldsp: 12 },
+      important: {
+        "side-left": { id: "side-0001", role: "side-left", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 600, heightMm: 2300, faceSide: "right", edge: { front: 1, back: 1, left: 1, right: 1 } },
+        top: { id: "top-0004", role: "top", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 1768, heightMm: 600, faceSide: "top", edge: { front: 1, back: 1, left: 1, right: 1 } },
+        "back-panel": { id: "back-0001", role: "back-panel", materialType: "hdf", materialId: "white-matt", thicknessMm: 3, widthMm: 1796, heightMm: 2296, faceSide: "back", edge: {} },
+        "facade-door": { id: "door-0001", role: "facade-door", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 433.5, heightMm: 2294, faceSide: "front", edge: { front: 2, back: 2, left: 2, right: 2 } },
+        shelf: { id: "shel-0007", role: "shelf", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 876, heightMm: 580, faceSide: "top", edge: { front: 1, back: 1, left: 1, right: 1 } },
+      },
+    },
+    edgeBanding: {
+      count: 48,
+      countByThickness: { 1: 32, 2: 16 },
+      sample: [
+        { panelId: "side-0001", side: "front", materialId: "white-matt", thicknessMm: 1, lengthMm: 600 },
+        { panelId: "side-0001", side: "back", materialId: "white-matt", thicknessMm: 1, lengthMm: 600 },
+        { panelId: "side-0001", side: "left", materialId: "white-matt", thicknessMm: 1, lengthMm: 2300 },
+        { panelId: "side-0001", side: "right", materialId: "white-matt", thicknessMm: 1, lengthMm: 2300 },
+      ],
+    },
+    hardware: {
+      countByType: { confirmat: 4, handle: 4, hinge: 20, "shelf-support": 4 },
+      sampleByType: {
+        confirmat: { id: "conf-0001", type: "confirmat", linkedPanelIds: ["side-0001", "bott-0003"], drillingRefs: ["drill-0001"], visibleInViewer: false, includeInDocs: true },
+        handle: { id: "hnd-000a", type: "handle", linkedPanelIds: ["door-0001"], drillingRefs: ["drill-000a"], visibleInViewer: true, includeInDocs: true },
+        hinge: { id: "hin-0005", type: "hinge", linkedPanelIds: ["door-0001"], drillingRefs: ["drill-0005"], visibleInViewer: false, includeInDocs: true },
+        "shelf-support": { id: "ss-000t", type: "shelf-support", linkedPanelIds: ["side-0001", "shel-0007"], drillingRefs: ["drill-0001"], visibleInViewer: false, includeInDocs: true },
+      },
+    },
+    drilling: {
+      countByPurpose: { confirmat: 4, handle: 4, "hinge-cup": 20, "shelf-support": 4 },
+      sampleByPurpose: {
+        confirmat: { id: "drill-0001", panelId: "side-0001", purpose: "confirmat", diameterMm: 7, depthMm: 50, side: "right", through: false, requiresTechnologistCheck: true },
+        handle: { id: "drill-000a", panelId: "door-0001", purpose: "handle", diameterMm: 5, depthMm: 18, side: "front", through: true, requiresTechnologistCheck: true },
+        "hinge-cup": { id: "drill-0005", panelId: "door-0001", purpose: "hinge-cup", diameterMm: 35, depthMm: 13, side: "back", through: false, requiresTechnologistCheck: true },
+        "shelf-support": { id: "drill-0001", panelId: "side-0001", purpose: "shelf-support", diameterMm: 5, depthMm: 12, side: "right", through: false, requiresTechnologistCheck: true },
+      },
+    },
+    warnings: [
+      { code: "tall-facade", severity: "warn", panelId: null },
+      { code: "tall-facade", severity: "warn", panelId: null },
+      { code: "many-hinges", severity: "warn", panelId: "door-0001" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0002" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0003" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0004" },
+    ],
+    validation: { status: "ready-for-review", errorCount: 0, warningCount: 24, summary: { panels: 13, hardware: 32, drilling: 32, edgeBandingLengthMm: 58252, basisSteps: 179 } },
+    review: { status: "requires-review", manualChangesAllowed: true, visibleToClient: false },
+    basis: {
+      status: "manual-json-ready",
+      actionCounts: { "add-user-property": 26, "create-drilling": 32, "create-panel": 13, "group-object": 2, "place-hardware": 32, "set-edge": 48, "set-face-side": 13, "set-material": 13 },
+      firstStep: { action: "group-object", targetId: "root", status: "ready", note: "Корневой объект изделия. Технолог вручную создаёт 3D-документ в БАЗИС (manual JSON plan, не automatic .b3d)." },
+      lastStep: { action: "group-object", targetId: "root", status: "ready", note: "Сгруппировать всё в изделие и подготовить спецификацию (ручной шаг технолога в БАЗИС)." },
+    },
+  },
+  "handleless wardrobe payload": {
+    project: {
+      bodyMaterialId: "white-matt",
+      facadeMaterialId: "white-matt",
+      facadeThicknessMm: 16,
+      sectionCount: 2,
+      shelves: 2,
+      drawers: 0,
+      hangingRod: false,
+      openingMode: "push-to-open",
+      hardwareMode: "comfort",
+    },
+    panels: {
+      countByRole: {
+        "back-panel": 1,
+        bottom: 1,
+        "facade-door": 4,
+        plinth: 1,
+        shelf: 2,
+        "side-left": 1,
+        "side-right": 1,
+        top: 1,
+        "vertical-partition": 1,
+      },
+      countByMaterialType: { hdf: 1, ldsp: 12 },
+      important: {
+        "side-left": { id: "side-0001", role: "side-left", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 600, heightMm: 2300, faceSide: "right", edge: { front: 1, back: 1, left: 1, right: 1 } },
+        top: { id: "top-0004", role: "top", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 1768, heightMm: 600, faceSide: "top", edge: { front: 1, back: 1, left: 1, right: 1 } },
+        "back-panel": { id: "back-0001", role: "back-panel", materialType: "hdf", materialId: "white-matt", thicknessMm: 3, widthMm: 1796, heightMm: 2296, faceSide: "back", edge: {} },
+        "facade-door": { id: "door-0001", role: "facade-door", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 433.5, heightMm: 2294, faceSide: "front", edge: { front: 2, back: 2, left: 2, right: 2 } },
+        shelf: { id: "shel-0007", role: "shelf", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 876, heightMm: 580, faceSide: "top", edge: { front: 1, back: 1, left: 1, right: 1 } },
+      },
+    },
+    edgeBanding: {
+      count: 48,
+      countByThickness: { 1: 32, 2: 16 },
+      sample: [
+        { panelId: "side-0001", side: "front", materialId: "white-matt", thicknessMm: 1, lengthMm: 600 },
+        { panelId: "side-0001", side: "back", materialId: "white-matt", thicknessMm: 1, lengthMm: 600 },
+        { panelId: "side-0001", side: "left", materialId: "white-matt", thicknessMm: 1, lengthMm: 2300 },
+        { panelId: "side-0001", side: "right", materialId: "white-matt", thicknessMm: 1, lengthMm: 2300 },
+      ],
+    },
+    hardware: {
+      countByType: { confirmat: 4, hinge: 20, "push-to-open": 4, "shelf-support": 4 },
+      sampleByType: {
+        confirmat: { id: "conf-0001", type: "confirmat", linkedPanelIds: ["side-0001", "bott-0003"], drillingRefs: ["drill-0001"], visibleInViewer: false, includeInDocs: true },
+        hinge: { id: "hin-0005", type: "hinge", linkedPanelIds: ["door-0001"], drillingRefs: ["drill-0005"], visibleInViewer: false, includeInDocs: true },
+        "push-to-open": { id: "p2o-000a", type: "push-to-open", linkedPanelIds: ["door-0001"], drillingRefs: [], visibleInViewer: false, includeInDocs: true },
+        "shelf-support": { id: "ss-000t", type: "shelf-support", linkedPanelIds: ["side-0001", "shel-0007"], drillingRefs: ["drill-0001"], visibleInViewer: false, includeInDocs: true },
+      },
+    },
+    drilling: {
+      countByPurpose: { confirmat: 4, "hinge-cup": 20, "shelf-support": 4 },
+      sampleByPurpose: {
+        confirmat: { id: "drill-0001", panelId: "side-0001", purpose: "confirmat", diameterMm: 7, depthMm: 50, side: "right", through: false, requiresTechnologistCheck: true },
+        "hinge-cup": { id: "drill-0005", panelId: "door-0001", purpose: "hinge-cup", diameterMm: 35, depthMm: 13, side: "back", through: false, requiresTechnologistCheck: true },
+        "shelf-support": { id: "drill-0001", panelId: "side-0001", purpose: "shelf-support", diameterMm: 5, depthMm: 12, side: "right", through: false, requiresTechnologistCheck: true },
+      },
+    },
+    warnings: [
+      { code: "tall-facade", severity: "warn", panelId: null },
+      { code: "tall-facade", severity: "warn", panelId: null },
+      { code: "many-hinges", severity: "warn", panelId: "door-0001" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0002" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0003" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0004" },
+    ],
+    validation: { status: "ready-for-review", errorCount: 0, warningCount: 24, summary: { panels: 13, hardware: 32, drilling: 28, edgeBandingLengthMm: 58252, basisSteps: 175 } },
+    review: { status: "requires-review", manualChangesAllowed: true, visibleToClient: false },
+    basis: {
+      status: "manual-json-ready",
+      actionCounts: { "add-user-property": 26, "create-drilling": 28, "create-panel": 13, "group-object": 2, "place-hardware": 32, "set-edge": 48, "set-face-side": 13, "set-material": 13 },
+      firstStep: { action: "group-object", targetId: "root", status: "ready", note: "Корневой объект изделия. Технолог вручную создаёт 3D-документ в БАЗИС (manual JSON plan, не automatic .b3d)." },
+      lastStep: { action: "group-object", targetId: "root", status: "ready", note: "Сгруппировать всё в изделие и подготовить спецификацию (ручной шаг технолога в БАЗИС)." },
+    },
+  },
+  "drawers + rods + shelves payload": {
+    project: {
+      bodyMaterialId: "white-matt",
+      facadeMaterialId: "white-matt",
+      facadeThicknessMm: 16,
+      sectionCount: 2,
+      shelves: 4,
+      drawers: 2,
+      hangingRod: true,
+      openingMode: "handle-soft-close",
+      hardwareMode: "base",
+    },
+    panels: {
+      countByRole: {
+        "back-panel": 1,
+        bottom: 1,
+        "drawer-back": 2,
+        "drawer-bottom": 2,
+        "drawer-front": 2,
+        "drawer-side": 4,
+        "facade-door": 4,
+        plinth: 1,
+        shelf: 4,
+        "side-left": 1,
+        "side-right": 1,
+        top: 1,
+        "vertical-partition": 1,
+      },
+      countByMaterialType: { hdf: 3, ldsp: 22 },
+      important: {
+        "side-left": { id: "side-0001", role: "side-left", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 600, heightMm: 2300, faceSide: "right", edge: { front: 1, back: 1, left: 1, right: 1 } },
+        top: { id: "top-0004", role: "top", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 1768, heightMm: 600, faceSide: "top", edge: { front: 1, back: 1, left: 1, right: 1 } },
+        "back-panel": { id: "back-0001", role: "back-panel", materialType: "hdf", materialId: "white-matt", thicknessMm: 3, widthMm: 1796, heightMm: 2296, faceSide: "back", edge: {} },
+        "facade-door": { id: "door-0001", role: "facade-door", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 433.5, heightMm: 1878, faceSide: "front", edge: { front: 2, back: 2, left: 2, right: 2 } },
+        "drawer-front": { id: "dwf-0001", role: "drawer-front", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 870, heightMm: 394, faceSide: "front", edge: { front: 2, back: 2, left: 2, right: 2 } },
+        "drawer-bottom": { id: "dwbt-0005", role: "drawer-bottom", materialType: "hdf", materialId: "white-matt", thicknessMm: 3, widthMm: 842, heightMm: 562, faceSide: "top", edge: {} },
+        shelf: { id: "shel-0007", role: "shelf", materialType: "ldsp", materialId: "white-matt", thicknessMm: 16, widthMm: 876, heightMm: 580, faceSide: "top", edge: { front: 1, back: 1, left: 1, right: 1 } },
+      },
+    },
+    edgeBanding: {
+      count: 88,
+      countByThickness: { 1: 64, 2: 24 },
+      sample: [
+        { panelId: "side-0001", side: "front", materialId: "white-matt", thicknessMm: 1, lengthMm: 600 },
+        { panelId: "side-0001", side: "back", materialId: "white-matt", thicknessMm: 1, lengthMm: 600 },
+        { panelId: "side-0001", side: "left", materialId: "white-matt", thicknessMm: 1, lengthMm: 2300 },
+        { panelId: "side-0001", side: "right", materialId: "white-matt", thicknessMm: 1, lengthMm: 2300 },
+      ],
+    },
+    hardware: {
+      countByType: { confirmat: 4, "drawer-slide": 2, handle: 6, hinge: 18, rod: 1, "rod-holder": 2, "shelf-support": 8 },
+      sampleByType: {
+        confirmat: { id: "conf-0001", type: "confirmat", linkedPanelIds: ["side-0001", "bott-0003"], drillingRefs: ["drill-0001"], visibleInViewer: false, includeInDocs: true },
+        "drawer-slide": { id: "slide-000r", type: "drawer-slide", linkedPanelIds: ["side-0001", "side-0002", "dwf-0001"], drillingRefs: ["drill-0001", "drill-0001"], visibleInViewer: false, includeInDocs: true },
+        handle: { id: "hnd-0009", type: "handle", linkedPanelIds: ["door-0001"], drillingRefs: ["drill-0009"], visibleInViewer: true, includeInDocs: true },
+        hinge: { id: "hin-0005", type: "hinge", linkedPanelIds: ["door-0001"], drillingRefs: ["drill-0005"], visibleInViewer: false, includeInDocs: true },
+        rod: { id: "rod-000v", type: "rod", linkedPanelIds: [], drillingRefs: [], visibleInViewer: true, includeInDocs: true },
+        "rod-holder": { id: "rh-000w", type: "rod-holder", linkedPanelIds: ["side-0001"], drillingRefs: ["drill-000t"], visibleInViewer: false, includeInDocs: true },
+        "shelf-support": { id: "ss-000y", type: "shelf-support", linkedPanelIds: ["side-0001", "shel-0007"], drillingRefs: ["drill-0001"], visibleInViewer: false, includeInDocs: true },
+      },
+    },
+    drilling: {
+      countByPurpose: { confirmat: 4, "drawer-slide": 4, handle: 6, "hinge-cup": 18, "rod-holder": 2, "shelf-support": 8 },
+      sampleByPurpose: {
+        confirmat: { id: "drill-0001", panelId: "side-0001", purpose: "confirmat", diameterMm: 7, depthMm: 50, side: "right", through: false, requiresTechnologistCheck: true },
+        "drawer-slide": { id: "drill-0001", panelId: "side-0001", purpose: "drawer-slide", diameterMm: 4, depthMm: 12, side: "right", through: false, requiresTechnologistCheck: true },
+        handle: { id: "drill-0009", panelId: "door-0001", purpose: "handle", diameterMm: 5, depthMm: 18, side: "front", through: true, requiresTechnologistCheck: true },
+        "hinge-cup": { id: "drill-0005", panelId: "door-0001", purpose: "hinge-cup", diameterMm: 35, depthMm: 13, side: "back", through: false, requiresTechnologistCheck: true },
+        "rod-holder": { id: "drill-000t", panelId: "side-0001", purpose: "rod-holder", diameterMm: 4, depthMm: 12, side: "right", through: false, requiresTechnologistCheck: true },
+        "shelf-support": { id: "drill-0001", panelId: "side-0001", purpose: "shelf-support", diameterMm: 5, depthMm: 12, side: "right", through: false, requiresTechnologistCheck: true },
+      },
+    },
+    warnings: [
+      { code: "tall-facade", severity: "warn", panelId: null },
+      { code: "many-hinges", severity: "warn", panelId: "door-0003" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0004" },
+    ],
+    validation: { status: "blocked", errorCount: 2, warningCount: 25, summary: { panels: 25, hardware: 41, drilling: 42, edgeBandingLengthMm: 79740, basisSteps: 308 } },
+    review: { status: "blocked", manualChangesAllowed: true, visibleToClient: false },
+    basis: {
+      status: "manual-json-ready",
+      actionCounts: { "add-user-property": 60, "create-drilling": 42, "create-panel": 25, "group-object": 2, "place-hardware": 41, "set-edge": 88, "set-face-side": 25, "set-material": 25 },
+      firstStep: { action: "group-object", targetId: "root", status: "ready", note: "Корневой объект изделия. Технолог вручную создаёт 3D-документ в БАЗИС (manual JSON plan, не automatic .b3d)." },
+      lastStep: { action: "group-object", targetId: "root", status: "ready", note: "Сгруппировать всё в изделие и подготовить спецификацию (ручной шаг технолога в БАЗИС)." },
+    },
+  },
+  "material-aware body/facade payload": {
+    project: {
+      bodyMaterialId: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+      facadeMaterialId: "mdf-egger-r010-seryy-grafitovyy-ms",
+      facadeThicknessMm: 18,
+      sectionCount: 2,
+      shelves: 2,
+      drawers: 0,
+      hangingRod: false,
+      openingMode: "handle-soft-close",
+      hardwareMode: "base",
+    },
+    panels: {
+      countByRole: {
+        "back-panel": 1,
+        bottom: 1,
+        "facade-door": 4,
+        plinth: 1,
+        shelf: 2,
+        "side-left": 1,
+        "side-right": 1,
+        top: 1,
+        "vertical-partition": 1,
+      },
+      countByMaterialType: { hdf: 1, ldsp: 8, mdf: 4 },
+      important: {
+        "side-left": { id: "side-0001", role: "side-left", materialType: "ldsp", materialId: "ldsp-egger-w960-belyy-klassicheskiy-sm", thicknessMm: 16, widthMm: 600, heightMm: 2300, faceSide: "right", edge: { front: 1, back: 1, left: 1, right: 1 } },
+        top: { id: "top-0004", role: "top", materialType: "ldsp", materialId: "ldsp-egger-w960-belyy-klassicheskiy-sm", thicknessMm: 16, widthMm: 1768, heightMm: 600, faceSide: "top", edge: { front: 1, back: 1, left: 1, right: 1 } },
+        "back-panel": { id: "back-0001", role: "back-panel", materialType: "hdf", materialId: "white-matt", thicknessMm: 3, widthMm: 1796, heightMm: 2296, faceSide: "back", edge: {} },
+        "facade-door": { id: "door-0001", role: "facade-door", materialType: "mdf", materialId: "mdf-egger-r010-seryy-grafitovyy-ms", thicknessMm: 18, widthMm: 433.5, heightMm: 2294, faceSide: "front", edge: { front: 2, back: 2, left: 2, right: 2 } },
+        shelf: { id: "shel-0007", role: "shelf", materialType: "ldsp", materialId: "ldsp-egger-w960-belyy-klassicheskiy-sm", thicknessMm: 16, widthMm: 876, heightMm: 580, faceSide: "top", edge: { front: 1, back: 1, left: 1, right: 1 } },
+      },
+    },
+    edgeBanding: {
+      count: 48,
+      countByThickness: { 1: 32, 2: 16 },
+      sample: [
+        { panelId: "side-0001", side: "front", materialId: "ldsp-egger-w960-belyy-klassicheskiy-sm", thicknessMm: 1, lengthMm: 600 },
+        { panelId: "side-0001", side: "back", materialId: "ldsp-egger-w960-belyy-klassicheskiy-sm", thicknessMm: 1, lengthMm: 600 },
+        { panelId: "side-0001", side: "left", materialId: "ldsp-egger-w960-belyy-klassicheskiy-sm", thicknessMm: 1, lengthMm: 2300 },
+        { panelId: "side-0001", side: "right", materialId: "ldsp-egger-w960-belyy-klassicheskiy-sm", thicknessMm: 1, lengthMm: 2300 },
+      ],
+    },
+    hardware: {
+      countByType: { confirmat: 4, handle: 4, hinge: 20, "shelf-support": 4 },
+      sampleByType: {
+        confirmat: { id: "conf-0001", type: "confirmat", linkedPanelIds: ["side-0001", "bott-0003"], drillingRefs: ["drill-0001"], visibleInViewer: false, includeInDocs: true },
+        handle: { id: "hnd-000a", type: "handle", linkedPanelIds: ["door-0001"], drillingRefs: ["drill-000a"], visibleInViewer: true, includeInDocs: true },
+        hinge: { id: "hin-0005", type: "hinge", linkedPanelIds: ["door-0001"], drillingRefs: ["drill-0005"], visibleInViewer: false, includeInDocs: true },
+        "shelf-support": { id: "ss-000t", type: "shelf-support", linkedPanelIds: ["side-0001", "shel-0007"], drillingRefs: ["drill-0001"], visibleInViewer: false, includeInDocs: true },
+      },
+    },
+    drilling: {
+      countByPurpose: { confirmat: 4, handle: 4, "hinge-cup": 20, "shelf-support": 4 },
+      sampleByPurpose: {
+        confirmat: { id: "drill-0001", panelId: "side-0001", purpose: "confirmat", diameterMm: 7, depthMm: 50, side: "right", through: false, requiresTechnologistCheck: true },
+        handle: { id: "drill-000a", panelId: "door-0001", purpose: "handle", diameterMm: 5, depthMm: 18, side: "front", through: true, requiresTechnologistCheck: true },
+        "hinge-cup": { id: "drill-0005", panelId: "door-0001", purpose: "hinge-cup", diameterMm: 35, depthMm: 13, side: "back", through: false, requiresTechnologistCheck: true },
+        "shelf-support": { id: "drill-0001", panelId: "side-0001", purpose: "shelf-support", diameterMm: 5, depthMm: 12, side: "right", through: false, requiresTechnologistCheck: true },
+      },
+    },
+    warnings: [
+      { code: "tall-facade", severity: "warn", panelId: null },
+      { code: "tall-facade", severity: "warn", panelId: null },
+      { code: "many-hinges", severity: "warn", panelId: "door-0001" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0002" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0003" },
+      { code: "many-hinges", severity: "warn", panelId: "door-0004" },
+    ],
+    validation: { status: "ready-for-review", errorCount: 0, warningCount: 24, summary: { panels: 13, hardware: 32, drilling: 32, edgeBandingLengthMm: 58252, basisSteps: 179 } },
+    review: { status: "requires-review", manualChangesAllowed: true, visibleToClient: false },
+    basis: {
+      status: "manual-json-ready",
+      actionCounts: { "add-user-property": 26, "create-drilling": 32, "create-panel": 13, "group-object": 2, "place-hardware": 32, "set-edge": 48, "set-face-side": 13, "set-material": 13 },
+      firstStep: { action: "group-object", targetId: "root", status: "ready", note: "Корневой объект изделия. Технолог вручную создаёт 3D-документ в БАЗИС (manual JSON plan, не automatic .b3d)." },
+      lastStep: { action: "group-object", targetId: "root", status: "ready", note: "Сгруппировать всё в изделие и подготовить спецификацию (ручной шаг технолога в БАЗИС)." },
+    },
+  },
+} as const;
+
+function assertRequiredProductionV3CanonicalSnapshot(
+  label: keyof typeof REQUIRED_V3_CANONICAL_SNAPSHOTS,
+  productionExport: ProductionExportPackage,
+) {
+  assert.deepEqual(
+    extractProductionV3CanonicalSnapshot(productionExport),
+    REQUIRED_V3_CANONICAL_SNAPSHOTS[label],
+  );
+}
+
 function extractProductionV3GoldenSnapshot(
   productionExport: ProductionExportPackage,
 ): ProductionV3GoldenSnapshot {
@@ -419,6 +925,19 @@ const mixedFillingPayload = makePayload({
   },
 });
 
+const handlelessWardrobePayload = makePayload({
+  orderId: "RZ-20260623-9005",
+  filling: { shelves: 2, drawers: 0, hangingRod: false },
+  materials: {
+    bodyId: "white-matt",
+    facadeId: "white-matt",
+    facadeKind: "ldsp",
+    backPanelId: "white-matt",
+    backPanelKind: "hdf",
+  },
+  style: { facadeStyleId: "no-handle", hardwareId: "comfort" },
+});
+
 const facadeMaterialPayload = makePayload({
   orderId: "RZ-20260623-9004",
   filling: { shelves: 2, drawers: 0, hangingRod: false },
@@ -429,38 +948,85 @@ const facadeMaterialPayload = makePayload({
     backPanelId: "white-matt",
     backPanelKind: "hdf",
   },
-  style: { facadeStyleId: "no-handle", hardwareId: "comfort" },
+  style: { facadeStyleId: "regular", hardwareId: "base" },
 });
 
-runGoldenCase("base wardrobe payload", baseWardrobePayload, {
-  panels: 13,
-  hardware: 32,
-  drilling: 32,
-  edgeBanding: 48,
-  warnings: 6,
-  basisSteps: 179,
-  review: "requires-review",
-  validation: "ready-for-review",
-  totals: {
-    panelCount: 13,
-    drillingCount: 32,
-    hardwareCount: 32,
-    edgeBandingLengthMm: 58252,
-    bodyAreaM2: 7.44,
-    facadeAreaM2: 3.98,
-    backPanelAreaM2: 4.12,
-    materialAreaM2: { ldsp: 11.42, hdf: 4.12 },
+runGoldenCase(
+  "base wardrobe payload",
+  baseWardrobePayload,
+  {
+    panels: 13,
+    hardware: 32,
+    drilling: 32,
+    edgeBanding: 48,
+    warnings: 6,
+    basisSteps: 179,
+    review: "requires-review",
+    validation: "ready-for-review",
+    totals: {
+      panelCount: 13,
+      drillingCount: 32,
+      hardwareCount: 32,
+      edgeBandingLengthMm: 58252,
+      bodyAreaM2: 7.44,
+      facadeAreaM2: 3.98,
+      backPanelAreaM2: 4.12,
+      materialAreaM2: { ldsp: 11.42, hdf: 4.12 },
+    },
+    hardwareTypes: ["confirmat", "handle", "hinge", "shelf-support"],
+    facadeThickness: 16,
+    bodyMaterial: "white-matt",
+    facadeMaterial: "white-matt",
+    sections: 2,
+    shelves: 2,
+    drawers: 0,
+    hangingRod: false,
+    facadeMode: "hinged",
   },
-  hardwareTypes: ["confirmat", "handle", "hinge", "shelf-support"],
-  facadeThickness: 16,
-  bodyMaterial: "white-matt",
-  facadeMaterial: "white-matt",
-  sections: 2,
-  shelves: 2,
-  drawers: 0,
-  hangingRod: false,
-  facadeMode: "hinged",
-});
+  (productionExport) => {
+    assertRequiredProductionV3CanonicalSnapshot("base wardrobe payload", productionExport);
+  },
+);
+
+runGoldenCase(
+  "handleless wardrobe payload",
+  handlelessWardrobePayload,
+  {
+    panels: 13,
+    hardware: 32,
+    drilling: 28,
+    edgeBanding: 48,
+    warnings: 6,
+    basisSteps: 175,
+    review: "requires-review",
+    validation: "ready-for-review",
+    totals: {
+      panelCount: 13,
+      drillingCount: 28,
+      hardwareCount: 32,
+      edgeBandingLengthMm: 58252,
+      bodyAreaM2: 7.44,
+      facadeAreaM2: 3.98,
+      backPanelAreaM2: 4.12,
+      materialAreaM2: { ldsp: 11.42, hdf: 4.12 },
+    },
+    hardwareTypes: ["confirmat", "hinge", "push-to-open", "shelf-support"],
+    facadeThickness: 16,
+    bodyMaterial: "white-matt",
+    facadeMaterial: "white-matt",
+    sections: 2,
+    shelves: 2,
+    drawers: 0,
+    hangingRod: false,
+    facadeMode: "hinged",
+  },
+  (productionExport) => {
+    assertRequiredProductionV3CanonicalSnapshot("handleless wardrobe payload", productionExport);
+    assert.equal(productionExport.project.structure.openingMode, "push-to-open");
+    assert.equal(productionExport.project.structure.hardwareMode, "comfort");
+    assert.ok(productionExport.productionModel.hardware.some((item) => item.type === "push-to-open"));
+  },
+);
 
 runGoldenCase("multi-section payload", multiSectionPayload, {
   panels: 18,
@@ -533,6 +1099,7 @@ runGoldenCase(
     facadeMode: "hinged",
   },
   (productionExport) => {
+    assertRequiredProductionV3CanonicalSnapshot("drawers + rods + shelves payload", productionExport);
     assert.ok(productionExport.productionModel.hardware.some((item) => item.type === "rod"));
     assert.ok(productionExport.productionModel.hardware.some((item) => item.type === "drawer-slide"));
     assert.ok(productionExport.manufacturing.requiresTechnologistCheck);
@@ -540,20 +1107,20 @@ runGoldenCase(
 );
 
 runGoldenCase(
-  "facade/material variation payload",
+  "material-aware body/facade payload",
   facadeMaterialPayload,
   {
     panels: 13,
     hardware: 32,
-    drilling: 28,
+    drilling: 32,
     edgeBanding: 48,
     warnings: 6,
-    basisSteps: 175,
+    basisSteps: 179,
     review: "requires-review",
     validation: "ready-for-review",
     totals: {
       panelCount: 13,
-      drillingCount: 28,
+      drillingCount: 32,
       hardwareCount: 32,
       edgeBandingLengthMm: 58252,
       bodyAreaM2: 7.44,
@@ -561,7 +1128,7 @@ runGoldenCase(
       backPanelAreaM2: 4.12,
       materialAreaM2: { ldsp: 7.44, mdf: 3.98, hdf: 4.12 },
     },
-    hardwareTypes: ["confirmat", "hinge", "push-to-open", "shelf-support"],
+    hardwareTypes: ["confirmat", "handle", "hinge", "shelf-support"],
     facadeThickness: 18,
     bodyMaterial: "ldsp-egger-w960-belyy-klassicheskiy-sm",
     facadeMaterial: "mdf-egger-r010-seryy-grafitovyy-ms",
@@ -572,9 +1139,10 @@ runGoldenCase(
     facadeMode: "hinged",
   },
   (productionExport) => {
-    assert.equal(productionExport.project.structure.openingMode, "push-to-open");
-    assert.equal(productionExport.project.structure.hardwareMode, "comfort");
-    assert.ok(productionExport.productionModel.hardware.some((item) => item.type === "push-to-open"));
+    assertRequiredProductionV3CanonicalSnapshot("material-aware body/facade payload", productionExport);
+    assert.equal(productionExport.project.structure.openingMode, "handle-soft-close");
+    assert.equal(productionExport.project.structure.hardwareMode, "base");
+    assert.ok(productionExport.productionModel.hardware.some((item) => item.type === "handle"));
     assert.equal(productionExport.project.material.facadeThicknessMm, 18);
   },
 );
