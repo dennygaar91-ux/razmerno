@@ -24,6 +24,7 @@ const steps = [
   "test:checkout-submit-hook",
   "test:admin-order-summary",
   "test:webgl-fallback-e2e",
+  "test:mvp-release-verification-e2e",
 ];
 
 for (const step of steps) {
