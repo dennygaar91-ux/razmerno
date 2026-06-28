@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { OrderRequest } from "../api/_shared/order-types.js";
+import {
+  buildManufacturingDocumentFromSpecification,
+  serializeManufacturingDocumentMarkdown,
+} from "../src/constructor/production/manufacturingDocument.js";
 import { buildManufacturingSpecificationFromProductionExport } from "../src/constructor/production/manufacturingSpecification.js";
 import { buildProductionExportFromOrder, buildProductionExportFromPayload } from "../src/constructor/production/orderExportPackage.js";
 
@@ -151,6 +155,42 @@ function extractManufacturingSpecSnapshot(payload: OrderRequest) {
   };
 }
 
+function extractManufacturingDocumentSnapshot(payload: OrderRequest) {
+  const { spec } = extractManufacturingSpecSnapshot(payload);
+  const document = buildManufacturingDocumentFromSpecification(spec);
+  const markdown = serializeManufacturingDocumentMarkdown(document);
+
+  return {
+    document,
+    markdown,
+    snapshot: {
+      cover: document.sections.cover,
+      cutList: {
+        totalPanels: document.sections.cutList.totalPanels,
+        firstItem: document.sections.cutList.items[0] ?? null,
+        lastItem: document.sections.cutList.items.at(-1) ?? null,
+      },
+      edgeBanding: {
+        totalEdges: document.sections.edgeBanding.totalEdges,
+        totalLengthMm: document.sections.edgeBanding.totalLengthMm,
+        byThickness: document.sections.edgeBanding.byThickness,
+      },
+      hardware: {
+        totalItems: document.sections.hardware.totalItems,
+        items: document.sections.hardware.items,
+      },
+      drillingAndOperations: {
+        totalOperations: document.sections.drillingAndOperations.totalOperations,
+        requiresTechnologistCheck: document.sections.drillingAndOperations.requiresTechnologistCheck,
+        drilling: document.sections.drillingAndOperations.drilling,
+        basisActions: document.sections.drillingAndOperations.basisActions,
+      },
+      basisChecklist: document.sections.basisChecklist,
+      validation: document.sections.validation,
+    },
+  };
+}
+
 function assertManufacturingSpecificationInvariants(
   payload: OrderRequest,
   label: string,
@@ -185,6 +225,46 @@ function assertManufacturingSpecificationInvariants(
   assert.ok(!serialized.includes("createdAt"), `${label}: spec must exclude createdAt`);
   assert.ok(!serialized.includes("RZ-20260623"), `${label}: spec must exclude order ids`);
   assertBasisManualJsonBoundary(serialized, spec.basisManualJson.status, label);
+}
+
+function assertManufacturingDocumentInvariants(
+  payload: OrderRequest,
+  label: string,
+) {
+  const { document, markdown } = extractManufacturingDocumentSnapshot(payload);
+  const serialized = JSON.stringify(document);
+
+  assert.equal(document.schema, "razmerno.manufacturing-document.v1");
+  assert.equal(document.derivedFrom.manufacturingSpecificationSchema, "razmerno.manufacturing-spec.v1");
+  assert.equal(document.derivedFrom.basisBoundary, "manual-json");
+  assert.ok(markdown.startsWith("# Manufacturing Specification"));
+  assert.ok(markdown.includes("## Cut List"));
+  assert.ok(markdown.includes("## Edge Banding Sheet"));
+  assert.ok(markdown.includes("## Hardware List"));
+  assert.ok(markdown.includes("## Drilling and Operations Summary"));
+  assert.ok(markdown.includes("## Basis Manual Checklist"));
+  assert.ok(markdown.includes("## Validation and Review Summary"));
+  assert.ok(markdown.includes("Basis boundary: manual JSON handoff only."));
+  assert.ok(markdown.includes("Automatic .b3d generation is not provided."));
+  assert.ok(
+    markdown.includes("Technologist review may be required.") ||
+      markdown.includes("Technologist review is not currently required by this specification."),
+  );
+
+  assert.ok(!serialized.includes("client@example.com"), `${label}: document must exclude customer email`);
+  assert.ok(!serialized.includes("+7 999"), `${label}: document must exclude customer phone`);
+  assert.ok(!serialized.includes("Иван"), `${label}: document must exclude customer name`);
+  assert.ok(!serialized.includes("RZ-20260623"), `${label}: document must exclude order ids`);
+  assert.ok(!serialized.includes("acceptedAt"), `${label}: document must exclude acceptedAt`);
+  assert.ok(!serialized.includes("createdAt"), `${label}: document must exclude createdAt`);
+  assert.ok(!markdown.includes("client@example.com"), `${label}: markdown must exclude customer email`);
+  assert.ok(!markdown.includes("+7 999"), `${label}: markdown must exclude customer phone`);
+  assert.ok(!markdown.includes("Иван"), `${label}: markdown must exclude customer name`);
+  assert.ok(!markdown.includes("RZ-20260623"), `${label}: markdown must exclude order ids`);
+  assert.ok(!markdown.includes("acceptedAt"), `${label}: markdown must exclude acceptedAt`);
+  assert.ok(!markdown.includes("createdAt"), `${label}: markdown must exclude createdAt`);
+  assertBasisManualJsonBoundary(serialized, document.sections.basisChecklist.status, label);
+  assertBasisManualJsonBoundary(markdown, document.sections.basisChecklist.status, `${label} markdown`);
 }
 
 test("production export package baseline invariants stay valid", () => {
@@ -735,6 +815,162 @@ test("manufacturing specification: material-aware body and facade materials stay
       manualPlanStepCount: 179,
     },
   });
+});
+
+test("manufacturing document is independent from payload-only PII, pricing and order metadata", () => {
+  const first = makePayload({
+    orderId: "RZ-20260623-9301",
+    customer: { name: "Первый", phone: "+7 911 000 00 01", email: "first@example.com" },
+    totalPrice: 654321,
+    consent: { personalData: true, privacyVersion: "2026-05-24", acceptedAt: "2026-06-20T10:00:00.000Z" },
+  });
+  const second = makePayload({
+    orderId: "RZ-20260623-9302",
+    customer: { name: "Второй", phone: "+7 922 000 00 02", email: "second@example.com" },
+    totalPrice: 1,
+    priceBreakdown: {
+      body: 1,
+      facades: 1,
+      filling: 1,
+      hardware: 1,
+      production: 1,
+      materials: 1,
+      edgeBanding: 1,
+      services: 1,
+      delivery: 1,
+      assembly: 1,
+    },
+    consent: { personalData: true, privacyVersion: "2026-05-24", acceptedAt: "2026-06-22T22:22:22.000Z" },
+  });
+
+  const firstDocument = extractManufacturingDocumentSnapshot(first);
+  const secondDocument = extractManufacturingDocumentSnapshot(second);
+
+  assert.deepEqual(firstDocument.document, secondDocument.document);
+  assert.equal(firstDocument.markdown, secondDocument.markdown);
+});
+
+test("manufacturing document: baseline wardrobe markdown and sections are stable", () => {
+  const payload = makePayload({ orderId: "RZ-20260623-9001" });
+  assertManufacturingDocumentInvariants(payload, "baseline wardrobe document");
+
+  const { snapshot, markdown } = extractManufacturingDocumentSnapshot(payload);
+  assert.deepEqual(snapshot.cover, {
+    title: "Manufacturing Specification",
+    productType: "wardrobe",
+    dimensionsLabel: "1800 x 2400 x 600 mm",
+    sectionCount: 2,
+    facadeMode: "hinged",
+    openingMode: "handle-soft-close",
+    hardwareMode: "base",
+    bodyMaterialId: "white-matt",
+    facadeMaterialId: "white-matt",
+    backPanelMaterialId: "white-matt",
+    basisBoundaryStatement: "Basis boundary: manual JSON handoff only.",
+    automaticB3dStatement: "Automatic .b3d generation is not provided.",
+    technologistReviewStatement: "Technologist review may be required.",
+  });
+  assert.equal(snapshot.cutList.totalPanels, 13);
+  assert.equal(snapshot.edgeBanding.totalEdges, 48);
+  assert.equal(snapshot.hardware.totalItems, 32);
+  assert.equal(snapshot.drillingAndOperations.totalOperations, 32);
+  assert.equal(snapshot.basisChecklist.manualPlanStepCount, 179);
+  assert.equal(snapshot.validation.status, "ready-for-review");
+  assert.ok(markdown.includes("| facade-door | ldsp:white-matt | 16 | 433.5x2294x16 mm | 4 | front:2, back:2, left:2, right:2 |"));
+});
+
+test("manufacturing document: handleless wardrobe keeps push-to-open and future basis steps visible", () => {
+  const payload = makePayload({
+    orderId: "RZ-20260623-9005",
+    style: { facadeStyleId: "no-handle", hardwareId: "comfort" },
+  });
+  assertManufacturingDocumentInvariants(payload, "handleless wardrobe document");
+
+  const { snapshot, markdown } = extractManufacturingDocumentSnapshot(payload);
+  assert.equal(snapshot.cover.openingMode, "push-to-open");
+  assert.equal(snapshot.cover.hardwareMode, "comfort");
+  assert.ok(snapshot.hardware.items.some((item) => item.type === "push-to-open" && item.count === 4));
+  assert.ok(snapshot.drillingAndOperations.basisActions.some((item) => item.action === "place-hardware" && item.count === 32));
+  assert.ok(markdown.includes("| push-to-open |"));
+  assert.ok(markdown.includes("Technologist review may be required."));
+});
+
+test("manufacturing document: mixed blocked case preserves blocked review summary", () => {
+  const payload = makePayload({
+    orderId: "RZ-20260623-9003",
+    filling: { shelves: 4, drawers: 2, hangingRod: true },
+    layout: {
+      sections: [
+        {
+          id: "section-1",
+          widthMm: 900,
+          compartments: [
+            {
+              id: "section-1-compartment-1",
+              kind: "drawers" as const,
+              heightMm: 800,
+              shelves: 0,
+              drawers: 2,
+              hasRod: false,
+            },
+            {
+              id: "section-1-compartment-2",
+              kind: "rod" as const,
+              heightMm: 1600,
+              shelves: 0,
+              drawers: 0,
+              hasRod: true,
+            },
+          ],
+        },
+        {
+          id: "section-2",
+          widthMm: 900,
+          compartments: [
+            {
+              id: "section-2-compartment-1",
+              kind: "shelves" as const,
+              heightMm: 2400,
+              shelves: 4,
+              drawers: 0,
+              hasRod: false,
+            },
+          ],
+        },
+      ],
+    },
+  });
+  assertManufacturingDocumentInvariants(payload, "mixed blocked document");
+
+  const { snapshot, markdown } = extractManufacturingDocumentSnapshot(payload);
+  assert.equal(snapshot.validation.status, "blocked");
+  assert.equal(snapshot.validation.reviewStatus, "blocked");
+  assert.ok(snapshot.validation.productionWarnings.some((item) => item.code === "tall-facade"));
+  assert.ok(snapshot.hardware.items.some((item) => item.type === "rod"));
+  assert.ok(snapshot.hardware.items.some((item) => item.type === "drawer-slide"));
+  assert.ok(markdown.includes("Validation status: blocked"));
+  assert.ok(markdown.includes("Review status: blocked"));
+});
+
+test("manufacturing document: material-aware case keeps body and facade material split", () => {
+  const payload = makePayload({
+    orderId: "RZ-20260623-9004",
+    materials: {
+      bodyId: "ldsp-egger-w960-belyy-klassicheskiy-sm",
+      facadeId: "mdf-egger-r010-seryy-grafitovyy-ms",
+      facadeKind: "mdf",
+      backPanelId: "white-matt",
+      backPanelKind: "hdf",
+    },
+  });
+  assertManufacturingDocumentInvariants(payload, "material-aware document");
+
+  const { snapshot, markdown } = extractManufacturingDocumentSnapshot(payload);
+  assert.equal(snapshot.cover.bodyMaterialId, "ldsp-egger-w960-belyy-klassicheskiy-sm");
+  assert.equal(snapshot.cover.facadeMaterialId, "mdf-egger-r010-seryy-grafitovyy-ms");
+  assert.ok(snapshot.cutList.firstItem?.material.includes(":white-matt"));
+  assert.ok(markdown.includes("- Body material: ldsp-egger-w960-belyy-klassicheskiy-sm"));
+  assert.ok(markdown.includes("- Facade material: mdf-egger-r010-seryy-grafitovyy-ms"));
 });
 
 console.log("Production export package test passed.");

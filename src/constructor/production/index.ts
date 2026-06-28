@@ -11,3 +11,8 @@ export {
   type ManufacturingSpecification,
   type ManufacturingCutListItem,
 } from "./manufacturingSpecification.js";
+export {
+  buildManufacturingDocumentFromSpecification,
+  serializeManufacturingDocumentMarkdown,
+  type ManufacturingDocument,
+} from "./manufacturingDocument.js";
