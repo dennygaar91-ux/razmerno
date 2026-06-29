@@ -20,16 +20,17 @@
   }
 
   .rzm-3d-stepper {
-    grid-template-columns: repeat(4, minmax(132px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(4, minmax(148px, 1fr));
+    gap: 12px;
   }
 
   .rzm-3d-step {
     min-height: 50px;
-    padding: 8px 12px;
+    padding: 8px 14px 8px 12px;
     gap: 10px;
     border-radius: 18px;
-    align-items: flex-start;
+    align-items: center;
+    overflow: visible;
   }
 
   .rzm-3d-step-index {
@@ -42,14 +43,43 @@
     align-content: center;
     gap: 2px;
     padding-top: 1px;
+    overflow: visible;
+  }
+
+  .rzm-3d-step > span.rzm-3d-step-copy {
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    border-radius: 0 !important;
+    background: transparent !important;
+    place-items: initial !important;
   }
 
   .rzm-3d-step-title {
     font-size: 12.5px;
-    line-height: 1.18;
+    line-height: 1.16;
     letter-spacing: -.025em;
     white-space: normal;
     text-wrap: balance;
+    overflow: visible;
+    text-overflow: clip;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .rzm-3d-step > span.rzm-3d-step-copy > span.rzm-3d-step-title {
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    display: block !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    place-items: initial !important;
   }
 }
 
