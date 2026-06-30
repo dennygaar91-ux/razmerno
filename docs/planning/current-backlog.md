@@ -26,8 +26,10 @@ Governance note:
 - `closed` — закрыто и подтверждено документальным evidence.
 - `closed / disputed` — в backlog есть закрытие, но closure evidence требует reconciliation.
 - `open / blocked` — актуально, но выполнение зависит от внешнего решения, PR cleanup или evidence.
+- `needs reconciliation` — задача остаётся открытой, пока не устранён конфликт между RPES / accepted decisions / backlog / evidence wording.
 - `obsolete` — потеряло актуальность.
 - `duplicate` — перекрыто другой задачей и не должно запускаться отдельно.
+- `superseded` — исторический смысл задачи сохранён в другой активной задаче; отдельно не запускать.
 
 ## Evidence / Closure Rules
 
@@ -158,7 +160,7 @@ Evidence status note:
 
 Риск: потеря конверсии и заявок.
 
-Reconciliation note: contract-scope закрыт через P0-11/P0-12. Остаточный browser-level checkout UX/E2E scope остаётся в P1-05 и P1-09.
+Reconciliation note: contract-scope закрыт через P0-11/P0-12. Остаточный browser-level checkout UX/E2E scope остаётся в `P1-09` и `M9-P1-01`.
 
 ### P0-05 Three.js Stability
 
@@ -234,7 +236,7 @@ Post-closure maintenance evidence:
 
 Риск: крупная декомпозиция станет небезопасной.
 
-Reconciliation note: базовая QA/CI/testing foundation закрыта инфраструктурно и contract-layer задачами. Остаточная работа по Fast/Medium/Heavy, nightly/release workflows и quarantine остаётся в P1-14—P1-19.
+Reconciliation note: базовая QA/CI/testing foundation закрыта инфраструктурно и contract-layer задачами. Остаточная работа по extended release/nightly automation и release-process maturity остаётся в `M9-P1-01`, `M9-P1-10` и связанных `M8/M9/M10` QA-задачах, а не в отдельных `P1-14—P1-19`.
 
 ### P0-09 QA Fast CI Gate
 
@@ -760,7 +762,7 @@ Why: `docs/design-system/README.md` still states `mobile-first`, while accepted 
 
 Risk: UX/design tasks may keep making conflicting visual decisions about constructor shell, stepper, fallback layout and release gate.
 
-Owner: 01 Product / Planning Agent + 08 UX/UI / Design System Agent.
+Owner: 01 Product / Planning Agent + 08 UX / Design System Agent.
 
 Evidence needed:
 
@@ -808,7 +810,7 @@ Why: RPES Volume VIII and accepted decisions define a minimal MVP admin scope, b
 
 Risk: admin work can drift from minimal MVP operations into unapproved extended workflow scope.
 
-Owner: 01 Product / Planning Agent + 04 API / Orders Agent + 08 UX/UI / Design System Agent.
+Owner: 01 Product / Planning Agent + 04 API / Orders Agent + 08 UX / Design System Agent.
 
 Evidence needed:
 
@@ -816,7 +818,7 @@ Evidence needed:
 - mapping to `P2-09`, `P2-25`, `M9-P1-02`;
 - explicit list of what is in MVP now versus deferred.
 
-Dependencies: `docs/specification/volume-08-admin-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `P2-09`, `P2-25`.
+Dependencies: `docs/specification/volume-08-admin-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
 
@@ -1120,7 +1122,7 @@ Do not run separately: keep admin visual scope under `P2-25`; keep VQA artifact/
 
 Статус: superseded.
 
-Owner: 08 UX/UI / Design System Agent.
+Owner: 08 UX / Design System Agent.
 
 Reason: duplicate management scope of `P2-22 Accessibility / Focus Visual Pass`.
 
@@ -1140,9 +1142,11 @@ Do not run separately: use `P2-20` for screenshot suite coverage and `P2-21` for
 
 Статус: open.
 
-Owner: 08 UX/UI / Design System Agent.
+Owner: 08 UX / Design System Agent.
 
 Reason: Dedicated design-system inventory not confirmed; Constructor3D CSS is layered hardening, not clean DS architecture.
+
+Dependency note: run this after `P1-26`, so inventory/token cleanup follows the reconciled desktop-first design-system direction instead of an outdated mobile-first baseline.
 
 Closure condition:
 
@@ -1208,9 +1212,11 @@ Closure condition:
 
 Статус: open.
 
-Owner: 07 Production / Manufacturing Agent + 04 API / Orders Agent + 08 UX/UI / Design System Agent.
+Owner: 07 Production / Manufacturing Agent + 04 API / Orders Agent + 08 UX / Design System Agent.
 
 Reason: Admin production review is partial: no per-panel, per-hole, hardware/SKU operation editing.
+
+Dependency note: do not start implementation planning for this task before `P1-28` fixes the MVP admin boundary versus extended operations scope.
 
 Closure condition:
 
