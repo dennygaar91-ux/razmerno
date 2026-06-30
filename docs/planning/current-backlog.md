@@ -143,6 +143,8 @@ Committed evidence note:
 - `P0-03` remains open: pricing formulas were not changed, parity closure still depends on `P0-13`, GitHub QA/main verification and remaining source/fallback evidence.
 - QA note for `799b6f89`: local task evidence covered checkout pricing persistence tests and typecheck, but `typecheck:api` is `not verified` in this backlog note due the Windows/glob issue called out in the implementation report.
 - `338976f3` (`test: add pricing parity evidence pack`) adds branch-only parity evidence in `tests/checkout-submit-hook.test.ts` and `tests/admin-order-summary.test.ts` for stored snapshot recompute, delivery/assembly matrix persistence, material-aware snapshot paths and admin stored-snapshot semantics. `P0-03` remains open; GitHub QA/main verification `not verified`.
+- Local architecture cleanup evidence: dead browser runtime-catalog helper `src/pricing/runtimeCatalog.ts`, dead duplicate quick-estimate wrapper `src/shared/lib/estimate.ts` and dead legacy exports `calculateLegacyPrice` / `quickEstimate` / `applyClientPriceMultiplier` were removed after repo-wide reachability check confirmed no active imports. Active MVP pricing path remains `Constructor3D useConstructorQuote -> shared/lib/price.calculatePrice -> pricing/engine -> api/_shared/server-price -> order snapshot -> admin stored snapshot read`.
+- Remaining work narrowed: legacy constructor/manual export pricing files under `src/constructor/**` were not removed because they still have local import chains for manual Basis/technical export paths; public MVP pricing still needs source/fallback evidence and P0-13 parity closure.
 
 Объём: M. Зависимости: price sources, delivery, assembly, P0-13. Независимо: частично.
 

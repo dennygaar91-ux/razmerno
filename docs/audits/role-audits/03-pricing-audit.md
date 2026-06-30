@@ -21,8 +21,10 @@
 
 - В репо есть отдельный pricing engine layer в `src/pricing/**`.
 - Server-side pricing resolution вынесен в `api/_shared/server-price.ts`.
-- Есть runtime catalog/store path и Supabase-backed price-items store с seed fallback.
+- Есть runtime catalog/store path и Supabase-backed price-items store с seed fallback; dead browser helper `src/pricing/runtimeCatalog.ts` уже не нужен active MVP path и removed locally after reachability check.
 - Большой объём pricing tests уже существует: catalog, engine, delivery, hardware, services, runtime catalog, parity-related fixtures.
+- Active MVP pricing path подтверждён как `Constructor3D/useConstructorQuote -> shared/lib/price.calculatePrice -> pricing/engine -> api/_shared/server-price -> stored order snapshot -> admin stored snapshot read`.
+- Dead duplicate helper layer partially cleaned: removed `src/shared/lib/estimate.ts` and dead exports `calculateLegacyPrice`, `quickEstimate`, `applyClientPriceMultiplier`.
 - Planning/backlog прямо признаёт P0-13 open и связывает pricing release gate с parity/golden fixtures.
 
 ## RPES Alignment
@@ -43,6 +45,7 @@
 - Backlog сам фиксирует, что pricing parity closure не завершён; task остаётся open.
 - Repo всё ещё несёт duality `Supabase/runtime catalog` vs `seed fallback`, а historical pricing audit documents фиксируют риск drift.
 - В client code pricing layer по-прежнему опирается на local catalog stack/seed behavior, тогда как accepted decisions требуют жёсткий source-of-truth lock around Supabase/runtime catalog for MVP.
+- Legacy constructor/manual export pricing path в `src/constructor/**` не доказан мёртвым: локальные import chains для manual Basis/technical export still exist, поэтому этот слой оставлен как legacy-compatible, а не удалён.
 - Отдельного merged closure evidence for full quote/order/stored snapshot parity в audit scope не подтверждено.
 
 ## Risks
@@ -56,7 +59,7 @@
 - Свести в один pricing closure pack evidence по `quote -> order -> stored snapshot -> admin summary`.
 - Зафиксировать one-page source-of-truth map: client preview source, server authoritative source, fallback semantics, admin reporting source.
 - Добрать explicit tests/evidence for production-panel pricing parity and stored snapshot parity where backlog still marks open scope.
-- Проверить, что backlog wording и pricing docs больше не оставляют ambiguity по live MVP pricing source.
+- Отдельно решить судьбу legacy constructor/manual export pricing layer: quarantine guard or future removal only after reachability beyond manual Basis/technical export is proven.
 
 ## Evidence Required for Closure
 
