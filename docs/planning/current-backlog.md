@@ -112,8 +112,8 @@ Local branch evidence note:
 - `9e4a2f13` (`docs: define constructor state ownership contract`) adds `docs/planning/constructor-state-ownership-contract-v1.md` and documents active Constructor3D ownership, active-vs-legacy boundary, snapshot/payload boundary and closure evidence requirements.
 - Current repository audit shows `9e4a2f13` is present in local branch `task/p0-03-pricing-source-lock` and is not verified on local `main`.
 - This is docs-layer, branch-only evidence and cannot close `P0-02` or `M8-P0-02`.
-- Local dependency-audit note: active Constructor3D store/payload flow now uses `src/static-pages/constructor/layoutTypes.ts`, but the active submit chain still depends transitively on legacy layout typing through `src/shared/lib/order.ts -> src/configurator/model/compartments.ts`. This does not reopen `P0-18`; it keeps `P0-02` open as a state/payload boundary follow-up.
-- `P0-02` stays open until focused runtime state-transition tests, constructor payload tests, GitHub QA and merged/main verification are recorded.
+- Local implementation evidence note: branch-local architecture cleanup removed the specific shared-order legacy type dependency `src/shared/lib/order.ts -> src/configurator/model/compartments.ts` by introducing an order-contract-local layout type in `src/shared/lib/order.ts`; required QA passed locally: `npm.cmd run typecheck`, `npm.cmd run test:checkout-submit-hook`, `npm.cmd run test:constructor-flow`, `npm.cmd run test:mvp-release-verification-e2e`, `git diff --check`.
+- Remaining work: `P0-02` stays open until this narrowed payload-boundary cleanup is merged/main-verified and the broader state-ownership closure evidence is complete across focused runtime state-transition tests, constructor payload tests, GitHub QA and merged/main verification.
 
 Объём: L. Зависимости: P0-01. Независимо: нет.
 

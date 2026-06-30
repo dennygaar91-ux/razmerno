@@ -101,6 +101,8 @@
 | RAR-009 | Visual execution evidence gap | 08 UX / Design System, 05 Infra / QA, 06 Three.js | P2-20, P2-21, P2-26, M8-P1-01 | P1 | Execute screenshot matrix with human review; `Local MVP Demo` readiness does not close public release without this layer | yes |
 | RAR-010 | Visualization layer duality | 06 Three.js / Visualization | P2-26A, P2-26B, P2-26C, M8-P0-03, P2-26D, M10-P2-07 | P2 | Document active vs legacy visualization ownership before deeper runtime changes and treat zero-import modules only as cleanup candidates until manual/external entry verification is done | no |
 
+- `RAR-003` note: local implementation now removes the specific `src/shared/lib/order.ts -> src/configurator/model/compartments.ts` shared-order legacy layout dependency, but broader Constructor3D state ownership closure evidence remains open until merged/main verification.
+
 ## P0 / P1 / P2 Reclassification Suggestions
 
 Эти suggestions не меняют `current-backlog.md`; они только предлагают дальнейший planning review.

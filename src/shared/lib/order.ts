@@ -1,4 +1,3 @@
-import type { LayoutModel } from "../../configurator/model/compartments";
 import { trackEvent } from "./analytics";
 import manifest from "../../config/manifest.json";
 
@@ -13,12 +12,34 @@ import manifest from "../../config/manifest.json";
  * - если VITE_USE_MOCK_API === "true" — возвращаем mock-success без записи PII в localStorage.
  */
 
+export type OrderLayoutCompartmentKind = "empty" | "shelves" | "drawers" | "rod";
+
+export interface OrderLayoutCompartment {
+  id: string;
+  kind: OrderLayoutCompartmentKind;
+  heightMm: number;
+  shelves: number;
+  drawers: number;
+  hasRod: boolean;
+}
+
+export interface OrderLayoutSection {
+  id: string;
+  widthMm: number;
+  facadeMode?: "open" | "hinged";
+  compartments: OrderLayoutCompartment[];
+}
+
+export interface OrderLayoutModel {
+  sections: OrderLayoutSection[];
+}
+
 export interface OrderPayload {
   productType: "wardrobe" | "dresser" | "nightstand";
   dimensions: { width: number; height: number; depth: number };
   sections: number;
   filling: { shelves: number; drawers: number; hangingRod: boolean };
-  layout?: LayoutModel;
+  layout?: OrderLayoutModel;
   materials: { bodyId: string; facadeId: string; facadeKind?: "ldsp" | "mdf"; backPanelId?: string; backPanelKind?: "hdf" };
   style: { facadeStyleId: string; hardwareId: string };
   priceBreakdown: Record<string, number>;
