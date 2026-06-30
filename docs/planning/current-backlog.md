@@ -112,6 +112,7 @@ Local branch evidence note:
 - `9e4a2f13` (`docs: define constructor state ownership contract`) adds `docs/planning/constructor-state-ownership-contract-v1.md` and documents active Constructor3D ownership, active-vs-legacy boundary, snapshot/payload boundary and closure evidence requirements.
 - Current repository audit shows `9e4a2f13` is present in local branch `task/p0-03-pricing-source-lock` and is not verified on local `main`.
 - This is docs-layer, branch-only evidence and cannot close `P0-02` or `M8-P0-02`.
+- Local dependency-audit note: active Constructor3D store/payload flow now uses `src/static-pages/constructor/layoutTypes.ts`, but the active submit chain still depends transitively on legacy layout typing through `src/shared/lib/order.ts -> src/configurator/model/compartments.ts`. This does not reopen `P0-18`; it keeps `P0-02` open as a state/payload boundary follow-up.
 - `P0-02` stays open until focused runtime state-transition tests, constructor payload tests, GitHub QA and merged/main verification are recorded.
 
 Объём: L. Зависимости: P0-01. Независимо: нет.
@@ -1046,6 +1047,8 @@ Evidence needed:
 
 Dependencies: `docs/specification/volume-03-visualization/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
+Implementation evidence note: local dependency audit confirms active runtime route `/configurator-3d` renders `src/static-pages/Constructor3DPage.tsx` and depends on `src/static-pages/constructor/three/**`, while `src/configurator/three/**` remains reachable only through isolated legacy `src/configurator/ConfiguratorPage.tsx` and legacy-oriented tests. Task remains open until this ownership map is documented on merged/main.
+
 Do-not-touch constraints:
 
 - do not refactor Three.js runtime in this task;
@@ -1417,6 +1420,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Acceptance summary: production-like insert/read, RLS assumptions, safe email recipients and no-PII logging verified with evidence.
 - Suggested agent: 05 Infrastructure / QA Agent
 - Accepted decisions note: evaluate against accepted Supabase/runtime catalog, notification failure and no-PII decision layer.
+- Fresh local evidence note (2026-06-30): current local release-audit shell had all required release env groups missing (`ALLOWED_ORIGINS`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `ORDER_MANAGER_EMAIL`, `ADMIN_API_KEY`, `ADMIN_PASSWORD_HASH`, frontend release vars), so live-provider/public-release readiness remains `not verified` and this gate stays open.
 
 #### M8-P1-03 — PII and logging audit
 - Status: closed with evidence
@@ -1462,6 +1466,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Related existing task: QA Release Maturity Matrix, P1-21, P2-26
 - Acceptance summary: one end-to-end release candidate pass covers landing to constructor to order persistence to notifications, with manual and automated evidence.
 - Suggested agent: 01 Product / Planning Agent
+- Fresh local evidence note (2026-06-30): `npm.cmd run qa:mvp-local`, `npm.cmd run test:pricing-engine`, `npm.cmd run test:pricing-final`, `npm.cmd run test:production-export` and `npm.cmd run qa:css-performance` passed locally or returned warning-only inventory; this supports `Local MVP Demo` readiness only and does not close public-release gates without fresh visual review, live-provider verification and merged/main evidence.
 
 ### Needed for 9/10 production-ready
 
@@ -1602,6 +1607,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Product-visible: no
 - Related existing task: P0-01, P0-02, P0-18, TASK 08-UX-07
 - Acceptance summary: large components, legacy Constructor boundaries, domain contracts and dead code removal are planned without weakening current guards.
+- Implementation evidence note: repo-wide dependency audit found zero in-repo importers for `src/Landing.tsx`, `src/StaticDesignPages.tsx`, `src/constructor/api.ts`, `src/constructor/analytics.ts`, `src/constructor/store.ts`, `src/constructor/quickEstimate.ts`, `src/constructor/production/index.ts`, `src/constructor/production/exportPackage.ts` and `src/constructor/basis/manualExport.ts`; legacy-removal planning should start from this confirmed set instead of creating a duplicate cleanup task.
 - Suggested agent: 02 Constructor Agent
 
 #### M10-P2-08 — Load and stress testing
