@@ -1607,7 +1607,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Product-visible: no
 - Related existing task: P0-01, P0-02, P0-18, TASK 08-UX-07
 - Acceptance summary: large components, legacy Constructor boundaries, domain contracts and dead code removal are planned without weakening current guards.
-- Implementation evidence note: repo-wide dependency audit found zero in-repo importers for `src/Landing.tsx`, `src/StaticDesignPages.tsx`, `src/constructor/api.ts`, `src/constructor/analytics.ts`, `src/constructor/store.ts`, `src/constructor/quickEstimate.ts`, `src/constructor/production/index.ts`, `src/constructor/production/exportPackage.ts` and `src/constructor/basis/manualExport.ts`; legacy-removal planning should start from this confirmed set instead of creating a duplicate cleanup task.
+- Implementation evidence note: repo-wide dependency audit found zero in-repo importers for `src/Landing.tsx`, `src/StaticDesignPages.tsx`, `src/constructor/api.ts`, `src/constructor/analytics.ts`, `src/constructor/store.ts`, `src/constructor/quickEstimate.ts`, `src/constructor/production/index.ts`, `src/constructor/production/exportPackage.ts` and `src/constructor/basis/manualExport.ts`; legacy-removal planning should start from this confirmed set instead of creating a duplicate cleanup task, but zero in-repo imports alone do not prove safe deletion until manual/external entry points, config references and documentation links are checked.
 - Suggested agent: 02 Constructor Agent
 
 #### M10-P2-08 — Load and stress testing

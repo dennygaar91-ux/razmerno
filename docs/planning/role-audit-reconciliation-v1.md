@@ -20,11 +20,13 @@
 
 - RPES уже является primary Source of Truth, но часть томов ещё выглядит как draft/foundation layer, поэтому backlog и implementation требуют явного reconciliation, а не implicit interpretation.
 - Pricing остаётся самым чувствительным source-of-truth конфликтом: accepted decision требует `Supabase/runtime catalog` как primary MVP source, тогда как backlog и audits всё ещё фиксируют ambiguity и open parity evidence.
-- Constructor3D закреплён как active path, но state ownership contract и legacy boundary simplification ещё не доведены до отдельного explicit документа.
+- Constructor3D закреплён как active path, но state ownership contract и legacy boundary simplification ещё не доведены до отдельного explicit документа; свежий dependency audit также подтвердил, что active submit chain всё ещё зависит от legacy layout typing transitively through `src/shared/lib/order.ts -> src/configurator/model/compartments.ts`.
 - Customer platform scope в RPES шире, чем явно подтверждённая current implementation surface в role audits.
 - Production/manufacturing слой уже богат по коду и тестам, но evidence around active v3 golden snapshots и full manufacturing lock остаётся неполным.
 - UX/design-system слой содержит документный drift: `docs/design-system/**` формулирует mobile-first направление, а accepted decisions фиксируют desktop/website-first current scope.
 - Admin/order workflow scope требует отдельного product decision pass: admin уже существует как implementation surface, но release/MVP operational boundary ещё не полностью стабилизирована.
+- Maximum release audit currently supports `Local MVP Demo` readiness only; `Public MVP Release` remains blocked until live provider / Supabase verification, fresh visual review and merged/main closure evidence are recorded.
+- Zero-import cleanup candidates are useful for planning, but zero in-repo imports alone are not deletion evidence until manual/external entry points, config references and documentation links are checked.
 
 ## Cross-role Conflicts
 
@@ -91,13 +93,13 @@
 | RAR-001 | RPES/backlog reconciliation | 01 Product / Planning | P0-07, M8-P1-05 | P0 | Create RPES-to-backlog crosswalk and conflict register | no |
 | RAR-002 | Pricing source lock | 03 Pricing | P0-03, P0-13, M8-P0-01 | P0 | Write pricing source-of-truth lock doc before further parity claims | no |
 | RAR-003 | Constructor state ownership | 02 Constructor | P0-02, M8-P0-02 | P0 | Create explicit state ownership contract doc | no |
-| RAR-004 | Live provider / Supabase verification | 04 API / Orders, 05 Infra / QA | Live Provider / Supabase Order Flow Verification, M8-P1-02 | P1 | Prepare live verification plan and evidence format | no |
+| RAR-004 | Live provider / Supabase verification | 04 API / Orders, 05 Infra / QA | Live Provider / Supabase Order Flow Verification, M8-P1-02 | P1 | Prepare live verification plan and evidence format; public release stays blocked until this evidence exists on merged/main | no |
 | RAR-005 | Design-system direction drift | 08 UX / Design System | P1-21, P2-21, TASK 08-UX-07 | P1 | Reconcile mobile-first doc wording with accepted desktop-first direction | no |
 | RAR-006 | Customer platform scope gap | 04 API / Orders | customer platform-related open scope, M10-P2-09 adjacency | P1 | Record explicit MVP customer platform scope decision | no |
 | RAR-007 | Production evidence gap | 07 Production / Manufacturing | P1-11A, P1-11B, P1-23, P1-24, M9-P1-09 | P1 | Fix snapshot scope decision before any closure attempt | no |
 | RAR-008 | Admin workflow scope drift | 04 API / Orders, 08 UX / Design System | P2-09, P2-25, TASK 08-UX-04 | P1 | Record admin MVP vs extended operations boundary | no |
-| RAR-009 | Visual execution evidence gap | 08 UX / Design System, 05 Infra / QA, 06 Three.js | P2-20, P2-21, P2-26, M8-P1-01 | P1 | Execute screenshot matrix with human review | yes |
-| RAR-010 | Visualization layer duality | 06 Three.js / Visualization | P2-26A, P2-26B, P2-26C, M8-P0-03 | P2 | Document active vs legacy visualization ownership before deeper runtime changes | no |
+| RAR-009 | Visual execution evidence gap | 08 UX / Design System, 05 Infra / QA, 06 Three.js | P2-20, P2-21, P2-26, M8-P1-01 | P1 | Execute screenshot matrix with human review; `Local MVP Demo` readiness does not close public release without this layer | yes |
+| RAR-010 | Visualization layer duality | 06 Three.js / Visualization | P2-26A, P2-26B, P2-26C, M8-P0-03, P2-26D, M10-P2-07 | P2 | Document active vs legacy visualization ownership before deeper runtime changes and treat zero-import modules only as cleanup candidates until manual/external entry verification is done | no |
 
 ## P0 / P1 / P2 Reclassification Suggestions
 
