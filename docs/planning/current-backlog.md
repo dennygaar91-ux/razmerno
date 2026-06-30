@@ -70,7 +70,7 @@ The following PRs must not be treated as closure evidence until merged and verif
 - PR #41 — dependency recovery: open/draft/not merged; P0-19 remains disputed until closure evidence is reconciled.
 - PR #43 — pricing parity: open/draft/not merged; cannot close P0-13.
 - PR #51 — production golden snapshots: open/not merged; not closure-ready because package scripts are not committed and snapshots target legacy v2 while active export uses v3.
-- PR #52 — API notification failure contracts: open/not merged; useful branch work, but wording must be corrected from idempotent replay to safe 409 conflict unless true idempotency is implemented.
+- PR #52 — superseded for active backlog management by merged PR #84 and PR #92; keep only as historical branch context, not as active triage or closure evidence.
 
 Next action:
 
@@ -105,10 +105,12 @@ Each PR requires one decision:
 
 Audit follow-up: требуется зафиксировать ownership contract для `sceneRenderMode`, exact/advanced flags, `selectedZoneId` / `selectedCompartmentId` bridge и snapshot/payload boundary. Не закрывать через visual QA или generic Constructor E2E.
 
-Committed evidence note:
+Local branch evidence note:
 
 - `9e4a2f13` (`docs: define constructor state ownership contract`) adds `docs/planning/constructor-state-ownership-contract-v1.md` and documents active Constructor3D ownership, active-vs-legacy boundary, snapshot/payload boundary and closure evidence requirements.
-- This is documentation-layer evidence only. `P0-02` stays open until focused runtime state-transition tests, constructor payload tests, GitHub QA and main verification are recorded.
+- Current repository audit shows `9e4a2f13` is present in local branch `task/p0-03-pricing-source-lock` and is not verified on local `main`.
+- This is docs-layer, branch-only evidence and cannot close `P0-02` or `M8-P0-02`.
+- `P0-02` stays open until focused runtime state-transition tests, constructor payload tests, GitHub QA and merged/main verification are recorded.
 
 Объём: L. Зависимости: P0-01. Независимо: нет.
 
@@ -134,14 +136,14 @@ These follow-ups must not be mixed with Production or API implementation PRs unl
 
 Accepted decisions note: interpret this task together with Q8 in `accepted-backlog-decisions-v1.md`, where `Supabase/runtime catalog` is the primary MVP price source.
 
-Committed evidence note:
+Evidence status note:
 
-- `a5263615` (`docs: lock pricing source of truth`) adds `docs/planning/pricing-source-of-truth-lock-v1.md` and locks the hierarchy `Supabase/runtime catalog -> server authoritative calculation -> client preview as non-authoritative estimate -> seed/bundled fallback -> stored order snapshot as immutable audit record`.
-- `799b6f89` (`fix: persist server-authoritative order pricing`) records runtime evidence that order submit persists server-resolved `total_price` and pricing breakdown instead of trusting client-provided final pricing.
-- `b433fa2e` (`fix: align admin pricing with stored snapshot`) records runtime evidence that admin list/detail read persisted order snapshot semantics and do not recalculate pricing in admin UI.
+- Local branch `task/p0-03-pricing-source-lock` contains `a5263615` (`docs: lock pricing source of truth`), `799b6f89` (`fix: persist server-authoritative order pricing`) and `b433fa2e` (`fix: align admin pricing with stored snapshot`).
+- These commits add `docs/planning/pricing-source-of-truth-lock-v1.md` and local runtime evidence for server-owned pricing persistence and admin stored-snapshot semantics.
+- Current repository audit does not verify these three commits on local `main`; treat them as branch-only evidence, not merged/main closure evidence.
 - Current schema has no persisted source/fallback attribution field, so admin wording remains limited to safe semantics such as `final server snapshot` and `source attribution not persisted`.
 - `P0-03` remains open: pricing formulas were not changed, parity closure still depends on `P0-13`, GitHub QA/main verification and remaining source/fallback evidence.
-- QA note for `799b6f89`: local task evidence covered checkout pricing persistence tests and typecheck, but `typecheck:api` is `not verified` in this backlog note due the Windows/glob issue called out in the implementation report.
+- QA note for local branch runtime evidence: checkout pricing persistence tests and typecheck were reported locally, but merged/main verification and `typecheck:api` remain `not verified` in this backlog note.
 - `338976f3` (`test: add pricing parity evidence pack`) adds branch-only parity evidence in `tests/checkout-submit-hook.test.ts` and `tests/admin-order-summary.test.ts` for stored snapshot recompute, delivery/assembly matrix persistence, material-aware snapshot paths and admin stored-snapshot semantics. `P0-03` remains open; GitHub QA/main verification `not verified`.
 - Local architecture cleanup evidence: dead browser runtime-catalog helper `src/pricing/runtimeCatalog.ts`, dead duplicate quick-estimate wrapper `src/shared/lib/estimate.ts` and dead legacy exports `calculateLegacyPrice` / `quickEstimate` / `applyClientPriceMultiplier` were removed after repo-wide reachability check confirmed no active imports. Active MVP pricing path remains `Constructor3D useConstructorQuote -> shared/lib/price.calculatePrice -> pricing/engine -> api/_shared/server-price -> order snapshot -> admin stored snapshot read`.
 - Remaining work narrowed: legacy constructor/manual export pricing files under `src/constructor/**` were not removed because they still have local import chains for manual Basis/technical export paths; public MVP pricing still needs source/fallback evidence and P0-13 parity closure.
@@ -573,60 +575,71 @@ Closure summary: P1-22 закрыта после получения exact Vercel
 
 ### API Order Notification Failure Contracts
 
-Статус: open.
+Статус: closed.
 
 Owner: 04 API / Orders Agent + 05 Infrastructure / QA Agent.
 
-Reason: PR #52 is useful but remains open/not merged. It hardens notification failure handling but wording must be reconciled: duplicate order ID behavior is safe 409 conflict unless true idempotent replay is implemented.
+Closure evidence:
 
-Main evidence update: PR #84 `fix: align notification failure policy` merged to `main` at `af9fd2813bfc68014b852a0fdf6af4cfe9760237`. Changed files: `api/orders.ts`, `tests/checkout-submit-hook.test.ts`. Pre-merge QA: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`. Outcome on `main`: manager email failure no longer returns customer-facing `502` after saved order; customer email path continues after manager email failure; `manager_notification_failed` is observable through response/persisted email status/error; notification failure logs use generic safe markers instead of raw provider error details. Remaining out of scope here: duplicate submit / payload-match idempotency remains open, manual retry remains open, automatic retry queue remains later, separate `order_status_events` notification event model remains out of scope.
+- replacement scope is merged to `main`: PR #84 `fix: align notification failure policy`, merge baseline `af9fd2813bfc68014b852a0fdf6af4cfe9760237`;
+- local repository audit confirms `af9fd2813bfc68014b852a0fdf6af4cfe9760237` is contained in local `main`;
+- changed files on merged scope: `api/orders.ts`, `tests/checkout-submit-hook.test.ts`;
+- pre-merge QA recorded in backlog evidence: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`;
+- customer email failure path and manager email failure path are covered by merged policy wording;
+- `manager_notification_failed` is observable through response/persisted email status/error;
+- PII-safe logging evidence is separately merged on `main` via `40d5dbc9 test: lock pii logging sanitization (#89)`.
 
-Closure condition:
+Verification status:
 
-- PR #52 or replacement merged;
-- PR/body/docs wording matches actual duplicate contract;
-- customer email failure tested;
-- manager email failure policy documented;
-- PII-safe logging tests merged;
-- GitHub QA success;
-- main verification.
+- merged/main evidence: verified locally via commit containment on `main`;
+- GitHub QA success: referenced in merged backlog evidence, not re-run in this docs-only audit;
+- live provider verification: not required for this task itself; remains separate in `Live Provider / Supabase Order Flow Verification`.
 
 Accepted decisions note: interpret this task together with the accepted notification policy: customer email failure keeps order success with logged error; manager email failure keeps customer success but must record `manager_notification_failed`; MVP retry is manual, automatic retry queue is later.
 
+Remaining exclusions:
+
+- payload-match idempotency is tracked separately in `Duplicate Submit / Payload-match Idempotency`;
+- manual retry remains open in later maturity tracks;
+- automatic retry queue and `order_status_events` remain out of scope.
+
 ### Duplicate Submit / Payload-match Idempotency
 
-Статус: open.
+Статус: closed.
 
 Owner: 04 API / Orders Agent.
 
-Reason: Safe duplicate 409 conflict exists in branch evidence, but true payload-match idempotent replay is not confirmed.
+Closure evidence:
 
-Closure condition:
+- PR #92 `fix: implement M8-P0-05 idempotency policy` was squash-merged into `main`;
+- local repository audit confirms `723a0351` is contained in local `main`;
+- merged behavior recorded in backlog evidence: same `Idempotency-Key` + same payload returns the same order/result and does not resend notifications;
+- same `Idempotency-Key` + different payload returns `409 conflict`;
+- mismatched `Idempotency-Key` and `body.orderId` is rejected before persistence/notifications;
+- focused QA recorded before merge: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`;
+- GitHub checks were recorded green before merge; main verification is recorded in the maturity block.
 
-- same payload replay vs different payload conflict behavior decided;
-- payload hash/idempotency key or equivalent implemented if chosen;
-- no duplicate notifications;
-- frontend 409 handling verified;
-- GitHub QA success.
+Verification status:
+
+- merged/main evidence: verified locally via commit containment on `main`;
+- runtime/live provider verification: not required for idempotency closure itself.
 
 Accepted decisions note: interpret this task together with accepted idempotency rules: same payload replay returns the same order/result; different payload replay returns `409 conflict`; PR/body wording must not claim stronger replay semantics unless implemented.
 
+Remaining exclusions:
+
+- live Supabase/provider behavior remains open in `Live Provider / Supabase Order Flow Verification`;
+- notification retry queue remains a later task and is not part of idempotency closure.
+
 ### Manager Notification Failure Policy
 
-Статус: open.
+Статус: superseded.
 
 Owner: 04 API / Orders Agent + 01 Product / Planning Agent.
 
-Reason: If order persistence succeeds but manager notification fails, the product/API contract must define whether the order is successful, warning, failed, or queued for retry.
+Reason: this narrower policy task is now management-wise covered by the merged umbrella task `API Order Notification Failure Contracts`, which already carries the same merged/main evidence and exclusions.
 
-Main evidence update: PR #84 `fix: align notification failure policy` merged to `main` at `af9fd2813bfc68014b852a0fdf6af4cfe9760237`. Changed files: `api/orders.ts`, `tests/checkout-submit-hook.test.ts`. Pre-merge QA: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`. Outcome on `main`: manager email failure now keeps customer success semantics, customer email path continues, `manager_notification_failed` is observable through response/persisted email status/error, and notification failure logs use generic safe markers instead of raw provider error details. Remaining follow-up stays separate: manual retry is still MVP-open, automatic retry queue is later, and separate `order_status_events` notification event model was not added in this scope.
-
-Closure condition:
-
-- policy chosen;
-- API behavior tested;
-- customer/admin messaging documented;
-- notification retry/failure logging policy documented.
+Do not run separately: use `API Order Notification Failure Contracts` for closure evidence, and `M9-P1-03` for retry/queue follow-up scope.
 
 ### Production Golden Snapshots
 
@@ -712,6 +725,104 @@ Closure condition:
 - edge length totals verified.
 
 Accepted decisions note: current accepted MVP decision is body/drawers/shelves = `1 мм` edge banding all around, facades = `2 мм` all around unless a later reconciliation explicitly replaces it.
+
+### P1-25 — RPES / Backlog MVP Crosswalk
+
+Статус: needs reconciliation.
+
+Why: role-audit reconciliation `RAR-001` and RPES/governance sources show that `P0/P1/M8` release-critical tasks still lack a single explicit RPES-to-backlog crosswalk with per-block status `accepted/open/conflict/not verified`.
+
+Priority correction: treat this as `P0` planning work for execution order and release gating, even while the legacy task id remains `P1-25` in this backlog revision.
+
+Risk: product/planning, UX, pricing and QA work can interpret RPES draft layers and backlog closure wording differently, causing incorrect release-readiness claims.
+
+Owner: 01 Product / Planning Agent.
+
+Evidence needed:
+
+- merged/main crosswalk note mapped to active `P0/P1/M8` tasks;
+- explicit status per block: `accepted`, `open`, `conflict`, `not verified`;
+- links to accepted decisions and existing backlog evidence, without closing technical tasks automatically.
+
+Dependencies: `P0-07`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
+
+Do-not-touch constraints:
+
+- do not rewrite RPES volumes wholesale;
+- do not close tasks from docs-only findings alone;
+- do not change runtime, API, pricing, Supabase, Three.js or production logic.
+
+### P1-26 — Design-system Direction Reconciliation
+
+Статус: needs reconciliation.
+
+Why: `docs/design-system/README.md` still states `mobile-first`, while accepted decisions and current implementation scope fix the active direction as desktop/website-first with mobile redesign deferred.
+
+Risk: UX/design tasks may keep making conflicting visual decisions about constructor shell, stepper, fallback layout and release gate.
+
+Owner: 01 Product / Planning Agent + 08 UX/UI / Design System Agent.
+
+Evidence needed:
+
+- merged/main wording reconciliation across active design-system/planning docs;
+- explicit statement of current desktop-first release scope and deferred mobile redesign;
+- mapping of affected backlog tasks (`P1-21`, `P2-21`, `TASK 08-UX-07`, `P2-26*`).
+
+Dependencies: `docs/design-system/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
+
+Do-not-touch constraints:
+
+- do not redesign mobile UX in this task;
+- do not mass-clean runtime CSS/components;
+- do not close visual tasks without fresh screenshots and human review.
+
+### P1-27 — Customer Platform MVP Scope Reconciliation
+
+Статус: needs reconciliation.
+
+Why: RPES Volume VII requires auth, cabinet, saved configuration continuity, project/order lists and post-submit visibility, while current backlog has no dedicated scope-decision task for this gap and current repo evidence does not confirm a matching customer UI surface.
+
+Risk: MVP wording can overpromise a customer platform scope that is broader than the verified implementation surface.
+
+Owner: 01 Product / Planning Agent + 04 API / Orders Agent.
+
+Evidence needed:
+
+- merged/main scope decision: full MVP customer platform, narrowed MVP scope, or explicit defer;
+- implementation inventory mapped against RPES VII;
+- backlog linkage for any runtime follow-up tasks created after the decision.
+
+Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
+
+Do-not-touch constraints:
+
+- do not invent auth/provider readiness;
+- do not change customer auth UX or runtime routes in this task;
+- do not mark customer-platform scope closed without merged/main decision evidence.
+
+### P1-28 — Admin MVP Scope Boundary Reconciliation
+
+Статус: needs reconciliation.
+
+Why: RPES Volume VIII and accepted decisions define a minimal MVP admin scope, but open tasks such as `P2-09` and `P2-25` already point toward a broader operations platform without an explicit planning boundary.
+
+Risk: admin work can drift from minimal MVP operations into unapproved extended workflow scope.
+
+Owner: 01 Product / Planning Agent + 04 API / Orders Agent + 08 UX/UI / Design System Agent.
+
+Evidence needed:
+
+- merged/main admin scope note distinguishing minimal MVP admin from later extended operations scope;
+- mapping to `P2-09`, `P2-25`, `M9-P1-02`;
+- explicit list of what is in MVP now versus deferred.
+
+Dependencies: `docs/specification/volume-08-admin-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `P2-09`, `P2-25`.
+
+Do-not-touch constraints:
+
+- do not expand admin runtime scope in this task;
+- do not close admin visual or production-editor tasks from docs-only reconciliation;
+- do not change API/order semantics here.
 
 ---
 
@@ -915,6 +1026,30 @@ Closure condition:
 
 Accepted decisions note: visual closure still requires fresh screenshots and explicit visual review.
 
+### P2-26D — Active vs Legacy Visualization Ownership Map
+
+Статус: needs reconciliation.
+
+Why: the repo still contains active visualization in `src/static-pages/constructor/three/**` and older visualization in `src/configurator/three/**`, while the backlog has no dedicated ownership-mapping task for this documented duality.
+
+Risk: future visualization fixes can reintroduce legacy dependencies into the active Constructor3D path or split evidence between old and new layers.
+
+Owner: 06 Three.js / Visualization Agent + 01 Product / Planning Agent.
+
+Evidence needed:
+
+- merged/main ownership note for active vs legacy visualization layers;
+- allowed import/dependency boundary map;
+- linkage from this note to `P0-05`, `P0-06`, `P2-26A`, `P2-26B`, `P2-26C`.
+
+Dependencies: `docs/specification/volume-03-visualization/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
+
+Do-not-touch constraints:
+
+- do not refactor Three.js runtime in this task;
+- do not change labels/markers/fallback behavior without accepted decision;
+- do not use docs-only mapping as closure evidence for visual tasks.
+
 ### P2-22 Accessibility / Focus Visual Pass
 
 Статус: open.
@@ -973,43 +1108,33 @@ Accepted decisions note: interpret closure together with the global visual decis
 
 ### TASK 08-UX-04 — Admin Visual Consistency / VQA-010
 
-Статус: open.
+Статус: superseded.
 
-Owner: 08 UX/UI / Design System Agent / Admin owner.
+Owner: 08 UX/UI / Design System Agent + 04 API / Orders Agent.
 
-Reason: Admin protected screen is raw/outside design system.
+Reason: this narrower VQA item is now management-wise covered by `P2-25 Admin Visual Consistency Pass` plus `P2-26` evidence tracking.
 
-Closure condition:
-
-- decision recorded: VQA-010 stays in P2-26 or moves to P2-25;
-- admin protected/dashboard/detail/error states use consistent internal design system;
-- fresh admin screenshots attached.
+Do not run separately: keep admin visual scope under `P2-25`; keep VQA artifact/evidence under `P2-26`.
 
 ### TASK 08-UX-05 — Accessibility / Focus Visual Pass
 
-Статус: open.
+Статус: superseded.
 
 Owner: 08 UX/UI / Design System Agent.
 
-Reason: UI-level keyboard/focus states are not fully proven.
+Reason: duplicate management scope of `P2-22 Accessibility / Focus Visual Pass`.
 
-Closure condition:
-
-- keyboard/focus screenshot pass exists;
-- constructor, drawer, fallback, checkout, disabled/error/warning states covered.
+Do not run separately: use `P2-22` as the single active accessibility/focus visual task.
 
 ### TASK 08-UX-06 — Visual Regression / Cross-browser Device Coverage
 
-Статус: open.
+Статус: superseded.
 
 Owner: 08 UX/UI / Design System Agent + 05 Infrastructure / QA Agent.
 
-Reason: Current screenshot evidence is Chromium-heavy; cross-browser/device coverage not confirmed.
+Reason: combined management scope is already split more cleanly between `P2-20 Visual Regression Screenshot Suite` and `P2-21 Cross-browser / Device Visual QA Execution`.
 
-Closure condition:
-
-- visual matrix documented;
-- public pages, Constructor3D, fallback, admin, checkout forced states captured.
+Do not run separately: use `P2-20` for screenshot suite coverage and `P2-21` for browser/device execution and closure evidence.
 
 ### TASK 08-UX-07 — Design-system Inventory / Token Cleanup
 
@@ -1036,6 +1161,8 @@ Closure condition:
 Owner: 04 API / Orders Agent + 05 Infrastructure / QA Agent.
 
 Reason: Mock tests do not confirm live Supabase/RLS/email provider behavior.
+
+Priority note: treat as `P1` / `M8-P1-02` release-gate work even while it remains grouped inside the shared API / Production / QA section.
 
 Closure condition:
 
@@ -1081,7 +1208,7 @@ Closure condition:
 
 Статус: open.
 
-Owner: 07 Production / Manufacturing Agent + 04 API / Orders Agent + Admin/UX owner.
+Owner: 07 Production / Manufacturing Agent + 04 API / Orders Agent + 08 UX/UI / Design System Agent.
 
 Reason: Admin production review is partial: no per-panel, per-hole, hardware/SKU operation editing.
 
@@ -1204,14 +1331,14 @@ Closure condition:
 Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning/accepted-backlog-decisions-v1.md`, especially for pricing source of truth, idempotency, notification failure policy, Constructor3D/WebGL fallback boundaries, visual closure and the `8/10 strong MVP-ready` target itself.
 
 #### M8-P0-01 — Pricing parity closure plan
-- Status: closed with evidence
+- Status: needs reconciliation
 - Area: pricing
 - Product-visible: yes
 - Related existing task: P0-03, P0-13, PR #43 triage
-- Acceptance summary: golden fixtures, material-aware client/server parity, delivery/assembly matrix, quote/order/stored price parity verified on main.
+- Acceptance summary: pricing source-of-truth plan and parity closure map must be documented and linked to `P0-03` / `P0-13`; this milestone line must not claim technical parity closure before those tasks close on merged/main evidence.
 - Suggested agent: 03 Pricing Agent
 - Accepted decisions note: use Q8 pricing source-of-truth rules and the PR #43 stale-branch decision.
-- Follow-up evidence note: `a5263615` adds the planning source-of-truth lock; `799b6f89` and `b433fa2e` add committed runtime evidence for server-owned order snapshot persistence and admin snapshot semantics. The plan task stays closed as planning, while `P0-03` and `P0-13` remain open until their own closure rules are met.
+- Follow-up evidence note: local branch `task/p0-03-pricing-source-lock` contains `a5263615`, `799b6f89` and `b433fa2e`, but merged/main verification for this planning/evidence pack is not verified in the current repository audit. Keep this milestone line out of `closed` state until the planning artifact itself is verified on `main`.
 
 #### M8-P1-01 — Visual QA execution gate
 - Status: open
@@ -1246,7 +1373,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Status: closed with evidence
 - Area: API / orders
 - Product-visible: yes
-- Related existing task: API Order Notification Failure Contracts, Manager Notification Failure Policy, PR #52 triage
+- Related existing task: API Order Notification Failure Contracts
 - Acceptance summary: manager/customer email failure policy chosen, tested, documented and aligned with order success semantics.
 - Suggested agent: 04 API / Orders Agent
 - Accepted decisions note: customer email failure keeps order success with logging; manager email failure keeps customer success and records `manager_notification_failed`; MVP retry is manual.
@@ -1254,7 +1381,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Changed files: `api/orders.ts`, `tests/checkout-submit-hook.test.ts`.
 - QA before merge: `npm.cmd run test:checkout-submit-hook`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`.
 - Outcome: manager email failure no longer returns customer-facing `502` after saved order; customer email path continues after manager email failure; `manager_notification_failed` marker is observable through response/persisted email status/error; notification failure logs use generic safe markers instead of raw provider error details.
-- Remaining out of scope: duplicate submit / payload-match idempotency remains open; manual retry remains open; automatic retry queue remains later; separate `order_status_events` notification event model remains out of scope.
+- Remaining out of scope: idempotency is now tracked as closed through `Duplicate Submit / Payload-match Idempotency`; manual retry remains open; automatic retry queue remains later; separate `order_status_events` notification event model remains out of scope.
 
 #### M8-P0-05 — Duplicate submit and idempotency policy
 - Status: closed with evidence
@@ -1344,7 +1471,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Status: open
 - Area: admin / operations
 - Product-visible: yes
-- Related existing task: P2-25, TASK 08-UX-04, P2-09
+- Related existing task: P2-25, P2-09
 - Acceptance summary: real order list/detail, status change, manager notes, auth hardening and basic audit trail are usable for MVP operations.
 - Suggested agent: 04 API / Orders Agent
 - Committed evidence note: `020ba133` adds a safe admin order summary baseline, and `b433fa2e` aligns admin pricing semantics with persisted stored snapshot fields. This is partial evidence only; status change, manager notes, auth hardening and audit trail closure evidence are still `not verified`.
@@ -1353,7 +1480,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Status: open
 - Area: notifications
 - Product-visible: yes
-- Related existing task: API Order Notification Failure Contracts, Manager Notification Failure Policy
+- Related existing task: API Order Notification Failure Contracts
 - Acceptance summary: failed notifications are visible, retryable or safely queued; manual resend and status tracking are defined.
 - Suggested agent: 04 API / Orders Agent
 
@@ -1393,7 +1520,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Status: open
 - Area: visual QA
 - Product-visible: yes
-- Related existing task: P2-21, TASK 08-UX-06
+- Related existing task: P2-20, P2-21
 - Acceptance summary: Chromium, Firefox and available WebKit/Safari-equivalent checks cover public pages, Constructor3D, checkout, fallback and admin states.
 - Suggested agent: 08 UX/UI / Design System Agent
 
@@ -1427,7 +1554,7 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Status: open
 - Area: accessibility
 - Product-visible: yes
-- Related existing task: P2-22, TASK 08-UX-05
+- Related existing task: P2-22
 - Acceptance summary: keyboard navigation, focus states, ARIA, disabled/error/warning semantics and screen-reader smoke are reviewed and fixed.
 - Suggested agent: 08 UX/UI / Design System Agent
 
