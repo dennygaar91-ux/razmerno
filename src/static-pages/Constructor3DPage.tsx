@@ -35,6 +35,7 @@ import { useConstructorQuote } from "./constructor/hooks/useConstructorQuote";
 import { useConstructorSubmit } from "./constructor/hooks/useConstructorSubmit";
 import { stepOrder } from "./constructor/options";
 import { formatFallbackPrice } from "./constructor/utils";
+import { useCheckoutAuthGate } from "../shared/auth/useCheckoutAuthGate";
 import type {
   ConstructorSceneViewMode,
 } from "./constructor/types";
@@ -202,6 +203,7 @@ export default function Constructor3DPage() {
       saveDraft();
     },
   });
+  const { authGateError, attemptCheckoutSubmit, checkoutAuthModal } = useCheckoutAuthGate(submit);
   const formatPrice = quote?.formatPrice ?? formatFallbackPrice;
   const currentStepIndex = stepOrder.indexOf(step);
   const nextStep =
@@ -237,7 +239,7 @@ export default function Constructor3DPage() {
   const handlePrimaryAction = () => {
     if (step === "checkout") {
       if (checkoutBlocked || checkoutRequiredMissing || !consent || isCooldownActive) return;
-      void submit();
+      attemptCheckoutSubmit();
       return;
     }
     setStep(nextStep);
@@ -468,7 +470,7 @@ export default function Constructor3DPage() {
                 checkoutRequiredMissing={checkoutRequiredMissing}
                 checkoutSubmitDisabled={checkoutSubmitDisabled}
                 submitStatus={submitStatus}
-                submitMessage={submitMessage}
+                submitMessage={authGateError ?? submitMessage}
                 isCooldownActive={isCooldownActive}
                 cooldownRemainingMs={cooldownRemainingMs}
                 consent={consent}
@@ -601,6 +603,7 @@ export default function Constructor3DPage() {
         onCancel={() => setResetDialogOpen(false)}
         onConfirm={handleResetConfirm}
       />
+      {checkoutAuthModal}
     </>
   );
 }

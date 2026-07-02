@@ -1,3 +1,5 @@
+import { HeaderAuthControls } from "../../shared/auth/HeaderAuthControls";
+
 type SiteHeaderActivePage = "home" | "measurements" | "materials" | "assembly";
 
 const navItems: Array<{
@@ -37,6 +39,7 @@ export function SiteHeader({ activePage }: { activePage: SiteHeaderActivePage })
         </nav>
 
         <div className="rzm-action">
+          <HeaderAuthControls />
           <a className="rzm-cta" href="/configurator">Открыть конструктор</a>
           <label className="rzm-burger" htmlFor="rzm-menu-toggle" aria-label="Открыть меню">
             <span className="rzm-burger-lines"><span></span></span>

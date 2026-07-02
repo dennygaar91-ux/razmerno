@@ -1,0 +1,114 @@
+.rzm-header-auth{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-right:8px;
+}
+
+.rzm-header-auth-user{
+  max-width:160px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:14px;
+  color:var(--rzm-text-secondary, #5f6368);
+}
+
+.rzm-constructor-shell-actions .rzm-header-auth{
+  margin-right:0;
+}
+
+.rzm-auth-modal-root{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:rgba(16, 24, 40, 0.45);
+}
+
+.rzm-auth-modal{
+  position:relative;
+  width:min(100%, 420px);
+  padding:24px;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 20px 60px rgba(16, 24, 40, 0.18);
+}
+
+.rzm-auth-modal-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  border:0;
+  background:transparent;
+  font-size:24px;
+  line-height:1;
+  cursor:pointer;
+}
+
+.rzm-auth-modal-title{
+  margin:0 0 8px;
+  font-size:24px;
+}
+
+.rzm-auth-modal-description{
+  margin:0 0 16px;
+  color:var(--rzm-text-secondary, #5f6368);
+}
+
+.rzm-auth-modal-tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:16px;
+}
+
+.rzm-auth-modal-tabs button{
+  flex:1;
+  border:1px solid #d0d5dd;
+  border-radius:999px;
+  padding:8px 12px;
+  background:#fff;
+  cursor:pointer;
+}
+
+.rzm-auth-modal-tabs button.is-active{
+  border-color:#111827;
+  background:#111827;
+  color:#fff;
+}
+
+.rzm-auth-modal-form{
+  display:grid;
+  gap:12px;
+}
+
+.rzm-auth-field{
+  display:grid;
+  gap:6px;
+  font-size:14px;
+}
+
+.rzm-auth-field input{
+  width:100%;
+  border:1px solid #d0d5dd;
+  border-radius:10px;
+  padding:10px 12px;
+  font:inherit;
+}
+
+.rzm-auth-modal-error{
+  margin:0;
+  color:#b42318;
+  font-size:14px;
+}
+
+.rzm-auth-modal-submit{
+  width:100%;
+}
+
+@media (max-width: 768px){
+  .rzm-header-auth-user{display:none}
+}

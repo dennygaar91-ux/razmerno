@@ -849,6 +849,16 @@ Evidence needed:
 - implementation inventory mapped against RPES VII;
 - backlog linkage for any runtime follow-up tasks created after the decision.
 
+Branch implementation evidence (2026-06-23, Epic A — Customer Authentication Foundation, `task/epic-a-customer-auth`, not closure):
+
+- Supabase `profiles` migration + `db/customer-profiles.sql`;
+- API `GET/PATCH /api/profile` with JWT verification via service role (email immutable; phone/full_name editable; verification extension point reserved);
+- frontend auth foundation: `SessionProvider`, `AuthProvider`, `UserContext`, `ProtectedRoute`, `GuestRoute`, `useAuth()`, `useProfile()`, header login/register/logout, checkout auth gate modal;
+- tests: `tests/customer-auth.test.ts` (`npm run test:customer-auth`);
+- QA blocker fixes (2026-06-23): production fail-closed when `VITE_SUPABASE_*` missing; shared `useCheckoutAuthGate` wired in `Constructor3DPage` and legacy `ConstructorPage`;
+- explicit non-scope preserved: no Customer Cabinet, drafts server, orders list, notifications, email verification, `user_id` on orders;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

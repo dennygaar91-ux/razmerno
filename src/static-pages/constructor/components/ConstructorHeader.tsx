@@ -1,3 +1,5 @@
+import { HeaderAuthControls } from "../../../shared/auth/HeaderAuthControls";
+
 type ConstructorHeaderVariant = "landing" | "workspace";
 
 type ConstructorHeaderProps = {
@@ -31,6 +33,7 @@ export function ConstructorHeader({
           </div>
 
           <div className="rzm-constructor-shell-actions" aria-label="Действия конструктора">
+            <HeaderAuthControls compact />
             {onReset ? (
               <button
                 type="button"
@@ -69,6 +72,7 @@ export function ConstructorHeader({
         </nav>
 
         <div className="rzm-action">
+          <HeaderAuthControls />
           <a className="rzm-cta" href="/configurator">Собрать шкаф</a>
         </div>
       </header>

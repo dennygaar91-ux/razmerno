@@ -9,6 +9,7 @@ import { useConstructorSubmit } from "./constructor/hooks/useConstructorSubmit";
 import { useProductionPreview } from "./constructor/hooks/useProductionPreview";
 import { useConstructorPageState } from "./constructor/hooks/useConstructorPageState";
 import { formatFallbackPrice } from "./constructor/utils";
+import { useCheckoutAuthGate } from "../shared/auth/useCheckoutAuthGate";
 import type { ConstructorValidationIssue, StepKey } from "./constructor/types";
 
 export default function ConstructorPage() {
@@ -112,6 +113,7 @@ export default function ConstructorPage() {
     onStepChange: setStep,
     onDraftSave: saveDraft,
   });
+  const { authGateError, attemptCheckoutSubmit, checkoutAuthModal } = useCheckoutAuthGate(submit);
   const {
     preview: productionPreview,
     productionSnapshot,
@@ -168,7 +170,7 @@ export default function ConstructorPage() {
       focusValidationIssue(blockingIssues[0]);
       return;
     }
-    void submit();
+    attemptCheckoutSubmit();
   }
 
   return (
@@ -192,7 +194,7 @@ export default function ConstructorPage() {
             validation={validation}
             formatPrice={formatPrice}
             submitStatus={submitStatus}
-            submitMessage={submitMessage}
+            submitMessage={authGateError ?? submitMessage}
             onContactChange={setContact}
             onConsentChange={setConsent}
             onDeliveryEnabledChange={setDeliveryEnabled}
@@ -238,7 +240,7 @@ export default function ConstructorPage() {
               canGoBack={canGoBack}
               isCheckoutStep={isCheckoutStep}
               submitStatus={submitStatus}
-              submitMessage={submitMessage}
+              submitMessage={authGateError ?? submitMessage}
               onFurnitureChange={setFurniture}
               onWidthChange={setWidth}
               onHeightChange={setHeight}
@@ -316,6 +318,7 @@ export default function ConstructorPage() {
           </section>
         )}
       </main>
+      {checkoutAuthModal}
     </>
   );
 }

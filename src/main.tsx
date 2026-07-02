@@ -6,8 +6,10 @@ import "./index.css";
 import "./styles/info-pages.css";
 import "./styles/constructor.css";
 import "./styles/constructor3d.css";
+import "./styles/auth.css";
 import App from "./App";
 import { AppErrorBoundary } from "./shared/components/AppErrorBoundary";
+import { CustomerAuthProviders } from "./shared/auth/CustomerAuthProviders";
 import { initYandexMetrika } from "./shared/lib/analytics";
 
 initYandexMetrika();
@@ -15,7 +17,9 @@ initYandexMetrika();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AppErrorBoundary>
-      <App />
+      <CustomerAuthProviders>
+        <App />
+      </CustomerAuthProviders>
     </AppErrorBoundary>
   </StrictMode>
 );
