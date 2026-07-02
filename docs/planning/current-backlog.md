@@ -224,7 +224,8 @@ Reconciliation note: contract-scope закрыт через P0-11/P0-12. Ост�
 Committed evidence note:
 
 - `d3f4eb06` (`feat: harden Three.js runtime recovery`) adds branch-only runtime recovery hardening in `Constructor3DPage.tsx`, `LazyThreeFurnitureViewer.tsx`, `ThreeSceneBoundary.tsx` and `ThreeFurnitureViewer.tsx`: explicit recovery reasons (`three-boundary-error`, `three-load-timeout`, `three-context-lost`), `recoveryKey` remount on retry, load-timeout cancel on ready, boundary reset via `resetKey`, context-lost fallback without `webglcontextrestored` auto-remount.
-- Local QA evidence: `test:constructor-flow`, `test:constructor-three-safety`, `typecheck` — pass on branch; GitHub QA/main verification `not verified`; visual review and browser E2E for recovery paths `not verified`.
+- Local verification gate `2026-06-23` on branch `task/p0-05-threejs-stability`: `npm run test:constructor-three-safety` (14/14 pass), `npm run test:constructor-flow` (16/16 pass), `npm run typecheck` (pass), `npm run build` (pass), `npm run test:webgl-fallback-e2e` (10/10 pass after `npx playwright install chromium`).
+- Status remains `open`: GitHub QA/main verification `not verified`; explicit human visual review `not verified`; camera framing visual pass (`P2-26C`) `not verified`.
 
 Объём: XL. Зависимости: scene adapter, state model. Независимо: нет.
 
@@ -1431,7 +1432,9 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Acceptance summary: error boundary, loading state, camera reset, reduced-quality path and fallback UX verified without weakening existing WebGL fallback E2E.
 - Suggested agent: 06 Three.js / Visualization Agent
 - Accepted decisions note: fallback must remain a полноценный SVG/2D mode, not a degraded pseudo-preview.
-- Committed evidence note: `d3f4eb06` (`feat: harden Three.js runtime recovery`) adds branch-only recovery contract — boundary error, load timeout and WebGL context lost map to full 2D fallback; explicit retry remount via `threeRecoveryAttempt`/`recoveryKey`; recovery handlers do not mutate committed constructor snapshot fields. Local tests: `constructorFlowSmoke.test.ts`, `threeSceneSafety.test.ts`. Status remains `open`: camera reset, reduced-quality UX verification, visual review and browser E2E (`tests/browser/webgl-fallback.spec.ts`) `not verified`; GitHub QA/main verification `not verified`.
+- Committed evidence note: `d3f4eb06` (`feat: harden Three.js runtime recovery`) adds branch-only recovery contract — boundary error, load timeout and WebGL context lost map to full 2D fallback; explicit retry remount via `threeRecoveryAttempt`/`recoveryKey`; recovery handlers do not mutate committed constructor snapshot fields. Local tests: `constructorFlowSmoke.test.ts`, `threeSceneSafety.test.ts`.
+- Local verification gate `2026-06-23` on branch `task/p0-05-threejs-stability`: source safety/flow tests pass; browser E2E `tests/browser/webgl-fallback.spec.ts` pass (10/10), including M8-P0-03 recovery controls (`Повторить 3D`, `Запустить упрощённое 3D`) and checkout-from-fallback path; `typecheck` and `build` pass.
+- Status remains `open`: camera framing visual pass (`P2-26C`) `not verified`; explicit human visual review (`M8-P1-01`) `not verified`; GitHub QA/main verification `not verified`.
 
 #### M8-P0-04 — Notification failure policy
 - Status: closed with evidence
