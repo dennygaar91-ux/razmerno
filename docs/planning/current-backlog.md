@@ -193,6 +193,7 @@ Evidence status note:
 - These commits add `docs/planning/pricing-source-of-truth-lock-v1.md` and local runtime evidence for server-owned pricing persistence and admin stored-snapshot semantics.
 - Current repository audit does not verify these three commits on local `main`; treat them as branch-only evidence, not merged/main closure evidence.
 - Current schema has no persisted source/fallback attribution field, so admin wording remains limited to safe semantics such as `final server snapshot` and `source attribution not persisted`.
+- Local implementation evidence (branch-only, not verified on main): `catalog_source_used`, `pricing_source_diagnostic` and `pricing_fallback_reason` are persisted on order submit via migration `20260626_add_order_pricing_source_attribution.sql`; admin read model uses persisted attribution when present and keeps legacy fallback for null rows. `P0-03` / `P0-13` remain open; GitHub QA/main verification `not verified`.
 - `P0-03` remains open: pricing formulas were not changed, parity closure still depends on `P0-13`, GitHub QA/main verification and remaining source/fallback evidence.
 - QA note for local branch runtime evidence: checkout pricing persistence tests and typecheck were reported locally, but merged/main verification and `typecheck:api` remain `not verified` in this backlog note.
 - `338976f3` (`test: add pricing parity evidence pack`) adds branch-only parity evidence in `tests/checkout-submit-hook.test.ts` and `tests/admin-order-summary.test.ts` for stored snapshot recompute, delivery/assembly matrix persistence, material-aware snapshot paths and admin stored-snapshot semantics. `P0-03` remains open; GitHub QA/main verification `not verified`.
@@ -344,6 +345,7 @@ Implementation evidence candidate:
 - Production-panel parity remains untested in this PR because the safe existing pure test path lives outside the allowed files/scope.
 - P0-13B evidence candidate: server pricing now reads selected body/facade material tokens for catalog material pricing; body-material and facade-material parity fixtures now assert client/server parity. P0-13 remains open for delivery/assembly matrix, production-panel parity and quote/order/stored snapshot parity.
 - P0-13C evidence candidate: delivery/assembly pricing matrix fixtures cover no delivery/no assembly, Moscow delivery, outside-MKAD delivery, assembly-only, delivery+assembly and material-aware delivery+assembly parity. No runtime pricing changes were required. P0-13 remains open for production-panel parity and quote/order/stored snapshot parity.
+- Branch-only source-attribution persistence evidence: order submit now stores `catalog_source_used`, `pricing_source_diagnostic`, `pricing_fallback_reason`; does not close P0-13 parity or main verification.
 
 Required sub-work:
 

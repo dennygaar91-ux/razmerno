@@ -160,4 +160,7 @@ export const REQUIRED_ORDER_DB_COLUMNS = [
   "user_agent",
   "client_ip_hash",
   "production_export",
+  "catalog_source_used",
+  "pricing_source_diagnostic",
+  "pricing_fallback_reason",
 ] as const;

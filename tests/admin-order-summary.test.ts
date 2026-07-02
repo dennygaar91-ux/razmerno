@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { mapOrderRow } from "../api/_shared/admin-orders.js";
 import { mapApiOrder } from "../src/admin/format.js";
 import {
   maskEmail,
@@ -259,6 +260,70 @@ test("admin fallback guard: local/demo rows keep non-authoritative pricing seman
   assert.equal(summary.pricingSource, "pricing source not verified");
   assert.notEqual(summary.pricingLabel, "final server snapshot");
   assert.notEqual(summary.pricingSource, "source attribution not persisted");
+});
+
+test("admin read model uses persisted pricing source attribution when present", () => {
+  const apiOrder = mapOrderRow({
+    order_id: "RZ-20260626-5104",
+    status: "new",
+    created_at: "2026-06-26T10:00:00.000Z",
+    product_type: "wardrobe",
+    dimensions: { width: 1800, height: 2400, depth: 600 },
+    total_price: 86_400,
+    price_breakdown: { body: 10_000, facades: 20_000, delivery: 6_000, assembly: 7_000 },
+    delivery_enabled: true,
+    delivery_price: 6_000,
+    delivery_address: "Москва",
+    assembly_enabled: true,
+    assembly_price: 7_000,
+    assembly_base_price: 79_800,
+    customer_name: "Иван Петров",
+    customer_phone: "+7 999 123-45-67",
+    customer_email: "client@example.com",
+    manager_email_status: "sent",
+    customer_email_status: "pending",
+    production_export: null,
+    catalog_source_used: "supabase",
+    pricing_source_diagnostic: "supabase_success",
+    pricing_fallback_reason: null,
+  } as Parameters<typeof mapOrderRow>[0]);
+
+  const row = mapApiOrder(apiOrder);
+
+  assert.equal(row.pricingSource, "supabase");
+  assert.match(row.pricingSnapshotSummary ?? "", /diagnostic: supabase_success/);
+});
+
+test("admin read model keeps legacy fallback when pricing attribution is null", () => {
+  const apiOrder = mapOrderRow({
+    order_id: "RZ-20260626-5105",
+    status: "new",
+    created_at: "2026-06-26T10:00:00.000Z",
+    product_type: "wardrobe",
+    dimensions: { width: 1800, height: 2400, depth: 600 },
+    total_price: 86_400,
+    price_breakdown: null,
+    delivery_enabled: false,
+    delivery_price: 0,
+    delivery_address: null,
+    assembly_enabled: false,
+    assembly_price: 0,
+    assembly_base_price: null,
+    customer_name: "Иван Петров",
+    customer_phone: "+7 999 123-45-67",
+    customer_email: "client@example.com",
+    manager_email_status: "sent",
+    customer_email_status: "pending",
+    production_export: null,
+    catalog_source_used: null,
+    pricing_source_diagnostic: null,
+    pricing_fallback_reason: null,
+  } as Parameters<typeof mapOrderRow>[0]);
+
+  const row = mapApiOrder(apiOrder);
+
+  assert.equal(row.pricingSource, "source attribution not persisted");
+  assert.doesNotMatch(row.pricingSnapshotSummary ?? "", /diagnostic:/);
 });
 
 test("summarizeOrderForAdmin parses dimensions from product label", () => {

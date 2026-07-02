@@ -19,7 +19,9 @@ export type AdminOrderSummary = {
   }
   pricing: {
     status: 'final server snapshot'
-    source: 'source attribution not persisted'
+    source: string
+    diagnostic: string | null
+    fallbackReason: string | null
   }
   customer: {
     nameMasked: string
@@ -60,6 +62,9 @@ type OrderDbRow = {
   manager_email_status: string | null
   customer_email_status: string | null
   production_export: unknown | null
+  catalog_source_used?: string | null
+  pricing_source_diagnostic?: string | null
+  pricing_fallback_reason?: string | null
 }
 
 function getSupabaseAdminClient() {
@@ -148,6 +153,25 @@ function productLabel(row: OrderDbRow): string {
   return `${type} ${size}`
 }
 
+function mapPricingAttribution(row: OrderDbRow): AdminOrderSummary['pricing'] {
+  const catalogSource = row.catalog_source_used?.trim() || null
+  if (!catalogSource) {
+    return {
+      status: 'final server snapshot',
+      source: 'source attribution not persisted',
+      diagnostic: null,
+      fallbackReason: null,
+    }
+  }
+
+  return {
+    status: 'final server snapshot',
+    source: catalogSource,
+    diagnostic: row.pricing_source_diagnostic?.trim() || null,
+    fallbackReason: row.pricing_fallback_reason?.trim() || null,
+  }
+}
+
 export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
   return {
     id: row.order_id,
@@ -166,10 +190,7 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
       price: row.assembly_price ?? 0,
       basePrice: row.assembly_base_price ?? null,
     },
-    pricing: {
-      status: 'final server snapshot',
-      source: 'source attribution not persisted',
-    },
+    pricing: mapPricingAttribution(row),
     customer: {
       nameMasked: maskName(row.customer_name),
       phoneMasked: maskPhone(row.customer_phone),
@@ -188,7 +209,7 @@ export async function listAdminOrders(limit = 50): Promise<AdminOrderSummary[]> 
 
   const { data, error } = await supabase
     .from('orders')
-    .select('order_id,status,created_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export')
+    .select('order_id,status,created_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason')
     .order('created_at', { ascending: false })
     .limit(Math.min(Math.max(limit, 1), 100))
 

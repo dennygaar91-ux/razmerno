@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import type { OrderDbInsert, OrderRequest } from "./order-types";
+import type { OrderDbInsert, OrderPricingAttribution, OrderRequest } from "./order-types";
 
 function hashClientIp(value: string | null): string | null {
   if (!value) return null;
@@ -11,11 +11,13 @@ export function toOrderDbInsert({
   body,
   userAgent,
   clientIp,
+  pricingAttribution = null,
 }: {
   orderId: string;
   body: OrderRequest;
   userAgent: string | null;
   clientIp: string | null;
+  pricingAttribution?: OrderPricingAttribution | null;
 }): OrderDbInsert {
   return {
     order_id: orderId,
@@ -58,5 +60,9 @@ export function toOrderDbInsert({
     user_agent: userAgent,
     client_ip_hash: hashClientIp(clientIp),
     production_export: body.productionExport ?? null,
+
+    catalog_source_used: pricingAttribution?.catalog_source_used ?? null,
+    pricing_source_diagnostic: pricingAttribution?.pricing_source_diagnostic ?? null,
+    pricing_fallback_reason: pricingAttribution?.pricing_fallback_reason ?? null,
   };
 }

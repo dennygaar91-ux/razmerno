@@ -32,6 +32,9 @@ export type StoredOrderRecord = {
   manager_email_error: string | null;
   customer_email_error: string | null;
   production_export: unknown | null;
+  catalog_source_used: OrderDbInsert["catalog_source_used"];
+  pricing_source_diagnostic: OrderDbInsert["pricing_source_diagnostic"];
+  pricing_fallback_reason: OrderDbInsert["pricing_fallback_reason"];
   created_at: string;
 };
 
@@ -86,7 +89,7 @@ export async function getOrderRecordByOrderId(orderId: string) {
   const { data, error } = await client
     .from("orders")
     .select(
-      "order_id,source,product_type,dimensions,sections,filling,layout,materials,style,price_breakdown,total_price,customer_name,customer_phone,customer_email,customer_comment,delivery_enabled,delivery_address,delivery_price,assembly_enabled,assembly_price,assembly_rate,assembly_base_price,consent,config_version,utm,manager_email_status,customer_email_status,manager_email_error,customer_email_error,production_export,created_at",
+      "order_id,source,product_type,dimensions,sections,filling,layout,materials,style,price_breakdown,total_price,customer_name,customer_phone,customer_email,customer_comment,delivery_enabled,delivery_address,delivery_price,assembly_enabled,assembly_price,assembly_rate,assembly_base_price,consent,config_version,utm,manager_email_status,customer_email_status,manager_email_error,customer_email_error,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason,created_at",
     )
     .eq("order_id", orderId)
     .limit(1);

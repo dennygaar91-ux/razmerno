@@ -28,7 +28,11 @@ export function mapApiOrder(order: AdminApiOrder): AdminOrderRow {
     materialsSummary: "not available in current admin payload",
     pricingLabel: order.pricing.status,
     pricingSource: order.pricing.source,
-    pricingSnapshotSummary: "persisted total/delivery/assembly from stored order snapshot",
+    pricingSnapshotSummary: [
+      "persisted total/delivery/assembly from stored order snapshot",
+      order.pricing.diagnostic ? `diagnostic: ${order.pricing.diagnostic}` : null,
+      order.pricing.fallbackReason ? `fallback: ${order.pricing.fallbackReason}` : null,
+    ].filter(Boolean).join("; "),
     priceBreakdownSummary: breakdownKeys.length > 0
       ? `stored breakdown keys: ${breakdownKeys.join(", ")}`
       : "stored breakdown not available in current admin payload",

@@ -77,6 +77,9 @@ function fromStoredOrderRecord(record: StoredOrderRecord): ComparableOrderRecord
     consent: record.consent,
     config_version: record.config_version,
     utm: record.utm,
+    catalog_source_used: record.catalog_source_used,
+    pricing_source_diagnostic: record.pricing_source_diagnostic,
+    pricing_fallback_reason: record.pricing_fallback_reason,
   };
 }
 

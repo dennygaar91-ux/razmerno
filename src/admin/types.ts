@@ -32,7 +32,12 @@ export type AdminApiOrder = {
   priceBreakdown: Record<string, number> | null;
   delivery: { enabled: boolean; price: number; addressMasked: string | null };
   assembly: { enabled: boolean; price: number; basePrice: number | null };
-  pricing: { status: "final server snapshot"; source: "source attribution not persisted" };
+  pricing: {
+    status: "final server snapshot";
+    source: string;
+    diagnostic?: string | null;
+    fallbackReason?: string | null;
+  };
   customer: { nameMasked: string; phoneMasked: string; emailMasked: string };
   email: { manager: string; customer: string };
   production: { status: string; warnings: number; rejects: number; repairs: number; revision: number; manualAllowed: boolean };

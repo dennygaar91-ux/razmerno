@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import handler from "../api/orders";
 import { mapOrderRow, mapStatusEvent, isAdminOrderStatus } from "../api/_shared/admin-orders";
 import { toOrderDbInsert } from "../api/_shared/order-db";
+import { isSameOrderPayload } from "../api/_shared/order-idempotency";
 import {
   assertCatalogSourceConsistency,
   calculateServerCatalogPriceResolved,
@@ -1061,6 +1062,8 @@ test("Supabase read/status repository contracts map admin rows and status transi
   assert.equal(row.assembly.basePrice, 71_820);
   assert.equal(row.pricing.status, "final server snapshot");
   assert.equal(row.pricing.source, "source attribution not persisted");
+  assert.equal(row.pricing.diagnostic, null);
+  assert.equal(row.pricing.fallbackReason, null);
   assert.equal(row.production.warnings, 1);
   assert.equal(row.production.repairs, 1);
   assert.equal(row.production.revision, 2);
@@ -1175,6 +1178,9 @@ test("P0-13 API payload contract: persisted snapshot uses constructor payload fo
   });
   assert.equal(storedInsert.delivery_price, expectedServerPrice.price.delivery);
   assert.equal(storedInsert.assembly_price, expectedServerPrice.price.assembly ?? 0);
+  assert.equal(storedInsert.catalog_source_used, expectedServerPrice.catalogSourceUsed);
+  assert.equal(storedInsert.pricing_source_diagnostic, expectedServerPrice.source);
+  assert.equal(storedInsert.pricing_fallback_reason, expectedServerPrice.fallbackReason);
   assert.ok(storedProductionExport);
   assert.equal(storedProductionExport?.schema, expectedProductionExport.schema);
   assert.equal(storedProductionExport?.source, expectedProductionExport.source);
@@ -1845,6 +1851,93 @@ test("API order flow enforces request cooldown/rate limit deterministically", as
   assert.equal(result?.statusCode, 429);
   assert.equal((result?.json as { ok?: boolean }).ok, false);
   assert.ok((((result?.json as { message?: string }).message) ?? "").length > 0);
+});
+
+test("P0-03 pricing source attribution: admin mapOrderRow uses persisted catalog source when present", () => {
+  const row = mapOrderRow({
+    order_id: "RZ-20260626-5101",
+    status: "new",
+    product_type: "wardrobe",
+    dimensions: { width: 1800, height: 2200, depth: 600 },
+    total_price: 79_800,
+    price_breakdown: { body: 10_000, facades: 20_000 },
+    delivery_enabled: false,
+    delivery_price: 0,
+    delivery_address: null,
+    assembly_enabled: false,
+    assembly_price: 0,
+    assembly_base_price: 0,
+    customer_name: "Иван Петров",
+    customer_phone: "+7 999 111-22-33",
+    customer_email: "client@example.com",
+    manager_email_status: "sent",
+    customer_email_status: "pending",
+    production_export: null,
+    catalog_source_used: "supabase",
+    pricing_source_diagnostic: "supabase_success",
+    pricing_fallback_reason: null,
+  } as Parameters<typeof mapOrderRow>[0]);
+
+  assert.equal(row.pricing.source, "supabase");
+  assert.equal(row.pricing.diagnostic, "supabase_success");
+  assert.equal(row.pricing.fallbackReason, null);
+});
+
+test("P0-03 pricing source attribution: idempotency comparable payload includes attribution fields", () => {
+  const record = toOrderDbInsert({
+    orderId: "RZ-20260626-5102",
+    body: makeValidOrder(),
+    userAgent: "contract-test-agent",
+    clientIp: "203.0.113.42",
+    pricingAttribution: {
+      catalog_source_used: "seed_fallback",
+      pricing_source_diagnostic: "supabase_empty",
+      pricing_fallback_reason: "supabase_empty_catalog",
+    },
+  });
+
+  assert.equal(
+    isSameOrderPayload(record, {
+      ...record,
+      order_id: record.order_id,
+      created_at: "2026-06-26T10:00:00.000Z",
+    }),
+    true,
+  );
+
+  const changedAttribution = {
+    ...record,
+    pricing_fallback_reason: "supabase_fetch_failed",
+  };
+
+  assert.equal(
+    isSameOrderPayload(changedAttribution, {
+      ...record,
+      order_id: record.order_id,
+      created_at: "2026-06-26T10:00:00.000Z",
+    }),
+    false,
+  );
+});
+
+test("P0-03 pricing source attribution: seed fallback reason persists on order submit", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock({ emptySupabasePriceItems: true });
+  const order = makeValidOrder({ orderId: "RZ-20260626-5103" });
+  const expectedServerPrice = await calculateServerOrderPriceResolved({
+    body: order,
+    productionExport: buildProductionExportFromOrder(order),
+  });
+
+  const result = await callOrderHandler(order, {
+    idempotencyKey: "RZ-20260626-5103",
+  });
+  const storedInsert = getOrdersInsertPayload(records);
+
+  assert.equal(result.statusCode, 200);
+  assert.equal(storedInsert.catalog_source_used, "seed_fallback");
+  assert.equal(storedInsert.pricing_source_diagnostic, expectedServerPrice.source);
+  assert.equal(storedInsert.pricing_fallback_reason, "supabase_empty_catalog");
 });
 
 try {

@@ -41,6 +41,20 @@ export type OrderRequest = {
 
 export type OrderEmailStatus = "pending" | "sent" | "skipped" | "failed";
 
+export type OrderCatalogSourceUsed = "supabase" | "seed_fallback";
+
+export type OrderPricingSourceDiagnostic =
+  | "supabase_success"
+  | "supabase_empty"
+  | "supabase_failed"
+  | "seed_fallback";
+
+export type OrderPricingAttribution = {
+  catalog_source_used: OrderCatalogSourceUsed;
+  pricing_source_diagnostic: OrderPricingSourceDiagnostic;
+  pricing_fallback_reason: string | null;
+};
+
 export type OrderDbInsert = {
   order_id: string;
   status: "new";
@@ -82,4 +96,8 @@ export type OrderDbInsert = {
   user_agent: string | null;
   client_ip_hash: string | null;
   production_export: unknown | null;
+
+  catalog_source_used: OrderCatalogSourceUsed | null;
+  pricing_source_diagnostic: OrderPricingSourceDiagnostic | null;
+  pricing_fallback_reason: string | null;
 };

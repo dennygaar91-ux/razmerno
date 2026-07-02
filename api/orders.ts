@@ -1,4 +1,4 @@
-import type { OrderRequest } from './_shared/order-types.js'
+import type { OrderPricingAttribution, OrderRequest } from './_shared/order-types.js'
 import { toOrderDbInsert } from './_shared/order-db.js'
 import { isSameOrderPayload } from './_shared/order-idempotency.js'
 import { buildClientText, buildManagerAttachments, buildManagerText, sendEmail } from './_shared/order-email.js'
@@ -128,6 +128,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (validationError) return res.status(400).json({ ok: false, message: validationError })
 
   let orderBodyForPersistence: OrderRequest
+  let pricingAttribution: OrderPricingAttribution | null = null
   try {
     const bodyWithOrderId = { ...body, orderId: orderIdentity.orderId }
     const productionExport = buildProductionExportFromPayload(bodyWithOrderId)
@@ -135,6 +136,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       body: bodyWithOrderId,
       productionExport,
     })
+    pricingAttribution = {
+      catalog_source_used: resolvedPricing.catalogSourceUsed,
+      pricing_source_diagnostic: resolvedPricing.source,
+      pricing_fallback_reason: resolvedPricing.fallbackReason,
+    }
     orderBodyForPersistence = withServerPrice(
       { ...bodyWithOrderId, productionExport },
       resolvedPricing.price,
@@ -154,6 +160,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       body: orderBodyForPersistence,
       userAgent: getHeader(req, 'user-agent'),
       clientIp: clientKey,
+      pricingAttribution,
     })
 
     if (idempotencyKey) {
