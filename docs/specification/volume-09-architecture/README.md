@@ -308,9 +308,66 @@ Supabase catalog должен включать:
 - validation/review statuses;
 - email statuses;
 - Basis status;
+- Change Requests;
+- Approval View preparation;
+- audit/event log;
 - exports.
 
-На MVP админка преимущественно read-only, кроме изменения статусов.
+Release v1 admin = Order Operations Workspace: status changes, manual payment confirmation, pricing adjustment, CR resolution, audit inspection.
+
+Manager не редактирует submitted JSON manually в Release v1.
+
+---
+
+# 12.1 Status vs Business Rules / Locks
+
+Архитектурный принцип Release v1:
+
+- **Status** отвечает: где заказ в lifecycle (`Черновик`, `Проверка`, `Оплата`, `В работе`, `Завершено`, `Отмена`).
+- **Business Rules / Locks** отвечают: какие действия сейчас разрешены (`Production Lock`, `Approval Lock`, future payment/delivery locks).
+
+Не кодировать каждое operational ограничение отдельным customer-facing status.
+
+Пример: open Change Request в `Проверка` → `Production Lock = true`.
+
+---
+
+# 12.2 Change Request Lifecycle (canonical)
+
+Decision source: Release v1 product decisions.
+
+Единое определение business process. RPES VII и RPES VIII ссылаются сюда; не дублировать lifecycle в других томах.
+
+## Initiator
+
+- customer (через cancellation request или запрос изменений);
+- manager/operator (через operational evaluation).
+
+## Manager evaluation
+
+Manager/operator оценивает запрос, фиксирует изменения в Operations View и при необходимости открывает Approval View для customer confirmation.
+
+## Approval View
+
+Text-based customer confirmation для изменений цены/конфигурации. Customer outcomes:
+
+- **Confirmed** — `Изменения подтверждаю`;
+- **Rejected** — `Изменения не подтверждаю`;
+- **Cancelled** — `Отмена изменений` (CR закрыт без применения изменений).
+
+## Production Lock interaction
+
+- Open CR при order status `Проверка` → `Production Lock = true`;
+- B3D handoff и production transfer блокируются до resolution CR;
+- status остаётся `Проверка`; lock — business rule, не отдельный customer status.
+
+## Terminal CR outcomes
+
+| Outcome | Meaning |
+|---|---|
+| Confirmed | Изменения приняты и зафиксированы в audit trail |
+| Rejected | Изменения отклонены customer |
+| Cancelled | CR закрыт без применения изменений |
 
 ---
 

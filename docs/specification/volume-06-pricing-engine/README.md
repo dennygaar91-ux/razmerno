@@ -227,6 +227,9 @@ Price snapshot должен хранить:
 
 - order id;
 - timestamp;
+- `initial_backend_price`;
+- manager adjustment fields (`manager_adjustment`, `adjustment_reason`, `adjusted_by`, `adjusted_at`) when present;
+- `final_price`;
 - product price;
 - delivery price;
 - assembly price;
@@ -238,6 +241,8 @@ Price snapshot должен хранить:
 - pricing version;
 - config reference;
 - production model reference.
+
+Initial backend price не перезаписывается manager adjustment.
 
 ## 11.3 Где используется
 
@@ -254,14 +259,20 @@ Price snapshot используется:
 
 # 12. Client price и server price
 
+Финальная цена рассчитывается **только на backend**. Frontend может показывать preview, но не является final price authority.
+
 Система должна различать:
 
-- client-calculated price;
-- server-resolved price.
+- client-calculated price (preview);
+- server-resolved price (authoritative);
+- `initial_backend_price` snapshot after submit;
+- manager adjustment and `final_price`.
 
-Server price является более доверенным источником.
+Server price является authoritative source для stored order snapshot.
 
-Админ должен видеть расхождение, если оно есть.
+Если `final_price` увеличивается после submit, customer подтверждает изменение через Approval View. Снижение цены без изменения конфигурации может не требовать approval, но должно логироваться.
+
+Админ должен видеть расхождение client/server и adjustment history, если они есть.
 
 Пользователь не должен видеть техническое сравнение client/server.
 

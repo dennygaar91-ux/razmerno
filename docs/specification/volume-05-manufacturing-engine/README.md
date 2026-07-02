@@ -281,11 +281,23 @@ Review не виден клиенту в техническом виде.
 
 # 8. Basis Boundary
 
-## 8.1 MVP boundary
+## 8.1 Release v1 boundary
 
-MVP не генерирует `.b3d`.
+Release v1:
 
-MVP формирует manual JSON / Basis manual plan, достаточный для ручной сборки технологом в БАЗИС-Мебельщик.
+- **не генерирует** `.b3d` автоматически;
+- **обязательно сохраняет** structured configuration JSON для каждого submitted order;
+- создаёт B3D **вручную** в Basis после submit;
+- передаёт в production primarily готовый B3D file;
+- хранит visual preview/screenshot reference при submit.
+
+JSON / Basis manual plan остаётся обязательным входом для ручной сборки B3D технологом.
+
+JSON alone не является factory-ready handoff.
+
+## 8.1.1 Source of truth after handoff
+
+Backend остаётся source of truth после production handoff. Basis — production tool/editor, не система учёта заказа.
 
 ## 8.2 Запрещённые claims
 
@@ -299,7 +311,11 @@ MVP формирует manual JSON / Basis manual plan, достаточный �
 
 Корректная формулировка:
 
-> Production JSON готов для ручной подготовки модели в БАЗИС-Мебельщик.
+> Structured configuration JSON сохраняется как configuration source и backend-owned snapshot input. Final production handoff artifact в Release v1 — **B3D file**, подготовленный технологом вручную в БАЗИС-Мебельщик. JSON alone не является factory-ready handoff.
+
+Backend остаётся Source of Truth для configuration/price snapshots. B3D — factory-facing artifact.
+
+Decision source: Release v1 product decisions; `accepted-backlog-decisions-v1.md` §8 Production / Manufacturing.
 
 ## 8.4 Future
 

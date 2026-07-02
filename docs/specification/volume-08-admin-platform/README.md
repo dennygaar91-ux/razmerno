@@ -6,9 +6,11 @@
 
 # 1. Назначение
 
-Административная панель является внутренним операционным центром продукта.
+Административная панель является внутренним **Order Operations Workspace** продукта.
 
-Она предназначена для обработки заявок, контроля статусов, проверки производственной модели, мониторинга цены и передачи заказа в производство.
+Она предназначена для обработки заявок, контроля статусов, проверки производственной модели, мониторинга цены, Change Requests, audit trail и передачи заказа в производство.
+
+Админка не является CRM и не заменяет Bitrix/amoCRM или полноценный sales pipeline.
 
 Админка не должна дублировать конструктор. Она работает с уже сформированной конфигурацией.
 
@@ -90,15 +92,30 @@ PII должна отображаться безопасно (masking там, г
 
 # 7. Статусы
 
-Рабочие статусы:
+Customer-facing Release v1 domain statuses:
 
-- Новая;
-- Проверка;
-- В производстве;
-- Отправлено;
-- Закрыто.
+```text
+Черновик → Проверка → Оплата → В работе → Завершено
+Отмена — terminal cancel status (только manager/operator)
+```
 
-Клиентские статусы формируются отдельно.
+Канонический enum: `Черновик`, `Проверка`, `Оплата`, `В работе`, `Завершено`, `Отмена`.
+
+Decision source: Release v1 product decisions.
+
+Operations queues (recommended):
+
+- New / Проверка;
+- Waiting for customer approval;
+- Payment;
+- Ready for production / В работе handoff;
+- In production / В работе;
+- Completed;
+- Cancelled.
+
+Только manager/operator меняет order status. Customer cancel action создаёт cancellation request.
+
+При open Change Request в `Проверка` активируется **Production Lock** — business rule, не отдельный customer status. Canonical CR lifecycle: RPES IX §12.2.
 
 # 8. Production Review
 
@@ -161,12 +178,16 @@ PII должна отображаться безопасно (masking там, г
 
 ## 14.1 Редактирование
 
-Админ может редактировать:
+Админ может:
 
-- контактные данные клиента;
-- комментарии;
-- статус заказа;
-- цену, если требуется manager price override.
+- менять статус заказа;
+- создавать/вести Change Request (canonical lifecycle: RPES IX §12.2);
+- готовить Approval View;
+- подтверждать оплату вручную;
+- делать manual commercial price adjustment с reason/audit;
+- просматривать Audit Log / История изменений.
+
+Manager **не редактирует JSON вручную** в Release v1. Initial JSON остаётся submitted/configuration snapshot; post-Basis changes описываются через Change Requests и audit events.
 
 Ручное редактирование production model пока не входит в ближайший scope.
 
@@ -180,7 +201,11 @@ PII должна отображаться безопасно (masking там, г
 
 ## 14.3 JSON/PDF export
 
-JSON/PDF export нужен в MVP/Release v1.
+JSON export для operations — in scope Release v1.
+
+PDF/specification export — optional, если JSON/B3D flow достаточен для production/manual validation.
+
+Decision source: Release v1 product decisions.
 
 ## 14.4 PII
 

@@ -147,3 +147,25 @@ Any pricing computation MUST explicitly tag source:
 - supabase
 - seed-fallback
 - failed-resolution
+
+## 18. Release v1 Reconciliation Layer
+
+Decision source: `docs/planning/razmerno-release-v1-product-decisions-delta-final.md` integrated into RPES and planning on 2026-06-26.
+
+Hierarchy for agents:
+
+```text
+Accepted Decisions
+→ RPES
+→ Planning (`mvp-scope.md`, `release-roadmap.md`)
+→ Backlog (`current-backlog.md`)
+```
+
+Reconciliation rules for Release v1:
+
+1. Термин **MVP** в этом документе сохраняет принятые baseline-ограничения (pricing, production boundary, validation, release gate). Продуктовый объём Release v1 описан в `docs/planning/mvp-scope.md` и RPES и **не отменяет** baseline-ограничения из §4–§11 автоматически.
+2. §12 Admin / Operations остаётся **минимальным operational floor**: список, детали, статус, production JSON / intermediate handoff, базовая ручная проверка, manager notes.
+3. Release v1 **Order Operations Workspace** (RPES VIII, `mvp-scope.md`) — это расширение operational surface поверх §12 floor: Change Request, Approval View, audit trail, manual payment confirmation, operational queues. Расширение не отменяет §12 и не закрывает reconciliation tasks `P1-27` / `P1-28` без merged/main evidence.
+4. Customer platform (auth, drafts, cabinet, order card) входит в Release v1 scope по RPES VII и `mvp-scope.md`. Это не противоречит §10–§14 baseline validation/pricing rules, но implementation closure остаётся open до evidence (`P1-27`).
+5. Online payment, automatic `.b3d`, CRM replacement и manager manual JSON editing остаются **out of scope** и согласуются с §8 Production / Manufacturing и Release v1 planning wording.
+6. При конфликте wording между этим файлом и RPES/planning: **не выбирать молча**; использовать `P1-27`, `P1-28`, `role-audit-reconciliation-v1.md` и explicit reconciliation note до updated decision layer.

@@ -11,6 +11,54 @@ Governance note:
 - `docs/planning/accepted-backlog-decisions-v1.md` is a mandatory decision layer for interpreting backlog tasks.
 - `docs/planning/current-backlog.md` remains the main backlog source of truth.
 - If `current-backlog.md` and accepted decisions appear to conflict, stop and request reconciliation.
+- Release v1 documentation hierarchy: `accepted-backlog-decisions-v1.md` §18 → RPES → `mvp-scope.md` / `release-roadmap.md` → this backlog. Governance traceability below does not change task status or closure evidence.
+
+## Release v1 Governance Traceability
+
+Planning input integrated from `docs/planning/razmerno-release-v1-product-decisions-delta-final.md` on 2026-06-26.
+
+- `docs/planning/mvp-scope.md` now documents **Release v1 Scope** while keeping the legacy file path.
+- This backlog remains the operational source of truth for task status, evidence and closure conditions.
+- Release v1 decisions are traced below by **Capability** and **Release Phase** without changing any task status or closure evidence.
+
+### Release Progress
+
+| Release Phase | Capability focus | Primary outcome | Representative backlog tracks |
+|---|---|---|---|
+| RV1-A Constructor Core | Core Configuration, Visualization Runtime | stable Constructor3D, state model, submit path, WebGL fallback | P0-01, P0-02, P0-05, P0-06, P0-16, P0-17, P0-18, M8-P0-02, M8-P0-03, P1-10 |
+| RV1-B Pricing & Submit Reliability | Pricing Authority, Order Snapshot | backend-owned price, parity fixtures, checkout/API reliability | P0-03, P0-11, P0-12, P0-13, M8-P0-01, M8-P0-04, M8-P0-05 |
+| RV1-C Customer Platform | Auth, Drafts, Customer Cabinet | auth gate, email+password, drafts/projects, customer order card | P1-27 |
+| RV1-D Orders Lifecycle | Status Model, Change Requests, Audit | domain statuses `Черновик`, `Проверка`, `Оплата`, `В работе`, `Завершено`, `Отмена`; `RZM_0001`, CR, locks, audit trail | P1-28, M9-P1-02, P2-09 |
+| RV1-E Operations Workspace | Operations View, Approval View, Manual Pricing | Order Operations Workspace, Approval View, manager adjustment | P1-28, P2-09, P2-25 |
+| RV1-F Production Handoff | JSON Snapshot, Manual B3D | mandatory JSON, manual Basis/B3D, preview storage | P1-11A, P1-11B, P1-23, P1-24, БАЗИС-Мебельщик Boundary Lock, Production Export Failure Contract |
+| RV1-G Payments & Notifications | Manual Payment, Notification Center | manual payment confirmation, email + in-cabinet notifications | API notification tracks, M8-P0-04, M9-P1-03 |
+| RV1-H Release Candidate | QA / Live Verification / Visual Gate | release checklist, live Supabase/email, visual QA | M8-P1-01, M8-P1-02, M8-P1-05, P1-21, P2-20, P2-21, Live Provider / Supabase Order Flow Verification |
+
+### Capability Mapping
+
+Use this table for governance traceability only. Task status and evidence remain in each task block below.
+
+| Capability | Release Phase | Related backlog tasks / tracks |
+|---|---|---|
+| Core Configuration | RV1-A | P0-01, P0-02, P0-16, P0-17, P0-18, M8-P0-02 |
+| Visualization Runtime | RV1-A | P0-05, P0-06, M8-P0-03, P1-10, P2-26A, P2-26B, P2-26C |
+| Pricing Authority | RV1-B | P0-03, P0-13, M8-P0-01 |
+| Order Snapshot & Submit Reliability | RV1-B | P0-11, P0-12, M8-P0-04, M8-P0-05, P1-09 |
+| Auth & Registration | RV1-C | P1-27 |
+| Drafts / Projects | RV1-C | P1-27 |
+| Customer Cabinet & Order Card | RV1-C | P1-27 |
+| Status Model & Order Numbering | RV1-D | P1-28, M9-P1-02 |
+| Change Request & Production Lock | RV1-D | P2-09, P1-28 |
+| Audit Trail / Event Log | RV1-D | P2-09, P1-28 |
+| Operations View | RV1-E | P1-28, P2-25 |
+| Approval View | RV1-E | P1-28, P2-09 |
+| Manual Manager Price Adjustment | RV1-E | P0-03, P0-13, P1-28 |
+| JSON Manufacturing Snapshot | RV1-F | P1-11A, P1-11B, Production Golden Snapshots, Production Export Failure Contract |
+| Manual B3D / Basis Handoff | RV1-F | БАЗИС-Мебельщик Boundary Lock, P1-11A, P1-11B |
+| Order Preview / Screenshot Storage | RV1-F | P0-11, P0-12 |
+| Manual Payment Workflow | RV1-G | P1-28, M9-P1-02 |
+| Notification Center & Email | RV1-G | API Order Notification Failure Contracts, M8-P0-04, M9-P1-03 |
+| Release QA / Live Verification | RV1-H | M8-P1-01, M8-P1-02, M8-P1-05, Live Provider / Supabase Order Flow Verification, P1-21 |
 
 Формат приоритета:
 
@@ -785,6 +833,8 @@ Do-not-touch constraints:
 
 Why: RPES Volume VII requires auth, cabinet, saved configuration continuity, project/order lists and post-submit visibility, while current backlog has no dedicated scope-decision task for this gap and current repo evidence does not confirm a matching customer UI surface.
 
+Governance traceability note (2026-06-26 final pass): Release v1 planning (`mvp-scope.md`, RPES VII, `accepted-backlog-decisions-v1.md` §18) now explicitly treats customer platform as Release v1-required. This task remains `needs reconciliation` until merged/main implementation inventory and closure evidence exist — documentation alignment alone does not close the task.
+
 Risk: MVP wording can overpromise a customer platform scope that is broader than the verified implementation surface.
 
 Owner: 01 Product / Planning Agent + 04 API / Orders Agent.
@@ -808,6 +858,8 @@ Do-not-touch constraints:
 Статус: needs reconciliation.
 
 Why: RPES Volume VIII and accepted decisions define a minimal MVP admin scope, but open tasks such as `P2-09` and `P2-25` already point toward a broader operations platform without an explicit planning boundary.
+
+Governance traceability note (2026-06-26 final pass): `accepted-backlog-decisions-v1.md` §18 reconciles §12 minimal admin floor with Release v1 Order Operations Workspace (RPES VIII). Extended tracks (`P2-09`, `P2-25`) remain open; this task stays `needs reconciliation` until merged/main boundary evidence closes the gap between floor and workspace scope.
 
 Risk: admin work can drift from minimal MVP operations into unapproved extended workflow scope.
 

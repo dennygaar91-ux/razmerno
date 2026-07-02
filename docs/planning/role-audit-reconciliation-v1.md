@@ -188,3 +188,26 @@ These tasks must not be closed based on audit docs alone:
 Сделай docs-only state ownership contract для active Constructor3D: зафиксируй ownership и boundaries для `sceneRenderMode`, exact/advanced flags, selected entity bridge, snapshot/payload boundary и active vs legacy state layers. Не меняй runtime code и не закрывай tasks.
 
 Обращаться к агенту: 02 Constructor Agent
+
+---
+
+## Release v1 Documentation Governance Reconciliation (2026-06-26)
+
+Integrated input: `docs/planning/razmerno-release-v1-product-decisions-delta-final.md`.
+
+Reconciliation notes:
+
+1. Historical **MVP scope** wording in planning docs is replaced by **Release v1 Scope** content while preserving the file path `docs/planning/mvp-scope.md` for compatibility.
+2. `docs/planning/current-backlog.md` now includes **Release Progress** and **Capability Mapping** (`Capability`, `Release Phase`) for governance traceability; existing task statuses, evidence, dependencies and closure conditions were preserved.
+3. `docs/planning/release-roadmap.md` wording is aligned to Release v1 Scope and Operations Workspace terminology.
+4. Relevant RPES sections were updated for Release v1 decisions: customer auth/cabinet, order statuses, Customer/Operations/Approval views, Change Request + Production Lock, backend pricing snapshots, manual B3D, manual payment, audit trail, Order Operations Workspace.
+5. `accepted-backlog-decisions-v1.md` §18 (Release v1 Reconciliation Layer) bridges accepted baseline decisions with RPES/planning extensions; hierarchy is Accepted Decisions → RPES → Planning → Backlog.
+6. Final governance pass (2026-06-26): status enum normalized; payment wording reconciled in RPES VII; CR lifecycle canonicalized in RPES IX §12.2; JSON vs B3D clarified in RPES V §8.3; roadmap ↔ RV1 phase traceability added.
+
+Remaining conflicts to track (not closed by documentation alone):
+
+- RAR-006 Customer platform scope: documentation aligned; `P1-27` remains `needs reconciliation` until merged/main implementation evidence.
+- RAR-008 Admin workflow scope: §18 reconciles minimal admin floor vs Order Operations Workspace; `P1-28` remains `needs reconciliation` until merged/main boundary evidence.
+- Production handoff: B3D = final artifact; JSON = configuration source; automatic `.b3d` remains forbidden.
+
+GitHub QA/main verification for this documentation alignment: **not verified**.
