@@ -908,6 +908,17 @@ Branch implementation evidence (2026-07-03, Epic F — Project Resume & Load Fou
 - explicit non-scope preserved: no project archive UI, no autosave, no order detail, notifications, payments, production timeline;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Project Update Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- constructor sync tracks `currentProjectId` from resumed/saved project;
+- server save uses `PATCH /api/project?id=` when `currentProjectId` exists, otherwise `POST /api/projects`;
+- UI copy: `Сохранить на сервер` for new project, `Сохранить изменения` for existing;
+- helpers: `src/shared/projects/projectSave.ts`, `buildProjectPatchInputFromConstructor`;
+- failed PATCH keeps `currentProjectId`; successful PATCH/POST refresh saved project state;
+- tests extended in `tests/customer-project-resume.test.ts`;
+- explicit non-scope preserved: no autosave, rename/archive/delete UI;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

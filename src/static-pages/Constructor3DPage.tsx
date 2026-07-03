@@ -152,17 +152,20 @@ export default function Constructor3DPage() {
     clearDraft,
   } = useConstructorDraftLifecycle(snapshot);
   const {
-    syncStatus: projectSyncStatus,
-    syncMessage: projectSyncMessage,
-    lastSavedProject,
-    saveCurrentAsProject,
-    canSaveToServer,
-  } = useConstructorProjectSync(snapshot, hasStoredDraft);
-  const {
     status: projectResumeStatus,
     message: projectResumeMessage,
     loadedProject: resumedProject,
   } = useConstructorProjectResume();
+  const {
+    syncStatus: projectSyncStatus,
+    syncMessage: projectSyncMessage,
+    currentProjectId,
+    lastSavedProject,
+    hasExistingServerProject,
+    saveCurrentAsProject,
+    clearServerProjectIdentity,
+    canSaveToServer,
+  } = useConstructorProjectSync(snapshot, hasStoredDraft, resumedProject);
   const { session } = useSessionContext();
 
   const retryThreeScene = useCallback((reduced = false) => {
@@ -219,7 +222,7 @@ export default function Constructor3DPage() {
       saveDraft();
     },
     accessToken: session?.access_token ?? null,
-    projectId: resumedProject?.id ?? lastSavedProject?.id ?? null,
+    projectId: currentProjectId ?? lastSavedProject?.id ?? null,
   });
   const { authGateError, attemptCheckoutSubmit, checkoutAuthModal } = useCheckoutAuthGate(submit);
   const formatPrice = quote?.formatPrice ?? formatFallbackPrice;
@@ -289,6 +292,7 @@ export default function Constructor3DPage() {
 
   const handleResetConfirm = () => {
     resetProject();
+    clearServerProjectIdentity();
     setActiveAddTarget(null);
     setThreeFailed(false);
     setThreeFailureReason(null);
@@ -479,6 +483,7 @@ export default function Constructor3DPage() {
                   clearDraft();
                 }}
                 canSaveToServer={canSaveToServer}
+                hasExistingServerProject={hasExistingServerProject}
                 onSaveToServer={() => {
                   void saveCurrentAsProject();
                 }}

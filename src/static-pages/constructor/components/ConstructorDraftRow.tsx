@@ -1,4 +1,5 @@
 import type { ConstructorDraftStatus } from "../hooks/useConstructorDraftLifecycle";
+import { getProjectServerSaveButtonLabel } from "../../../shared/projects/projectSave";
 
 export function ConstructorDraftRow({
   draftStatus,
@@ -8,6 +9,7 @@ export function ConstructorDraftRow({
   onClearDraft,
   canSaveToServer = false,
   onSaveToServer,
+  hasExistingServerProject = false,
   serverSyncMessage,
   serverSyncStatus = "idle",
 }: {
@@ -18,9 +20,13 @@ export function ConstructorDraftRow({
   onClearDraft: () => void;
   canSaveToServer?: boolean;
   onSaveToServer?: () => void;
+  hasExistingServerProject?: boolean;
   serverSyncMessage?: string | null;
   serverSyncStatus?: "idle" | "saving" | "saved" | "importing" | "imported" | "error";
 }) {
+  const saveMode = hasExistingServerProject ? "update" : "create";
+  const isSaving = serverSyncStatus === "saving" || serverSyncStatus === "importing";
+
   return (
     <div className="rzm-constructor-draft-row">
       <span>
@@ -44,9 +50,9 @@ export function ConstructorDraftRow({
           <button
             type="button"
             onClick={onSaveToServer}
-            disabled={serverSyncStatus === "saving" || serverSyncStatus === "importing"}
+            disabled={isSaving}
           >
-            {serverSyncStatus === "saving" ? "Сохраняем на сервер…" : "Сохранить на сервер"}
+            {getProjectServerSaveButtonLabel(saveMode, isSaving)}
           </button>
         ) : null}
         <button type="button" onClick={onRestoreDraft} disabled={!hasStoredDraft}>Восстановить проект</button>

@@ -9,6 +9,11 @@ import {
   PROJECT_RESUME_QUERY_PARAM,
 } from "../src/shared/projects/projectResume";
 import {
+  executeProjectServerSave,
+  shouldKeepCurrentProjectIdAfterFailedSave,
+} from "../src/shared/projects/projectSave";
+import { shouldRebindResumedProject } from "../src/static-pages/constructor/hooks/useConstructorProjectSync";
+import {
   applyStoredConstructorDraftToStore,
   isStoredConstructorDraft,
 } from "../src/static-pages/constructor/store/constructorDraft";
@@ -23,6 +28,24 @@ function test(name: string, run: AsyncTest) {
 }
 
 const sampleProjectId = "550e8400-e29b-41d4-a716-446655440020";
+
+const sampleConstructorSnapshot = {
+  furniture: "wardrobe" as const,
+  width: 600,
+  height: 2000,
+  depth: 600,
+  fill: "shelves" as const,
+  sections: 2,
+  compartments: 2,
+  handleless: false,
+  material: "white",
+  facadeMaterial: "white",
+  deliveryEnabled: false,
+  assemblyEnabled: false,
+  deliveryAddress: "",
+  contact: { name: "", phone: "", email: "", company: "" },
+  consent: false,
+};
 
 test("buildConfiguratorResumeUrl uses projectId query param", () => {
   const url = buildConfiguratorResumeUrl(sampleProjectId);
@@ -127,9 +150,173 @@ test("cabinet projects section links to configurator resume url", () => {
 test("Constructor3DPage wires project resume hook", () => {
   const page = readFileSync("src/static-pages/Constructor3DPage.tsx", "utf8");
   const hook = readFileSync("src/static-pages/constructor/hooks/useConstructorProjectResume.ts", "utf8");
+  const sync = readFileSync("src/static-pages/constructor/hooks/useConstructorProjectSync.ts", "utf8");
   assert.match(page, /useConstructorProjectResume/);
+  assert.match(page, /useConstructorProjectSync\(snapshot, hasStoredDraft, resumedProject\)/);
   assert.match(hook, /getCustomerProject/);
   assert.match(hook, /applyStoredConstructorDraftToStore/);
+  assert.match(sync, /executeProjectServerSave/);
+  assert.match(sync, /currentProjectId/);
+});
+
+test("save after resume uses PATCH through executeProjectServerSave", async () => {
+  const calls: string[] = [];
+  const sampleProject = {
+    id: sampleProjectId,
+    user_id: "user-1",
+    title: "Шкаф в спальню",
+    snapshot: { version: 1 as const, draft: { dimensions: [600, 2000, 600], furnitureType: "Шкаф", material: "Белый", sections: 2, filling: "shelves" } },
+    furniture_type: "wardrobe",
+    preview_path: null,
+    archived_at: null,
+    created_at: "2026-07-03T10:00:00.000Z",
+    updated_at: "2026-07-03T10:00:00.000Z",
+  };
+
+  const result = await executeProjectServerSave(
+    {
+      accessToken: "token",
+      snapshot: sampleConstructorSnapshot,
+      currentProjectId: sampleProjectId,
+      existingProjectTitle: sampleProject.title,
+    },
+    {
+      createProject: async () => {
+        calls.push("POST");
+        return { ok: false, message: "should not create" };
+      },
+      updateProject: async () => {
+        calls.push("PATCH");
+        return { ok: true, data: sampleProject };
+      },
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(calls, ["PATCH"]);
+  if (result.ok) {
+    assert.equal(result.mode, "update");
+    assert.equal(result.data.id, sampleProjectId);
+  }
+});
+
+test("save new project uses POST through executeProjectServerSave", async () => {
+  const calls: string[] = [];
+  const sampleProject = {
+    id: "660e8400-e29b-41d4-a716-446655440030",
+    user_id: "user-1",
+    title: "Шкаф",
+    snapshot: { version: 1 as const, draft: {} },
+    furniture_type: "wardrobe",
+    preview_path: null,
+    archived_at: null,
+    created_at: "2026-07-03T10:00:00.000Z",
+    updated_at: "2026-07-03T10:00:00.000Z",
+  };
+
+  const result = await executeProjectServerSave(
+    {
+      accessToken: "token",
+      snapshot: sampleConstructorSnapshot,
+      currentProjectId: null,
+    },
+    {
+      createProject: async () => {
+        calls.push("POST");
+        return { ok: true, data: sampleProject };
+      },
+      updateProject: async () => {
+        calls.push("PATCH");
+        return { ok: false, message: "should not patch" };
+      },
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(calls, ["POST"]);
+  if (result.ok) {
+    assert.equal(result.mode, "create");
+  }
+});
+
+test("failed PATCH keeps current project id semantics", () => {
+  assert.equal(shouldKeepCurrentProjectIdAfterFailedSave(sampleProjectId, "update"), true);
+  assert.equal(shouldKeepCurrentProjectIdAfterFailedSave(null, "create"), false);
+});
+
+test("resume-save path does not call POST when current project id is set", async () => {
+  const syncSource = readFileSync("src/static-pages/constructor/hooks/useConstructorProjectSync.ts", "utf8");
+  assert.match(syncSource, /executeProjectServerSave/);
+  assert.match(syncSource, /shouldKeepCurrentProjectIdAfterFailedSave/);
+  assert.doesNotMatch(syncSource, /createCustomerProject\(\s*accessToken,\s*buildProjectCreateInputFromConstructor/);
+});
+
+test("constructor draft row shows update copy for existing server project", () => {
+  const draftRow = readFileSync("src/static-pages/constructor/components/ConstructorDraftRow.tsx", "utf8");
+  const projectSave = readFileSync("src/shared/projects/projectSave.ts", "utf8");
+  assert.match(draftRow, /hasExistingServerProject/);
+  assert.match(draftRow, /getProjectServerSaveButtonLabel/);
+  assert.match(projectSave, /Сохранить изменения/);
+  assert.match(projectSave, /Сохранить на сервер/);
+});
+
+test("reset after resume clears server project identity and next save uses POST", async () => {
+  const calls: string[] = [];
+  const sampleProject = {
+    id: sampleProjectId,
+    user_id: "user-1",
+    title: "Шкаф в спальню",
+    snapshot: { version: 1 as const, draft: { dimensions: [600, 2000, 600], furnitureType: "Шкаф", material: "Белый", sections: 2, filling: "shelves" } },
+    furniture_type: "wardrobe",
+    preview_path: null,
+    archived_at: null,
+    created_at: "2026-07-03T10:00:00.000Z",
+    updated_at: "2026-07-03T10:00:00.000Z",
+  };
+
+  assert.equal(
+    shouldRebindResumedProject({
+      detachedFromResumedProjectId: sampleProjectId,
+      resumedProjectId: sampleProjectId,
+    }),
+    false,
+  );
+  assert.equal(
+    shouldRebindResumedProject({
+      detachedFromResumedProjectId: sampleProjectId,
+      resumedProjectId: "660e8400-e29b-41d4-a716-446655440030",
+    }),
+    true,
+  );
+
+  const page = readFileSync("src/static-pages/Constructor3DPage.tsx", "utf8");
+  const sync = readFileSync("src/static-pages/constructor/hooks/useConstructorProjectSync.ts", "utf8");
+  assert.match(page, /handleResetConfirm/);
+  assert.match(page, /clearServerProjectIdentity/);
+  assert.match(sync, /clearServerProjectIdentity/);
+  assert.match(sync, /detachedFromResumedProjectIdRef/);
+
+  const result = await executeProjectServerSave(
+    {
+      accessToken: "token",
+      snapshot: sampleConstructorSnapshot,
+      currentProjectId: null,
+      existingProjectTitle: sampleProject.title,
+    },
+    {
+      createProject: async () => {
+        calls.push("POST");
+        return { ok: true, data: { ...sampleProject, id: "660e8400-e29b-41d4-a716-446655440030" } };
+      },
+      updateProject: async () => {
+        calls.push("PATCH");
+        return { ok: false, message: "should not patch after reset" };
+      },
+    },
+  );
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(calls, ["POST"]);
 });
 
 async function runTests() {

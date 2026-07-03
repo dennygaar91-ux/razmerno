@@ -1,7 +1,7 @@
 import { buildConstructorDraft } from "../../static-pages/constructor/adapters/constructorPayload";
 import type { ConstructorSnapshot } from "../../static-pages/constructor/adapters/constructorPayload";
 import type { StoredConstructorDraft } from "../../static-pages/constructor/store/constructorDraft";
-import type { ConstructorProjectCreateInput, ConstructorProjectSnapshot } from "./types";
+import type { ConstructorProjectCreateInput, ConstructorProjectPatchInput, ConstructorProjectSnapshot } from "./types";
 
 export function buildProjectSnapshotFromConstructor(
   snapshot: ConstructorSnapshot,
@@ -18,6 +18,17 @@ export function buildProjectCreateInputFromConstructor(
 ): ConstructorProjectCreateInput {
   return {
     title: title?.trim() || defaultProjectTitle(snapshot),
+    furniture_type: snapshot.furniture,
+    snapshot: buildProjectSnapshotFromConstructor(snapshot),
+  };
+}
+
+export function buildProjectPatchInputFromConstructor(
+  snapshot: ConstructorSnapshot,
+  title?: string,
+): ConstructorProjectPatchInput {
+  return {
+    ...(title?.trim() ? { title: title.trim() } : {}),
     furniture_type: snapshot.furniture,
     snapshot: buildProjectSnapshotFromConstructor(snapshot),
   };
