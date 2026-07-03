@@ -10,6 +10,7 @@ import { CheckoutDeliveryBlock } from "./checkout/CheckoutDeliveryBlock";
 import { CheckoutAssemblyBlock } from "./checkout/CheckoutAssemblyBlock";
 import { CheckoutSubmitBlock } from "./checkout/CheckoutSubmitBlock";
 import { useCheckoutSubmit } from "./checkout/useCheckoutSubmit";
+import { useSessionContext } from "../shared/auth/SessionProvider";
 
 /**
  * Форма заявки (п.11.2 ТЗ).
@@ -30,6 +31,7 @@ export function CheckoutDrawer() {
   const deliveryQuote = calculateDeliveryQuote(deliveryEnabled, deliveryAddress);
   const assemblyQuote = calculateAssemblyQuote(assemblyEnabled, price.total);
   const checkoutTotal = price.total + deliveryQuote.price + assemblyQuote.price;
+  const { session } = useSessionContext();
   const {
     errors,
     setErrors,
@@ -45,6 +47,7 @@ export function CheckoutDrawer() {
     assemblyEnabled,
     consentAccepted: consent,
     onSuccess: actions.setOrderId,
+    accessToken: session?.access_token ?? null,
   });
 
   const clearError = (key: keyof typeof errors) => {

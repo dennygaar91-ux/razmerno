@@ -37,6 +37,7 @@ import { useConstructorSubmit } from "./constructor/hooks/useConstructorSubmit";
 import { stepOrder } from "./constructor/options";
 import { formatFallbackPrice } from "./constructor/utils";
 import { useCheckoutAuthGate } from "../shared/auth/useCheckoutAuthGate";
+import { useSessionContext } from "../shared/auth/SessionProvider";
 import type {
   ConstructorSceneViewMode,
 } from "./constructor/types";
@@ -152,9 +153,11 @@ export default function Constructor3DPage() {
   const {
     syncStatus: projectSyncStatus,
     syncMessage: projectSyncMessage,
+    lastSavedProject,
     saveCurrentAsProject,
     canSaveToServer,
   } = useConstructorProjectSync(snapshot, hasStoredDraft);
+  const { session } = useSessionContext();
 
   const retryThreeScene = useCallback((reduced = false) => {
     setForceReduced3D(reduced);
@@ -209,6 +212,8 @@ export default function Constructor3DPage() {
     onDraftSave: () => {
       saveDraft();
     },
+    accessToken: session?.access_token ?? null,
+    projectId: lastSavedProject?.id ?? null,
   });
   const { authGateError, attemptCheckoutSubmit, checkoutAuthModal } = useCheckoutAuthGate(submit);
   const formatPrice = quote?.formatPrice ?? formatFallbackPrice;

@@ -5,6 +5,10 @@ type ComparableOrderRecord = Omit<
   OrderDbInsert,
   | "order_id"
   | "status"
+  | "user_id"
+  | "public_order_number"
+  | "domain_status"
+  | "constructor_project_id"
   | "manager_email_status"
   | "customer_email_status"
   | "manager_email_error"
@@ -38,6 +42,10 @@ function toComparableRecord(record: OrderDbInsert): ComparableOrderRecord {
   const {
     order_id: _orderId,
     status: _status,
+    user_id: _userId,
+    public_order_number: _publicOrderNumber,
+    domain_status: _domainStatus,
+    constructor_project_id: _constructorProjectId,
     manager_email_status: _managerEmailStatus,
     customer_email_status: _customerEmailStatus,
     manager_email_error: _managerEmailError,

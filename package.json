@@ -359,9 +359,10 @@
     "check:stage13-19-final": "npm run check:stage13-validation-ux && npm run check:stage14-pricing-estimate && npm run check:stage15-checkout-conversion && npm run check:stage16-reset-no-autosave && npm run check:stage17-a11y-hardening && npm run check:stage18-final-regression && npm run check:stage19-legacy-cleanup",
     "check:css-architecture": "node scripts/check-css-architecture.mjs",
     "check:production-geometry-architecture": "node scripts/check-production-geometry-architecture.mjs",
-    "test": "npm run test:customer-auth && npm run test:customer-projects",
+    "test": "npm run test:customer-auth && npm run test:customer-projects && npm run test:customer-order-submit && npm run test:checkout-submit-hook",
     "test:customer-auth": "node --no-warnings --import tsx tests/customer-auth.test.ts",
-    "test:customer-projects": "node --no-warnings --import tsx tests/customer-projects.test.ts"
+    "test:customer-projects": "node --no-warnings --import tsx tests/customer-projects.test.ts",
+    "test:customer-order-submit": "node --no-warnings --import tsx tests/customer-order-submit.test.ts"
   },
   "dependencies": {
     "@react-three/drei": "^9.105.0",

@@ -867,6 +867,16 @@ Branch implementation evidence (2026-07-03, Epic B — Customer Projects Foundat
 - tests: `tests/customer-projects.test.ts` (`npm run test:customer-projects`);
 - explicit non-scope preserved: no Customer Cabinet UI, orders list, notifications, `user_id` on orders, project→order conversion.
 
+Branch implementation evidence (2026-07-03, Epic C — Submit Ownership Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- Supabase migration `20260703_add_order_ownership_foundation.sql` + `db/order-ownership.sql`: `user_id`, `public_order_number` (`RZM_0001` sequence/RPC), `domain_status`, optional `constructor_project_id`;
+- `POST /api/orders` requires authenticated customer JWT (401 without token); assigns `public_order_number` at submit; `domain_status = "Проверка"`; legacy `status = "new"` preserved;
+- optional project→order link via `projectId` with ownership check; profile phone autofill when profile phone empty;
+- frontend: `submitOrder` sends `Authorization` bearer + shows `publicOrderNumber` in success message;
+- tests: `tests/customer-order-submit.test.ts`, updated `tests/checkout-submit-hook.test.ts` (auth header + ownership columns + malicious price overwrite preserved);
+- explicit non-scope preserved: no Customer Cabinet, orders list UI, notifications, change requests, payments, production changes;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

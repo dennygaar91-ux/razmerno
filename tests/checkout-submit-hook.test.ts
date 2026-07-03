@@ -3,6 +3,17 @@ import crypto from "node:crypto";
 import { readFileSync } from "node:fs";
 
 import handler from "../api/orders";
+import {
+  ORDER_SUBMIT_TEST_AUTH_TOKEN,
+  ORDER_SUBMIT_TEST_USER_ID,
+} from "../api/_shared/order-submit-auth";
+import { INITIAL_ORDER_DOMAIN_STATUS } from "../api/_shared/order-domain";
+
+const TEST_ORDER_OWNERSHIP_INPUT = {
+  userId: ORDER_SUBMIT_TEST_USER_ID,
+  publicOrderNumber: "RZM_0001",
+  constructorProjectId: null,
+} as const;
 import { mapOrderRow, mapStatusEvent, isAdminOrderStatus } from "../api/_shared/admin-orders";
 import { toOrderDbInsert } from "../api/_shared/order-db";
 import { isSameOrderPayload } from "../api/_shared/order-idempotency";
@@ -200,6 +211,7 @@ function installServerFetchMock(options: {
 } = {}): FetchRecord[] {
   const records: FetchRecord[] = [];
   let resendCall = 0;
+  let publicOrderSequence = 0;
   const orders = new Map<string, Record<string, unknown>>();
 
   function findOrderId(url: URL): string | null {
@@ -218,6 +230,11 @@ function installServerFetchMock(options: {
       body: typeof init?.body === "string" ? init.body : null,
       headers: Object.fromEntries(headers.entries()),
     });
+
+    if (url.includes("supabase.example.test") && url.includes("/rest/v1/rpc/next_public_order_number")) {
+      publicOrderSequence += 1;
+      return jsonResponse(`RZM_${String(publicOrderSequence).padStart(4, "0")}`);
+    }
 
     if (url.includes("supabase.example.test") && url.includes("/rest/v1/orders")) {
       const parsedUrl = new URL(url);
@@ -318,13 +335,22 @@ function installServerFetchMock(options: {
 
 function makeReq(
   body: OrderRequest,
-  options: { method?: string; ip?: string; origin?: string; idempotencyKey?: string | null } = {},
+  options: {
+    method?: string;
+    ip?: string;
+    origin?: string;
+    idempotencyKey?: string | null;
+    authenticated?: boolean;
+  } = {},
 ) {
   const headers: Record<string, string> = {
     origin: options.origin ?? "http://localhost:5173",
     "user-agent": "contract-test-agent",
     "x-forwarded-for": options.ip ?? `198.51.100.${ipCounter++}`,
   };
+  if (options.authenticated !== false) {
+    headers.authorization = `Bearer ${ORDER_SUBMIT_TEST_AUTH_TOKEN}`;
+  }
   if (options.idempotencyKey !== null) {
     headers["idempotency-key"] = options.idempotencyKey ?? body.orderId ?? "";
   }
@@ -450,7 +476,13 @@ function withMaterialPricingInput(input: CatalogPriceInput, materials: { bodyId:
 
 async function callOrderHandler(
   body: OrderRequest,
-  options: { method?: string; ip?: string; origin?: string; idempotencyKey?: string | null } = {},
+  options: {
+    method?: string;
+    ip?: string;
+    origin?: string;
+    idempotencyKey?: string | null;
+    authenticated?: boolean;
+  } = {},
 ) {
   const { res, state } = makeRes();
   await handler(makeReq(body, options), res);
@@ -966,6 +998,7 @@ test("Supabase env-missing repository contract skips writes deterministically", 
     body: makeValidOrder(),
     userAgent: "contract-test-agent",
     clientIp: "203.0.113.10",
+    ...TEST_ORDER_OWNERSHIP_INPUT,
   });
 
   assert.deepEqual(await insertOrderRecord(record), {
@@ -986,10 +1019,15 @@ test("Supabase DB insert contract maps order payload without leaking raw client 
     body: makeAssemblyOrder(),
     userAgent: "contract-test-agent",
     clientIp: "203.0.113.42",
+    ...TEST_ORDER_OWNERSHIP_INPUT,
   });
 
   assert.equal(record.order_id, "RZ-20260615-2002");
   assert.equal(record.status, "new");
+  assert.equal(record.user_id, ORDER_SUBMIT_TEST_USER_ID);
+  assert.equal(record.public_order_number, "RZM_0001");
+  assert.equal(record.domain_status, INITIAL_ORDER_DOMAIN_STATUS);
+  assert.equal(record.constructor_project_id, null);
   assert.equal(record.source, "constructor-store-adapter");
   assert.equal(record.customer_email, "client@example.com");
   assert.equal(record.assembly_enabled, true);
@@ -1002,8 +1040,9 @@ test("Supabase DB insert contract maps order payload without leaking raw client 
 
 test("Supabase schema contract contains required orders columns, RLS and status events", () => {
   const baseSchema = readFileSync("db/orders.sql", "utf8");
+  const ownershipSchema = readFileSync("db/order-ownership.sql", "utf8");
   const deploySchema = readFileSync("supabase/deploy/deploy-all.sql", "utf8");
-  const schema = `${baseSchema}\n${deploySchema}`;
+  const schema = `${baseSchema}\n${ownershipSchema}\n${deploySchema}`;
 
   for (const column of REQUIRED_ORDER_DB_COLUMNS) {
     assert.ok(schema.includes(column), `Missing orders schema column: ${column}`);
@@ -1889,6 +1928,7 @@ test("P0-03 pricing source attribution: idempotency comparable payload includes 
     body: makeValidOrder(),
     userAgent: "contract-test-agent",
     clientIp: "203.0.113.42",
+    ...TEST_ORDER_OWNERSHIP_INPUT,
     pricingAttribution: {
       catalog_source_used: "seed_fallback",
       pricing_source_diagnostic: "supabase_empty",

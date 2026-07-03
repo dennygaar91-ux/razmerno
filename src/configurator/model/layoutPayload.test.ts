@@ -26,6 +26,9 @@ test("Layout payload: order DB insert preserves layout", () => {
     orderId: "RZ-TEST",
     userAgent: null,
     clientIp: null,
+    userId: "11111111-1111-4111-8111-111111111101",
+    publicOrderNumber: "RZM_0001",
+    constructorProjectId: null,
     body: {
       productType: "wardrobe",
       dimensions: { width: 1800, height: 2400, depth: 600 },

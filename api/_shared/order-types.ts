@@ -37,6 +37,8 @@ export type OrderRequest = {
   utm?: Record<string, string>;
   honeypot?: string;
   productionExport?: unknown;
+  /** Optional server project reference when submit originates from saved project. */
+  projectId?: string;
 };
 
 export type OrderEmailStatus = "pending" | "sent" | "skipped" | "failed";
@@ -58,6 +60,10 @@ export type OrderPricingAttribution = {
 export type OrderDbInsert = {
   order_id: string;
   status: "new";
+  user_id: string;
+  public_order_number: string;
+  domain_status: string;
+  constructor_project_id: string | null;
   source: string;
 
   product_type: ProductType;

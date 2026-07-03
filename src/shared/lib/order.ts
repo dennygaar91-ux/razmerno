@@ -57,8 +57,14 @@ export interface OrderPayload {
 export interface OrderResult {
   ok: boolean;
   orderId?: string;
+  publicOrderNumber?: string;
   error?: string;
 }
+
+export type SubmitOrderOptions = {
+  accessToken?: string | null;
+  projectId?: string | null;
+};
 
 type ViteRuntimeEnv = Record<string, string | undefined> & { DEV?: boolean };
 const viteEnv = ((import.meta as ImportMeta & { env?: ViteRuntimeEnv }).env ?? {}) as ViteRuntimeEnv;
@@ -93,14 +99,16 @@ function readUtm(): Record<string, string> {
 
 export async function submitOrder(
   payload: Omit<OrderPayload, "utm" | "source"> & { source?: string },
+  options: SubmitOrderOptions = {},
 ): Promise<OrderResult> {
   const orderId = generateOrderId();
-  const fullPayload: OrderPayload & { orderId: string } = {
+  const fullPayload: OrderPayload & { orderId: string; projectId?: string } = {
     orderId,
     ...payload,
     source: payload.source ?? "configurator",
     configVersion: manifest.configVersion,
     utm: readUtm(),
+    ...(options.projectId ? { projectId: options.projectId } : {}),
   };
 
   try {
@@ -110,12 +118,17 @@ export async function submitOrder(
       return { ok: true, orderId };
     }
 
-    const res = await fetch(ORDER_API_URL, {
-      method: "POST",
-      headers: {
+    const headers: Record<string, string> = {
         "Content-Type": "application/json",
         "Idempotency-Key": orderId,
-      },
+      };
+    if (options.accessToken) {
+      headers.Authorization = `Bearer ${options.accessToken}`;
+    }
+
+    const res = await fetch(ORDER_API_URL, {
+      method: "POST",
+      headers,
       body: JSON.stringify(fullPayload),
     });
 
@@ -126,8 +139,11 @@ export async function submitOrder(
     }
 
     const serverOrderId = (data as { orderId?: string })?.orderId ?? orderId;
+    const publicOrderNumber = (data as { publicOrderNumber?: string })?.publicOrderNumber;
     trackEvent("order_submit_success", { orderId: serverOrderId, total: payload.totalPrice, mode: "api" });
-    return { ok: true, orderId: serverOrderId };
+    return publicOrderNumber
+      ? { ok: true, orderId: serverOrderId, publicOrderNumber }
+      : { ok: true, orderId: serverOrderId };
   } catch (e) {
     trackEvent("order_submit_error", {
       error: ORDER_SUBMIT_ERROR_EVENT,

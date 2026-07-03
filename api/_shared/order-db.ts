@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { INITIAL_ORDER_DOMAIN_STATUS, LEGACY_ORDER_STATUS_ON_SUBMIT } from "./order-domain";
 import type { OrderDbInsert, OrderPricingAttribution, OrderRequest } from "./order-types";
 
 function hashClientIp(value: string | null): string | null {
@@ -12,16 +13,26 @@ export function toOrderDbInsert({
   userAgent,
   clientIp,
   pricingAttribution = null,
+  userId,
+  publicOrderNumber,
+  constructorProjectId = null,
 }: {
   orderId: string;
   body: OrderRequest;
   userAgent: string | null;
   clientIp: string | null;
   pricingAttribution?: OrderPricingAttribution | null;
+  userId: string;
+  publicOrderNumber: string;
+  constructorProjectId?: string | null;
 }): OrderDbInsert {
   return {
     order_id: orderId,
-    status: "new",
+    status: LEGACY_ORDER_STATUS_ON_SUBMIT,
+    user_id: userId,
+    public_order_number: publicOrderNumber,
+    domain_status: INITIAL_ORDER_DOMAIN_STATUS,
+    constructor_project_id: constructorProjectId,
     source: body.source ?? "configurator",
 
     product_type: body.productType ?? "wardrobe",

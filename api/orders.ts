@@ -3,13 +3,19 @@ import { toOrderDbInsert } from './_shared/order-db.js'
 import { isSameOrderPayload } from './_shared/order-idempotency.js'
 import { buildClientText, buildManagerAttachments, buildManagerText, sendEmail } from './_shared/order-email.js'
 import { applyCorsHeaders, getHeader, isAllowedOrigin } from './_shared/order-cors.js'
+import { CUSTOMER_UNAUTHORIZED_MESSAGE } from './_shared/customer-api-auth.js'
+import { extractBearerToken } from './_shared/customer-cors.js'
+import { getConstructorProjectById } from './_shared/constructor-projects-store.js'
+import { isValidProjectId } from './_shared/constructor-project-types.js'
+import { maybeAutofillProfilePhoneFromOrder } from './_shared/order-profile-autofill.js'
+import { authorizeOrderSubmit } from './_shared/order-submit-auth.js'
 import { assertServerEnvReady } from './_shared/env.js'
 import { applyNoStoreHeaders } from './_shared/headers.js'
 import { logEvent, safeErrorMessage } from './_shared/logger.js'
 import { getClientKey, isRateLimited } from './_shared/order-rate-limit.js'
 import { applyRequestIdHeader, getRequestId } from './_shared/request-context.js'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types.js'
-import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders.js'
+import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus, allocatePublicOrderNumber } from './_shared/supabase-orders.js'
 import { validateOrder } from './_shared/order-validation.js'
 import { buildProductionExportFromPayload } from '../src/constructor/production/orderExportPackage.js'
 import { calculateServerOrderPriceResolved, withServerPrice } from './_shared/server-price.js'
@@ -24,7 +30,41 @@ const DB_INSERT_FAILED_MESSAGE = 'Не удалось сохранить зая�
 const INVALID_IDEMPOTENCY_KEY_MESSAGE = 'Некорректный Idempotency-Key.'
 const ORDER_ID_MISMATCH_MESSAGE = 'Idempotency-Key должен совпадать с orderId заявки.'
 const INVALID_ORDER_ID_MESSAGE = 'Некорректный идентификатор заявки.'
+const INVALID_PROJECT_ID_MESSAGE = 'Некорректный идентификатор проекта.'
+const PROJECT_NOT_FOUND_MESSAGE = 'Проект не найден.'
 const ORDER_ID_PATTERN = /^RZ-\d{8}-\d{4}$/
+
+async function resolveConstructorProjectLink(
+  projectId: string | undefined,
+  userId: string,
+): Promise<
+  | { ok: true; constructorProjectId: string | null }
+  | { ok: false; status: number; message: string }
+> {
+  const normalized = projectId?.trim()
+  if (!normalized) {
+    return { ok: true, constructorProjectId: null }
+  }
+
+  if (!isValidProjectId(normalized)) {
+    return { ok: false, status: 400, message: INVALID_PROJECT_ID_MESSAGE }
+  }
+
+  const loaded = await getConstructorProjectById(normalized)
+  if (!loaded.ok) {
+    if (loaded.notFound) {
+      return { ok: false, status: 404, message: PROJECT_NOT_FOUND_MESSAGE }
+    }
+    logEvent('error', 'orders.project_lookup_failed', { projectId: normalized, reason: loaded.error })
+    return { ok: false, status: 502, message: GENERIC_ORDER_SUBMIT_FAILED }
+  }
+
+  if (loaded.project.user_id !== userId) {
+    return { ok: false, status: 404, message: PROJECT_NOT_FOUND_MESSAGE }
+  }
+
+  return { ok: true, constructorProjectId: normalized }
+}
 
 function safeOrderId(): string {
   const now = new Date()
@@ -77,6 +117,7 @@ function buildReplayResponse(row: NonNullable<Awaited<ReturnType<typeof getOrder
   return {
     ok: true,
     orderId: row.order_id,
+    publicOrderNumber: row.public_order_number,
     receivedAt: row.created_at,
     email: {
       manager: row.manager_email_status,
@@ -119,6 +160,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     return res.status(200).json({ ok: true, orderId: safeOrderId(), receivedAt: new Date().toISOString(), spam: 'filtered' })
   }
 
+  const customer = await authorizeOrderSubmit(extractBearerToken(req))
+  if (!customer) {
+    return res.status(401).json({ ok: false, message: CUSTOMER_UNAUTHORIZED_MESSAGE })
+  }
+
   const orderIdentity = resolveOrderIdentity(body.orderId, getHeader(req, 'idempotency-key'))
   if (!orderIdentity.ok) {
     return res.status(orderIdentity.status).json({ ok: false, message: orderIdentity.message })
@@ -126,6 +172,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
   const validationError = validateOrder(body)
   if (validationError) return res.status(400).json({ ok: false, message: validationError })
+
+  const projectLink = await resolveConstructorProjectLink(body.projectId, customer.userId)
+  if (!projectLink.ok) {
+    return res.status(projectLink.status).json({ ok: false, message: projectLink.message })
+  }
 
   let orderBodyForPersistence: OrderRequest
   let pricingAttribution: OrderPricingAttribution | null = null
@@ -154,6 +205,12 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   const idempotencyKey = orderIdentity.idempotencyKey
   const managerEmail = process.env.ORDER_MANAGER_EMAIL
 
+  const publicNumberResult = await allocatePublicOrderNumber()
+  if (!publicNumberResult.ok) {
+    logEvent('error', 'orders.public_number_allocation_failed', { requestId, orderId, reason: publicNumberResult.error })
+    return res.status(502).json({ ok: false, message: DB_INSERT_FAILED_MESSAGE })
+  }
+
   try {
     const dbRecord = toOrderDbInsert({
       orderId,
@@ -161,6 +218,9 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       userAgent: getHeader(req, 'user-agent'),
       clientIp: clientKey,
       pricingAttribution,
+      userId: customer.userId,
+      publicOrderNumber: publicNumberResult.value,
+      constructorProjectId: projectLink.constructorProjectId,
     })
 
     if (idempotencyKey) {
@@ -207,6 +267,8 @@ if (dbResult.ok === false) {
       logEvent('error', 'orders.db_insert_failed', { requestId, orderId, reason: dbResult.error })
       return res.status(502).json({ ok: false, message: DB_INSERT_FAILED_MESSAGE })
     }
+
+    void maybeAutofillProfilePhoneFromOrder(customer.userId, orderBodyForPersistence.customer?.phone ?? '')
 
     let managerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
     let customerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
@@ -273,6 +335,7 @@ if (dbResult.ok === false) {
     return res.status(200).json({
       ok: true,
       orderId,
+      publicOrderNumber: publicNumberResult.value,
       receivedAt: new Date().toISOString(),
       email: {
         manager: managerEmailStatus,
