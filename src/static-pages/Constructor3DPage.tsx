@@ -28,6 +28,7 @@ import {
   type ThreeRuntimeFailureReason,
 } from "./constructor/components/LazyThreeFurnitureViewer";
 import { useConstructorDraftLifecycle } from "./constructor/hooks/useConstructorDraftLifecycle";
+import { useConstructorProjectSync } from "./constructor/hooks/useConstructorProjectSync";
 import { useWebGLDiagnostics } from "./constructor/three/useWebGLAvailable";
 import { useThreeSceneQuality } from "./constructor/three/useThreeSceneQuality";
 import { useConstructorPageState } from "./constructor/hooks/useConstructorPageState";
@@ -148,6 +149,12 @@ export default function Constructor3DPage() {
     restoreDraft,
     clearDraft,
   } = useConstructorDraftLifecycle(snapshot);
+  const {
+    syncStatus: projectSyncStatus,
+    syncMessage: projectSyncMessage,
+    saveCurrentAsProject,
+    canSaveToServer,
+  } = useConstructorProjectSync(snapshot, hasStoredDraft);
 
   const retryThreeScene = useCallback((reduced = false) => {
     setForceReduced3D(reduced);
@@ -460,6 +467,12 @@ export default function Constructor3DPage() {
                 onClearDraft={() => {
                   clearDraft();
                 }}
+                canSaveToServer={canSaveToServer}
+                onSaveToServer={() => {
+                  void saveCurrentAsProject();
+                }}
+                serverSyncMessage={projectSyncMessage}
+                serverSyncStatus={projectSyncStatus}
               />
 
               <ConstructorDrawerFooter

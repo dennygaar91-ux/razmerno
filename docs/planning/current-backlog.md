@@ -859,6 +859,14 @@ Branch implementation evidence (2026-06-23, Epic A — Customer Authentication F
 - explicit non-scope preserved: no Customer Cabinet, drafts server, orders list, notifications, email verification, `user_id` on orders;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Epic B — Customer Projects Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- Supabase `constructor_projects` migration + `db/constructor-projects.sql` (RLS deny-all / API-only);
+- API: `GET/POST /api/projects`, `GET/PATCH/DELETE /api/project?id=` with JWT auth, per-user ownership, max 3 active projects, archive via `archived_at`;
+- frontend foundation: `src/shared/projects/*`, `useConstructorProjectSync`, server save button + post-login local draft import in `Constructor3DPage`;
+- tests: `tests/customer-projects.test.ts` (`npm run test:customer-projects`);
+- explicit non-scope preserved: no Customer Cabinet UI, orders list, notifications, `user_id` on orders, project→order conversion.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
