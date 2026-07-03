@@ -358,6 +358,41 @@
   white-space:nowrap;
 }
 
+.rzm-account-order-link{
+  color:inherit;
+  text-decoration:none;
+}
+
+.rzm-account-order-link:hover{
+  color:var(--rzm-dark, #2A2C41);
+}
+
+.rzm-account-order-pricing{
+  display:grid;
+  gap:12px;
+}
+
+.rzm-account-order-pricing div{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.rzm-account-order-pricing dt{
+  margin:0;
+  color:var(--rzm-muted);
+}
+
+.rzm-account-order-pricing dd{
+  margin:0;
+  font-weight:600;
+}
+
+.rzm-account-order-pricing-total{
+  padding-top:8px;
+  border-top:1px solid rgba(229,231,239,.9);
+}
+
 @media (max-width: 900px){
   .rzm-account-summary{
     grid-template-columns:1fr;

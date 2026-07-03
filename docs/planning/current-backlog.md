@@ -919,6 +919,16 @@ Branch implementation evidence (2026-07-03, Project Update Foundation, `task/epi
 - explicit non-scope preserved: no autosave, rename/archive/delete UI;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Epic G — Customer Order Detail Read-only, `task/epic-b-projects-foundation`, not closure):
+
+- API `GET /api/customer/order?id=` with JWT auth and ownership by `user_id`;
+- safe read model: `publicOrderNumber`, `domainStatus`, contacts, delivery/assembly flags, dimensions/materials summary, pricing summary (шкаф/доставка/сборка);
+- excludes `order_id`, `production_export`, raw `price_breakdown`, pricing diagnostics, email/admin/audit fields;
+- frontend `/account/order/:id`, links from cabinet orders list, read-only `CustomerOrderDetailCard`;
+- tests: `tests/customer-order-detail.test.ts` (`npm run test:customer-order-detail`);
+- explicit non-scope preserved: no cancel/change requests, notifications, payments, production timeline, profile/project changes;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

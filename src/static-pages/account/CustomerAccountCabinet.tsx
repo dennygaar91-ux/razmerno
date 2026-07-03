@@ -8,6 +8,7 @@ import {
   isWorkspaceFullyEmpty,
 } from "../../shared/workspace/formatWorkspace";
 import { buildConfiguratorResumeUrl } from "../../shared/projects/projectResume";
+import { buildAccountOrderUrl } from "../../shared/workspace/orderDetailRoutes";
 import { useCustomerWorkspace } from "../../shared/workspace/useCustomerWorkspace";
 import type { CustomerWorkspace } from "../../shared/workspace/types";
 
@@ -86,9 +87,9 @@ function AccountOrdersSection({ workspace }: { workspace: CustomerWorkspace }) {
           {workspace.orders.map((order) => (
             <li key={order.id} className="rzm-account-list-item">
               <div className="rzm-account-list-main">
-                <p className="rzm-account-list-title">
+                <a className="rzm-account-list-title rzm-account-order-link" href={buildAccountOrderUrl(order.id)}>
                   {order.publicOrderNumber ?? "Заявка без номера"}
-                </p>
+                </a>
                 <p className="rzm-account-list-meta">
                   {order.domainStatus || "Статус уточняется"} · {formatWorkspaceDate(order.createdAt)}
                 </p>
@@ -96,7 +97,12 @@ function AccountOrdersSection({ workspace }: { workspace: CustomerWorkspace }) {
                   <p className="rzm-account-list-sub">{order.deliveryAddress}</p>
                 ) : null}
               </div>
-              <p className="rzm-account-order-price">{formatWorkspacePrice(order.totalPrice)}</p>
+              <div className="rzm-account-list-actions">
+                <p className="rzm-account-order-price">{formatWorkspacePrice(order.totalPrice)}</p>
+                <a className="rzm-ui-btn rzm-ui-btn--secondary rzm-account-project-open" href={buildAccountOrderUrl(order.id)}>
+                  Открыть заказ
+                </a>
+              </div>
             </li>
           ))}
         </ul>

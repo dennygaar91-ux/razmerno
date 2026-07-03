@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { CustomerOrderDetailRow } from './customer-order-detail-types'
 
 export type CustomerOrderListRow = {
   id: string
@@ -61,4 +62,31 @@ export async function listCustomerOrdersForUser(
   if (error) return { ok: false, error: error.message }
 
   return { ok: true, orders: data ?? [] }
+}
+
+const CUSTOMER_ORDER_DETAIL_SELECT =
+  'id, user_id, public_order_number, domain_status, created_at, total_price, customer_name, customer_phone, delivery_address, delivery_enabled, delivery_price, assembly_enabled, assembly_price, product_type, dimensions, materials, style, sections, filling, price_breakdown'
+
+export async function getCustomerOrderByIdForUser(
+  orderId: string,
+  userId: string,
+): Promise<
+  | { ok: true; order: CustomerOrderDetailRow }
+  | { ok: false; notFound: true }
+  | { ok: false; error: string }
+> {
+  const client = getSupabaseClient()
+  if (!client) return { ok: false, error: 'order_storage_unavailable' }
+
+  const { data, error } = await client
+    .from('orders')
+    .select(CUSTOMER_ORDER_DETAIL_SELECT)
+    .eq('id', orderId)
+    .maybeSingle()
+
+  if (error) return { ok: false, error: error.message }
+  if (!data) return { ok: false, notFound: true }
+  if (data.user_id !== userId) return { ok: false, notFound: true }
+
+  return { ok: true, order: data as CustomerOrderDetailRow }
 }

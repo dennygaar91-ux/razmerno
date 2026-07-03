@@ -8,6 +8,7 @@ const LazyAssemblyPage = lazy(() => import("./static-pages/AssemblyPage"));
 const LazyConstructorPage = lazy(() => import("./static-pages/ConstructorPage"));
 const LazyConstructor3DPage = lazy(() => import("./static-pages/Constructor3DPage"));
 const LazyAccountPage = lazy(() => import("./static-pages/AccountPage"));
+const LazyAccountOrderPage = lazy(() => import("./static-pages/AccountOrderPage"));
 
 const LazyAdminOrdersPage = lazy(() =>
   import("./admin/AdminOrdersPage").then((m) => ({ default: m.AdminOrdersPage })),
@@ -52,10 +53,11 @@ function useBrowserRoute() {
   return route;
 }
 
-type StaticPageKey = "home" | "measurements" | "materials" | "assembly" | "constructor" | "constructorLegacy" | "account";
+type StaticPageKey = "home" | "measurements" | "materials" | "assembly" | "constructor" | "constructorLegacy" | "account" | "accountOrder";
 
 function resolveStaticPage(pathname: string): StaticPageKey {
   if (pathname === "/" || pathname === "/index.html") return "home" as const;
+  if (/^\/account\/order\/[^/]+\/?$/.test(pathname)) return "accountOrder" as const;
   if (pathname === "/account" || pathname === "/account/") return "account" as const;
   if (pathname === "/measurements" || pathname === "/measurements.html") return "measurements" as const;
   if (pathname === "/materials" || pathname === "/materials.html") return "materials" as const;
@@ -112,6 +114,7 @@ export default function App() {
     staticPage === "constructor" ? LazyConstructor3DPage :
     staticPage === "constructorLegacy" ? LazyConstructorPage :
     staticPage === "account" ? LazyAccountPage :
+    staticPage === "accountOrder" ? LazyAccountOrderPage :
     LazyHomePage;
 
   return (
