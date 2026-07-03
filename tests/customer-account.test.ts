@@ -110,7 +110,7 @@ test("AccountPage uses auth gate and cabinet sections", () => {
   assert.match(gate, /resolveCheckoutAuthGateDecision/);
   assert.match(cabinet, /Проекты/);
   assert.match(cabinet, /Заказы/);
-  assert.match(cabinet, /Профиль/);
+  assert.match(cabinet, /CustomerProfileSection/);
   assert.match(cabinet, /publicOrderNumber/);
   assert.match(cabinet, /getAccountProjectsEmptyMessage/);
   assert.match(cabinet, /getAccountOrdersEmptyMessage/);

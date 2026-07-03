@@ -929,6 +929,15 @@ Branch implementation evidence (2026-07-03, Epic G — Customer Order Detail Rea
 - explicit non-scope preserved: no cancel/change requests, notifications, payments, production timeline, profile/project changes;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Epic H — Customer Profile Editing Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- reuses existing `GET/PATCH /api/profile` (no new APIs);
+- profile section in `/account`: view mode + edit mode for `full_name` and `phone`, email read-only;
+- client `patchCustomerProfile` + local `updateProfile` refresh in cabinet without full reload;
+- tests: `tests/customer-profile-edit.test.ts` (`npm run test:customer-profile-edit`);
+- explicit non-scope preserved: no email change, phone verification, password change, notifications, payments, order/project changes;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

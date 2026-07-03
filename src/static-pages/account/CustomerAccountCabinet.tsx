@@ -11,6 +11,7 @@ import { buildConfiguratorResumeUrl } from "../../shared/projects/projectResume"
 import { buildAccountOrderUrl } from "../../shared/workspace/orderDetailRoutes";
 import { useCustomerWorkspace } from "../../shared/workspace/useCustomerWorkspace";
 import type { CustomerWorkspace } from "../../shared/workspace/types";
+import { CustomerProfileSection } from "./CustomerProfileSection";
 
 function AccountSummaryCards({ workspace }: { workspace: CustomerWorkspace }) {
   return (
@@ -111,33 +112,8 @@ function AccountOrdersSection({ workspace }: { workspace: CustomerWorkspace }) {
   );
 }
 
-function AccountProfileSection({ workspace }: { workspace: CustomerWorkspace }) {
-  return (
-    <section className="rzm-account-section" aria-labelledby="account-profile-title">
-      <div className="rzm-account-section-head">
-        <h2 id="account-profile-title">Профиль</h2>
-        <p className="rzm-step-text">Контактные данные аккаунта.</p>
-      </div>
-      <dl className="rzm-account-profile">
-        <div>
-          <dt>Имя</dt>
-          <dd>{workspace.profile.fullName || "—"}</dd>
-        </div>
-        <div>
-          <dt>Email</dt>
-          <dd>{workspace.profile.email}</dd>
-        </div>
-        <div>
-          <dt>Телефон</dt>
-          <dd>{workspace.profile.phone || "Не указан"}</dd>
-        </div>
-      </dl>
-    </section>
-  );
-}
-
 export function CustomerAccountCabinet() {
-  const { state, workspace, errorMessage, reload } = useCustomerWorkspace(true);
+  const { state, workspace, errorMessage, reload, updateProfile } = useCustomerWorkspace(true);
 
   if (state === "loading" || state === "idle") {
     return (
@@ -194,7 +170,7 @@ export function CustomerAccountCabinet() {
       <AccountSummaryCards workspace={workspace} />
       <AccountProjectsSection workspace={workspace} />
       <AccountOrdersSection workspace={workspace} />
-      <AccountProfileSection workspace={workspace} />
+      <CustomerProfileSection profile={workspace.profile} onProfileUpdated={updateProfile} />
     </div>
   );
 }

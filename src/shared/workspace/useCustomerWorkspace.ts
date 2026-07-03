@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSessionContext } from "../auth/SessionProvider";
 import { useAuth } from "../auth/useAuth";
 import { fetchCustomerWorkspace } from "./workspaceApi";
-import type { CustomerWorkspace } from "./types";
+import type { CustomerWorkspace, CustomerWorkspaceProfile } from "./types";
 
 export type CustomerWorkspaceLoadState =
   | "idle"
@@ -47,6 +47,10 @@ export function useCustomerWorkspace(enabled: boolean) {
     setState("success");
   }, [session?.access_token]);
 
+  const updateProfile = useCallback((profile: CustomerWorkspaceProfile) => {
+    setWorkspace((current) => (current ? { ...current, profile } : current));
+  }, []);
+
   useEffect(() => {
     if (!enabled || authLoading) return;
     void reload();
@@ -57,5 +61,6 @@ export function useCustomerWorkspace(enabled: boolean) {
     workspace,
     errorMessage,
     reload,
+    updateProfile,
   };
 }
