@@ -21,9 +21,9 @@ export function HeaderAuthControls({ className, compact = false }: HeaderAuthCon
   if (isAuthenticated) {
     return (
       <div className={rootClassName} aria-label="Аккаунт">
-        <span className="rzm-header-auth-user" title={displayName ?? undefined}>
-          {compact ? "Аккаунт" : displayName ?? "Аккаунт"}
-        </span>
+        <a className="rzm-header-auth-user rzm-header-auth-link" href="/account" title={displayName ?? undefined}>
+          {compact ? "Кабинет" : displayName ?? "Кабинет"}
+        </a>
         <button type="button" className="rzm-ui-btn rzm-ui-btn--ghost rzm-header-auth-logout" onClick={() => void signOut()}>
           Выйти
         </button>

@@ -888,6 +888,16 @@ Branch implementation evidence (2026-07-03, Epic D — Customer Workspace API Fo
 - explicit non-scope preserved: no Customer Cabinet UI, notifications, change requests, payments, order edit APIs;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Epic E — Customer Cabinet UI Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- route `/account` with `AccountPageGate` (JWT gate + `AuthModal`, production fail-closed via shared checkout auth policy);
+- cabinet UI: dashboard summary, projects list, orders list (`RZM_0001`, domain status), profile summary;
+- header: authenticated users link to `/account`, guest login/register preserved, logout unchanged;
+- reuse: `CustomerAuthProviders`, `useAuth`, `fetchCustomerWorkspace`, existing Razmerno card/layout tokens (`rzm-info`/`auth.css`);
+- tests: `tests/customer-account.test.ts` (`npm run test:customer-account`);
+- explicit non-scope preserved: no order detail page, profile edit, project archive/load, notifications, payments, production timeline;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
