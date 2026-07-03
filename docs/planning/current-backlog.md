@@ -877,6 +877,17 @@ Branch implementation evidence (2026-07-03, Epic C — Submit Ownership Foundati
 - explicit non-scope preserved: no Customer Cabinet, orders list UI, notifications, change requests, payments, production changes;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Epic D — Customer Workspace API Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- API `GET /api/customer/workspace` with JWT auth via shared `customer-api-auth` (API-only / service-role);
+- read model: sanitized `profile`, active `projects`, customer-owned `orders`, `stats` (`activeProjects`, `orders`);
+- excludes snapshot, production export, pricing diagnostics, admin/email/internal audit fields;
+- orders scoped by `user_id`; projects scoped by authenticated user + active-only in workspace list;
+- minimal client helpers: `src/shared/workspace/types.ts`, `src/shared/workspace/workspaceApi.ts`;
+- tests: `tests/customer-workspace.test.ts` (`npm run test:customer-workspace`);
+- explicit non-scope preserved: no Customer Cabinet UI, notifications, change requests, payments, order edit APIs;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
