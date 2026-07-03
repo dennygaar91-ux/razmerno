@@ -949,6 +949,15 @@ Branch implementation evidence (2026-07-03, Epic I-1 — Customer Change Request
 - explicit non-scope preserved: no UI, approval, production lock, email, cancellation workflow;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Epic I-2 — Customer Change Request UI Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- order detail `/account/order/:id`: section `Изменения заказа`, empty state, `Запросить изменение` form, history list;
+- client `changeRequestApi` + `useCustomerChangeRequests` reuse Epic I-1 APIs with Bearer auth;
+- local prepend after POST success; no page reload; success copy `Запрос отправлен менеджеру.`;
+- tests: `tests/customer-change-request-ui.test.ts` (`npm run test:customer-change-request-ui`);
+- explicit non-scope preserved: no manager reply/approve/reject, notifications, email, production lock, order mutation;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

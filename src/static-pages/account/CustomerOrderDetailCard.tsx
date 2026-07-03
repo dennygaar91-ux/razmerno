@@ -4,6 +4,7 @@ import {
 } from "../../shared/workspace/formatWorkspace";
 import { useCustomerOrderDetail } from "../../shared/workspace/useCustomerOrderDetail";
 import type { CustomerOrderDetail } from "../../shared/workspace/orderDetailTypes";
+import { CustomerOrderChangeRequestsSection } from "./CustomerOrderChangeRequestsSection";
 
 function CustomerOrderPricingSection({ order }: { order: CustomerOrderDetail }) {
   const { pricingSummary } = order;
@@ -150,6 +151,8 @@ export function CustomerOrderDetailCard({ orderId }: { orderId: string }) {
       ) : null}
 
       <CustomerOrderPricingSection order={order} />
+
+      <CustomerOrderChangeRequestsSection orderId={orderId} />
 
       <div className="rzm-account-panel-actions">
         <a className="rzm-secondary-cta" href="/account">Вернуться в кабинет</a>
