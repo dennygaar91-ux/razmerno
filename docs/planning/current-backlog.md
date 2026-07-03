@@ -938,6 +938,17 @@ Branch implementation evidence (2026-07-03, Epic H — Customer Profile Editing 
 - explicit non-scope preserved: no email change, phone verification, password change, notifications, payments, order/project changes;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Epic I-1 — Customer Change Request API Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- migration `supabase/migrations/20260703_add_order_change_requests.sql` + reference `db/order-change-requests.sql`;
+- table `public.order_change_requests` with RLS deny-all; service-role API access only;
+- customer APIs `POST /api/customer/change-request`, `GET /api/customer/change-requests?orderId=`;
+- ownership via existing `getCustomerOrderByIdForUser`; foreign/missing order -> 404;
+- safe read model only; no order mutation, status transition, notifications, manager workflow;
+- tests: `tests/customer-change-request.test.ts` (`npm run test:customer-change-request`);
+- explicit non-scope preserved: no UI, approval, production lock, email, cancellation workflow;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
