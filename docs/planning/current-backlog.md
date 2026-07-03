@@ -958,6 +958,16 @@ Branch implementation evidence (2026-07-03, Epic I-2 — Customer Change Request
 - explicit non-scope preserved: no manager reply/approve/reject, notifications, email, production lock, order mutation;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Customer Notifications API Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- migration `supabase/migrations/20260703_add_order_notifications.sql` + reference `db/order-notifications.sql`;
+- table `public.order_notifications` with RLS deny-all; service-role API access only;
+- customer API `GET /api/customer/notifications` with JWT auth and `user_id` ownership filter;
+- safe read model: `id`, `type`, `title`, `message`, `isRead`, `createdAt`, `orderId`;
+- tests: `tests/customer-notifications.test.ts` (`npm run test:customer-notifications`);
+- explicit non-scope preserved: no UI, bell/badge, mark-as-read API, generation, email, push, websocket, polling, manager workflow;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
