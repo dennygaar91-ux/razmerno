@@ -898,6 +898,16 @@ Branch implementation evidence (2026-07-03, Epic E — Customer Cabinet UI Found
 - explicit non-scope preserved: no order detail page, profile edit, project archive/load, notifications, payments, production timeline;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-03, Epic F — Project Resume & Load Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- reuse `GET /api/project?id=` full project payload with persisted `snapshot` (no snapshot schema changes);
+- client resume helpers: `src/shared/projects/projectResume.ts`, `useConstructorProjectResume`, `applyStoredConstructorDraftToStore`;
+- cabinet projects list: `Открыть в конструкторе` → `/configurator?projectId=...`;
+- constructor resume: fetch owned project, restore snapshot into Zustand store + local draft, link submit `projectId`;
+- tests: `tests/customer-project-resume.test.ts` (`npm run test:customer-project-resume`);
+- explicit non-scope preserved: no project archive UI, no autosave, no order detail, notifications, payments, production timeline;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

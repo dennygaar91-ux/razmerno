@@ -29,6 +29,7 @@ import {
 } from "./constructor/components/LazyThreeFurnitureViewer";
 import { useConstructorDraftLifecycle } from "./constructor/hooks/useConstructorDraftLifecycle";
 import { useConstructorProjectSync } from "./constructor/hooks/useConstructorProjectSync";
+import { useConstructorProjectResume } from "./constructor/hooks/useConstructorProjectResume";
 import { useWebGLDiagnostics } from "./constructor/three/useWebGLAvailable";
 import { useThreeSceneQuality } from "./constructor/three/useThreeSceneQuality";
 import { useConstructorPageState } from "./constructor/hooks/useConstructorPageState";
@@ -157,6 +158,11 @@ export default function Constructor3DPage() {
     saveCurrentAsProject,
     canSaveToServer,
   } = useConstructorProjectSync(snapshot, hasStoredDraft);
+  const {
+    status: projectResumeStatus,
+    message: projectResumeMessage,
+    loadedProject: resumedProject,
+  } = useConstructorProjectResume();
   const { session } = useSessionContext();
 
   const retryThreeScene = useCallback((reduced = false) => {
@@ -213,7 +219,7 @@ export default function Constructor3DPage() {
       saveDraft();
     },
     accessToken: session?.access_token ?? null,
-    projectId: lastSavedProject?.id ?? null,
+    projectId: resumedProject?.id ?? lastSavedProject?.id ?? null,
   });
   const { authGateError, attemptCheckoutSubmit, checkoutAuthModal } = useCheckoutAuthGate(submit);
   const formatPrice = quote?.formatPrice ?? formatFallbackPrice;
@@ -476,8 +482,12 @@ export default function Constructor3DPage() {
                 onSaveToServer={() => {
                   void saveCurrentAsProject();
                 }}
-                serverSyncMessage={projectSyncMessage}
-                serverSyncStatus={projectSyncStatus}
+                serverSyncMessage={projectResumeMessage ?? projectSyncMessage}
+                serverSyncStatus={
+                  projectResumeStatus === "loading"
+                    ? "importing"
+                    : projectSyncStatus
+                }
               />
 
               <ConstructorDrawerFooter

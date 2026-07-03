@@ -7,6 +7,7 @@ import {
   getAccountProjectsEmptyMessage,
   isWorkspaceFullyEmpty,
 } from "../../shared/workspace/formatWorkspace";
+import { buildConfiguratorResumeUrl } from "../../shared/projects/projectResume";
 import { useCustomerWorkspace } from "../../shared/workspace/useCustomerWorkspace";
 import type { CustomerWorkspace } from "../../shared/workspace/types";
 
@@ -48,13 +49,21 @@ function AccountProjectsSection({ workspace }: { workspace: CustomerWorkspace })
                   {formatFurnitureTypeLabel(project.furnitureType)} · обновлён {formatWorkspaceDate(project.updatedAt)}
                 </p>
               </div>
-              {project.previewPath ? (
-                <div className="rzm-account-preview" aria-hidden="true">
-                  <img src={project.previewPath} alt="" />
-                </div>
-              ) : (
-                <div className="rzm-account-preview rzm-account-preview--placeholder" aria-hidden="true" />
-              )}
+              <div className="rzm-account-list-actions">
+                <a
+                  className="rzm-ui-btn rzm-ui-btn--secondary rzm-account-project-open"
+                  href={buildConfiguratorResumeUrl(project.id)}
+                >
+                  Открыть в конструкторе
+                </a>
+                {project.previewPath ? (
+                  <div className="rzm-account-preview" aria-hidden="true">
+                    <img src={project.previewPath} alt="" />
+                  </div>
+                ) : (
+                  <div className="rzm-account-preview rzm-account-preview--placeholder" aria-hidden="true" />
+                )}
+              </div>
             </li>
           ))}
         </ul>

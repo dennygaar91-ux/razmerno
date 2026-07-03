@@ -15,7 +15,7 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
-function isStoredConstructorDraft(value: unknown): value is StoredConstructorDraft {
+export function isStoredConstructorDraft(value: unknown): value is StoredConstructorDraft {
   if (!value || typeof value !== "object") return false;
 
   const draft = value as Partial<StoredConstructorDraft>;
@@ -61,10 +61,15 @@ export function clearConstructorDraft(storage: Storage = window.localStorage) {
   storage.removeItem(CONSTRUCTOR_DRAFT_STORAGE_KEY);
 }
 
-export function restoreConstructorDraftToStore(storage: Storage = window.localStorage) {
-  const draft = loadConstructorDraft(storage);
-  if (!draft) return null;
+export function saveStoredConstructorDraft(
+  draft: StoredConstructorDraft,
+  storage: Storage = window.localStorage,
+) {
+  storage.setItem(CONSTRUCTOR_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+  return draft;
+}
 
+export function applyStoredConstructorDraftToStore(draft: StoredConstructorDraft) {
   const [width, height, depth] = draft.dimensions;
   const filling = draft.filling === "shelves" || draft.filling === "drawers" || draft.filling === "rod" ? draft.filling : "shelves";
 
@@ -111,4 +116,10 @@ export function restoreConstructorDraftToStore(storage: Storage = window.localSt
   });
 
   return draft;
+}
+
+export function restoreConstructorDraftToStore(storage: Storage = window.localStorage) {
+  const draft = loadConstructorDraft(storage);
+  if (!draft) return null;
+  return applyStoredConstructorDraftToStore(draft);
 }

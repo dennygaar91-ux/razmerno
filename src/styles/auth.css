@@ -347,6 +347,17 @@
   align-items:center;
 }
 
+.rzm-account-list-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.rzm-account-project-open{
+  white-space:nowrap;
+}
+
 @media (max-width: 900px){
   .rzm-account-summary{
     grid-template-columns:1fr;
