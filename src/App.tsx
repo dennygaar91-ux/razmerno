@@ -13,6 +13,9 @@ const LazyAccountOrderPage = lazy(() => import("./static-pages/AccountOrderPage"
 const LazyAdminOrdersPage = lazy(() =>
   import("./admin/AdminOrdersPage").then((m) => ({ default: m.AdminOrdersPage })),
 );
+const LazyOperationsWorkspacePage = lazy(() =>
+  import("./operations/OperationsWorkspacePage").then((m) => ({ default: m.OperationsWorkspacePage })),
+);
 
 interface LocationRoute {
   pathname: string;
@@ -77,12 +80,13 @@ function resolveStaticPage(pathname: string): StaticPageKey {
 export default function App() {
   const route = useBrowserRoute();
   const isAdmin = route.pathname === "/admin" || route.pathname.startsWith("/admin/");
+  const isOperations = route.pathname === "/operations" || route.pathname.startsWith("/operations/");
 
   useEffect(() => {
     const path = `${route.pathname}${route.search}${route.hash}`;
     trackPageView(path);
 
-    if (isAdmin) {
+    if (isAdmin || isOperations) {
       window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
       return;
     }
@@ -96,12 +100,20 @@ export default function App() {
     }
 
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
-  }, [isAdmin, route.pathname, route.search, route.hash]);
+  }, [isAdmin, isOperations, route.pathname, route.search, route.hash]);
 
   if (isAdmin) {
     return (
       <Suspense fallback={<Fallback />}>
         <LazyAdminOrdersPage routePath={route.pathname} />
+      </Suspense>
+    );
+  }
+
+  if (isOperations) {
+    return (
+      <Suspense fallback={<Fallback />}>
+        <LazyOperationsWorkspacePage routePath={route.pathname} />
       </Suspense>
     );
   }

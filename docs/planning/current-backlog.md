@@ -990,6 +990,18 @@ Branch implementation evidence (2026-07-05, Customer Notifications Completion, `
 - explicit non-scope preserved: no bell/badge/realtime/polling/email/push/preferences/manager workflow;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-05, Operations Workspace — Orders Queue Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done** (QA PASS, not closure);
+- `GET /api/operations/workspace` returns safe operations queue read model via admin JWT/session auth and service-role store reuse;
+- route `/operations` + `/operations/orders/:id` with API-backed queue UI and reuse of existing admin order detail flow;
+- client `operationsApi` + `useOperationsWorkspace` mirror customer workspace hook conventions; frontend has no direct DB access;
+- tests: `tests/operations-workspace.test.ts` (6), `tests/operations-workspace-ui.test.ts` (7);
+- QA passed locally: `npm run test:operations-workspace` (6), `npm run test:operations-workspace-ui` (7), `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- commit: `ed39b5fd` (`feat: add operations orders queue foundation`, branch-only, not closure);
+- explicit non-scope preserved: no production/admin CRM/payments/realtime/status-change workflow expansion;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

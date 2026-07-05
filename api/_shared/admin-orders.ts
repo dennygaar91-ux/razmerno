@@ -4,6 +4,7 @@ export type AdminOrderSummary = {
   id: string
   status: string
   createdAt: string | null
+  updatedAt: string | null
   product: string
   totalPrice: number
   priceBreakdown: Record<string, number> | null
@@ -46,6 +47,7 @@ type OrderDbRow = {
   order_id: string
   status: string | null
   created_at?: string | null
+  updated_at?: string | null
   product_type: string | null
   dimensions: { width?: number; height?: number; depth?: number } | null
   total_price: number | null
@@ -177,6 +179,7 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
     id: row.order_id,
     status: row.status ?? 'new',
     createdAt: row.created_at ?? null,
+    updatedAt: row.updated_at ?? null,
     product: productLabel(row),
     totalPrice: row.total_price ?? 0,
     priceBreakdown: row.price_breakdown ?? null,
@@ -209,7 +212,7 @@ export async function listAdminOrders(limit = 50): Promise<AdminOrderSummary[]> 
 
   const { data, error } = await supabase
     .from('orders')
-    .select('order_id,status,created_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason')
+    .select('order_id,status,created_at,updated_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason')
     .order('created_at', { ascending: false })
     .limit(Math.min(Math.max(limit, 1), 100))
 
