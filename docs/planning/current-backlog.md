@@ -979,10 +979,14 @@ Branch implementation evidence (2026-07-05, Epic J-2 — Customer Notifications 
 
 Branch implementation evidence (2026-07-05, Customer Notifications Completion, `task/epic-b-projects-foundation`, not closure):
 
+- branch local status: **done** (QA PASS, not closure);
 - best-effort generation on authenticated order submit (`order_created`) and change request create (`change_request`);
 - mark-as-read APIs `PATCH /api/customer/notification/read` and `PATCH /api/customer/notifications/read-all` with ownership;
 - cabinet UI actions `Отметить прочитанным` / `Отметить все прочитанными` with local state update, no reload;
 - tests extended in `customer-notifications.test.ts`, `customer-notifications-ui.test.ts`, `customer-order-submit.test.ts`, `customer-change-request.test.ts`;
+- pre-commit audit PASS (2026-07-05): generation, mark-as-read, ownership, safe read model, forbidden scope preserved;
+- QA passed locally: `npm run test:customer-notifications` (17), `npm run test:customer-notifications-ui` (13), `npm run test:customer-order-submit` (8), `npm run test:customer-change-request` (13), `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- commit: `d1ab3b7d` (`feat(customer): complete notifications workflow`, branch-only, not closure);
 - explicit non-scope preserved: no bell/badge/realtime/polling/email/push/preferences/manager workflow;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
