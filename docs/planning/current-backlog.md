@@ -1015,6 +1015,17 @@ Branch implementation evidence (2026-07-05, Operations Approval View — Manual 
 - explicit non-scope preserved: no approve/reject/status mutation/manual pricing write/production review workflow;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-05, Operations Manual Pricing Draft Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done** (QA PASS, not closure);
+- reuses existing `GET /api/operations/order?orderId=` safe pricing summary fields; no new API/write endpoint;
+- `OperationsManualPricingDraftSection` on manual review screen: current safe pricing summary, local-only draft input, disabled «Сохранить ручную цену»;
+- tests: `tests/operations-manual-pricing-draft-ui.test.ts` (6);
+- QA passed locally: `npm run test:operations-manual-pricing-draft-ui`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- commit: see final agent report / final HEAD after commit (`feat: add operations manual pricing draft foundation`, branch-only, not closure);
+- explicit non-scope preserved: no manual pricing write, no order total/breakdown mutation, no status change;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

@@ -1,5 +1,6 @@
 import { AdminOrderDetailPage } from "../admin/AdminOrderDetailPage";
 import type { AdminOrderDetailSummary } from "../admin/orderSummary";
+import { OperationsManualPricingDraftSection } from "./OperationsManualPricingDraftSection";
 import { formatOperationsDate } from "../shared/operations/formatOperations";
 import { mapOperationsReviewToAdminDetailSummary } from "../shared/operations/mapOperationsReviewToAdminDetailSummary";
 import type { OperationsOrderReview, OperationsOrderReviewLoadState } from "../shared/operations/reviewTypes";
@@ -103,6 +104,8 @@ export function OperationsManualReviewView({
           </p>
         </div>
       )}
+
+      {review && <OperationsManualPricingDraftSection review={review} />}
 
       <AdminOrderDetailPage summary={detailSummary} loading={loading} onBack={onBack} />
     </section>

@@ -59,3 +59,23 @@ export function getOperationsOrderReviewErrorMessage(): string {
 export function getOperationsOrderReviewNotFoundMessage(): string {
   return "Заявка не найдена.";
 }
+
+export function getOperationsManualPricingDraftTitle(): string {
+  return "Manual pricing draft";
+}
+
+export function getOperationsManualPricingDraftDescription(): string {
+  return "Черновик для будущей ручной корректировки цены. Значение не сохраняется и не применяется к заказу.";
+}
+
+export function getOperationsManualPricingSaveNotImplementedMessage(): string {
+  return "Сохранение ручной цены пока не реализовано. Черновик остаётся только на экране.";
+}
+
+export function getOperationsManualPricingDraftInputLabel(): string {
+  return "Черновик новой суммы (локально)";
+}
+
+export function getOperationsManualPricingSaveButtonLabel(): string {
+  return "Сохранить ручную цену";
+}
