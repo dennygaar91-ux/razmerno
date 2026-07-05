@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactNode } from "react";
-import { AdminOrderDetailPage } from "../admin/AdminOrderDetailPage";
-import { ADMIN_SESSION_KEY, fetchAdminOrders, loadProductionDetail, loginAdmin } from "../admin/adminClient";
-import { mapApiOrder } from "../admin/format";
-import { summarizeOrderForAdmin } from "../admin/orderSummary";
-import type { AdminOrderDetailSummary } from "../admin/orderSummary";
-import type { AdminOrderRow } from "../admin/types";
+import { OperationsManualReviewView } from "./OperationsManualReviewView";
+import { ADMIN_SESSION_KEY, loginAdmin } from "../admin/adminClient";
 import { formatOperationsDate, formatOperationsPrice } from "../shared/operations/formatOperations";
 import { buildOperationsOrderDetailPath, parseOperationsRouteOrderId } from "../shared/operations/orderDetailRoutes";
+import { getOperationsManualReviewTitle } from "../shared/operations/reviewTypes";
+import { useOperationsOrderReview } from "../shared/operations/useOperationsOrderReview";
 import { useOperationsWorkspace } from "../shared/operations/useOperationsWorkspace";
 import {
   getOperationsOrderStatusLabel,
@@ -98,66 +96,18 @@ function OperationsWorkspaceDashboard({
   onLogout: () => void;
 }) {
   const { state, workspace, errorMessage, reload } = useOperationsWorkspace(accessToken, true);
-  const [detailSummary, setDetailSummary] = useState<AdminOrderDetailSummary | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [adminOrdersCache, setAdminOrdersCache] = useState<AdminOrderRow[]>([]);
-
-  useEffect(() => {
-    if (!routeOrderId) {
-      setDetailSummary(null);
-      return;
-    }
-
-    const queueOrder = workspace?.orders.find((item) => item.orderId === routeOrderId) ?? null;
-    if (!queueOrder) {
-      setDetailSummary(null);
-      return;
-    }
-
-    const activeOrderId = routeOrderId;
-    let cancelled = false;
-
-    async function loadDetail() {
-      setDetailLoading(true);
-      try {
-        let adminOrder = adminOrdersCache.find((item) => item.id === activeOrderId) ?? null;
-        if (!adminOrder) {
-          const apiOrders = await fetchAdminOrders(accessToken);
-          const mapped = apiOrders.map(mapApiOrder);
-          if (!cancelled) setAdminOrdersCache(mapped);
-          adminOrder = mapped.find((item) => item.id === activeOrderId) ?? null;
-        }
-
-        if (!adminOrder) {
-          if (!cancelled) setDetailSummary(null);
-          return;
-        }
-
-        let productionDetail = null;
-        try {
-          productionDetail = await loadProductionDetail(accessToken, activeOrderId);
-        } catch {
-          productionDetail = null;
-        }
-
-        if (!cancelled) {
-          setDetailSummary(summarizeOrderForAdmin(adminOrder, productionDetail));
-        }
-      } catch {
-        if (!cancelled) setDetailSummary(null);
-      } finally {
-        if (!cancelled) setDetailLoading(false);
-      }
-    }
-
-    void loadDetail();
-    return () => {
-      cancelled = true;
-    };
-  }, [accessToken, adminOrdersCache, routeOrderId, workspace?.orders]);
+  const {
+    state: reviewState,
+    review,
+    errorMessage: reviewErrorMessage,
+  } = useOperationsOrderReview(accessToken, routeOrderId);
 
   const isLoading = state === "loading" || state === "idle";
   const orders = workspace?.orders ?? [];
+
+  function handleBackToQueue() {
+    window.history.pushState({}, "", "/operations");
+  }
 
   return (
     <main className="min-h-screen bg-[var(--rzm-surface-canvas)] text-[var(--rzm-text-main)]">
@@ -165,7 +115,7 @@ function OperationsWorkspaceDashboard({
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="eyebrow mb-4">Operations Workspace</div>
-            <h1 className="h-section">{routeOrderId ? "Деталь заявки" : "Очередь заявок"}</h1>
+            <h1 className="h-section">{routeOrderId ? getOperationsManualReviewTitle() : "Очередь заявок"}</h1>
             <p className="mt-4 max-w-[680px] text-[15px] leading-[1.6] text-[var(--rzm-text-muted)]">
               API-backed очередь заявок для операционной обработки. Клиентские данные показываются только в masked safe read model.
             </p>
@@ -247,7 +197,7 @@ function OperationsWorkspaceDashboard({
                         <Td>{formatOperationsDate(order.updatedAt)}</Td>
                         <Td>
                           <a href={buildOperationsOrderDetailPath(order.orderId)} className="btn btn-outline btn-sm focus-ring">
-                            Открыть
+                            Review
                           </a>
                         </Td>
                       </tr>
@@ -260,13 +210,12 @@ function OperationsWorkspaceDashboard({
         )}
 
         {routeOrderId && (
-          <AdminOrderDetailPage
-            summary={detailSummary}
-            loading={detailLoading || isLoading}
-            onBack={() => {
-              window.history.pushState({}, "", "/operations");
-              setDetailSummary(null);
-            }}
+          <OperationsManualReviewView
+            review={review}
+            state={reviewState}
+            errorMessage={reviewErrorMessage}
+            loading={reviewState === "loading" || reviewState === "idle"}
+            onBack={handleBackToQueue}
           />
         )}
       </section>

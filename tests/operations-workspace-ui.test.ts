@@ -40,11 +40,11 @@ test("operations queue section renders safe fields only", () => {
   assert.doesNotMatch(page, /customer_name|customer_phone|customer_email|production_export|price_breakdown/i);
 });
 
-test("operations order detail reuses existing admin detail page", () => {
+test("operations order detail reuses manual review view and review API", () => {
   const page = readFileSync("src/operations/OperationsWorkspacePage.tsx", "utf8");
-  assert.match(page, /AdminOrderDetailPage/);
-  assert.match(page, /summarizeOrderForAdmin/);
-  assert.match(page, /fetchAdminOrders/);
+  assert.match(page, /OperationsManualReviewView/);
+  assert.match(page, /useOperationsOrderReview/);
+  assert.doesNotMatch(page, /fetchAdminOrders/);
 });
 
 test("operations API client sends Bearer token to operations workspace endpoint", () => {

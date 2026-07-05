@@ -207,12 +207,30 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
   }
 }
 
+const ADMIN_ORDER_SELECT =
+  'order_id,status,created_at,updated_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason'
+
+export async function getAdminOrderByOrderId(orderId: string): Promise<AdminOrderSummary | null> {
+  const supabase = getSupabaseAdminClient()
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select(ADMIN_ORDER_SELECT)
+    .eq('order_id', orderId)
+    .maybeSingle()
+
+  if (error) throw new Error(error.message)
+  if (!data) return null
+
+  return mapOrderRow(data as OrderDbRow)
+}
+
 export async function listAdminOrders(limit = 50): Promise<AdminOrderSummary[]> {
   const supabase = getSupabaseAdminClient()
 
   const { data, error } = await supabase
     .from('orders')
-    .select('order_id,status,created_at,updated_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason')
+    .select(ADMIN_ORDER_SELECT)
     .order('created_at', { ascending: false })
     .limit(Math.min(Math.max(limit, 1), 100))
 

@@ -1003,6 +1003,18 @@ Branch implementation evidence (2026-07-05, Operations Workspace — Orders Queu
 - explicit non-scope preserved: no production/admin CRM/payments/realtime/status-change workflow expansion;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-05, Operations Approval View — Manual Review Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done** (QA PASS, not closure);
+- `GET /api/operations/order?orderId=` returns safe manual review read model via admin JWT/session auth; `production_export` summarized server-side only;
+- route `/operations/orders/:id` shows `OperationsManualReviewView` with approval summary, disabled action placeholders, and reused `AdminOrderDetailPage`;
+- client `operationsReviewApi` + `useOperationsOrderReview`; frontend has no direct DB access;
+- tests: `tests/operations-order-review.test.ts` (5), `tests/operations-manual-review-ui.test.ts` (7); updated `tests/operations-workspace-ui.test.ts`;
+- QA passed locally: `npm run test:operations-order-review`, `npm run test:operations-manual-review-ui`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- commit: see final agent report / final HEAD after commit (`feat: add operations manual review foundation`, branch-only, not closure);
+- explicit non-scope preserved: no approve/reject/status mutation/manual pricing write/production review workflow;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
