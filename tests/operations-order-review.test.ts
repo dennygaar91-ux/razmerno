@@ -108,6 +108,10 @@ function installOrderReviewFetchMock(options: { orderFound?: boolean } = {}) {
       return jsonResponse([sampleOrderRow]);
     }
 
+    if (url.includes("/rest/v1/order_manual_pricing_drafts")) {
+      return jsonResponse(null);
+    }
+
     return jsonResponse({ ok: true });
   }) as typeof fetch;
 }
@@ -148,6 +152,7 @@ test("operations order review exposes safe manual review fields only", () => {
   const review = buildOperationsOrderReview(sampleAdminSummary, sampleOrderRow.production_export);
   assert.equal(review.orderId, ORDER_ID);
   assert.equal(review.approvalActionsImplemented, false);
+  assert.equal(review.manualPricingDraft, null);
   assert.equal(review.productionReviewStatus, "requires-review");
   assert.match(review.priceBreakdownSummary, /stored breakdown keys/);
   assert.notEqual(review.customerNameMasked, "Иван Петров");
@@ -219,6 +224,7 @@ test("operations order review GET returns safe review read model for authorized 
       approvalActionsImplemented: false;
       customerNameMasked: string;
       productionReviewStatus: string;
+      manualPricingDraft: unknown;
     };
   };
 
@@ -226,6 +232,7 @@ test("operations order review GET returns safe review read model for authorized 
   assert.equal(body.review.orderId, ORDER_ID);
   assert.equal(body.review.approvalActionsImplemented, false);
   assert.equal(body.review.productionReviewStatus, "requires-review");
+  assert.equal(body.review.manualPricingDraft, null);
   assert.notEqual(body.review.customerNameMasked, "Иван Петров");
 });
 
@@ -238,6 +245,7 @@ test("buildOperationsOrderReviewByOrderId loads review through service role path
   if (!built.ok) return;
   assert.equal(built.review.orderId, ORDER_ID);
   assert.equal(built.review.approvalActionsImplemented, false);
+  assert.equal(built.review.manualPricingDraft, null);
 });
 
 async function runTests() {

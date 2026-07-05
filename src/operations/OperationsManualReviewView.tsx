@@ -18,13 +18,17 @@ export function OperationsManualReviewView({
   state,
   errorMessage,
   loading,
+  accessToken,
   onBack,
+  onDraftSaved,
 }: {
   review: OperationsOrderReview | null;
   state: OperationsOrderReviewLoadState;
   errorMessage: string | null;
   loading: boolean;
+  accessToken: string;
   onBack: () => void;
+  onDraftSaved: () => Promise<void> | void;
 }) {
   if (state === "not_found" || (state === "success" && !review)) {
     return (
@@ -105,7 +109,13 @@ export function OperationsManualReviewView({
         </div>
       )}
 
-      {review && <OperationsManualPricingDraftSection review={review} />}
+      {review && (
+        <OperationsManualPricingDraftSection
+          review={review}
+          accessToken={accessToken}
+          onSaved={onDraftSaved}
+        />
+      )}
 
       <AdminOrderDetailPage summary={detailSummary} loading={loading} onBack={onBack} />
     </section>

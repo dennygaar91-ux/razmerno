@@ -1,4 +1,5 @@
 import { getAdminOrderByOrderId, getAdminProductionDetail } from './admin-orders'
+import { getOperationsManualPricingDraftByOrderId } from './operations-manual-pricing-drafts-store'
 import { buildOperationsOrderReview } from './operations-order-review-types'
 
 export async function buildOperationsOrderReviewByOrderId(orderId: string): Promise<
@@ -10,7 +11,13 @@ export async function buildOperationsOrderReviewByOrderId(orderId: string): Prom
     if (!order) return { ok: false, reason: 'not_found', message: 'Order not found' }
 
     const detail = await getAdminProductionDetail(orderId)
-    return { ok: true, review: buildOperationsOrderReview(order, detail.productionExport) }
+    const draftResult = await getOperationsManualPricingDraftByOrderId(orderId)
+    if (!draftResult.ok) {
+      return { ok: false, reason: 'error', message: draftResult.error }
+    }
+
+    const review = buildOperationsOrderReview(order, detail.productionExport)
+    return { ok: true, review: { ...review, manualPricingDraft: draftResult.draft } }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     return { ok: false, reason: 'error', message }

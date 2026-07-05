@@ -1026,6 +1026,18 @@ Branch implementation evidence (2026-07-05, Operations Manual Pricing Draft Foun
 - explicit non-scope preserved: no manual pricing write, no order total/breakdown mutation, no status change;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-05, Operations Manual Pricing Write Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done** (QA PASS, not closure);
+- API: `POST /api/operations/manual-pricing-draft` with admin auth, server-side validation, safe DTO response; `GET /api/operations/order?orderId=` now includes optional `manualPricingDraft` readback;
+- DB: `order_manual_pricing_drafts` table migration with RLS deny-all (`supabase/migrations/20260705_add_order_manual_pricing_drafts.sql`);
+- frontend: active save in `OperationsManualPricingDraftSection` via API client only, loading/success/error states, persisted draft summary after reload;
+- tests: `tests/operations-manual-pricing-write.test.ts` (6), updated `tests/operations-manual-pricing-draft-ui.test.ts`, updated `tests/operations-order-review.test.ts`;
+- QA passed locally: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- commit: see final agent report / final HEAD after commit (`feat: add operations manual pricing write foundation`, branch-only, not closure);
+- explicit non-scope preserved: no approve/reject, no order/production status mutation, no payment flow, no customer-facing final price update;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

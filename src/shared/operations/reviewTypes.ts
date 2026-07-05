@@ -1,3 +1,12 @@
+export type OperationsManualPricingDraft = {
+  orderId: string;
+  manualTotalPrice: number;
+  manualTotalPriceLabel: string;
+  reason: string | null;
+  status: "draft";
+  updatedAt: string | null;
+};
+
 export type OperationsOrderReview = {
   orderId: string;
   status: string;
@@ -26,6 +35,7 @@ export type OperationsOrderReview = {
   validationErrorsCount: number;
   validationWarningsCount: number;
   approvalActionsImplemented: false;
+  manualPricingDraft: OperationsManualPricingDraft | null;
 };
 
 export type OperationsOrderReviewApiResult =
@@ -65,15 +75,27 @@ export function getOperationsManualPricingDraftTitle(): string {
 }
 
 export function getOperationsManualPricingDraftDescription(): string {
-  return "Черновик для будущей ручной корректировки цены. Значение не сохраняется и не применяется к заказу.";
+  return "Черновик ручной цены для операционной проверки. Это не финальная customer-facing цена и не одобрение заказа.";
 }
 
 export function getOperationsManualPricingSaveNotImplementedMessage(): string {
   return "Сохранение ручной цены пока не реализовано. Черновик остаётся только на экране.";
 }
 
+export function getOperationsManualPricingSavedMessage(): string {
+  return "Черновик ручной цены сохранён. Это operations draft, не финальная цена для клиента.";
+}
+
+export function getOperationsManualPricingSaveErrorMessage(): string {
+  return "Не удалось сохранить черновик ручной цены.";
+}
+
+export function getOperationsManualPricingReasonLabel(): string {
+  return "Примечание (опционально)";
+}
+
 export function getOperationsManualPricingDraftInputLabel(): string {
-  return "Черновик новой суммы (локально)";
+  return "Черновик новой суммы";
 }
 
 export function getOperationsManualPricingSaveButtonLabel(): string {

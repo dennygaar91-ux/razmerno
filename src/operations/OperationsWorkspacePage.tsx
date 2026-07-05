@@ -100,6 +100,7 @@ function OperationsWorkspaceDashboard({
     state: reviewState,
     review,
     errorMessage: reviewErrorMessage,
+    reload: reloadReview,
   } = useOperationsOrderReview(accessToken, routeOrderId);
 
   const isLoading = state === "loading" || state === "idle";
@@ -215,7 +216,9 @@ function OperationsWorkspaceDashboard({
             state={reviewState}
             errorMessage={reviewErrorMessage}
             loading={reviewState === "loading" || reviewState === "idle"}
+            accessToken={accessToken}
             onBack={handleBackToQueue}
+            onDraftSaved={reloadReview}
           />
         )}
       </section>

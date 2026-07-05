@@ -1,5 +1,7 @@
 import type { AdminOrderSummary } from './admin-orders'
 
+import type { OperationsManualPricingDraft } from './operations-manual-pricing-draft-types'
+
 export type OperationsOrderReview = {
   orderId: string
   status: string
@@ -28,6 +30,7 @@ export type OperationsOrderReview = {
   validationErrorsCount: number
   validationWarningsCount: number
   approvalActionsImplemented: false
+  manualPricingDraft: OperationsManualPricingDraft | null
 }
 
 export const OPERATIONS_ORDER_REVIEW_FORBIDDEN_RESPONSE_KEYS = [
@@ -150,5 +153,6 @@ export function buildOperationsOrderReview(
     customerEmailStatus: order.email.customer,
     ...production,
     approvalActionsImplemented: false,
+    manualPricingDraft: null,
   }
 }

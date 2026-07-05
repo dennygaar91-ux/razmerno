@@ -43,6 +43,7 @@ const sampleReview = {
   validationErrorsCount: 1,
   validationWarningsCount: 2,
   approvalActionsImplemented: false as const,
+  manualPricingDraft: null,
 };
 
 test("operations manual review view exists and uses approval summary", () => {
