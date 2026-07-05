@@ -998,7 +998,8 @@ Branch implementation evidence (2026-07-05, Operations Workspace — Orders Queu
 - client `operationsApi` + `useOperationsWorkspace` mirror customer workspace hook conventions; frontend has no direct DB access;
 - tests: `tests/operations-workspace.test.ts` (6), `tests/operations-workspace-ui.test.ts` (7);
 - QA passed locally: `npm run test:operations-workspace` (6), `npm run test:operations-workspace-ui` (7), `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
-- commit: `ed39b5fd` (`feat: add operations orders queue foundation`, branch-only, not closure);
+- evidence correction: actual final HEAD for this Epic is `782cb441`; previous backlog reference `ed39b5fd` was superseded by amend chain;
+- final implementation commit recorded by agent final report: `782cb441` `feat: add operations orders queue foundation` (branch-only, not closure);
 - explicit non-scope preserved: no production/admin CRM/payments/realtime/status-change workflow expansion;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
