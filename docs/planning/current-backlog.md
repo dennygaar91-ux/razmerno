@@ -977,6 +977,15 @@ Branch implementation evidence (2026-07-05, Epic J-2 — Customer Notifications 
 - explicit non-scope preserved: no backend/migration, no PATCH/POST, no notification generation, no manager UI;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-05, Customer Notifications Completion, `task/epic-b-projects-foundation`, not closure):
+
+- best-effort generation on authenticated order submit (`order_created`) and change request create (`change_request`);
+- mark-as-read APIs `PATCH /api/customer/notification/read` and `PATCH /api/customer/notifications/read-all` with ownership;
+- cabinet UI actions `Отметить прочитанным` / `Отметить все прочитанными` with local state update, no reload;
+- tests extended in `customer-notifications.test.ts`, `customer-notifications-ui.test.ts`, `customer-order-submit.test.ts`, `customer-change-request.test.ts`;
+- explicit non-scope preserved: no bell/badge/realtime/polling/email/push/preferences/manager workflow;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

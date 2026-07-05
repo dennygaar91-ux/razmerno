@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSessionContext } from "../auth/SessionProvider";
 import { useAuth } from "../auth/useAuth";
-import { fetchCustomerNotifications } from "./notificationApi";
+import {
+  fetchCustomerNotifications,
+  markAllCustomerNotificationsRead,
+  markCustomerNotificationRead,
+} from "./notificationApi";
 import type { CustomerNotification } from "./notificationTypes";
 
 export type CustomerNotificationsLoadState =
@@ -18,6 +22,13 @@ export function useCustomerNotifications(enabled: boolean) {
   const [state, setState] = useState<CustomerNotificationsLoadState>("idle");
   const [notifications, setNotifications] = useState<CustomerNotification[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [markingOneId, setMarkingOneId] = useState<string | null>(null);
+  const [markingAll, setMarkingAll] = useState(false);
+
+  const hasUnread = useMemo(
+    () => notifications.some((notification) => !notification.isRead),
+    [notifications],
+  );
 
   const retry = useCallback(async () => {
     const accessToken = session?.access_token;
@@ -48,6 +59,53 @@ export function useCustomerNotifications(enabled: boolean) {
     setState(result.data.length === 0 ? "empty" : "success");
   }, [session?.access_token]);
 
+  const markOneAsRead = useCallback(
+    async (notificationId: string) => {
+      const accessToken = session?.access_token;
+      if (!accessToken) {
+        return { ok: false as const, message: "Сессия истекла. Войдите снова." };
+      }
+
+      setMarkingOneId(notificationId);
+      const result = await markCustomerNotificationRead(accessToken, notificationId);
+      setMarkingOneId(null);
+
+      if (!result.ok) {
+        return { ok: false as const, message: result.message };
+      }
+
+      setNotifications((current) =>
+        current.map((notification) =>
+          notification.id === notificationId ? result.data : notification,
+        ),
+      );
+      return { ok: true as const, data: result.data };
+    },
+    [session?.access_token],
+  );
+
+  const markAllAsRead = useCallback(async () => {
+    const accessToken = session?.access_token;
+    if (!accessToken) {
+      return { ok: false as const, message: "Сессия истекла. Войдите снова." };
+    }
+
+    setMarkingAll(true);
+    const result = await markAllCustomerNotificationsRead(accessToken);
+    setMarkingAll(false);
+
+    if (!result.ok) {
+      return { ok: false as const, message: result.message };
+    }
+
+    setNotifications((current) =>
+      current.map((notification) =>
+        notification.isRead ? notification : { ...notification, isRead: true },
+      ),
+    );
+    return { ok: true as const, updatedCount: result.updatedCount };
+  }, [session?.access_token]);
+
   useEffect(() => {
     if (!enabled || authLoading) return;
     void retry();
@@ -57,6 +115,11 @@ export function useCustomerNotifications(enabled: boolean) {
     state,
     notifications,
     errorMessage,
+    hasUnread,
+    markingOneId,
+    markingAll,
     retry,
+    markOneAsRead,
+    markAllAsRead,
   };
 }

@@ -3,6 +3,7 @@ import {
   parseCustomerApiBody,
   prepareCustomerApi,
 } from '../_shared/customer-api-auth'
+import { createChangeRequestNotificationBestEffort } from '../_shared/customer-notification-events'
 import { validateCustomerChangeRequestBody } from '../_shared/customer-change-request-validation'
 import { createCustomerChangeRequest } from '../_shared/customer-change-requests-store'
 import { getCustomerOrderByIdForUser } from '../_shared/customer-orders-store'
@@ -49,6 +50,13 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     })
     return res.status(500).json({ ok: false, message: CHANGE_REQUEST_UNAVAILABLE_MESSAGE })
   }
+
+  await createChangeRequestNotificationBestEffort({
+    requestId: prepared.requestId,
+    userId: auth.user.userId,
+    orderId: validated.value.orderId,
+    publicOrderNumber: owned.order.public_order_number,
+  })
 
   return res.status(200).json({ ok: true, changeRequest: created.changeRequest })
 }

@@ -114,7 +114,9 @@ function createMockResponse() {
   return { res, snapshot: () => ({ ...state, headers: { ...state.headers } }) };
 }
 
-function installChangeRequestFetchMock() {
+function installChangeRequestFetchMock(options?: { notificationInsertFails?: boolean }) {
+  const notificationInserts: Array<Record<string, unknown>> = [];
+
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
     const method = init?.method ?? "GET";
@@ -167,8 +169,24 @@ function installChangeRequestFetchMock() {
       return jsonResponse([]);
     }
 
+    if (url.includes("/rest/v1/order_notifications") && method === "POST") {
+      const body = init?.body ? JSON.parse(String(init.body)) : null;
+      if (options?.notificationInsertFails) {
+        return jsonResponse({ message: "notification insert failed" }, 500);
+      }
+      notificationInserts.push(body as Record<string, unknown>);
+      return jsonResponse({
+        id: "990e8400-e29b-41d4-a716-446655440060",
+        ...(body ?? {}),
+        is_read: false,
+        created_at: "2026-07-05T14:00:00.000Z",
+      });
+    }
+
     return jsonResponse({ ok: true });
   }) as typeof fetch;
+
+  return { getNotificationInserts: () => notificationInserts };
 }
 
 test("change request POST returns 401 without bearer token", async () => {
@@ -466,6 +484,63 @@ test("message validation rejects empty and too long values", () => {
     message: "Перенести доставку на другой адрес.",
   });
   assert.equal(valid.ok, true);
+});
+
+test("change request POST creates change_request notification", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const mock = installChangeRequestFetchMock();
+  const { res, snapshot } = createMockResponse();
+
+  await changeRequestHandler(
+    {
+      method: "POST",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+      body: {
+        orderId: ORDER_ID,
+        requestType: "dimensions",
+        message: "Нужно увеличить глубину до 650 мм.",
+      },
+    },
+    res,
+  );
+
+  assert.equal(snapshot().statusCode, 200);
+  const inserts = mock.getNotificationInserts();
+  assert.equal(inserts.length, 1);
+  assert.equal(inserts[0]?.type, "change_request");
+  assert.equal(inserts[0]?.title, "Запрос на изменение отправлен");
+  assert.equal(inserts[0]?.order_id, ORDER_ID);
+  assert.equal(inserts[0]?.user_id, ORDER_USER_ID);
+});
+
+test("change request POST stays successful when notification insert fails", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const mock = installChangeRequestFetchMock({ notificationInsertFails: true });
+  const { res, snapshot } = createMockResponse();
+
+  await changeRequestHandler(
+    {
+      method: "POST",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+      body: {
+        orderId: ORDER_ID,
+        requestType: "materials",
+        message: "Хочу другой фасад.",
+      },
+    },
+    res,
+  );
+
+  assert.equal(snapshot().statusCode, 200);
+  assert.equal(mock.getNotificationInserts().length, 0);
 });
 
 test("mapper exposes only customer-safe change request fields", () => {

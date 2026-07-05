@@ -46,9 +46,12 @@ function jsonResponse(payload: unknown, status = 200): Response {
   });
 }
 
+const ORDER_SUBMIT_ORDER_UUID = "660e8400-e29b-41d4-a716-446655440031";
+
 function installOwnershipFetchMock(options: {
   profilePhone?: string | null;
   projectOwnerId?: string | null;
+  notificationInsertFails?: boolean;
 } = {}): FetchRecord[] {
   const records: FetchRecord[] = [];
   let publicOrderSequence = 0;
@@ -73,7 +76,10 @@ function installOwnershipFetchMock(options: {
     if (url.includes("/rest/v1/orders")) {
       if (method === "POST") {
         const payload = JSON.parse(String(init?.body ?? "{}")) as Record<string, unknown>;
-        orders.set(String(payload.order_id), payload);
+        orders.set(String(payload.order_id), {
+          ...payload,
+          id: ORDER_SUBMIT_ORDER_UUID,
+        });
         return jsonResponse([], 201);
       }
       if (method === "GET") {
@@ -81,11 +87,26 @@ function installOwnershipFetchMock(options: {
         const filter = parsed.searchParams.get("order_id");
         const orderId = filter?.startsWith("eq.") ? decodeURIComponent(filter.slice(3)) : null;
         const order = orderId ? orders.get(orderId) : null;
+        if (order && parsed.searchParams.get("select")?.includes("id")) {
+          return jsonResponse({ id: order.id, user_id: order.user_id });
+        }
         return jsonResponse(order ? [order] : [], 200);
       }
       if (method === "PATCH") {
         return jsonResponse([], 200);
       }
+    }
+
+    if (url.includes("/rest/v1/order_notifications") && method === "POST") {
+      if (options.notificationInsertFails) {
+        return jsonResponse({ message: "notification insert failed" }, 500);
+      }
+      return jsonResponse({
+        id: "990e8400-e29b-41d4-a716-446655440060",
+        ...(init?.body ? JSON.parse(String(init.body)) : {}),
+        is_read: false,
+        created_at: "2026-07-05T14:00:00.000Z",
+      });
     }
 
     if (url.includes("/rest/v1/price_items") && method === "GET") {
@@ -200,6 +221,10 @@ function getOrdersInsert(records: FetchRecord[]) {
   return JSON.parse(insert.body) as Record<string, unknown>;
 }
 
+function getNotificationInserts(records: FetchRecord[]) {
+  return records.filter((record) => record.url.includes("/rest/v1/order_notifications") && record.method === "POST");
+}
+
 async function runTests() {
   const ownedProjectId = "550e8400-e29b-41d4-a716-446655440010";
   const foreignProjectId = "550e8400-e29b-41d4-a716-446655440011";
@@ -284,7 +309,31 @@ async function runTests() {
       assert.equal(profilePatch, undefined);
     }
 
-    console.log("customer-order-submit: 6 passed");
+    {
+      const records = installOwnershipFetchMock();
+      const order = makeValidOrder({ orderId: "RZ-20260705-3001" });
+      const { res, state } = makeRes();
+      await handler(makeReq(order), res);
+      assert.equal(state.statusCode, 200);
+      const notificationInserts = getNotificationInserts(records);
+      assert.equal(notificationInserts.length, 1);
+      const payload = JSON.parse(String(notificationInserts[0]?.body ?? "{}")) as Record<string, unknown>;
+      assert.equal(payload.type, "order_created");
+      assert.equal(payload.title, "Заказ оформлен");
+      assert.equal(payload.user_id, ORDER_SUBMIT_TEST_USER_ID);
+      assert.equal(payload.order_id, ORDER_SUBMIT_ORDER_UUID);
+    }
+
+    {
+      const records = installOwnershipFetchMock({ notificationInsertFails: true });
+      const order = makeValidOrder({ orderId: "RZ-20260705-3002" });
+      const { res, state } = makeRes();
+      await handler(makeReq(order), res);
+      assert.equal(state.statusCode, 200);
+      assert.equal(getNotificationInserts(records).length, 1);
+    }
+
+    console.log("customer-order-submit: 8 passed");
   } finally {
     restoreEnvironment();
   }

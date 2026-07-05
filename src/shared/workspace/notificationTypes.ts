@@ -18,6 +18,14 @@ export type CustomerNotificationListApiResult =
   | { ok: true; data: CustomerNotification[] }
   | { ok: false; message: string; status?: number };
 
+export type CustomerNotificationReadApiResult =
+  | { ok: true; data: CustomerNotification }
+  | { ok: false; message: string; status?: number };
+
+export type CustomerNotificationReadAllApiResult =
+  | { ok: true; updatedCount: number }
+  | { ok: false; message: string; status?: number };
+
 const CUSTOMER_NOTIFICATION_TYPE_LABELS: Record<CustomerNotificationType, string> = {
   order_created: "Заказ создан",
   order_updated: "Заказ обновлён",

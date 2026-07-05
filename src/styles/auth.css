@@ -567,6 +567,18 @@
   letter-spacing:.01em;
 }
 
+.rzm-account-notification-footer{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.rzm-account-notification-mark-read{
+  white-space:nowrap;
+}
+
 @media (max-width: 900px){
   .rzm-account-summary{
     grid-template-columns:1fr;

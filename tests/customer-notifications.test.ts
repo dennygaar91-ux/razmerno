@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 
 import notificationsHandler from "../api/customer/notifications";
+import notificationReadHandler from "../api/customer/notification/read";
+import notificationsReadAllHandler from "../api/customer/notifications/read-all";
 import { CUSTOMER_UNAUTHORIZED_MESSAGE } from "../api/_shared/customer-api-auth";
+import {
+  createChangeRequestNotificationBestEffort,
+  createOrderCreatedNotificationBestEffort,
+} from "../api/_shared/customer-notification-events";
 import {
   CUSTOMER_NOTIFICATION_FORBIDDEN_RESPONSE_KEYS,
   CUSTOMER_NOTIFICATION_TYPES,
@@ -10,8 +16,6 @@ import {
 } from "../api/_shared/customer-notification-types";
 import type { CustomerNotificationRow } from "../api/_shared/customer-notification-types";
 import { listCustomerNotificationsForUser } from "../api/_shared/customer-notifications-store";
-
-type AsyncTest = () => void | Promise<void>;
 
 const tests: Array<{ name: string; run: AsyncTest }> = [];
 
@@ -322,6 +326,264 @@ test("notifications API contract returns ok and notifications array", async () =
   assert.ok(Array.isArray(body.notifications));
   assert.equal(typeof body.notifications[0]?.id, "string");
   assert.equal(typeof body.notifications[0]?.isRead, "boolean");
+});
+
+function installNotificationStoreMock() {
+  const rows = new Map<string, CustomerNotificationRow>([
+    [NOTIFICATION_ID, { ...sampleNotificationRow }],
+    [
+      foreignNotificationRow.id,
+      { ...foreignNotificationRow },
+    ],
+  ]);
+  const inserts: CustomerNotificationRow[] = [];
+
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    const method = init?.method ?? "GET";
+
+    if (url.includes("/auth/v1/user")) {
+      return jsonResponse({
+        id: USER_ID,
+        email: "ivan@example.com",
+        user_metadata: { full_name: "Иван Петров" },
+      });
+    }
+
+    if (url.includes("/rest/v1/orders")) {
+      const parsed = new URL(url);
+      const orderIdFilter = parsed.searchParams.get("order_id");
+      if (orderIdFilter?.startsWith("eq.")) {
+        return jsonResponse({
+          id: ORDER_ID,
+          user_id: USER_ID,
+        });
+      }
+    }
+
+    if (url.includes("/rest/v1/order_notifications")) {
+      if (method === "POST") {
+        const body = init?.body ? JSON.parse(String(init.body)) : {};
+        const row: CustomerNotificationRow = {
+          id: "990e8400-e29b-41d4-a716-446655440060",
+          user_id: body.user_id,
+          order_id: body.order_id ?? null,
+          type: body.type,
+          title: body.title,
+          message: body.message,
+          is_read: false,
+          created_at: "2026-07-05T14:00:00.000Z",
+        };
+        rows.set(row.id, row);
+        inserts.push(row);
+        return jsonResponse(row);
+      }
+
+      if (method === "PATCH") {
+        const parsed = new URL(url);
+        const idFilter = parsed.searchParams.get("id");
+        const userFilter = parsed.searchParams.get("user_id");
+        const isReadFilter = parsed.searchParams.get("is_read");
+        const notificationId = idFilter?.startsWith("eq.") ? decodeURIComponent(idFilter.slice(3)) : null;
+        const userId = userFilter?.startsWith("eq.") ? decodeURIComponent(userFilter.slice(3)) : null;
+
+        if (notificationId) {
+          const row = rows.get(notificationId);
+          if (!row || row.user_id !== userId) {
+            return jsonResponse(null, 200);
+          }
+          const updated = { ...row, is_read: true };
+          rows.set(notificationId, updated);
+          return jsonResponse(updated);
+        }
+
+        if (userId && isReadFilter === "eq.false") {
+          const updatedRows: Array<{ id: string }> = [];
+          for (const row of rows.values()) {
+            if (row.user_id === userId && !row.is_read) {
+              const updated = { ...row, is_read: true };
+              rows.set(row.id, updated);
+              updatedRows.push({ id: row.id });
+            }
+          }
+          return jsonResponse(updatedRows);
+        }
+      }
+
+      const parsed = new URL(url);
+      const userFilter = parsed.searchParams.get("user_id");
+      const userId = userFilter?.startsWith("eq.") ? decodeURIComponent(userFilter.slice(3)) : null;
+      if (userId !== USER_ID) return jsonResponse([]);
+      return jsonResponse(
+        [...rows.values()].filter((row) => row.user_id === USER_ID).sort((a, b) => b.created_at.localeCompare(a.created_at)),
+      );
+    }
+
+    return jsonResponse({ ok: true });
+  }) as typeof fetch;
+
+  return {
+    getInserts: () => inserts,
+  };
+}
+
+test("order submit creates order_created notification best-effort", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const store = installNotificationStoreMock();
+
+  await createOrderCreatedNotificationBestEffort({
+    requestId: "req-order-created",
+    userId: USER_ID,
+    businessOrderId: "RZ-20260705-1001",
+    publicOrderNumber: "RZM_0007",
+  });
+
+  const inserts = store.getInserts();
+  assert.equal(inserts.length, 1);
+  assert.equal(inserts[0]?.type, "order_created");
+  assert.equal(inserts[0]?.title, "Заказ оформлен");
+  assert.equal(inserts[0]?.message, "Ваш заказ RZM_0007 отправлен на проверку.");
+  assert.equal(inserts[0]?.order_id, ORDER_ID);
+});
+
+test("change request creates change_request notification best-effort", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const store = installNotificationStoreMock();
+
+  await createChangeRequestNotificationBestEffort({
+    requestId: "req-change-request",
+    userId: USER_ID,
+    orderId: ORDER_ID,
+    publicOrderNumber: "RZM_0008",
+  });
+
+  const inserts = store.getInserts();
+  assert.equal(inserts.length, 1);
+  assert.equal(inserts[0]?.type, "change_request");
+  assert.equal(inserts[0]?.title, "Запрос на изменение отправлен");
+  assert.equal(inserts[0]?.message, "Ваш запрос по заказу RZM_0008 передан менеджеру.");
+});
+
+test("notification generation failure does not throw for primary helper", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+
+  globalThis.fetch = (async () => jsonResponse({ message: "insert failed" }, 500)) as typeof fetch;
+
+  await assert.doesNotReject(async () => {
+    await createChangeRequestNotificationBestEffort({
+      requestId: "req-change-request-fail",
+      userId: USER_ID,
+      orderId: ORDER_ID,
+      publicOrderNumber: "RZM_0009",
+    });
+  });
+});
+
+test("mark one read returns 401 without bearer token", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const { res, snapshot } = createMockResponse();
+
+  await notificationReadHandler(
+    {
+      method: "PATCH",
+      headers: { origin: "http://localhost:5173" },
+      body: { notificationId: NOTIFICATION_ID },
+    },
+    res,
+  );
+
+  assert.equal(snapshot().statusCode, 401);
+});
+
+test("mark one read returns 404 for foreign notification", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installNotificationStoreMock();
+  const { res, snapshot } = createMockResponse();
+
+  await notificationReadHandler(
+    {
+      method: "PATCH",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+      body: { notificationId: foreignNotificationRow.id },
+    },
+    res,
+  );
+
+  assert.equal(snapshot().statusCode, 404);
+});
+
+test("mark one read updates own notification and returns safe model", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installNotificationStoreMock();
+  const { res, snapshot } = createMockResponse();
+
+  await notificationReadHandler(
+    {
+      method: "PATCH",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+      body: { notificationId: NOTIFICATION_ID },
+    },
+    res,
+  );
+
+  const body = snapshot().body as { ok: boolean; notification: { id: string; isRead: boolean } };
+  assert.equal(snapshot().statusCode, 200);
+  assert.equal(body.ok, true);
+  assert.equal(body.notification.id, NOTIFICATION_ID);
+  assert.equal(body.notification.isRead, true);
+});
+
+test("read-all requires auth", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const { res, snapshot } = createMockResponse();
+
+  await notificationsReadAllHandler(
+    {
+      method: "PATCH",
+      headers: { origin: "http://localhost:5173" },
+      body: null,
+    },
+    res,
+  );
+
+  assert.equal(snapshot().statusCode, 401);
+});
+
+test("read-all updates only current user unread notifications", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installNotificationStoreMock();
+  const { res, snapshot } = createMockResponse();
+
+  await notificationsReadAllHandler(
+    {
+      method: "PATCH",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+      body: null,
+    },
+    res,
+  );
+
+  const body = snapshot().body as { ok: boolean; updatedCount: number };
+  assert.equal(snapshot().statusCode, 200);
+  assert.equal(body.ok, true);
+  assert.equal(body.updatedCount, 1);
 });
 
 async function runTests() {

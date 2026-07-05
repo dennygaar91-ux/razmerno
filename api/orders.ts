@@ -7,6 +7,7 @@ import { CUSTOMER_UNAUTHORIZED_MESSAGE } from './_shared/customer-api-auth.js'
 import { extractBearerToken } from './_shared/customer-cors.js'
 import { getConstructorProjectById } from './_shared/constructor-projects-store.js'
 import { isValidProjectId } from './_shared/constructor-project-types.js'
+import { createOrderCreatedNotificationBestEffort } from './_shared/customer-notification-events.js'
 import { maybeAutofillProfilePhoneFromOrder } from './_shared/order-profile-autofill.js'
 import { authorizeOrderSubmit } from './_shared/order-submit-auth.js'
 import { assertServerEnvReady } from './_shared/env.js'
@@ -269,6 +270,13 @@ if (dbResult.ok === false) {
     }
 
     void maybeAutofillProfilePhoneFromOrder(customer.userId, orderBodyForPersistence.customer?.phone ?? '')
+
+    await createOrderCreatedNotificationBestEffort({
+      requestId,
+      userId: customer.userId,
+      businessOrderId: orderId,
+      publicOrderNumber: publicNumberResult.value,
+    })
 
     let managerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
     let customerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'

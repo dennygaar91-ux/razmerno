@@ -90,3 +90,27 @@ export async function getCustomerOrderByIdForUser(
 
   return { ok: true, order: data as CustomerOrderDetailRow }
 }
+
+export async function getOrderUuidByBusinessOrderId(
+  userId: string,
+  businessOrderId: string,
+): Promise<
+  | { ok: true; id: string }
+  | { ok: false; notFound: true }
+  | { ok: false; error: string }
+> {
+  const client = getSupabaseClient()
+  if (!client) return { ok: false, error: 'order_storage_unavailable' }
+
+  const { data, error } = await client
+    .from('orders')
+    .select('id, user_id')
+    .eq('order_id', businessOrderId)
+    .maybeSingle()
+
+  if (error) return { ok: false, error: error.message }
+  if (!data) return { ok: false, notFound: true }
+  if (data.user_id !== userId) return { ok: false, notFound: true }
+
+  return { ok: true, id: data.id as string }
+}

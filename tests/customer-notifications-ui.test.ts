@@ -77,16 +77,37 @@ test("API client sends Bearer token", () => {
   assert.match(api, /Bearer \$\{accessToken\}/);
   assert.match(api, /\/api\/customer\/notifications/);
   assert.match(api, /fetchCustomerNotifications/);
+  assert.match(api, /markCustomerNotificationRead/);
+  assert.match(api, /markAllCustomerNotificationsRead/);
 });
 
-test("no mark-as-read UI", () => {
+test("mark-one button exists for unread notifications", () => {
   const section = readFileSync("src/static-pages/account/CustomerNotificationsSection.tsx", "utf8");
   const hook = readFileSync("src/shared/workspace/useCustomerNotifications.ts", "utf8");
-  const api = readFileSync("src/shared/workspace/notificationApi.ts", "utf8");
 
-  assert.doesNotMatch(section, /markAsRead|mark-as-read|mark_read|Прочитать|Отметить/i);
-  assert.doesNotMatch(hook, /PATCH|POST|markAsRead|isRead\s*:/);
-  assert.doesNotMatch(api, /PATCH|POST/);
+  assert.match(section, /Отметить прочитанным/);
+  assert.match(section, /markOneAsRead/);
+  assert.match(hook, /markOneAsRead/);
+  assert.match(section, /!notification\.isRead/);
+});
+
+test("mark-all button exists when unread notifications exist", () => {
+  const section = readFileSync("src/static-pages/account/CustomerNotificationsSection.tsx", "utf8");
+  const hook = readFileSync("src/shared/workspace/useCustomerNotifications.ts", "utf8");
+
+  assert.match(section, /Отметить все прочитанными/);
+  assert.match(section, /hasUnread/);
+  assert.match(hook, /markAllAsRead/);
+  assert.match(hook, /hasUnread/);
+});
+
+test("UI updates local state without reload", () => {
+  const hook = readFileSync("src/shared/workspace/useCustomerNotifications.ts", "utf8");
+  const section = readFileSync("src/static-pages/account/CustomerNotificationsSection.tsx", "utf8");
+
+  assert.match(hook, /setNotifications\(\(current\) =>/);
+  assert.match(hook, /isRead: true/);
+  assert.doesNotMatch(section, /window\.location\.reload|location\.reload/);
 });
 
 test("no bell UI", () => {
