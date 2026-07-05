@@ -126,6 +126,8 @@
     "qa:stage4": "npm run check:stage4-health-env && npm run typecheck && npm run typecheck:api && npm run check:stage4-fail-fast && npm run check:stage4-deploy-smoke && npm run check:stage4-predeploy-guard && npm run check:stage4-vercel-runbook && npm run check:stage4-api-headers && npm run check:stage4-robots && npm run check:stage4-release-readiness && npm run check:stage4-production-deploy-final",
     "check:stage4-fail-fast": "node scripts/check-stage4-fail-fast.mjs",
     "smoke:deploy": "node scripts/deploy-smoke.mjs",
+    "verify:live-manual-pricing-draft": "node scripts/live-manual-pricing-draft-verify.mjs",
+    "check:live-manual-pricing-draft-verify": "node scripts/check-live-manual-pricing-draft-verify.mjs",
     "check:stage4-deploy-smoke": "node scripts/check-stage4-deploy-smoke.mjs",
     "predeploy:guard": "node scripts/predeploy-guard.mjs",
     "check:stage4-predeploy-guard": "node scripts/predeploy-guard.mjs",

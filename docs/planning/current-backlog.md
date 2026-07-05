@@ -1052,6 +1052,20 @@ Branch implementation evidence (2026-07-05, Operations Manual Pricing Migration 
 - Live Supabase migration **not applied**; live verification **not performed**;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-05, Live Supabase Verification — Manual Pricing Draft, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **blocked/partial-live-verification**;
+- preflight PASS: clean working tree, branch `task/epic-b-projects-foundation`;
+- blocker: live Supabase/API credentials unavailable in agent runtime (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_API_KEY` missing; no local `.env`; Supabase CLI not linked; Vercel CLI not authenticated);
+- live migration apply: **not performed** (table existence could not be probed live);
+- live RLS deny-all: **not verified live** (local migration-prep tests remain green);
+- live Service Role write / API smoke / readback: **not performed** (requires env + `SMOKE_BASE_URL` + safe `LIVE_VERIFY_ORDER_ID`);
+- added runbook: `scripts/live-manual-pricing-draft-verify.mjs`, npm script `verify:live-manual-pricing-draft`;
+- local QA passed after runbook add: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`, `npm run check:live-manual-pricing-draft-verify`;
+- commit: see final agent report / final HEAD after commit (`docs: add manual pricing live verification runbook and blocked evidence`, branch-only, not closure);
+- explicit non-scope preserved: no approve/reject, no order/production/payment/customer-facing price mutation attempted live;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
