@@ -185,6 +185,14 @@ test("manual pricing draft validation rejects invalid payloads", () => {
     validateOperationsManualPricingDraftBody({ orderId: ORDER_ID, manualTotalPrice: 100, productionExport: {} }).ok,
     false,
   );
+  assert.equal(
+    validateOperationsManualPricingDraftBody({
+      orderId: ORDER_ID,
+      manualTotalPrice: 100,
+      reason: "x".repeat(501),
+    }).ok,
+    false,
+  );
 });
 
 test("manual pricing draft save returns 401 without bearer token", async () => {
@@ -289,6 +297,46 @@ test("authorized manual pricing draft save persists draft and returns safe DTO o
   assert.equal(savedDraftRows.length, 1);
   assert.equal(orderStatusMutations, 0);
   assert.equal(productionStatusMutations, 0);
+  assert.equal(sampleOrderRow.total_price, 86400);
+});
+
+test("authorized manual pricing draft upsert updates existing draft without order mutation", async () => {
+  setRequiredServerEnv();
+  installManualPricingDraftFetchMock();
+  const token = createAdminSessionToken(Date.now());
+  const first = createMockResponse();
+  const second = createMockResponse();
+
+  await manualPricingDraftHandler(
+    {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}` },
+      query: {},
+      body: { orderId: ORDER_ID, manualTotalPrice: 123000, reason: "First draft" },
+    },
+    first.res,
+  );
+
+  await manualPricingDraftHandler(
+    {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}` },
+      query: {},
+      body: { orderId: ORDER_ID, manualTotalPrice: 125000, reason: "Updated draft" },
+    },
+    second.res,
+  );
+
+  const firstBody = first.snapshot().body as { manualPricingDraft: { manualTotalPrice: number } };
+  const secondBody = second.snapshot().body as { manualPricingDraft: { manualTotalPrice: number; reason: string | null } };
+
+  assert.equal(firstBody.manualPricingDraft.manualTotalPrice, 123000);
+  assert.equal(secondBody.manualPricingDraft.manualTotalPrice, 125000);
+  assert.equal(secondBody.manualPricingDraft.reason, "Updated draft");
+  assert.equal(savedDraftRows.length, 1);
+  assert.equal(orderStatusMutations, 0);
+  assert.equal(productionStatusMutations, 0);
+  assert.equal(sampleOrderRow.total_price, 86400);
 });
 
 test("manual pricing draft mapper returns safe read model", () => {

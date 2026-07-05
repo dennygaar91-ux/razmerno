@@ -94,8 +94,9 @@ const sampleOrderRow = {
   pricing_fallback_reason: null,
 };
 
-function installOrderReviewFetchMock(options: { orderFound?: boolean } = {}) {
+function installOrderReviewFetchMock(options: { orderFound?: boolean; withDraft?: boolean } = {}) {
   const orderFound = options.orderFound !== false;
+  const withDraft = options.withDraft === true;
 
   globalThis.fetch = (async (input: RequestInfo | URL) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
@@ -109,7 +110,18 @@ function installOrderReviewFetchMock(options: { orderFound?: boolean } = {}) {
     }
 
     if (url.includes("/rest/v1/order_manual_pricing_drafts")) {
-      return jsonResponse(null);
+      if (!withDraft) return jsonResponse(null);
+      return jsonResponse({
+        id: "draft-id-1",
+        order_id: ORDER_ID,
+        manual_total_price: 123000,
+        reason: "Manual review adjustment",
+        status: "draft",
+        created_by: "admin",
+        updated_by: "admin",
+        created_at: "2026-07-05T12:00:00.000Z",
+        updated_at: "2026-07-05T12:00:00.000Z",
+      });
     }
 
     return jsonResponse({ ok: true });
@@ -246,6 +258,50 @@ test("buildOperationsOrderReviewByOrderId loads review through service role path
   assert.equal(built.review.orderId, ORDER_ID);
   assert.equal(built.review.approvalActionsImplemented, false);
   assert.equal(built.review.manualPricingDraft, null);
+});
+
+test("operations order review readback exposes saved manual pricing draft as safe DTO only", async () => {
+  setRequiredServerEnv();
+  installOrderReviewFetchMock({ withDraft: true });
+  const token = createAdminSessionToken(Date.now());
+  const { res, snapshot } = createMockResponse();
+
+  await orderReviewHandler(
+    {
+      method: "GET",
+      headers: { authorization: `Bearer ${token}` },
+      query: { orderId: ORDER_ID },
+      body: null,
+    },
+    res,
+  );
+
+  const result = snapshot();
+  assert.equal(result.statusCode, 200);
+
+  const body = result.body as {
+    ok: boolean;
+    review: {
+      manualPricingDraft: {
+        orderId: string;
+        manualTotalPrice: number;
+        manualTotalPriceLabel: string;
+        reason: string | null;
+        status: "draft";
+      } | null;
+    };
+  };
+
+  assert.equal(body.ok, true);
+  assert.equal(body.review.manualPricingDraft?.orderId, ORDER_ID);
+  assert.equal(body.review.manualPricingDraft?.manualTotalPrice, 123000);
+  assert.equal(body.review.manualPricingDraft?.status, "draft");
+
+  const serialized = JSON.stringify(body);
+  assert.equal(serialized.includes("ivan.petrov@example.com"), false);
+  assert.equal(serialized.includes("production_export"), false);
+  assert.equal(serialized.includes("price_breakdown"), false);
+  assert.equal(serialized.includes("created_by"), false);
 });
 
 async function runTests() {

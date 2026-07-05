@@ -1038,6 +1038,20 @@ Branch implementation evidence (2026-07-05, Operations Manual Pricing Write Foun
 - explicit non-scope preserved: no approve/reject, no order/production status mutation, no payment flow, no customer-facing final price update;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-05, Operations Manual Pricing Migration Verification Prep, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done** (QA PASS, not closure);
+- migration/script consistency checked: `supabase/migrations/20260705_add_order_manual_pricing_drafts.sql` ↔ `db/order-manual-pricing-drafts.sql` (core DDL, unique `order_id`, positive price, draft-only status);
+- RLS deny-all checked in migration and reference SQL;
+- API validation vs DB constraints checked: server min/max price and reason max length; DB positive price + draft status align with store/validation;
+- safe readback checked: `manualPricingDraft` safe DTO only, no raw PII/`production_export`/`price_breakdown`;
+- no status/production/payment/customer-facing price mutation checked in write/read tests;
+- tests added/updated: `tests/operations-manual-pricing-migration-prep.test.ts` (11), `tests/operations-manual-pricing-write.test.ts` (+upsert, reason length), `tests/operations-order-review.test.ts` (+draft readback);
+- QA passed locally: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- commit: see final agent report / final HEAD after commit (`test: add manual pricing migration verification prep`, branch-only, not closure);
+- Live Supabase migration **not applied**; live verification **not performed**;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
