@@ -12,6 +12,7 @@ import { buildAccountOrderUrl } from "../../shared/workspace/orderDetailRoutes";
 import { useCustomerWorkspace } from "../../shared/workspace/useCustomerWorkspace";
 import type { CustomerWorkspace } from "../../shared/workspace/types";
 import { CustomerProfileSection } from "./CustomerProfileSection";
+import { CustomerNotificationsSection } from "./CustomerNotificationsSection";
 
 function AccountSummaryCards({ workspace }: { workspace: CustomerWorkspace }) {
   return (
@@ -168,6 +169,7 @@ export function CustomerAccountCabinet() {
       </header>
 
       <AccountSummaryCards workspace={workspace} />
+      <CustomerNotificationsSection />
       <AccountProjectsSection workspace={workspace} />
       <AccountOrdersSection workspace={workspace} />
       <CustomerProfileSection profile={workspace.profile} onProfileUpdated={updateProfile} />

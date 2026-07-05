@@ -359,7 +359,7 @@
     "check:stage13-19-final": "npm run check:stage13-validation-ux && npm run check:stage14-pricing-estimate && npm run check:stage15-checkout-conversion && npm run check:stage16-reset-no-autosave && npm run check:stage17-a11y-hardening && npm run check:stage18-final-regression && npm run check:stage19-legacy-cleanup",
     "check:css-architecture": "node scripts/check-css-architecture.mjs",
     "check:production-geometry-architecture": "node scripts/check-production-geometry-architecture.mjs",
-    "test": "npm run test:customer-auth && npm run test:customer-projects && npm run test:customer-order-submit && npm run test:customer-workspace && npm run test:customer-account && npm run test:customer-project-resume && npm run test:customer-order-detail && npm run test:customer-profile-edit && npm run test:customer-change-request && npm run test:customer-change-request-ui && npm run test:customer-notifications && npm run test:checkout-submit-hook",
+    "test": "npm run test:customer-auth && npm run test:customer-projects && npm run test:customer-order-submit && npm run test:customer-workspace && npm run test:customer-account && npm run test:customer-project-resume && npm run test:customer-order-detail && npm run test:customer-profile-edit && npm run test:customer-change-request && npm run test:customer-change-request-ui && npm run test:customer-notifications && npm run test:customer-notifications-ui && npm run test:checkout-submit-hook",
     "test:customer-auth": "node --no-warnings --import tsx tests/customer-auth.test.ts",
     "test:customer-projects": "node --no-warnings --import tsx tests/customer-projects.test.ts",
     "test:customer-order-submit": "node --no-warnings --import tsx tests/customer-order-submit.test.ts",
@@ -370,7 +370,8 @@
     "test:customer-profile-edit": "node --no-warnings --import tsx tests/customer-profile-edit.test.ts",
     "test:customer-change-request": "node --no-warnings --import tsx tests/customer-change-request.test.ts",
     "test:customer-change-request-ui": "node --no-warnings --import tsx tests/customer-change-request-ui.test.ts",
-    "test:customer-notifications": "node --no-warnings --import tsx tests/customer-notifications.test.ts"
+    "test:customer-notifications": "node --no-warnings --import tsx tests/customer-notifications.test.ts",
+    "test:customer-notifications-ui": "node --no-warnings --import tsx tests/customer-notifications-ui.test.ts"
   },
   "dependencies": {
     "@react-three/drei": "^9.105.0",

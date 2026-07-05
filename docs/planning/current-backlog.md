@@ -968,6 +968,15 @@ Branch implementation evidence (2026-07-03, Customer Notifications API Foundatio
 - explicit non-scope preserved: no UI, bell/badge, mark-as-read API, generation, email, push, websocket, polling, manager workflow;
 - P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
 
+Branch implementation evidence (2026-07-05, Epic J-2 — Customer Notifications UI Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- account section `Уведомления` after dashboard summary; cards show title, message, type label, date, read/unread visual;
+- client `notificationApi` + `useCustomerNotifications` reuse Epic J-1 `GET /api/customer/notifications` with Bearer auth;
+- states: loading, success, empty, error with `retry()`; no polling/realtime/mark-as-read/bell/badge;
+- tests: `tests/customer-notifications-ui.test.ts` (`npm run test:customer-notifications-ui`);
+- explicit non-scope preserved: no backend/migration, no PATCH/POST, no notification generation, no manager UI;
+- P1-27 status remains `needs reconciliation` until merged/main inventory + closure evidence.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

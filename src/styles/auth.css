@@ -505,6 +505,68 @@
   white-space:pre-wrap;
 }
 
+.rzm-account-notification-list{
+  display:grid;
+  gap:12px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.rzm-account-notification-item{
+  display:grid;
+  gap:8px;
+  padding:18px 20px;
+  border-radius:20px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-notification-item--unread{
+  box-shadow:inset 0 0 0 2px rgba(99,102,241,.28);
+  background:rgba(248,249,255,.92);
+}
+
+.rzm-account-notification-item--read{
+  opacity:.92;
+}
+
+.rzm-account-notification-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.rzm-account-notification-title{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:16px;
+  font-weight:650;
+}
+
+.rzm-account-notification-meta{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:13px;
+}
+
+.rzm-account-notification-message{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:14px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+.rzm-account-notification-read-state{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.01em;
+}
+
 @media (max-width: 900px){
   .rzm-account-summary{
     grid-template-columns:1fr;
