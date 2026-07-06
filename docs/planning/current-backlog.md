@@ -1116,6 +1116,24 @@ Branch implementation evidence (2026-07-06, Read-only MCP Audit — Live Supabas
 - recommended next task: **Live Supabase Schema Reconciliation — Order Submit Prerequisite** (not executed in this audit);
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-06, Live Supabase Schema Reconciliation — Greenfield Order Submit Prerequisite, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, not closure)**;
+- Greenfield decision: user explicitly accepted greenfield reconciliation on empty legacy schema;
+- preflight PASS: project ref `gxfpgulkrpmlxfeuegpg`, URL `https://gxfpgulkrpmlxfeuegpg.supabase.co`, all 7 legacy public tables `0 rows`, `schema_migrations` empty, branch `task/epic-b-projects-foundation`, clean working tree;
+- dropped legacy objects (empty): `order_configurations`, `order_events`, `orders`, `materials`, `hardware_items`, `service_prices`, `pricing_versions`, legacy functions (`generate_order_number`, `set_order_number`, `set_updated_at`), sequence `rzm_order_seq`, enums (`order_status`, `material_type`, `hardware_type`, `service_type`);
+- applied via Supabase MCP `apply_migration`: `greenfield_drop_legacy_schema`, `base_orders_schema` (`db/orders.sql`), repo migrations `20260526_add_order_assembly_fields`, `20260526_add_order_status_events`, `20260527_add_order_production_export` (retry), `20260626_add_order_pricing_source_attribution`, `20260623_add_customer_profiles`, `20260703_add_constructor_projects`, `20260703_add_order_ownership_foundation`, `20260703_add_order_notifications`, `20260703_add_order_change_requests`, `20260705_add_order_manual_pricing_drafts`, plus `greenfield_contract_test_auth_user` for contract-test FK prerequisite;
+- `supabase/deploy/deploy-all.sql` assessed insufficient as sole path (confirmed); individual repo migrations + base schema used instead;
+- final schema verification PASS: `orders.order_id` + MVP payload columns + Epic C ownership columns + `production_export` + pricing attribution + assembly fields present; RPC `next_public_order_number` present; tables `profiles`, `constructor_projects`, `order_notifications`, `order_change_requests`, `order_status_events`, `order_manual_pricing_drafts` present;
+- RLS verification: deny-all policies on `orders`, `profiles`, `constructor_projects`, `order_notifications`, `order_change_requests`, `order_manual_pricing_drafts` (`using(false)` / `with check(false)`); no permissive allow policies;
+- `POST /api/orders` live smoke PASS via existing API handler + contract-test auth token: **200**, order id `RZ-20260706-7048` (manager/customer email notifications failed with placeholder Resend key; order persisted per policy);
+- `LIVE_VERIFY_ORDER_ID` candidate: `RZ-20260706-7048`;
+- `npm run verify:live-manual-pricing-draft` result: **blocked/partial** — `fetch failed` (likely `SMOKE_BASE_URL` API runtime not reachable); table/RLS pre-checks not fully reported due to early API smoke failure when `SMOKE_BASE_URL` set;
+- QA passed locally after backlog evidence add: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- no customer/production data existed before apply; only empty legacy schema dropped; one safe smoke order created through API flow;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
