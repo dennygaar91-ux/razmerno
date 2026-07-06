@@ -248,6 +248,18 @@ test("operations order review GET returns safe review read model for authorized 
   assert.notEqual(body.review.customerNameMasked, "Иван Петров");
 });
 
+test("buildOperationsOrderReviewByOrderId returns error when Supabase admin env is missing", async () => {
+  setRequiredServerEnv();
+  delete process.env.SUPABASE_URL;
+  delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  const built = await buildOperationsOrderReviewByOrderId(ORDER_ID);
+  assert.equal(built.ok, false);
+  if (built.ok) return;
+  assert.equal(built.reason, "error");
+  assert.match(built.message, /Supabase admin env is not configured/i);
+});
+
 test("buildOperationsOrderReviewByOrderId loads review through service role path", async () => {
   setRequiredServerEnv();
   installOrderReviewFetchMock();

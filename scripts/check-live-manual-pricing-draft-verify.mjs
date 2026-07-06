@@ -29,6 +29,9 @@ if (!fs.existsSync(scriptPath)) {
     'getEnvPresenceReport',
     'loadedEnvFiles',
     'envPresence',
+    'checkApiRuntimeReady',
+    'api_runtime_ready',
+    'normalizeSupabaseProjectUrl',
   ]) {
     if (!source.includes(token)) fail(`verify script missing token ${token}`)
     else pass(`verify script contains ${token}`)

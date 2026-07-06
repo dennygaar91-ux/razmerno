@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'node:fs'
 import { createHmac } from 'node:crypto'
-import { getEnvPresenceReport, loadProjectEnvFiles } from './load-project-env.mjs'
+import { getEnvPresenceReport, loadProjectEnvFiles, normalizeSupabaseProjectUrl } from './load-project-env.mjs'
 
 const MIGRATION_PATH = 'supabase/migrations/20260705_add_order_manual_pricing_drafts.sql'
 const TABLE_NAME = 'order_manual_pricing_drafts'
@@ -51,7 +51,10 @@ function requiredEnv(name) {
 }
 
 async function checkTableWithServiceRole(supabaseUrl, serviceRoleKey) {
-  const client = createClient(supabaseUrl, serviceRoleKey, {
+  const normalizedUrl = normalizeSupabaseProjectUrl(supabaseUrl)
+  if (!normalizedUrl) throw new Error('SUPABASE_URL is empty or invalid')
+
+  const client = createClient(normalizedUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 
@@ -67,7 +70,10 @@ async function checkTableWithServiceRole(supabaseUrl, serviceRoleKey) {
 }
 
 async function checkAnonDenied(supabaseUrl, anonKey) {
-  const client = createClient(supabaseUrl, anonKey, {
+  const normalizedUrl = normalizeSupabaseProjectUrl(supabaseUrl)
+  if (!normalizedUrl) throw new Error('SUPABASE_URL is empty or invalid')
+
+  const client = createClient(normalizedUrl, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 
@@ -89,6 +95,45 @@ async function requestJson(baseUrl, path, options = {}) {
     json = { raw: text.slice(0, 300) }
   }
   return { status: response.status, json }
+}
+
+async function checkApiRuntimeReady(baseUrl, adminKey, orderId) {
+  const health = await requestJson(baseUrl, '/api/health')
+  if (health.status >= 500 && !health.json) {
+    return {
+      ok: false,
+      detail: `API health unreachable at ${redactUrl(baseUrl)} (status ${health.status})`,
+    }
+  }
+
+  const checks = Array.isArray(health.json?.checks) ? health.json.checks : []
+  const missingSupabase = checks
+    .filter((item) => typeof item?.name === 'string' && item.name.includes('SUPABASE') && item.present !== true)
+    .map((item) => item.name)
+
+  if (missingSupabase.length > 0) {
+    return {
+      ok: false,
+      detail: `API runtime at ${redactUrl(baseUrl)} is missing ${missingSupabase.join(', ')}. Restart vercel dev with .env.local loaded on the same port as SMOKE_BASE_URL.`,
+    }
+  }
+
+  const token = signAdminToken(adminKey)
+  const review = await requestJson(
+    baseUrl,
+    `/api/operations/order?orderId=${encodeURIComponent(orderId)}`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  )
+
+  if (review.status !== 200 || review.json?.ok !== true) {
+    const message = typeof review.json?.message === 'string' ? review.json.message : 'unknown'
+    return {
+      ok: false,
+      detail: `Operations order readback failed at ${redactUrl(baseUrl)} (status ${review.status}, message: ${message})`,
+    }
+  }
+
+  return { ok: true, detail: { healthStatus: health.status, reviewStatus: review.status } }
 }
 
 async function runApiSmoke({ baseUrl, adminKey, orderId, draftPrice, draftReason }) {
@@ -235,6 +280,10 @@ async function main() {
   report.checks.push({ name: 'migration_sql_contract', ok: true })
 
   if (smokeBaseUrl && verifyOrderId) {
+    const runtimeReady = await checkApiRuntimeReady(smokeBaseUrl, adminKey, verifyOrderId)
+    report.checks.push({ name: 'api_runtime_ready', ok: runtimeReady.ok, detail: runtimeReady.detail })
+    assert(runtimeReady.ok, runtimeReady.detail)
+
     const smoke = await runApiSmoke({
       baseUrl: smokeBaseUrl,
       adminKey,

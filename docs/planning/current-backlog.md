@@ -1134,6 +1134,24 @@ Branch implementation evidence (2026-07-06, Live Supabase Schema Reconciliation 
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-06, Live Supabase Verification — Manual Pricing Draft, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (Live Supabase verification PASS, QA PASS, not closure)**;
+- Greenfield reconciliation already completed; safe test order used: `RZ-20260706-7048`;
+- root cause of operations readback failure: stale `vercel dev` on `http://localhost:3000` without `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` in API runtime (health checks showed missing Supabase env); operations read model/code was correct against reconciled live schema;
+- fix summary: enhanced `scripts/live-manual-pricing-draft-verify.mjs` with `checkApiRuntimeReady` (Supabase env probe via `/api/health` + operations readback preflight), `normalizeSupabaseProjectUrl` usage for service-role probes; exported `normalizeSupabaseProjectUrl` from `scripts/load-project-env.mjs`; added regression test for missing Supabase admin env in `tests/operations-order-review.test.ts`;
+- `GET /api/operations/order?orderId=RZ-20260706-7048` readback PASS on API runtime with loaded `.env.local` (`http://localhost:3001`, status 200);
+- manual pricing draft write PASS via `POST /api/operations/manual-pricing-draft` (draft price `123000`);
+- persisted draft readback PASS via operations order review (`manualPricingDraft.manualTotalPrice=123000`);
+- live Supabase confirm: `order_manual_pricing_drafts` row for `RZ-20260706-7048`, status `draft`;
+- order status unchanged (`new`); production workflow unchanged (`requires-review`); payment state unchanged; customer-facing `totalPrice` unchanged (`47932`);
+- frontend API-only unchanged; RLS deny-all unchanged; Service Role server-side only;
+- `npm run verify:live-manual-pricing-draft` result: **ok=true** with `SMOKE_BASE_URL=http://localhost:3001`;
+- note: use `SMOKE_BASE_URL` matching the `vercel dev` port that loaded `.env.local`; port `3000` may host a stale runtime without Supabase env;
+- QA passed: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`, `npm run check:live-manual-pricing-draft-verify`;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

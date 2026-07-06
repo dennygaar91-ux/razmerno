@@ -22,6 +22,12 @@ function parseEnvLine(line) {
   return { key, value }
 }
 
+export function normalizeSupabaseProjectUrl(raw) {
+  const trimmed = raw?.trim()
+  if (!trimmed) return null
+  return trimmed.replace(/\/rest\/v1\/?$/iu, '').replace(/\/+$/u, '')
+}
+
 export function loadProjectEnvFiles(files = DEFAULT_ENV_FILES, root = process.cwd()) {
   const loadedFiles = []
 
@@ -34,7 +40,7 @@ export function loadProjectEnvFiles(files = DEFAULT_ENV_FILES, root = process.cw
       const parsed = parseEnvLine(line)
       if (!parsed) continue
       if (parsed.key === 'SUPABASE_URL') {
-        parsed.value = parsed.value.replace(/\/rest\/v1\/?$/iu, '').replace(/\/+$/u, '')
+        parsed.value = normalizeSupabaseProjectUrl(parsed.value) ?? parsed.value
       }
       if (process.env[parsed.key] === undefined || process.env[parsed.key] === '') {
         process.env[parsed.key] = parsed.value
