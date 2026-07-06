@@ -1066,6 +1066,21 @@ Branch implementation evidence (2026-07-05, Live Supabase Verification — Manua
 - explicit non-scope preserved: no approve/reject, no order/production/payment/customer-facing price mutation attempted live;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-06, Live Supabase Verification — Manual Pricing Draft, autonomous retry, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **blocked/partial-live-verification**;
+- Cursor/Supabase access result: **no usable Supabase credentials discovered** in agent runtime (no `.env`/`.env.local`; shell env empty; Supabase CLI not logged in; Vercel project not linked; no Supabase MCP integration in workspace);
+- preflight PASS: clean working tree, branch `task/epic-b-projects-foundation`;
+- runbook enhanced: `scripts/load-project-env.mjs` auto-loads standard env files before live verify;
+- `npm run verify:live-manual-pricing-draft` result: exit `2`, blocker `missing_required_env` (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_API_KEY`);
+- live migration apply: **not performed**;
+- live table/RLS/API smoke: **not performed**;
+- local migration-prep + full `npm test` remain green;
+- QA passed after runbook enhancement: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`, `npm run check:live-manual-pricing-draft-verify`;
+- commit: see final agent report / final HEAD after commit (`docs: update manual pricing live verification blocker evidence`, branch-only, not closure);
+- unblock requires project env available to agent runtime (`.env.local` or authenticated Supabase/Vercel CLI) plus safe `LIVE_VERIFY_ORDER_ID` and `SMOKE_BASE_URL`;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

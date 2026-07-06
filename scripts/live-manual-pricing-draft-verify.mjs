@@ -3,9 +3,21 @@
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'node:fs'
 import { createHmac } from 'node:crypto'
+import { getEnvPresenceReport, loadProjectEnvFiles } from './load-project-env.mjs'
 
 const MIGRATION_PATH = 'supabase/migrations/20260705_add_order_manual_pricing_drafts.sql'
 const TABLE_NAME = 'order_manual_pricing_drafts'
+const REQUIRED_ENV_KEYS = [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'ADMIN_API_KEY',
+]
+const OPTIONAL_SMOKE_ENV_KEYS = [
+  'SMOKE_BASE_URL',
+  'LIVE_VERIFY_ORDER_ID',
+  'SUPABASE_ANON_KEY',
+  'VITE_SUPABASE_ANON_KEY',
+]
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -138,6 +150,27 @@ async function runApiSmoke({ baseUrl, adminKey, orderId, draftPrice, draftReason
 }
 
 async function main() {
+  const loadedEnvFiles = loadProjectEnvFiles()
+  const envPresence = getEnvPresenceReport([...REQUIRED_ENV_KEYS, ...OPTIONAL_SMOKE_ENV_KEYS])
+  const missingRequired = envPresence.filter((item) => REQUIRED_ENV_KEYS.includes(item.name) && !item.present)
+
+  if (missingRequired.length > 0) {
+    console.log(
+      JSON.stringify(
+        {
+          ok: false,
+          blocker: 'missing_required_env',
+          loadedEnvFiles,
+          envPresence,
+          message: `Missing required env: ${missingRequired.map((item) => item.name).join(', ')}`,
+        },
+        null,
+        2,
+      ),
+    )
+    process.exit(2)
+  }
+
   const supabaseUrl = requiredEnv('SUPABASE_URL')
   const serviceRoleKey = requiredEnv('SUPABASE_SERVICE_ROLE_KEY')
   const adminKey = requiredEnv('ADMIN_API_KEY')
@@ -156,6 +189,8 @@ async function main() {
     ok: false,
     supabaseHost: redactUrl(supabaseUrl),
     migrationPath: MIGRATION_PATH,
+    loadedEnvFiles,
+    envPresence,
     checks: [],
   }
 
