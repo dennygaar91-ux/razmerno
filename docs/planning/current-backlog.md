@@ -1097,6 +1097,25 @@ Branch implementation evidence (2026-07-06, Order Submit Failure — Live Verifi
 - `.env.local` remained uncommitted/gitignored;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-06, Read-only MCP Audit — Live Supabase Schema vs Repository Migrations, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (audit only, QA PASS, not closure)**;
+- Supabase MCP connected (`user-supabase`); Vercel MCP connected (`user-vercel`);
+- live schema inspected read-only via MCP (`list_tables`, `list_migrations`, `execute_sql` SELECT only);
+- connected project ref: `gxfpgulkrpmlxfeuegpg`; project URL: `https://gxfpgulkrpmlxfeuegpg.supabase.co`;
+- live `supabase_migrations.schema_migrations`: **empty** (no repo migrations recorded/applied);
+- public tables found (7, all RLS enabled, all 0 rows): `pricing_versions`, `materials`, `hardware_items`, `service_prices`, `orders`, `order_configurations`, `order_events`;
+- legacy live `orders` schema drift confirmed: uses `order_number` (not `order_id`), `order_status` enum, `pricing_version_id`, legacy triggers (`trg_orders_order_number` / `set_order_number`), legacy sequence `rzm_order_seq`, legacy functions `generate_order_number` / `set_order_number`; missing all repo MVP payload columns (`dimensions`, `sections`, `filling`, `materials`, `price_breakdown`, email status fields, assembly fields, `production_export`, pricing attribution, Epic C ownership columns);
+- missing order submit objects: `orders.order_id`, `orders.user_id`, `orders.public_order_number`, `orders.domain_status`, `orders.constructor_project_id`, RPC `public.next_public_order_number`, sequence `public_order_number_seq`, repo indexes/constraints on `order_id` / `public_order_number`, explicit deny-all RLS policies (RLS enabled but `pg_policies` empty on all public tables);
+- missing manual pricing objects: table `order_manual_pricing_drafts` (entire table absent);
+- missing Epic/customer tables: `profiles`, `constructor_projects`, `order_notifications`, `order_change_requests`, `order_status_events` (live has different `order_events` instead);
+- `supabase/deploy/deploy-all.sql` assessed **insufficient** for order submit (only assembly/status-events/production-export/pricing-attribution alters; does not create base `db/orders.sql` schema, Epic C, manual pricing, or customer tables); idempotent for its own blocks but **not safe as sole reconciliation path** against legacy schema without explicit reconciliation plan;
+- pricing reference seed: **not required** for order submit (server pricing can use seed fallback; live catalog tables differ from repo `price_items` contract);
+- no migrations applied; no live writes; no live data mutated;
+- QA passed locally after audit evidence add: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- recommended next task: **Live Supabase Schema Reconciliation — Order Submit Prerequisite** (not executed in this audit);
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
