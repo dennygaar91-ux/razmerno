@@ -48,6 +48,7 @@ const sampleReview = {
   validationWarningsCount: 2,
   approvalActionsImplemented: true,
   manualPricingDraft: null,
+  latestDecisionAudit: null,
 };
 
 test("operations manual review view exists and uses approval summary", () => {
@@ -65,6 +66,7 @@ test("manual review approve and reject actions are wired through API section", (
   assert.match(section, /submitOperationsOrderDecision/);
   assert.match(section, /data-status="success"/);
   assert.match(section, /data-status="error"/);
+  assert.match(section, /latestDecisionAudit/);
   assert.doesNotMatch(section, /createClient|supabase/i);
 });
 

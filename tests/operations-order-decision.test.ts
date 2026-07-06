@@ -139,6 +139,12 @@ function installDecisionFetchMock(options: { orderFound?: boolean; domainStatus?
       return jsonResponse(eventBody);
     }
 
+    if (url.includes("/rest/v1/order_status_events") && method === "GET") {
+      const latest = auditEvents.at(-1);
+      if (!latest) return jsonResponse(null);
+      return jsonResponse(latest);
+    }
+
     if (url.includes("/rest/v1/order_manual_pricing_drafts")) {
       return jsonResponse(null);
     }
@@ -201,6 +207,8 @@ test("approve updates domain status and legacy status with audit event", async (
   assert.equal(auditEvents[0].from_status, INITIAL_ORDER_DOMAIN_STATUS);
   assert.equal(auditEvents[0].to_status, OPERATIONS_APPROVED_DOMAIN_STATUS);
   assert.equal(auditEvents[0].changed_by, "operations:approve");
+  assert.equal(auditEvents[0].reason, null);
+  assert.equal(applied.result.auditReason, null);
   assert.equal(productionMutations, 0);
   assert.equal(totalPriceMutations, 0);
 });
@@ -222,11 +230,34 @@ test("reject updates domain status to cancelled with audit event", async () => {
   assert.equal(applied.result.legacyStatus, "new");
   assert.equal(orderUpdates[0].domain_status, OPERATIONS_REJECTED_DOMAIN_STATUS);
   assert.equal(auditEvents[0].changed_by, "operations:reject");
+  assert.equal(auditEvents[0].reason, "Dimensions mismatch");
+  assert.equal(applied.result.auditReason, "Dimensions mismatch");
   assert.equal(productionMutations, 0);
   assert.equal(totalPriceMutations, 0);
 });
 
+test("reject persists trimmed reason in order_status_events audit row", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installDecisionFetchMock();
+
+  const validated = validateOperationsOrderDecisionBody({
+    orderId: ORDER_ID,
+    decision: "reject",
+    reason: "  Dimensions mismatch  ",
+  });
+  assert.equal(validated.ok, true);
+  if (!validated.ok) return;
+
+  const applied = await applyOperationsOrderDecision(validated.value);
+  assert.equal(applied.ok, true);
+  if (!applied.ok) return;
+  assert.equal(applied.result.auditReason, "Dimensions mismatch");
+  assert.equal(auditEvents[0].reason, "Dimensions mismatch");
+});
+
 test("operations order decision POST approve returns safe review DTO", async () => {
+  restoreEnvironment();
   setRequiredServerEnv();
   installDecisionFetchMock();
   const token = createAdminSessionToken(Date.now());

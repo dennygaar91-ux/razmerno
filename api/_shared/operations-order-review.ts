@@ -1,4 +1,5 @@
 import { getAdminOrderByOrderId, getAdminProductionDetail } from './admin-orders'
+import { getLatestOperationsDecisionAuditByOrderId } from './operations-order-decision-store'
 import { getOperationsManualPricingDraftByOrderId } from './operations-manual-pricing-drafts-store'
 import { buildOperationsOrderReview } from './operations-order-review-types'
 
@@ -16,7 +17,8 @@ export async function buildOperationsOrderReviewByOrderId(orderId: string): Prom
       return { ok: false, reason: 'error', message: draftResult.error }
     }
 
-    const review = buildOperationsOrderReview(order, detail.productionExport)
+    const latestDecisionAudit = await getLatestOperationsDecisionAuditByOrderId(orderId)
+    const review = buildOperationsOrderReview(order, detail.productionExport, latestDecisionAudit)
     return { ok: true, review: { ...review, manualPricingDraft: draftResult.draft } }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

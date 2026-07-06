@@ -7,6 +7,15 @@ export type OperationsManualPricingDraft = {
   updatedAt: string | null;
 };
 
+export type OperationsDecisionAudit = {
+  decision: "approve" | "reject";
+  reason: string | null;
+  fromDomainStatus: string | null;
+  toDomainStatus: string;
+  changedBy: string;
+  createdAt: string | null;
+};
+
 export type OperationsOrderReview = {
   orderId: string;
   status: string;
@@ -38,6 +47,7 @@ export type OperationsOrderReview = {
   validationWarningsCount: number;
   approvalActionsImplemented: boolean;
   manualPricingDraft: OperationsManualPricingDraft | null;
+  latestDecisionAudit: OperationsDecisionAudit | null;
 };
 
 export type OperationsOrderReviewApiResult =
@@ -94,6 +104,10 @@ export function getOperationsDecisionErrorMessage(): string {
 
 export function getOperationsDecisionRejectReasonRequiredMessage(): string {
   return "Для отклонения укажите причину.";
+}
+
+export function getOperationsLatestDecisionAuditLabel(): string {
+  return "Последнее решение (audit)";
 }
 
 export function getOperationsOrderReviewErrorMessage(): string {

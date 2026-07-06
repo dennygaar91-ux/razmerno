@@ -1165,6 +1165,19 @@ Branch implementation evidence (2026-07-07, Operations Review Decision Actions â
 - explicit non-scope: no production handoff automation (`production_export` untouched); no payment flow; no customer-facing `total_price` mutation; no customer notification; no live migration apply; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Decision Audit Reason â€” Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, not closure)**;
+- audit reason persistence: reject `reason` now stored in `order_status_events.reason`; approve stores `null` reason unless optional note provided later;
+- migration: `supabase/migrations/20260707_add_order_status_event_reason.sql` (`add column if not exists reason text`); reference `db/order-status-events.sql`; no RLS/policy changes; live apply not performed;
+- API: `applyOperationsOrderDecision` inserts `reason` into audit row; `OperationsOrderDecisionResult.auditReason` returned; `getLatestOperationsDecisionAuditByOrderId` loads latest operations audit for review readback;
+- read model: `OperationsOrderReview.latestDecisionAudit` exposes safe internal audit summary including persisted reason;
+- UI: `OperationsOrderDecisionSection` shows latest audit reason in internal Operations context after reload; reject textarea unchanged;
+- tests: updated `operations-order-decision` (11), `operations-order-review` (8), `operations-manual-review-ui`; new `operations-order-decision-migration-prep` (5);
+- QA passed: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no payment flow; no production handoff; no customer-facing `total_price` mutation; no live migration apply; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

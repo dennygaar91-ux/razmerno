@@ -6,6 +6,7 @@ import {
   getOperationsDecisionErrorMessage,
   getOperationsDecisionRejectReasonRequiredMessage,
   getOperationsDecisionRejectedMessage,
+  getOperationsLatestDecisionAuditLabel,
   getOperationsRejectButtonLabel,
   getOperationsRejectReasonLabel,
   getOperationsRejectReasonPlaceholder,
@@ -145,6 +146,16 @@ export function OperationsOrderDecisionSection({
         <p className="mt-3 text-[12px] leading-[1.55] text-[var(--rzm-text-muted)]">
           Решение недоступно: текущий domain status — {review.domainStatus}.
         </p>
+      )}
+
+      {review.latestDecisionAudit && (
+        <div className="mt-4 rounded-[var(--rzm-radius-sm)] border border-[var(--rzm-line-soft)] px-3 py-2 text-[13px]">
+          <div className="control-meta">{getOperationsLatestDecisionAuditLabel()}</div>
+          <div className="mt-1">
+            {review.latestDecisionAudit.decision === "approve" ? "Одобрено" : "Отклонено"}
+            {review.latestDecisionAudit.reason ? ` · ${review.latestDecisionAudit.reason}` : ""}
+          </div>
+        </div>
       )}
     </div>
   );

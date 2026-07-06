@@ -7,7 +7,7 @@ import {
   OPERATIONS_APPROVED_DOMAIN_STATUS,
   OPERATIONS_REJECTED_DOMAIN_STATUS,
 } from './order-domain'
-import type { OperationsOrderDecisionInput, OperationsOrderDecisionResult } from './operations-order-decision-types'
+import type { OperationsOrderDecisionInput, OperationsOrderDecisionResult, OperationsDecisionAudit } from './operations-order-decision-types'
 import { normalizeSupabaseProjectUrl } from './supabase-url'
 
 function getSupabaseAdminClient() {
@@ -74,11 +74,14 @@ export async function applyOperationsOrderDecision(
     const auditChangedBy =
       input.decision === 'approve' ? `${changedBy}:approve` : `${changedBy}:reject`
 
+    const auditReason = input.reason
+
     const { error: auditError } = await supabase.from('order_status_events').insert({
       order_id: input.orderId,
       from_status: fromDomainStatus,
       to_status: nextDomainStatus,
       changed_by: auditChangedBy,
+      reason: auditReason,
     })
 
     if (auditError) return { ok: false, reason: 'error', message: auditError.message }
@@ -90,10 +93,60 @@ export async function applyOperationsOrderDecision(
         decision: input.decision,
         domainStatus: nextDomainStatus,
         legacyStatus: nextLegacyStatus,
+        auditReason,
       },
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     return { ok: false, reason: 'error', message }
+  }
+}
+
+type OrderStatusEventAuditRow = {
+  from_status: string | null
+  to_status: string
+  changed_by: string
+  reason: string | null
+  created_at: string | null
+}
+
+function parseOperationsDecisionFromChangedBy(changedBy: string): OperationsDecisionAudit['decision'] | null {
+  if (changedBy.endsWith(':approve')) return 'approve'
+  if (changedBy.endsWith(':reject')) return 'reject'
+  return null
+}
+
+export async function getLatestOperationsDecisionAuditByOrderId(
+  orderId: string,
+): Promise<OperationsDecisionAudit | null> {
+  try {
+    const supabase = getSupabaseAdminClient()
+
+    const { data, error } = await supabase
+      .from('order_status_events')
+      .select('from_status,to_status,changed_by,reason,created_at')
+      .eq('order_id', orderId)
+      .like('changed_by', 'operations:%')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (error) throw new Error(error.message)
+    if (!data) return null
+
+    const row = data as OrderStatusEventAuditRow
+    const decision = parseOperationsDecisionFromChangedBy(row.changed_by)
+    if (!decision) return null
+
+    return {
+      decision,
+      reason: typeof row.reason === 'string' && row.reason.trim().length > 0 ? row.reason.trim() : null,
+      fromDomainStatus: row.from_status,
+      toDomainStatus: row.to_status,
+      changedBy: row.changed_by,
+      createdAt: row.created_at,
+    }
+  } catch {
+    return null
   }
 }

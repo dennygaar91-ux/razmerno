@@ -1,5 +1,6 @@
 import type { AdminOrderSummary } from './admin-orders'
 import { INITIAL_ORDER_DOMAIN_STATUS } from './order-domain'
+import type { OperationsDecisionAudit } from './operations-order-decision-types'
 
 import type { OperationsManualPricingDraft } from './operations-manual-pricing-draft-types'
 
@@ -34,6 +35,7 @@ export type OperationsOrderReview = {
   validationWarningsCount: number
   approvalActionsImplemented: boolean
   manualPricingDraft: OperationsManualPricingDraft | null
+  latestDecisionAudit: OperationsDecisionAudit | null
 }
 
 export const OPERATIONS_ORDER_REVIEW_FORBIDDEN_RESPONSE_KEYS = [
@@ -125,6 +127,7 @@ function summarizeProductionReview(productionExport: unknown): {
 export function buildOperationsOrderReview(
   order: AdminOrderSummary,
   productionExport: unknown | null,
+  latestDecisionAudit: OperationsDecisionAudit | null = null,
 ): OperationsOrderReview {
   const production = summarizeProductionReview(productionExport)
 
@@ -159,5 +162,6 @@ export function buildOperationsOrderReview(
     ...production,
     approvalActionsImplemented: true,
     manualPricingDraft: null,
+    latestDecisionAudit,
   }
 }

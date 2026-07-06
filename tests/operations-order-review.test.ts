@@ -125,6 +125,10 @@ function installOrderReviewFetchMock(options: { orderFound?: boolean; withDraft?
       });
     }
 
+    if (url.includes("/rest/v1/order_status_events")) {
+      return jsonResponse(null);
+    }
+
     return jsonResponse({ ok: true });
   }) as typeof fetch;
 }
@@ -168,6 +172,7 @@ test("operations order review exposes safe manual review fields only", () => {
   assert.equal(review.approvalActionsImplemented, true);
   assert.equal(review.reviewDecisionAllowed, true);
   assert.equal(review.domainStatus, "Проверка");
+  assert.equal(review.latestDecisionAudit, null);
   assert.equal(review.manualPricingDraft, null);
   assert.equal(review.productionReviewStatus, "requires-review");
   assert.match(review.priceBreakdownSummary, /stored breakdown keys/);
@@ -179,6 +184,19 @@ test("operations order review exposes safe manual review fields only", () => {
   }
   assert.equal(serialized.includes("ivan.petrov@example.com"), false);
   assert.equal(serialized.includes("production_export"), false);
+});
+
+test("buildOperationsOrderReview exposes latest decision audit when provided", () => {
+  const review = buildOperationsOrderReview(sampleAdminSummary, sampleOrderRow.production_export, {
+    decision: "reject",
+    reason: "Dimensions mismatch",
+    fromDomainStatus: "Проверка",
+    toDomainStatus: "Отмена",
+    changedBy: "operations:reject",
+    createdAt: "2026-07-05T12:00:00.000Z",
+  });
+  assert.equal(review.latestDecisionAudit?.reason, "Dimensions mismatch");
+  assert.equal(review.latestDecisionAudit?.decision, "reject");
 });
 
 test("operations order review GET returns 401 without bearer token", async () => {
