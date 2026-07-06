@@ -33,6 +33,9 @@ export function loadProjectEnvFiles(files = DEFAULT_ENV_FILES, root = process.cw
     for (const line of content.split(/\r?\n/u)) {
       const parsed = parseEnvLine(line)
       if (!parsed) continue
+      if (parsed.key === 'SUPABASE_URL') {
+        parsed.value = parsed.value.replace(/\/rest\/v1\/?$/iu, '').replace(/\/+$/u, '')
+      }
       if (process.env[parsed.key] === undefined || process.env[parsed.key] === '') {
         process.env[parsed.key] = parsed.value
       }

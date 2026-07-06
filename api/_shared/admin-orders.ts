@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { normalizeSupabaseProjectUrl } from './supabase-url'
 
 export type AdminOrderSummary = {
   id: string
@@ -70,7 +71,7 @@ type OrderDbRow = {
 }
 
 function getSupabaseAdminClient() {
-  const url = process.env.SUPABASE_URL
+  const url = normalizeSupabaseProjectUrl(process.env.SUPABASE_URL)
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) throw new Error('Supabase admin env is not configured')
 

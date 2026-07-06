@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { CustomerProfile, CustomerProfilePatch } from './customer-profile'
 import { mapProfileRow } from './customer-profile'
+import { normalizeSupabaseProjectUrl } from './supabase-url'
 
 type ProfileRow = {
   user_id: string
@@ -14,7 +15,7 @@ type ProfileRow = {
 let cachedClient: SupabaseClient | null = null
 
 function getSupabaseClient(): SupabaseClient | null {
-  const url = process.env.SUPABASE_URL
+  const url = normalizeSupabaseProjectUrl(process.env.SUPABASE_URL)
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !serviceRoleKey) return null
 

@@ -1081,6 +1081,22 @@ Branch implementation evidence (2026-07-06, Live Supabase Verification — Manua
 - unblock requires project env available to agent runtime (`.env.local` or authenticated Supabase/Vercel CLI) plus safe `LIVE_VERIFY_ORDER_ID` and `SMOKE_BASE_URL`;
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged.
 
+Branch implementation evidence (2026-07-06, Order Submit Failure — Live Verification Blocker, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **blocked/needs-fix** (code fix applied; live safe test order not created);
+- diagnosis endpoint: `POST /api/orders`;
+- diagnosis status chain: **502** (`orders.public_number_allocation_failed`) after env fix; initial failure was **502** with reason `Invalid path specified in request URL` when `SUPABASE_URL` included `/rest/v1/` suffix;
+- root cause #1 (fixed in branch): misconfigured `SUPABASE_URL` (`https://<ref>.supabase.co/rest/v1/`) breaks Supabase JS client RPC/table paths;
+- root cause #2 (live blocker, not fixed in code): linked live Supabase project schema drift — `orders.order_id` and Epic C ownership columns (`user_id`, `public_order_number`, `domain_status`, `constructor_project_id`) missing; RPC `next_public_order_number` missing; many MVP order columns from repo migrations also missing on live (`dimensions`, `sections`, `filling`, `materials`, `price_breakdown`, email status fields, etc.); live `orders` table uses legacy `order_number` and is empty;
+- fix summary: added `api/_shared/supabase-url.ts` `normalizeSupabaseProjectUrl()`; wired all API Supabase stores + `scripts/load-project-env.mjs` to strip `/rest/v1` suffix/trailing slash;
+- tests added: `tests/api-supabase-url.test.ts` (3), wired `npm run test:api-supabase-url`;
+- live order submit re-test after URL fix: still **502**, RPC error `Could not find the function public.next_public_order_number`;
+- safe test order id: **not created** (no `LIVE_VERIFY_ORDER_ID` candidate); manual Supabase insert not used per project rules;
+- remaining required fix: apply repo Supabase migrations to linked live project per `docs/production/vercel-deploy-runbook.md` / `supabase/deploy/deploy-all.sql` and Epic C migrations at minimum `supabase/migrations/20260703_add_order_ownership_foundation.sql` plus prior MVP order schema migrations; then re-run customer `POST /api/orders` smoke to obtain `RZ-YYYYMMDD-NNNN`;
+- note: URL normalization only unblocks future live verification once schema is aligned; branch-only evidence, not merged/main closure;
+- `.env.local` remained uncommitted/gitignored;
+- P1-27 status remains `needs reconciliation`; P1-28 unchanged.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
