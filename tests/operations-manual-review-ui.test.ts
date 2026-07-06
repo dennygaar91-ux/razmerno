@@ -3,8 +3,10 @@ import { readFileSync } from "node:fs";
 
 import { mapOperationsReviewToAdminDetailSummary } from "../src/shared/operations/mapOperationsReviewToAdminDetailSummary";
 import {
-  getOperationsApprovalActionsNotImplementedMessage,
+  getOperationsApproveButtonLabel,
+  getOperationsDecisionApprovedMessage,
   getOperationsManualReviewTitle,
+  getOperationsRejectButtonLabel,
 } from "../src/shared/operations/reviewTypes";
 
 type AsyncTest = () => void | Promise<void>;
@@ -18,6 +20,8 @@ function test(name: string, run: AsyncTest) {
 const sampleReview = {
   orderId: "RZ-20260705-1001",
   status: "new",
+  domainStatus: "Проверка",
+  reviewDecisionAllowed: true,
   createdAt: "2026-07-05T10:00:00.000Z",
   updatedAt: "2026-07-05T11:30:00.000Z",
   customerNameMasked: "И•••",
@@ -42,7 +46,7 @@ const sampleReview = {
   basisStatus: "manual review required",
   validationErrorsCount: 1,
   validationWarningsCount: 2,
-  approvalActionsImplemented: false as const,
+  approvalActionsImplemented: true,
   manualPricingDraft: null,
 };
 
@@ -51,23 +55,24 @@ test("operations manual review view exists and uses approval summary", () => {
   assert.match(view, /OperationsManualReviewView/);
   assert.match(view, /Approval summary/);
   assert.match(view, /AdminOrderDetailPage/);
-  assert.match(view, /getOperationsApprovalActionsNotImplementedMessage/);
+  assert.match(view, /OperationsOrderDecisionSection/);
 });
 
-test("manual review actions are disabled placeholders only", () => {
-  const view = readFileSync("src/operations/OperationsManualReviewView.tsx", "utf8");
-  assert.match(view, /Одобрить/);
-  assert.match(view, /Отклонить/);
-  assert.match(view, /Ручная корректировка цены/);
-  assert.match(view, /disabled/);
-  assert.match(view, /aria-disabled="true"/);
-  assert.doesNotMatch(view, /updateOrderStatus|PATCH|approveChangeRequest/i);
+test("manual review approve and reject actions are wired through API section", () => {
+  const section = readFileSync("src/operations/OperationsOrderDecisionSection.tsx", "utf8");
+  assert.match(section, /getOperationsApproveButtonLabel/);
+  assert.match(section, /getOperationsRejectButtonLabel/);
+  assert.match(section, /submitOperationsOrderDecision/);
+  assert.match(section, /data-status="success"/);
+  assert.match(section, /data-status="error"/);
+  assert.doesNotMatch(section, /createClient|supabase/i);
 });
 
 test("operations workspace routes queue to manual review view", () => {
   const page = readFileSync("src/operations/OperationsWorkspacePage.tsx", "utf8");
   assert.match(page, /OperationsManualReviewView/);
   assert.match(page, /useOperationsOrderReview/);
+  assert.match(page, /onDecisionApplied/);
   assert.match(page, /Review/);
   assert.doesNotMatch(page, /fetchAdminOrders|loadProductionDetail|summarizeOrderForAdmin/);
 });
@@ -77,6 +82,13 @@ test("operations review API client sends Bearer token and uses operations order 
   assert.match(api, /Authorization/);
   assert.match(api, /Bearer \$\{accessToken\}/);
   assert.match(api, /\/api\/operations\/order/);
+  assert.doesNotMatch(api, /createClient|supabase/i);
+});
+
+test("operations order decision API client uses operations order-decision endpoint", () => {
+  const api = readFileSync("src/shared/operations/operationsOrderDecisionApi.ts", "utf8");
+  assert.match(api, /\/api\/operations\/order-decision/);
+  assert.match(api, /Authorization/);
   assert.doesNotMatch(api, /createClient|supabase/i);
 });
 
@@ -97,9 +109,11 @@ test("operations review maps to admin detail summary without raw pii fields", ()
   assert.equal(serialized.includes("price_breakdown"), false);
 });
 
-test("manual review labels and not-implemented message exist", () => {
+test("manual review decision labels exist", () => {
   assert.equal(getOperationsManualReviewTitle(), "Manual Review");
-  assert.match(getOperationsApprovalActionsNotImplementedMessage(), /не реализованы/);
+  assert.equal(getOperationsApproveButtonLabel(), "Одобрить");
+  assert.equal(getOperationsRejectButtonLabel(), "Отклонить");
+  assert.match(getOperationsDecisionApprovedMessage(), /одобрен/i);
 });
 
 async function runTests() {

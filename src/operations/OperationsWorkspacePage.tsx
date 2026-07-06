@@ -219,6 +219,7 @@ function OperationsWorkspaceDashboard({
             accessToken={accessToken}
             onBack={handleBackToQueue}
             onDraftSaved={reloadReview}
+            onDecisionApplied={reloadReview}
           />
         )}
       </section>

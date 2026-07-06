@@ -10,6 +10,8 @@ export type OperationsManualPricingDraft = {
 export type OperationsOrderReview = {
   orderId: string;
   status: string;
+  domainStatus: string;
+  reviewDecisionAllowed: boolean;
   createdAt: string | null;
   updatedAt: string | null;
   customerNameMasked: string;
@@ -34,7 +36,7 @@ export type OperationsOrderReview = {
   basisStatus: string;
   validationErrorsCount: number;
   validationWarningsCount: number;
-  approvalActionsImplemented: false;
+  approvalActionsImplemented: boolean;
   manualPricingDraft: OperationsManualPricingDraft | null;
 };
 
@@ -55,11 +57,43 @@ export function getOperationsManualReviewTitle(): string {
 }
 
 export function getOperationsManualReviewDescription(): string {
-  return "Read-only approval-oriented summary for operations review. Approve, reject and manual pricing actions are not implemented in this foundation slice.";
+  return "Approval-oriented summary for operations review. Approve and reject update domain status through API; manual pricing draft remains separate.";
 }
 
 export function getOperationsApprovalActionsNotImplementedMessage(): string {
-  return "Действия одобрения, отклонения и ручной корректировки цены пока не реализованы.";
+  return "Решение уже принято или недоступно для текущего статуса заказа.";
+}
+
+export function getOperationsApproveButtonLabel(): string {
+  return "Одобрить";
+}
+
+export function getOperationsRejectButtonLabel(): string {
+  return "Отклонить";
+}
+
+export function getOperationsRejectReasonLabel(): string {
+  return "Причина отклонения";
+}
+
+export function getOperationsRejectReasonPlaceholder(): string {
+  return "Укажите причину отклонения";
+}
+
+export function getOperationsDecisionApprovedMessage(): string {
+  return "Заказ одобрен для следующего внутреннего шага.";
+}
+
+export function getOperationsDecisionRejectedMessage(): string {
+  return "Заказ отклонён на этапе ручной проверки.";
+}
+
+export function getOperationsDecisionErrorMessage(): string {
+  return "Не удалось применить решение.";
+}
+
+export function getOperationsDecisionRejectReasonRequiredMessage(): string {
+  return "Для отклонения укажите причину.";
 }
 
 export function getOperationsOrderReviewErrorMessage(): string {

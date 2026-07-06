@@ -1,10 +1,13 @@
 import type { AdminOrderSummary } from './admin-orders'
+import { INITIAL_ORDER_DOMAIN_STATUS } from './order-domain'
 
 import type { OperationsManualPricingDraft } from './operations-manual-pricing-draft-types'
 
 export type OperationsOrderReview = {
   orderId: string
   status: string
+  domainStatus: string
+  reviewDecisionAllowed: boolean
   createdAt: string | null
   updatedAt: string | null
   customerNameMasked: string
@@ -29,7 +32,7 @@ export type OperationsOrderReview = {
   basisStatus: string
   validationErrorsCount: number
   validationWarningsCount: number
-  approvalActionsImplemented: false
+  approvalActionsImplemented: boolean
   manualPricingDraft: OperationsManualPricingDraft | null
 }
 
@@ -128,6 +131,8 @@ export function buildOperationsOrderReview(
   return {
     orderId: order.id,
     status: order.status,
+    domainStatus: order.domainStatus,
+    reviewDecisionAllowed: order.domainStatus === INITIAL_ORDER_DOMAIN_STATUS,
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,
     customerNameMasked: order.customer.nameMasked,
@@ -152,7 +157,7 @@ export function buildOperationsOrderReview(
     managerEmailStatus: order.email.manager,
     customerEmailStatus: order.email.customer,
     ...production,
-    approvalActionsImplemented: false,
+    approvalActionsImplemented: true,
     manualPricingDraft: null,
   }
 }

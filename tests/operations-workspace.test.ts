@@ -106,6 +106,7 @@ function installOperationsOrdersFetchMock() {
 const sampleAdminSummary: AdminOrderSummary = {
   id: "RZ-20260705-1001",
   status: "new",
+  domainStatus: "Проверка",
   createdAt: "2026-07-05T10:00:00.000Z",
   updatedAt: "2026-07-05T11:30:00.000Z",
   product: "Шкаф 1800×2400×600",

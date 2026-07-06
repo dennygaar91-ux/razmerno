@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
+import { INITIAL_ORDER_DOMAIN_STATUS } from './order-domain'
 import { normalizeSupabaseProjectUrl } from './supabase-url'
 
 export type AdminOrderSummary = {
   id: string
   status: string
+  domainStatus: string
   createdAt: string | null
   updatedAt: string | null
   product: string
@@ -47,6 +49,7 @@ export type AdminOrderSummary = {
 type OrderDbRow = {
   order_id: string
   status: string | null
+  domain_status: string | null
   created_at?: string | null
   updated_at?: string | null
   product_type: string | null
@@ -179,6 +182,10 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
   return {
     id: row.order_id,
     status: row.status ?? 'new',
+    domainStatus:
+      typeof row.domain_status === 'string' && row.domain_status.trim().length > 0
+        ? row.domain_status
+        : INITIAL_ORDER_DOMAIN_STATUS,
     createdAt: row.created_at ?? null,
     updatedAt: row.updated_at ?? null,
     product: productLabel(row),
@@ -209,7 +216,7 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
 }
 
 const ADMIN_ORDER_SELECT =
-  'order_id,status,created_at,updated_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason'
+  'order_id,status,domain_status,created_at,updated_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason'
 
 export async function getAdminOrderByOrderId(orderId: string): Promise<AdminOrderSummary | null> {
   const supabase = getSupabaseAdminClient()

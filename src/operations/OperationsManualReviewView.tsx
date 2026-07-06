@@ -1,11 +1,11 @@
 import { AdminOrderDetailPage } from "../admin/AdminOrderDetailPage";
 import type { AdminOrderDetailSummary } from "../admin/orderSummary";
 import { OperationsManualPricingDraftSection } from "./OperationsManualPricingDraftSection";
+import { OperationsOrderDecisionSection } from "./OperationsOrderDecisionSection";
 import { formatOperationsDate } from "../shared/operations/formatOperations";
 import { mapOperationsReviewToAdminDetailSummary } from "../shared/operations/mapOperationsReviewToAdminDetailSummary";
 import type { OperationsOrderReview, OperationsOrderReviewLoadState } from "../shared/operations/reviewTypes";
 import {
-  getOperationsApprovalActionsNotImplementedMessage,
   getOperationsManualReviewDescription,
   getOperationsManualReviewTitle,
   getOperationsOrderReviewErrorMessage,
@@ -21,6 +21,7 @@ export function OperationsManualReviewView({
   accessToken,
   onBack,
   onDraftSaved,
+  onDecisionApplied,
 }: {
   review: OperationsOrderReview | null;
   state: OperationsOrderReviewLoadState;
@@ -29,6 +30,7 @@ export function OperationsManualReviewView({
   accessToken: string;
   onBack: () => void;
   onDraftSaved: () => Promise<void> | void;
+  onDecisionApplied: () => Promise<void> | void;
 }) {
   if (state === "not_found" || (state === "success" && !review)) {
     return (
@@ -84,6 +86,7 @@ export function OperationsManualReviewView({
           <div className="mb-1 font-semibold">Approval summary</div>
           <div className="mt-3 grid grid-cols-1 gap-2 text-[13px] md:grid-cols-2">
             <SummaryRow label="Статус" value={getOperationsOrderStatusLabel(review.status)} />
+            <SummaryRow label="Domain status" value={review.domainStatus} />
             <SummaryRow label="Создана" value={formatOperationsDate(review.createdAt)} />
             <SummaryRow label="Обновлена" value={formatOperationsDate(review.updatedAt)} />
             <SummaryRow label="Клиент" value={review.customerNameMasked} />
@@ -92,20 +95,13 @@ export function OperationsManualReviewView({
             <SummaryRow label="Сумма" value={review.totalPriceLabel} />
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            <button type="button" disabled className="btn btn-primary focus-ring" aria-disabled="true" title="Not implemented">
-              Одобрить
-            </button>
-            <button type="button" disabled className="btn btn-outline focus-ring" aria-disabled="true" title="Not implemented">
-              Отклонить
-            </button>
-            <button type="button" disabled className="btn btn-outline focus-ring" aria-disabled="true" title="Not implemented">
-              Ручная корректировка цены
-            </button>
-          </div>
-          <p className="mt-3 text-[12px] leading-[1.55] text-[var(--rzm-text-muted)]">
-            {getOperationsApprovalActionsNotImplementedMessage()}
-          </p>
+          {review.approvalActionsImplemented && (
+            <OperationsOrderDecisionSection
+              review={review}
+              accessToken={accessToken}
+              onDecisionApplied={onDecisionApplied}
+            />
+          )}
         </div>
       )}
 

@@ -1152,6 +1152,19 @@ Branch implementation evidence (2026-07-06, Live Supabase Verification — Manua
 - P1-27 status remains `needs reconciliation`; P1-28 unchanged;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Review Decision Actions — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, not closure)**;
+- approve action: `POST /api/operations/order-decision` with `decision=approve` updates `domain_status` `Проверка` → `Оплата`, legacy `status` `new` → `in_progress`; writes `order_status_events` audit row (`changed_by=operations:approve`); returns safe operations review DTO;
+- reject action: same endpoint with `decision=reject` + required `reason` updates `domain_status` → `Отмена` (legacy `status` unchanged); audit row `changed_by=operations:reject`; no order delete;
+- API: `api/operations/order-decision.ts`, validation/store/types in `api/_shared/operations-order-decision-*`; admin auth required; 409 when order not in `Проверка`;
+- read model: `OperationsOrderReview` extended with `domainStatus`, `reviewDecisionAllowed`, `approvalActionsImplemented=true`;
+- UI: `OperationsOrderDecisionSection` on manual review screen — Approve/Reject buttons, reject reason input, loading/success/error states, API-only via `operationsOrderDecisionApi.ts`; reload after success;
+- tests: `tests/operations-order-decision.test.ts` (10), updated `operations-order-review`, `operations-manual-review-ui`; `npm run test:operations-order-decision` wired;
+- QA passed: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no production handoff automation (`production_export` untouched); no payment flow; no customer-facing `total_price` mutation; no customer notification; no live migration apply; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

@@ -67,6 +67,7 @@ function createMockResponse() {
 const sampleOrderRow = {
   order_id: ORDER_ID,
   status: "new",
+  domain_status: "Проверка",
   created_at: "2026-07-05T10:00:00.000Z",
   updated_at: "2026-07-05T11:30:00.000Z",
   product_type: "wardrobe",
@@ -131,6 +132,7 @@ function installOrderReviewFetchMock(options: { orderFound?: boolean; withDraft?
 const sampleAdminSummary: AdminOrderSummary = {
   id: ORDER_ID,
   status: "new",
+  domainStatus: "Проверка",
   createdAt: "2026-07-05T10:00:00.000Z",
   updatedAt: "2026-07-05T11:30:00.000Z",
   product: "Шкаф 1800×2400×600",
@@ -163,7 +165,9 @@ const sampleAdminSummary: AdminOrderSummary = {
 test("operations order review exposes safe manual review fields only", () => {
   const review = buildOperationsOrderReview(sampleAdminSummary, sampleOrderRow.production_export);
   assert.equal(review.orderId, ORDER_ID);
-  assert.equal(review.approvalActionsImplemented, false);
+  assert.equal(review.approvalActionsImplemented, true);
+  assert.equal(review.reviewDecisionAllowed, true);
+  assert.equal(review.domainStatus, "Проверка");
   assert.equal(review.manualPricingDraft, null);
   assert.equal(review.productionReviewStatus, "requires-review");
   assert.match(review.priceBreakdownSummary, /stored breakdown keys/);
@@ -233,7 +237,8 @@ test("operations order review GET returns safe review read model for authorized 
     ok: boolean;
     review: {
       orderId: string;
-      approvalActionsImplemented: false;
+      approvalActionsImplemented: boolean;
+      reviewDecisionAllowed: boolean;
       customerNameMasked: string;
       productionReviewStatus: string;
       manualPricingDraft: unknown;
@@ -242,7 +247,8 @@ test("operations order review GET returns safe review read model for authorized 
 
   assert.equal(body.ok, true);
   assert.equal(body.review.orderId, ORDER_ID);
-  assert.equal(body.review.approvalActionsImplemented, false);
+  assert.equal(body.review.approvalActionsImplemented, true);
+  assert.equal(body.review.reviewDecisionAllowed, true);
   assert.equal(body.review.productionReviewStatus, "requires-review");
   assert.equal(body.review.manualPricingDraft, null);
   assert.notEqual(body.review.customerNameMasked, "Иван Петров");
@@ -268,7 +274,8 @@ test("buildOperationsOrderReviewByOrderId loads review through service role path
   assert.equal(built.ok, true);
   if (!built.ok) return;
   assert.equal(built.review.orderId, ORDER_ID);
-  assert.equal(built.review.approvalActionsImplemented, false);
+  assert.equal(built.review.approvalActionsImplemented, true);
+  assert.equal(built.review.reviewDecisionAllowed, true);
   assert.equal(built.review.manualPricingDraft, null);
 });
 
