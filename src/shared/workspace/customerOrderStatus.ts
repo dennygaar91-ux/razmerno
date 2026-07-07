@@ -1,4 +1,10 @@
-export type CustomerOrderStatusStage = "review" | "payment" | "cancelled" | "unknown";
+export type CustomerOrderStatusStage =
+  | "review"
+  | "payment"
+  | "in_progress"
+  | "completed"
+  | "cancelled"
+  | "unknown";
 
 export type CustomerOrderStatus = {
   label: string;

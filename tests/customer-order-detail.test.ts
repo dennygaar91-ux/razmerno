@@ -241,6 +241,10 @@ test("customer order status mapping covers lifecycle states and unknown fallback
   assert.equal(mapCustomerOrderStatus("Оплата").stage, "payment");
   assert.equal(mapCustomerOrderStatus("Отмена").label, "Отменён");
   assert.equal(mapCustomerOrderStatus("Отмена").stage, "cancelled");
+  assert.equal(mapCustomerOrderStatus("В работе").label, "В работе");
+  assert.equal(mapCustomerOrderStatus("В работе").stage, "in_progress");
+  assert.equal(mapCustomerOrderStatus("Завершено").label, "Завершено");
+  assert.equal(mapCustomerOrderStatus("Завершено").stage, "completed");
   assert.equal(mapCustomerOrderStatus("Черновик").label, "Черновик");
   assert.equal(mapCustomerOrderStatus("Черновик").stage, "unknown");
   assert.equal(mapCustomerOrderStatus(null).label, "Статус уточняется");
@@ -314,6 +318,8 @@ test("customer order status timeline renders safe customer-facing states", () =>
   assert.match(card, /CustomerOrderStatusTimeline/);
   assert.match(timeline, /На проверке/);
   assert.match(timeline, /Ожидает оплаты/);
+  assert.match(timeline, /В работе/);
+  assert.match(timeline, /Завершено/);
   assert.match(timeline, /Отменён/);
   assert.match(timeline, /status\.description/);
   assert.match(timeline, /status\.nextStep/);

@@ -2,31 +2,40 @@ import { formatWorkspaceDate } from "../../shared/workspace/formatWorkspace";
 import type { CustomerOrderStatus } from "../../shared/workspace/customerOrderStatus";
 import { getCustomerOrderStatusFallbackLabel } from "../../shared/workspace/customerOrderStatus";
 
-function getCustomerOrderStatusTimelineSteps(status: CustomerOrderStatus) {
-  const steps = [
-    { id: "review", label: "На проверке" },
-    { id: "payment", label: "Ожидает оплаты" },
-    { id: "cancelled", label: "Отменён" },
-  ] as const;
+const HAPPY_PATH_STEPS = [
+  { id: "review", label: "На проверке" },
+  { id: "payment", label: "Ожидает оплаты" },
+  { id: "in_progress", label: "В работе" },
+  { id: "completed", label: "Завершено" },
+] as const;
 
+const HAPPY_PATH_STAGE_ORDER = ["review", "payment", "in_progress", "completed"] as const;
+
+function getCustomerOrderStatusTimelineSteps(status: CustomerOrderStatus) {
   if (status.stage === "cancelled") {
-    return steps.map((step) => ({
+    return [{ id: "cancelled", label: "Отменён", state: "current" as const }];
+  }
+
+  const currentIndex = HAPPY_PATH_STAGE_ORDER.indexOf(
+    status.stage as (typeof HAPPY_PATH_STAGE_ORDER)[number],
+  );
+
+  if (currentIndex === -1) {
+    return HAPPY_PATH_STEPS.map((step) => ({
       ...step,
-      state: step.id === "cancelled" ? ("current" as const) : ("inactive" as const),
+      state: step.id === status.stage ? ("current" as const) : ("inactive" as const),
     }));
   }
 
-  return steps
-    .filter((step) => step.id !== "cancelled")
-    .map((step) => ({
-      ...step,
-      state:
-        step.id === status.stage
-          ? ("current" as const)
-          : status.stage === "payment" && step.id === "review"
-            ? ("complete" as const)
-            : ("inactive" as const),
-    }));
+  return HAPPY_PATH_STEPS.map((step, index) => {
+    if (index < currentIndex) {
+      return { ...step, state: "complete" as const };
+    }
+    if (index === currentIndex) {
+      return { ...step, state: "current" as const };
+    }
+    return { ...step, state: "inactive" as const };
+  });
 }
 
 export function CustomerOrderStatusTimeline({

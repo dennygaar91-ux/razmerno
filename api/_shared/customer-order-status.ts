@@ -3,9 +3,16 @@ import {
   MANUAL_PAYMENT_CONFIRMED_DOMAIN_STATUS,
   OPERATIONS_APPROVED_DOMAIN_STATUS,
   OPERATIONS_REJECTED_DOMAIN_STATUS,
+  ORDER_COMPLETED_DOMAIN_STATUS,
 } from './order-domain'
 
-export type CustomerOrderStatusStage = 'review' | 'payment' | 'cancelled' | 'unknown'
+export type CustomerOrderStatusStage =
+  | 'review'
+  | 'payment'
+  | 'in_progress'
+  | 'completed'
+  | 'cancelled'
+  | 'unknown'
 
 export type CustomerOrderStatus = {
   label: string
@@ -38,9 +45,18 @@ export function mapCustomerOrderStatus(domainStatus: string | null | undefined):
   if (normalized === MANUAL_PAYMENT_CONFIRMED_DOMAIN_STATUS) {
     return {
       label: 'В работе',
-      stage: 'unknown',
-      description: 'Оплата подтверждена. Заявка передана на следующий этап.',
+      stage: 'in_progress',
+      description: 'Оплата подтверждена. Заявка передана в работу.',
       nextStep: 'Следите за уведомлениями в кабинете.',
+    }
+  }
+
+  if (normalized === ORDER_COMPLETED_DOMAIN_STATUS) {
+    return {
+      label: 'Завершено',
+      stage: 'completed',
+      description: 'Заказ завершён.',
+      nextStep: null,
     }
   }
 
