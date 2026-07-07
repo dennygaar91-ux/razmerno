@@ -1248,6 +1248,16 @@ Branch implementation evidence (2026-07-07, Customer Order Status Safe Read Mode
 - explicit non-scope: no DB migration; no payment flow; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Order Detail Status Timeline — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- UI: `CustomerOrderStatusTimeline` on customer order detail — current status, safe timeline steps, description and next-step copy;
+- no internal audit/raw `order_status_events` exposure;
+- tests: updated `customer-order-detail` (10);
+- QA passed: `npm run test:customer-order-detail`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no payment flow; no internal reject reason exposure; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
