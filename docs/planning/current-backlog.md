@@ -1415,6 +1415,16 @@ Branch implementation evidence (2026-07-07, Customer Notification on Manual Paym
 - explicit non-scope: no email/push; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Manual Payment Flow Contract Tests — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- tests: `tests/manual-payment-flow-contract.test.ts` — approve, awaiting payment, confirmation, notification, unread count, blocked outside Оплата;
+- wired: `test:manual-payment-flow-contract` in `npm test`;
+- explicit non-scope: no payment provider; no production mutation; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
