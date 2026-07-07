@@ -807,6 +807,29 @@ Do-not-touch constraints:
 - do not close tasks from docs-only findings alone;
 - do not change runtime, API, pricing, Supabase, Three.js or production logic.
 
+### Branch implementation evidence — P1-25 RPES / Backlog MVP Crosswalk Local Package — 2026-07-07
+
+branch local status: done (local crosswalk package prepared, QA PASS, not closure)
+
+Evidence:
+
+- Created `docs/planning/rpes-backlog-mvp-crosswalk-local.md`.
+- Mapped Release v1 RPES / accepted decisions / current backlog across active P0/P1/M8 tasks.
+- Classified active blocks as accepted/open/conflict/not verified/blocked/deferred/out of MVP.
+- Identified governance conflicts and recommended local resolution paths.
+- Prepared next local task packages by agent.
+- No runtime changes.
+- No API changes.
+- No pricing changes.
+- No Supabase changes.
+- No Three.js changes.
+- No production logic changes.
+- No push/PR/merge/deploy.
+- P1-25 remains `needs reconciliation`.
+- P1-27 remains `needs reconciliation`.
+- P1-28 remains `needs reconciliation`.
+- Not closure.
+
 ### P1-26 — Design-system Direction Reconciliation
 
 Статус: needs reconciliation.
