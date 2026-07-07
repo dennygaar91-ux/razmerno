@@ -5,6 +5,7 @@ import {
 import { useCustomerOrderDetail } from "../../shared/workspace/useCustomerOrderDetail";
 import type { CustomerOrderDetail } from "../../shared/workspace/orderDetailTypes";
 import { CustomerOrderChangeRequestsSection } from "./CustomerOrderChangeRequestsSection";
+import { CustomerPaymentInstructionsSection } from "./CustomerPaymentInstructionsSection";
 import { CustomerOrderStatusTimeline } from "./CustomerOrderStatusTimeline";
 
 function CustomerOrderPricingSection({ order }: { order: CustomerOrderDetail }) {
@@ -98,6 +99,8 @@ export function CustomerOrderDetailCard({ orderId }: { orderId: string }) {
       </header>
 
       <CustomerOrderStatusTimeline status={order.status} createdAt={order.createdAt} />
+
+      <CustomerPaymentInstructionsSection paymentState={order.paymentState} />
 
       <section className="rzm-account-section" aria-labelledby="order-contacts-title">
         <div className="rzm-account-section-head">

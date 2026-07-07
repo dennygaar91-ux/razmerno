@@ -1,4 +1,5 @@
 import type { CustomerOrderStatus } from "./customerOrderStatus";
+import type { PaymentReadinessState } from "./paymentInstructionsTypes";
 
 export type CustomerOrderPricingSummary = {
   furnitureTotal: number;
@@ -21,6 +22,7 @@ export type CustomerOrderDetail = {
   materialsDecorSummary: string | null;
   pricingSummary: CustomerOrderPricingSummary;
   changeRequestAllowed: boolean;
+  paymentState: PaymentReadinessState;
 };
 
 export type CustomerOrderDetailApiResult =

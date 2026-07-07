@@ -1372,6 +1372,15 @@ Branch implementation evidence (2026-07-07, Payment Readiness Safe Domain Model 
 - explicit non-scope: no payment provider; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Payment Instructions Block — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- UI: `CustomerPaymentInstructionsSection` on order detail when `paymentState === awaiting_manual_confirmation`;
+- copy: verified / awaiting payment / manager contact; no payment button, card input, or provider link;
+- tests: `tests/customer-payment-instructions-ui.test.ts`;
+- explicit non-scope: no payment provider; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
