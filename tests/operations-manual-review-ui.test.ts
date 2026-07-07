@@ -52,6 +52,8 @@ const sampleReview = {
   latestDecisionAudit: null,
   decisionHistory: [],
   changeRequests: [],
+  paymentState: "not_applicable" as const,
+  paymentConfirmationAllowed: false,
 };
 
 test("operations change requests section renders on manual review screen", () => {
@@ -185,6 +187,30 @@ test("decision history remains visible regardless of decision eligibility", () =
   const decisionIndex = view.indexOf("OperationsOrderDecisionSection");
   assert.ok(historyIndex > -1 && decisionIndex > -1);
   assert.ok(historyIndex > decisionIndex, "history section should render after decision section");
+});
+
+test("operations payment confirmation section renders on manual review screen", () => {
+  const view = readFileSync("src/operations/OperationsManualReviewView.tsx", "utf8");
+  const section = readFileSync("src/operations/OperationsPaymentConfirmationSection.tsx", "utf8");
+  assert.match(view, /OperationsPaymentConfirmationSection/);
+  assert.match(section, /getOperationsPaymentConfirmationTitle/);
+  assert.match(section, /submitOperationsPaymentConfirmation/);
+  assert.match(section, /data-testid="operations-payment-confirmation"/);
+  assert.match(section, /review\.paymentConfirmationAllowed/);
+  assert.doesNotMatch(section, /createClient|supabase/i);
+});
+
+test("payment confirmation section is read-only outside Оплата", () => {
+  const section = readFileSync("src/operations/OperationsPaymentConfirmationSection.tsx", "utf8");
+  assert.match(section, /data-testid="operations-payment-confirmation-readonly"/);
+  assert.match(section, /getOperationsPaymentConfirmationIneligibleMessage/);
+});
+
+test("operations payment confirmation API client uses operations endpoint", () => {
+  const api = readFileSync("src/shared/operations/operationsPaymentConfirmationApi.ts", "utf8");
+  assert.match(api, /\/api\/operations\/payment-confirmation/);
+  assert.match(api, /Authorization/);
+  assert.doesNotMatch(api, /createClient|supabase/i);
 });
 
 test("backend decision conflict protection remains in API tests", () => {

@@ -1,6 +1,7 @@
 import { AdminOrderDetailPage } from "../admin/AdminOrderDetailPage";
 import type { AdminOrderDetailSummary } from "../admin/orderSummary";
 import { OperationsChangeRequestsSection } from "./OperationsChangeRequestsSection";
+import { OperationsPaymentConfirmationSection } from "./OperationsPaymentConfirmationSection";
 import { OperationsManualPricingDraftSection } from "./OperationsManualPricingDraftSection";
 import { OperationsOrderDecisionSection } from "./OperationsOrderDecisionSection";
 import { OperationsOrderDecisionHistorySection } from "./OperationsOrderDecisionHistorySection";
@@ -112,6 +113,14 @@ export function OperationsManualReviewView({
           review={review}
           accessToken={accessToken}
           onDecisionApplied={onDecisionApplied}
+        />
+      )}
+
+      {review && (
+        <OperationsPaymentConfirmationSection
+          review={review}
+          accessToken={accessToken}
+          onConfirmationApplied={onDecisionApplied}
         />
       )}
 

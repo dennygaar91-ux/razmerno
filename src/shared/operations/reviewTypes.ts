@@ -71,6 +71,8 @@ export type OperationsOrderReview = {
   latestDecisionAudit: OperationsDecisionAudit | null;
   decisionHistory: OperationsDecisionHistoryEntry[];
   changeRequests: OperationsChangeRequest[];
+  paymentState: "awaiting_manual_confirmation" | "confirmed" | "not_applicable";
+  paymentConfirmationAllowed: boolean;
 };
 
 export type OperationsOrderReviewApiResult =
@@ -238,4 +240,38 @@ export function getOperationsChangeRequestDecisionSuccessMessage(decision: Opera
 
 export function getOperationsChangeRequestDecisionErrorMessage(): string {
   return "Не удалось обработать запрос на изменение.";
+}
+
+export function getOperationsPaymentConfirmationTitle(): string {
+  return "Подтверждение оплаты";
+}
+
+export function getOperationsPaymentConfirmationIneligibleMessage(domainStatus: string): string {
+  if (domainStatus === "В работе" || domainStatus === "Завершено") {
+    return "Оплата уже подтверждена или заказ на следующем этапе.";
+  }
+  if (domainStatus === "Отмена") {
+    return "Подтверждение оплаты недоступно для отменённой заявки.";
+  }
+  return "Подтверждение оплаты доступно только для статуса Оплата.";
+}
+
+export function getOperationsPaymentConfirmationButtonLabel(): string {
+  return "Подтвердить оплату";
+}
+
+export function getOperationsPaymentConfirmationNoteLabel(): string {
+  return "Примечание (опционально)";
+}
+
+export function getOperationsPaymentConfirmationNotePlaceholder(): string {
+  return "Оплата подтверждена менеджером";
+}
+
+export function getOperationsPaymentConfirmationSuccessMessage(): string {
+  return "Оплата подтверждена вручную.";
+}
+
+export function getOperationsPaymentConfirmationErrorMessage(): string {
+  return "Не удалось подтвердить оплату.";
 }
