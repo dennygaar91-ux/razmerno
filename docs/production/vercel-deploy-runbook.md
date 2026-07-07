@@ -211,3 +211,43 @@ npm run test:operations-order-decision
 - P1-27 / P1-28 are not closed by this local work;
 - live verification remains separate and is not implied by local tests alone;
 - `.env.local` must remain local/uncommitted.
+
+## 9. Change request workflow — local foundation (branch)
+
+Local-only customer ↔ operations change request flow on `task/epic-b-projects-foundation`. Not merged/main closure.
+
+### Customer API / UI
+
+- `POST /api/customer/change-request` — ownership + message validation; allowed only when `domain_status === Проверка`;
+- `GET /api/customer/change-requests?orderId=` — safe history for owned order;
+- order detail UI shows form only when `changeRequestAllowed` from order detail API;
+- ineligible copy: `Изменения недоступны для текущего статуса заявки`.
+
+### Operations readback / decisions
+
+- `GET /api/operations/order` includes safe `changeRequests` (newest-first);
+- `POST /api/operations/change-request-decision` transitions: `submitted|reviewed` → `reviewed|resolved|rejected`;
+- manual review UI: `OperationsChangeRequestsSection` with decision actions and reload after success.
+
+### Customer notifications
+
+- submit creates `change_request` notification (existing);
+- decision creates `order_updated` notification (`Запрос рассмотрен` / `Изменения приняты` / `Отклонён`);
+- unread count via `GET /api/customer/notifications/unread-count`;
+- no email/push in this foundation.
+
+### Local verification commands
+
+```bash
+npm run test:customer-change-request
+npm run test:customer-change-request-ui
+npm run test:operations-order-review
+npm run test:operations-change-request-decision
+npm run test:customer-change-request-contract
+```
+
+### Local-only caveats
+
+- frontend uses API only; Service Role server-side only; RLS deny-all unchanged;
+- no payment/production/customer final price mutation in this foundation;
+- P1-27 / P1-28 not closed; live migration apply not implied; `.env.local` remains local.
