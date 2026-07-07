@@ -128,6 +128,7 @@
     "smoke:deploy": "node scripts/deploy-smoke.mjs",
     "verify:live-manual-pricing-draft": "node scripts/live-manual-pricing-draft-verify.mjs",
     "verify:live-signed-mvp-path": "node scripts/live-signed-mvp-path-verify.mjs",
+    "capture:d13-local-visual-qa": "node scripts/d13-local-visual-qa-capture.mjs",
     "check:live-manual-pricing-draft-verify": "node scripts/check-live-manual-pricing-draft-verify.mjs",
     "check:stage4-deploy-smoke": "node scripts/check-stage4-deploy-smoke.mjs",
     "predeploy:guard": "node scripts/predeploy-guard.mjs",

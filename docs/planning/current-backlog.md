@@ -1684,6 +1684,27 @@ Evidence:
 - `order_status_events` RLS disabled remains security follow-up;
 - not closure.
 
+### D-13 Local Visual QA Baseline — 2026-07-07
+
+branch local status: done (local visual QA baseline prepared, QA PASS, not final preview visual QA, not closure)
+
+Evidence:
+
+- Created `docs/planning/d13-local-visual-qa-baseline.md`.
+- Added `scripts/d13-local-visual-qa-capture.mjs` and `npm run capture:d13-local-visual-qa`.
+- Updated `scripts/start-vercel-dev-with-env.mjs` to mirror `SUPABASE_*` → `VITE_SUPABASE_*` for local browser auth.
+- Captured local screenshots for signed Customer/Operations MVP screens using local runtime `http://localhost:3010` (stable capture); task-spec `localhost:3005` attempted; evidence folder `artifacts/visual-qa/d13-local/2026-07-07-d13/` (local, untracked PNGs).
+- Reviewed customer auth gate (desktop/tablet/mobile), authenticated workspace desktop (orders/profile/summary), operations login (desktop/tablet/mobile), operations workspace/review shells.
+- Responsive: full gate coverage; authenticated workspace and data-backed operations screens desktop-only in this baseline.
+- Classified visual findings by severity (no P0/P1 UI blockers; P2 polish/runtime/preview follow-ups).
+- **Result: PARTIAL** — supports PR with preview visual QA gate; not final D-13 PASS.
+- No push/merge/PR.
+- No deploy.
+- P1-27 remains `needs reconciliation`.
+- P1-28 remains `needs reconciliation`.
+- Final preview visual QA remains required.
+- Not closure.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
