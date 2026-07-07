@@ -1,4 +1,5 @@
 import { validateAdminRequest } from '../_shared/admin-auth'
+import { createManualPaymentConfirmationNotificationBestEffort } from '../_shared/customer-notification-events'
 import { applyJsonHeaders } from '../_shared/headers'
 import { logEvent } from '../_shared/logger'
 import { applyOperationsManualPaymentConfirmation } from '../_shared/operations-payment-confirmation-store'
@@ -75,6 +76,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       requestId,
       orderId: validated.value.orderId,
       domainStatus: applied.result.domainStatus,
+    })
+
+    await createManualPaymentConfirmationNotificationBestEffort({
+      requestId,
+      businessOrderId: validated.value.orderId,
     })
 
     return res.status(200).json({

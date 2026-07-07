@@ -169,3 +169,44 @@ export async function createChangeRequestDecisionNotificationBestEffort(input: {
     })
   }
 }
+
+export async function createManualPaymentConfirmationNotificationBestEffort(input: {
+  requestId: string
+  businessOrderId: string
+}): Promise<void> {
+  const target = await getOrderNotificationTargetByBusinessOrderId(input.businessOrderId)
+  if (!target.ok) {
+    if ('notFound' in target && target.notFound) {
+      logEvent('warn', 'customer_notifications.payment_confirmation_order_not_found', {
+        requestId: input.requestId,
+        businessOrderId: input.businessOrderId,
+      })
+      return
+    }
+
+    logEvent('error', 'customer_notifications.payment_confirmation_lookup_failed', {
+      requestId: input.requestId,
+      businessOrderId: input.businessOrderId,
+      reason: target.error,
+    })
+    return
+  }
+
+  const publicOrderNumber = formatPublicOrderNumber(target.publicOrderNumber)
+  const created = await createCustomerNotification({
+    userId: target.userId,
+    orderId: target.orderUuid,
+    type: 'order_updated',
+    title: 'Оплата подтверждена',
+    message: `Оплата по заявке ${publicOrderNumber} подтверждена. Заявка передана на следующий этап.`,
+  })
+
+  if (!created.ok) {
+    logEvent('error', 'customer_notifications.payment_confirmation_insert_failed', {
+      requestId: input.requestId,
+      userId: target.userId,
+      orderId: target.orderUuid,
+      reason: created.error,
+    })
+  }
+}

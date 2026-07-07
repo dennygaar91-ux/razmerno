@@ -8,6 +8,7 @@ import { CUSTOMER_UNAUTHORIZED_MESSAGE } from "../api/_shared/customer-api-auth"
 import {
   createChangeRequestDecisionNotificationBestEffort,
   createChangeRequestNotificationBestEffort,
+  createManualPaymentConfirmationNotificationBestEffort,
   createOperationsDecisionNotificationBestEffort,
   createOrderCreatedNotificationBestEffort,
 } from "../api/_shared/customer-notification-events";
@@ -665,6 +666,24 @@ test("operations reject creates safe customer notification without internal reas
   assert.equal(inserts[0]?.title, "Заявка отменена");
   assert.match(inserts[0]?.message ?? "", /отменена на этапе проверки/i);
   assert.doesNotMatch(inserts[0]?.message ?? "", /Dimensions mismatch|причина/i);
+});
+
+test("manual payment confirmation creates safe customer notification", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const store = installNotificationStoreMock();
+
+  await createManualPaymentConfirmationNotificationBestEffort({
+    requestId: "req-payment-confirm",
+    businessOrderId: "RZ-20260705-1001",
+  });
+
+  const inserts = store.getInserts();
+  assert.equal(inserts.length, 1);
+  assert.equal(inserts[0]?.type, "order_updated");
+  assert.equal(inserts[0]?.title, "Оплата подтверждена");
+  assert.match(inserts[0]?.message ?? "", /следующий этап/i);
+  assert.doesNotMatch(inserts[0]?.message ?? "", /менеджером|internal|audit|card/i);
 });
 
 test("unread count returns only owned unread notifications", async () => {

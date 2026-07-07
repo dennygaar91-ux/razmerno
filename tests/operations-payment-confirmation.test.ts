@@ -29,6 +29,7 @@ let orderUpdates: Array<Record<string, unknown>> = [];
 let auditEvents: Array<Record<string, unknown>> = [];
 let productionMutations = 0;
 let totalPriceMutations = 0;
+let notificationInserts: Array<Record<string, unknown>> = [];
 
 function restoreEnvironment() {
   for (const key of Object.keys(process.env)) {
@@ -40,6 +41,7 @@ function restoreEnvironment() {
   auditEvents = [];
   productionMutations = 0;
   totalPriceMutations = 0;
+  notificationInserts = [];
 }
 
 function setRequiredServerEnv() {
@@ -96,6 +98,21 @@ function installPaymentConfirmationFetchMock(options: { domainStatus?: string } 
     const method = init?.method ?? "GET";
 
     if (url.includes("/rest/v1/orders")) {
+      const parsed = new URL(url);
+      const orderIdFilter = parsed.searchParams.get("order_id");
+      const selectParam = parsed.searchParams.get("select") ?? "";
+
+      if (orderIdFilter?.startsWith("eq.") && method === "GET") {
+        const businessOrderId = decodeURIComponent(orderIdFilter.slice(3));
+        if (businessOrderId === ORDER_ID && selectParam.includes("public_order_number")) {
+          return jsonResponse({
+            id: ORDER_UUID,
+            user_id: ORDER_USER_ID,
+            public_order_number: "RZM_0001",
+          });
+        }
+      }
+
       if (method === "PATCH" || method === "PUT") {
         const body = init?.body ? JSON.parse(String(init.body)) : {};
         if ("production_export" in body) productionMutations += 1;
@@ -116,8 +133,25 @@ function installPaymentConfirmationFetchMock(options: { domainStatus?: string } 
       if (url.includes("select=status%2Cdomain_status") || url.includes("select=status,domain_status")) {
         return jsonResponse({ status: currentLegacyStatus, domain_status: currentDomainStatus });
       }
+      if (
+        (url.includes("select=id%2Cuser_id%2Cpublic_order_number") ||
+          url.includes("select=id,user_id,public_order_number")) &&
+        !url.includes("total_price")
+      ) {
+        return jsonResponse({
+          id: ORDER_UUID,
+          user_id: ORDER_USER_ID,
+          public_order_number: "RZM_0001",
+        });
+      }
       if (url.includes(ORDER_ID)) return jsonResponse(row());
       return jsonResponse([row()]);
+    }
+
+    if (url.includes("/rest/v1/order_notifications") && method === "POST") {
+      const body = init?.body ? JSON.parse(String(init.body)) : {};
+      notificationInserts.push(body);
+      return jsonResponse(body);
     }
 
     if (url.includes("/rest/v1/order_status_events") && method === "POST") {
@@ -227,6 +261,9 @@ test("payment confirmation handler returns safe review DTO", async () => {
   assert.equal(body.ok, true);
   assert.equal(body.review.paymentState, "confirmed");
   assert.equal(body.review.paymentConfirmationAllowed, false);
+  assert.equal(notificationInserts.length, 1);
+  assert.equal(notificationInserts[0]?.title, "Оплата подтверждена");
+  assert.doesNotMatch(String(notificationInserts[0]?.message ?? ""), /менеджером/i);
 });
 
 async function runAll() {

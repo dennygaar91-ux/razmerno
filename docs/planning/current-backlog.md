@@ -1404,6 +1404,17 @@ Branch implementation evidence (2026-07-07, Operations Manual Payment Confirmati
 - explicit non-scope: no payment provider UI; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Customer Notification on Manual Payment Confirmation — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- notification: `createManualPaymentConfirmationNotificationBestEffort` on payment confirmation; type `order_updated`;
+- copy: `Оплата подтверждена` / next-stage message; no internal note leak;
+- tests: updated `customer-notifications`, `operations-payment-confirmation`;
+- explicit non-scope: no email/push; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
