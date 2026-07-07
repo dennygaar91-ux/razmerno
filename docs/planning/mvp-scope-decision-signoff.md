@@ -400,6 +400,43 @@ This document **does not close** P1-27 or P1-28.
 
 ---
 
+## User Sign-off — 2026-07-07
+
+The user has **explicitly accepted** MVP Scope Decisions D-01–D-16 as recorded below.
+
+| ID | User decision |
+|----|---------------|
+| D-01 | **Accepted for MVP** — full lifecycle ladder |
+| D-02 | **Accepted for MVP** — in-app notifications |
+| D-03 | **Accepted for MVP** — customer change requests |
+| D-04 | **Accepted for MVP** — manual payment confirmation, no provider |
+| D-05 | **Accepted for MVP** — order completion |
+| D-06 | **Accepted for MVP as internal-only** — manual pricing draft is operations-only |
+| D-07 | **Deferred from MVP** — no customer final price update without Approval View |
+| D-08 | **Accepted for MVP** — Release v1 Operations Workspace |
+| D-09 | **Out of MVP** — production handoff automation |
+| D-10 | **Out of MVP** — admin editor |
+| D-11 | **Partially accepted** — in-app + existing email if already supported; push/SMS out |
+| D-12 | **Required before release** — live verification |
+| D-13 | **Required before release** — visual QA |
+| D-14 | **Accepted as process** — split branch/review into logical PRs or review sections |
+| D-15 | **Deferred from MVP** — customer cancellation request |
+| D-16 | **Deferred from MVP** — email-code profile edit confirmation |
+
+**Sign-off statements:**
+
+- This confirms the **MVP product boundary** for Customer and Operations/Admin scope as defined in sections 5–6 of this document.
+- This is **not P1-27 closure**.
+- This is **not P1-28 closure**.
+- This does **not** claim release readiness.
+- **Live verification** (D-12, M8-P1-02) remains required before release.
+- **Visual QA** (D-13, M8-P1-01) remains required before release.
+- **PR / merge / main evidence** remains required per project closure rules.
+
+Recorded on branch `task/epic-b-projects-foundation`. Branch-local product decision evidence only.
+
+---
+
 ## References
 
 - `docs/planning/p1-27-p1-28-reconciliation.md`

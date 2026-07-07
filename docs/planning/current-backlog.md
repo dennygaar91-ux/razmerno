@@ -1555,6 +1555,25 @@ Branch implementation evidence (2026-07-07, MVP Scope Decision Sign-off Pack —
 - no live data mutation;
 - not closure.
 
+Branch implementation evidence (2026-07-07, MVP Scope Decisions User Sign-off — Local Decision Record, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (user sign-off recorded, QA PASS, not closure)**;
+- recorded user sign-off for D-01–D-16 in `docs/planning/mvp-scope-decision-signoff.md` (section User Sign-off — 2026-07-07);
+- customer MVP boundary accepted with explicit deferrals/out-of-scope items;
+- Operations/Admin MVP boundary accepted with explicit deferrals/out-of-scope items;
+- D-07 Approval View / customer final price update **deferred**;
+- D-15 cancellation request **deferred**;
+- D-16 email-code profile edit **deferred**;
+- D-12 live verification **remains required**;
+- D-13 visual QA **remains required**;
+- **P1-27 status remains `needs reconciliation`**;
+- **P1-28 status remains `needs reconciliation`**;
+- no implementation changes;
+- no push/merge/PR;
+- no live migration apply;
+- no live data mutation;
+- not closure.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
