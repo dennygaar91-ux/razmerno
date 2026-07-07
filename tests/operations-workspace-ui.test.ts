@@ -13,7 +13,9 @@ import {
 } from "../src/shared/operations/types";
 import {
   OPERATIONS_DOMAIN_STATUS_FILTER_OPTIONS,
+  countOperationsWorkspaceByDomainStatus,
   filterOperationsWorkspaceByDomainStatus,
+  formatOperationsDomainStatusFilterLabel,
   getOperationsDomainStatusLabel,
   getOperationsWorkspaceFilteredEmptyMessage,
 } from "../src/shared/operations/workspaceFilters";
@@ -166,6 +168,23 @@ test("operations workspace order detail navigation preserved with filters", () =
   const page = readFileSync("src/operations/OperationsWorkspacePage.tsx", "utf8");
   assert.match(page, /buildOperationsOrderDetailPath\(order\.orderId\)/);
   assert.match(page, /OperationsManualReviewView/);
+});
+
+test("operations workspace status counts render from loaded queue rows", () => {
+  const page = readFileSync("src/operations/OperationsWorkspacePage.tsx", "utf8");
+  assert.match(page, /countOperationsWorkspaceByDomainStatus/);
+  assert.match(page, /formatOperationsDomainStatusFilterLabel/);
+
+  const counts = countOperationsWorkspaceByDomainStatus(sampleOrders);
+  assert.deepEqual(counts, {
+    all: 3,
+    Проверка: 1,
+    Оплата: 1,
+    Отмена: 1,
+  });
+  assert.equal(formatOperationsDomainStatusFilterLabel("Все", counts.all), "Все 3");
+  assert.equal(formatOperationsDomainStatusFilterLabel("Проверка", counts.Проверка), "Проверка 1");
+  assert.equal(filterOperationsWorkspaceByDomainStatus(sampleOrders, "Оплата").length, counts.Оплата);
 });
 
 async function runTests() {

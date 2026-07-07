@@ -41,3 +41,23 @@ export function getOperationsWorkspaceFilteredEmptyMessage(filter: OperationsDom
   if (filter === "all") return "Очередь заявок пока пуста.";
   return `Заявок со статусом «${filter}» пока нет.`;
 }
+
+export type OperationsDomainStatusCounts = Record<OperationsDomainStatusFilter, number>;
+
+export function countOperationsWorkspaceByDomainStatus(
+  orders: OperationsWorkspaceOrder[],
+): OperationsDomainStatusCounts {
+  return {
+    all: orders.length,
+    Проверка: orders.filter((order) => order.domainStatus === "Проверка").length,
+    Оплата: orders.filter((order) => order.domainStatus === "Оплата").length,
+    Отмена: orders.filter((order) => order.domainStatus === "Отмена").length,
+  };
+}
+
+export function formatOperationsDomainStatusFilterLabel(
+  label: string,
+  count: number,
+): string {
+  return `${label} ${count}`;
+}

@@ -1211,6 +1211,16 @@ Branch implementation evidence (2026-07-07, Operations Review Decision Eligibili
 - explicit non-scope: no payment flow; no production handoff; no customer-facing `total_price` mutation; no live migration apply; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Workspace Status Counts — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- UI: workspace filter buttons now show counts derived from loaded queue rows (`Все N`, `Проверка N`, etc.);
+- helpers: `countOperationsWorkspaceByDomainStatus`, `formatOperationsDomainStatusFilterLabel` in `workspaceFilters.ts`;
+- tests: updated `operations-workspace-ui` (11);
+- QA passed: `npm run test:operations-workspace-ui`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no DB migration; no separate analytics endpoint; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

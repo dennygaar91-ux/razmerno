@@ -15,7 +15,9 @@ import {
 } from "../shared/operations/types";
 import {
   OPERATIONS_DOMAIN_STATUS_FILTER_OPTIONS,
+  countOperationsWorkspaceByDomainStatus,
   filterOperationsWorkspaceByDomainStatus,
+  formatOperationsDomainStatusFilterLabel,
   getOperationsWorkspaceFilteredEmptyMessage,
   type OperationsDomainStatusFilter,
 } from "../shared/operations/workspaceFilters";
@@ -114,6 +116,7 @@ function OperationsWorkspaceDashboard({
   const isLoading = state === "loading" || state === "idle";
   const orders = workspace?.orders ?? [];
   const filteredOrders = filterOperationsWorkspaceByDomainStatus(orders, domainStatusFilter);
+  const domainStatusCounts = countOperationsWorkspaceByDomainStatus(orders);
   const queueEmptyMessage =
     orders.length === 0
       ? getOperationsWorkspaceEmptyMessage()
@@ -189,7 +192,7 @@ function OperationsWorkspaceDashboard({
                     ].join(" ")}
                     aria-pressed={domainStatusFilter === option.id}
                   >
-                    {option.label}
+                    {formatOperationsDomainStatusFilterLabel(option.label, domainStatusCounts[option.id])}
                   </button>
                 ))}
               </div>
