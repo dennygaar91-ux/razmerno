@@ -119,6 +119,13 @@ test("operations review DTO exposes paymentState and confirmation eligibility", 
   );
   assert.equal(reviewAfterConfirm.paymentState, "confirmed");
   assert.equal(reviewAfterConfirm.paymentConfirmationAllowed, false);
+  assert.equal(reviewAfterConfirm.orderCompletionAllowed, true);
+
+  const reviewCompleted = buildOperationsOrderReview(
+    { ...sampleAdminOrder, domainStatus: "Завершено" },
+    null,
+  );
+  assert.equal(reviewCompleted.orderCompletionAllowed, false);
 });
 
 async function runAll() {

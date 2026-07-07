@@ -54,6 +54,7 @@ const sampleReview = {
   changeRequests: [],
   paymentState: "not_applicable" as const,
   paymentConfirmationAllowed: false,
+  orderCompletionAllowed: false,
 };
 
 test("operations change requests section renders on manual review screen", () => {
@@ -209,6 +210,30 @@ test("payment confirmation section is read-only outside Оплата", () => {
 test("operations payment confirmation API client uses operations endpoint", () => {
   const api = readFileSync("src/shared/operations/operationsPaymentConfirmationApi.ts", "utf8");
   assert.match(api, /\/api\/operations\/payment-confirmation/);
+  assert.match(api, /Authorization/);
+  assert.doesNotMatch(api, /createClient|supabase/i);
+});
+
+test("operations order completion section renders on manual review screen", () => {
+  const view = readFileSync("src/operations/OperationsManualReviewView.tsx", "utf8");
+  const section = readFileSync("src/operations/OperationsOrderCompletionSection.tsx", "utf8");
+  assert.match(view, /OperationsOrderCompletionSection/);
+  assert.match(section, /getOperationsOrderCompletionTitle/);
+  assert.match(section, /submitOperationsOrderCompletion/);
+  assert.match(section, /data-testid="operations-order-completion"/);
+  assert.match(section, /review\.orderCompletionAllowed/);
+  assert.doesNotMatch(section, /createClient|supabase/i);
+});
+
+test("order completion section is read-only outside В работе", () => {
+  const section = readFileSync("src/operations/OperationsOrderCompletionSection.tsx", "utf8");
+  assert.match(section, /data-testid="operations-order-completion-readonly"/);
+  assert.match(section, /getOperationsOrderCompletionIneligibleMessage/);
+});
+
+test("operations order completion API client uses operations endpoint", () => {
+  const api = readFileSync("src/shared/operations/operationsOrderCompletionApi.ts", "utf8");
+  assert.match(api, /\/api\/operations\/order-completion/);
   assert.match(api, /Authorization/);
   assert.doesNotMatch(api, /createClient|supabase/i);
 });
