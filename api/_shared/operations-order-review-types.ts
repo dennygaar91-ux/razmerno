@@ -10,6 +10,7 @@ import {
   isManualPaymentConfirmationAllowedForDomainStatus,
   type PaymentReadinessState,
 } from './payment-readiness-domain'
+import { isOrderCompletionAllowedForDomainStatus } from './order-completion-domain'
 
 export type OperationsOrderReview = {
   orderId: string
@@ -47,6 +48,7 @@ export type OperationsOrderReview = {
   changeRequests: OperationsChangeRequest[]
   paymentState: PaymentReadinessState
   paymentConfirmationAllowed: boolean
+  orderCompletionAllowed: boolean
 }
 
 export const OPERATIONS_ORDER_REVIEW_FORBIDDEN_RESPONSE_KEYS = [
@@ -180,5 +182,6 @@ export function buildOperationsOrderReview(
     changeRequests,
     paymentState: derivePaymentReadinessState(order.domainStatus),
     paymentConfirmationAllowed: isManualPaymentConfirmationAllowedForDomainStatus(order.domainStatus),
+    orderCompletionAllowed: isOrderCompletionAllowedForDomainStatus(order.domainStatus),
   }
 }

@@ -73,6 +73,7 @@ export type OperationsOrderReview = {
   changeRequests: OperationsChangeRequest[];
   paymentState: "awaiting_manual_confirmation" | "confirmed" | "not_applicable";
   paymentConfirmationAllowed: boolean;
+  orderCompletionAllowed: boolean;
 };
 
 export type OperationsOrderReviewApiResult =
@@ -274,4 +275,41 @@ export function getOperationsPaymentConfirmationSuccessMessage(): string {
 
 export function getOperationsPaymentConfirmationErrorMessage(): string {
   return "Не удалось подтвердить оплату.";
+}
+
+export function getOperationsOrderCompletionTitle(): string {
+  return "Завершение заказа";
+}
+
+export function getOperationsOrderCompletionIneligibleMessage(domainStatus: string): string {
+  if (domainStatus === "Завершено") {
+    return "Заказ уже завершён.";
+  }
+  if (domainStatus === "Отмена") {
+    return "Завершение недоступно для отменённой заявки.";
+  }
+  if (domainStatus === "Проверка" || domainStatus === "Оплата") {
+    return "Завершение доступно только после подтверждения оплаты и перехода в статус В работе.";
+  }
+  return "Завершение заказа доступно только для статуса В работе.";
+}
+
+export function getOperationsOrderCompletionButtonLabel(): string {
+  return "Завершить заказ";
+}
+
+export function getOperationsOrderCompletionNoteLabel(): string {
+  return "Примечание (опционально)";
+}
+
+export function getOperationsOrderCompletionNotePlaceholder(): string {
+  return "Заказ завершён менеджером";
+}
+
+export function getOperationsOrderCompletionSuccessMessage(): string {
+  return "Заказ отмечен как завершённый.";
+}
+
+export function getOperationsOrderCompletionErrorMessage(): string {
+  return "Не удалось завершить заказ.";
 }
