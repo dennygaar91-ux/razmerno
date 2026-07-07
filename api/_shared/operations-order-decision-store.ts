@@ -7,7 +7,18 @@ import {
   OPERATIONS_APPROVED_DOMAIN_STATUS,
   OPERATIONS_REJECTED_DOMAIN_STATUS,
 } from './order-domain'
-import type { OperationsOrderDecisionInput, OperationsOrderDecisionResult, OperationsDecisionAudit } from './operations-order-decision-types'
+import type {
+  OperationsOrderDecisionInput,
+  OperationsOrderDecisionResult,
+  OperationsDecisionAudit,
+  OperationsDecisionHistoryEntry,
+} from './operations-order-decision-types'
+import { OPERATIONS_ORDER_STATUS_HISTORY_LIMIT } from './operations-order-decision-types'
+import {
+  deriveLatestOperationsDecisionAudit,
+  mapOrderStatusEventHistoryRow,
+  type OrderStatusEventHistoryRow,
+} from './operations-order-decision-history'
 import { normalizeSupabaseProjectUrl } from './supabase-url'
 
 function getSupabaseAdminClient() {
@@ -21,6 +32,31 @@ function getSupabaseAdminClient() {
       autoRefreshToken: false,
     },
   })
+}
+
+type OrderStatusEventRow = OrderStatusEventHistoryRow
+
+export async function listOperationsOrderStatusHistoryByOrderId(
+  orderId: string,
+  limit = OPERATIONS_ORDER_STATUS_HISTORY_LIMIT,
+): Promise<OperationsDecisionHistoryEntry[]> {
+  try {
+    const supabase = getSupabaseAdminClient()
+    const cappedLimit = Math.min(Math.max(limit, 1), OPERATIONS_ORDER_STATUS_HISTORY_LIMIT)
+
+    const { data, error } = await supabase
+      .from('order_status_events')
+      .select('id,from_status,to_status,changed_by,reason,created_at')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: false })
+      .limit(cappedLimit)
+
+    if (error) throw new Error(error.message)
+
+    return (data ?? []).map((row) => mapOrderStatusEventHistoryRow(row as OrderStatusEventRow))
+  } catch {
+    return []
+  }
 }
 
 export async function applyOperationsOrderDecision(
@@ -102,51 +138,9 @@ export async function applyOperationsOrderDecision(
   }
 }
 
-type OrderStatusEventAuditRow = {
-  from_status: string | null
-  to_status: string
-  changed_by: string
-  reason: string | null
-  created_at: string | null
-}
-
-function parseOperationsDecisionFromChangedBy(changedBy: string): OperationsDecisionAudit['decision'] | null {
-  if (changedBy.endsWith(':approve')) return 'approve'
-  if (changedBy.endsWith(':reject')) return 'reject'
-  return null
-}
-
 export async function getLatestOperationsDecisionAuditByOrderId(
   orderId: string,
 ): Promise<OperationsDecisionAudit | null> {
-  try {
-    const supabase = getSupabaseAdminClient()
-
-    const { data, error } = await supabase
-      .from('order_status_events')
-      .select('from_status,to_status,changed_by,reason,created_at')
-      .eq('order_id', orderId)
-      .like('changed_by', 'operations:%')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-
-    if (error) throw new Error(error.message)
-    if (!data) return null
-
-    const row = data as OrderStatusEventAuditRow
-    const decision = parseOperationsDecisionFromChangedBy(row.changed_by)
-    if (!decision) return null
-
-    return {
-      decision,
-      reason: typeof row.reason === 'string' && row.reason.trim().length > 0 ? row.reason.trim() : null,
-      fromDomainStatus: row.from_status,
-      toDomainStatus: row.to_status,
-      changedBy: row.changed_by,
-      createdAt: row.created_at,
-    }
-  } catch {
-    return null
-  }
+  const history = await listOperationsOrderStatusHistoryByOrderId(orderId)
+  return deriveLatestOperationsDecisionAudit(history)
 }

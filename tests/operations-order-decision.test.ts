@@ -8,7 +8,7 @@ import {
   OPERATIONS_APPROVED_DOMAIN_STATUS,
   OPERATIONS_REJECTED_DOMAIN_STATUS,
 } from "../api/_shared/order-domain";
-import { applyOperationsOrderDecision } from "../api/_shared/operations-order-decision-store";
+import { applyOperationsOrderDecision, listOperationsOrderStatusHistoryByOrderId } from "../api/_shared/operations-order-decision-store";
 import { validateOperationsOrderDecisionBody } from "../api/_shared/operations-order-decision-validation";
 
 type AsyncTest = () => void | Promise<void>;
@@ -140,9 +140,17 @@ function installDecisionFetchMock(options: { orderFound?: boolean; domainStatus?
     }
 
     if (url.includes("/rest/v1/order_status_events") && method === "GET") {
-      const latest = auditEvents.at(-1);
-      if (!latest) return jsonResponse(null);
-      return jsonResponse(latest);
+      return jsonResponse(
+        auditEvents.map((event, index) => ({
+          id: index + 1,
+          order_id: ORDER_ID,
+          from_status: event.from_status ?? null,
+          to_status: event.to_status,
+          changed_by: event.changed_by,
+          reason: event.reason ?? null,
+          created_at: new Date(Date.now() - index * 1000).toISOString(),
+        })),
+      );
     }
 
     if (url.includes("/rest/v1/order_manual_pricing_drafts")) {
@@ -254,6 +262,23 @@ test("reject persists trimmed reason in order_status_events audit row", async ()
   if (!applied.ok) return;
   assert.equal(applied.result.auditReason, "Dimensions mismatch");
   assert.equal(auditEvents[0].reason, "Dimensions mismatch");
+});
+
+test("listOperationsOrderStatusHistoryByOrderId returns newest-first history with reason", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installDecisionFetchMock();
+
+  await applyOperationsOrderDecision({
+    orderId: ORDER_ID,
+    decision: "reject",
+    reason: "Dimensions mismatch",
+  });
+
+  const history = await listOperationsOrderStatusHistoryByOrderId(ORDER_ID);
+  assert.equal(history.length, 1);
+  assert.equal(history[0]?.reason, "Dimensions mismatch");
+  assert.equal(history[0]?.toStatus, OPERATIONS_REJECTED_DOMAIN_STATUS);
 });
 
 test("operations order decision POST approve returns safe review DTO", async () => {

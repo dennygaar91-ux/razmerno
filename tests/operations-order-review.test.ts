@@ -95,9 +95,31 @@ const sampleOrderRow = {
   pricing_fallback_reason: null,
 };
 
-function installOrderReviewFetchMock(options: { orderFound?: boolean; withDraft?: boolean } = {}) {
+const sampleStatusHistory = [
+  {
+    id: 2,
+    order_id: ORDER_ID,
+    from_status: "Проверка",
+    to_status: "Оплата",
+    changed_by: "operations:approve",
+    reason: null,
+    created_at: "2026-07-05T13:00:00.000Z",
+  },
+  {
+    id: 1,
+    order_id: ORDER_ID,
+    from_status: "Проверка",
+    to_status: "Отмена",
+    changed_by: "operations:reject",
+    reason: "Dimensions mismatch",
+    created_at: "2026-07-05T12:00:00.000Z",
+  },
+];
+
+function installOrderReviewFetchMock(options: { orderFound?: boolean; withDraft?: boolean; withHistory?: boolean } = {}) {
   const orderFound = options.orderFound !== false;
   const withDraft = options.withDraft === true;
+  const withHistory = options.withHistory === true;
 
   globalThis.fetch = (async (input: RequestInfo | URL) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
@@ -126,7 +148,8 @@ function installOrderReviewFetchMock(options: { orderFound?: boolean; withDraft?
     }
 
     if (url.includes("/rest/v1/order_status_events")) {
-      return jsonResponse(null);
+      if (!withHistory) return jsonResponse([]);
+      return jsonResponse(sampleStatusHistory);
     }
 
     return jsonResponse({ ok: true });
@@ -173,6 +196,7 @@ test("operations order review exposes safe manual review fields only", () => {
   assert.equal(review.reviewDecisionAllowed, true);
   assert.equal(review.domainStatus, "Проверка");
   assert.equal(review.latestDecisionAudit, null);
+  assert.deepEqual(review.decisionHistory, []);
   assert.equal(review.manualPricingDraft, null);
   assert.equal(review.productionReviewStatus, "requires-review");
   assert.match(review.priceBreakdownSummary, /stored breakdown keys/);
@@ -187,16 +211,30 @@ test("operations order review exposes safe manual review fields only", () => {
 });
 
 test("buildOperationsOrderReview exposes latest decision audit when provided", () => {
-  const review = buildOperationsOrderReview(sampleAdminSummary, sampleOrderRow.production_export, {
-    decision: "reject",
-    reason: "Dimensions mismatch",
-    fromDomainStatus: "Проверка",
-    toDomainStatus: "Отмена",
-    changedBy: "operations:reject",
-    createdAt: "2026-07-05T12:00:00.000Z",
-  });
-  assert.equal(review.latestDecisionAudit?.reason, "Dimensions mismatch");
-  assert.equal(review.latestDecisionAudit?.decision, "reject");
+  const history = [
+    {
+      id: "2",
+      fromStatus: "Проверка",
+      toStatus: "Оплата",
+      reason: null,
+      changedBy: "operations:approve",
+      createdAt: "2026-07-05T13:00:00.000Z",
+    },
+    {
+      id: "1",
+      fromStatus: "Проверка",
+      toStatus: "Отмена",
+      reason: "Dimensions mismatch",
+      changedBy: "operations:reject",
+      createdAt: "2026-07-05T12:00:00.000Z",
+    },
+  ];
+  const review = buildOperationsOrderReview(sampleAdminSummary, sampleOrderRow.production_export, history);
+  assert.equal(review.latestDecisionAudit?.reason, null);
+  assert.equal(review.latestDecisionAudit?.decision, "approve");
+  assert.equal(review.decisionHistory.length, 2);
+  assert.equal(review.decisionHistory[0]?.reason, null);
+  assert.equal(review.decisionHistory[1]?.reason, "Dimensions mismatch");
 });
 
 test("operations order review GET returns 401 without bearer token", async () => {
@@ -257,6 +295,7 @@ test("operations order review GET returns safe review read model for authorized 
       orderId: string;
       approvalActionsImplemented: boolean;
       reviewDecisionAllowed: boolean;
+      decisionHistory: OperationsDecisionHistoryEntry[];
       customerNameMasked: string;
       productionReviewStatus: string;
       manualPricingDraft: unknown;
@@ -269,7 +308,50 @@ test("operations order review GET returns safe review read model for authorized 
   assert.equal(body.review.reviewDecisionAllowed, true);
   assert.equal(body.review.productionReviewStatus, "requires-review");
   assert.equal(body.review.manualPricingDraft, null);
+  assert.deepEqual(body.review.decisionHistory, []);
   assert.notEqual(body.review.customerNameMasked, "Иван Петров");
+});
+
+test("operations order review GET returns decision history newest-first", async () => {
+  setRequiredServerEnv();
+  installOrderReviewFetchMock({ withHistory: true });
+  const token = createAdminSessionToken(Date.now());
+  const { res, snapshot } = createMockResponse();
+
+  await orderReviewHandler(
+    {
+      method: "GET",
+      headers: { authorization: `Bearer ${token}` },
+      query: { orderId: ORDER_ID },
+      body: null,
+    },
+    res,
+  );
+
+  const result = snapshot();
+  assert.equal(result.statusCode, 200);
+  const body = result.body as {
+    ok: boolean;
+    review: {
+      decisionHistory: Array<{
+        id: string;
+        toStatus: string;
+        reason: string | null;
+        changedBy: string;
+      }>;
+      latestDecisionAudit: { decision: string; reason: string | null } | null;
+    };
+  };
+
+  assert.equal(body.ok, true);
+  assert.equal(body.review.decisionHistory.length, 2);
+  assert.equal(body.review.decisionHistory[0]?.toStatus, "Оплата");
+  assert.equal(body.review.decisionHistory[1]?.reason, "Dimensions mismatch");
+  assert.equal(body.review.latestDecisionAudit?.decision, "approve");
+
+  const serialized = JSON.stringify(body);
+  assert.equal(serialized.includes("ivan.petrov@example.com"), false);
+  assert.equal(serialized.includes("production_export"), false);
 });
 
 test("buildOperationsOrderReviewByOrderId returns error when Supabase admin env is missing", async () => {

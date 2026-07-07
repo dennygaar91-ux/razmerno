@@ -16,6 +16,15 @@ export type OperationsDecisionAudit = {
   createdAt: string | null;
 };
 
+export type OperationsDecisionHistoryEntry = {
+  id: string;
+  fromStatus: string | null;
+  toStatus: string;
+  reason: string | null;
+  changedBy: string;
+  createdAt: string;
+};
+
 export type OperationsOrderReview = {
   orderId: string;
   status: string;
@@ -48,6 +57,7 @@ export type OperationsOrderReview = {
   approvalActionsImplemented: boolean;
   manualPricingDraft: OperationsManualPricingDraft | null;
   latestDecisionAudit: OperationsDecisionAudit | null;
+  decisionHistory: OperationsDecisionHistoryEntry[];
 };
 
 export type OperationsOrderReviewApiResult =
@@ -108,6 +118,28 @@ export function getOperationsDecisionRejectReasonRequiredMessage(): string {
 
 export function getOperationsLatestDecisionAuditLabel(): string {
   return "Последнее решение (audit)";
+}
+
+export function getOperationsDecisionHistoryTitle(): string {
+  return "История решений";
+}
+
+export function getOperationsDecisionHistoryEmptyMessage(): string {
+  return "Решений пока нет";
+}
+
+export function formatOperationsDecisionHistoryActor(changedBy: string): string {
+  if (changedBy === "operations:approve") return "Оператор · одобрение";
+  if (changedBy === "operations:reject") return "Оператор · отклонение";
+  if (changedBy === "admin") return "Admin";
+  return changedBy;
+}
+
+export function formatOperationsDecisionHistoryStatus(entry: OperationsDecisionHistoryEntry): string {
+  if (entry.fromStatus && entry.fromStatus !== entry.toStatus) {
+    return `${entry.fromStatus} → ${entry.toStatus}`;
+  }
+  return entry.toStatus;
 }
 
 export function getOperationsOrderReviewErrorMessage(): string {

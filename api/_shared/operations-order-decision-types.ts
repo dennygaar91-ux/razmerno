@@ -22,3 +22,14 @@ export type OperationsDecisionAudit = {
   changedBy: string
   createdAt: string | null
 }
+
+export type OperationsDecisionHistoryEntry = {
+  id: string
+  fromStatus: string | null
+  toStatus: string
+  reason: string | null
+  changedBy: string
+  createdAt: string
+}
+
+export const OPERATIONS_ORDER_STATUS_HISTORY_LIMIT = 20

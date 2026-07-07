@@ -1,6 +1,7 @@
 import type { AdminOrderSummary } from './admin-orders'
 import { INITIAL_ORDER_DOMAIN_STATUS } from './order-domain'
-import type { OperationsDecisionAudit } from './operations-order-decision-types'
+import type { OperationsDecisionAudit, OperationsDecisionHistoryEntry } from './operations-order-decision-types'
+import { deriveLatestOperationsDecisionAudit } from './operations-order-decision-history'
 
 import type { OperationsManualPricingDraft } from './operations-manual-pricing-draft-types'
 
@@ -36,6 +37,7 @@ export type OperationsOrderReview = {
   approvalActionsImplemented: boolean
   manualPricingDraft: OperationsManualPricingDraft | null
   latestDecisionAudit: OperationsDecisionAudit | null
+  decisionHistory: OperationsDecisionHistoryEntry[]
 }
 
 export const OPERATIONS_ORDER_REVIEW_FORBIDDEN_RESPONSE_KEYS = [
@@ -127,9 +129,10 @@ function summarizeProductionReview(productionExport: unknown): {
 export function buildOperationsOrderReview(
   order: AdminOrderSummary,
   productionExport: unknown | null,
-  latestDecisionAudit: OperationsDecisionAudit | null = null,
+  decisionHistory: OperationsDecisionHistoryEntry[] = [],
 ): OperationsOrderReview {
   const production = summarizeProductionReview(productionExport)
+  const latestDecisionAudit = deriveLatestOperationsDecisionAudit(decisionHistory)
 
   return {
     orderId: order.id,
@@ -163,5 +166,6 @@ export function buildOperationsOrderReview(
     approvalActionsImplemented: true,
     manualPricingDraft: null,
     latestDecisionAudit,
+    decisionHistory,
   }
 }

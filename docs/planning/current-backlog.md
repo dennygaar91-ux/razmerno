@@ -1178,6 +1178,17 @@ Branch implementation evidence (2026-07-07, Operations Decision Audit Reason —
 - explicit non-scope: no payment flow; no production handoff; no customer-facing `total_price` mutation; no live migration apply; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Decision History — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `GET /api/operations/order` now returns `decisionHistory` (safe list from `order_status_events`, newest-first, cap 20) plus derived `latestDecisionAudit` from first operations event in history;
+- store: `listOperationsOrderStatusHistoryByOrderId`, pure mappers in `operations-order-decision-history.ts`;
+- UI: `OperationsOrderDecisionHistorySection` on Manual Review — title `История решений`, empty state `Решений пока нет`, shows status transition, reason, actor, date; replaced single latest-audit block in decision section;
+- tests: updated `operations-order-review` (9), `operations-order-decision` (12), `operations-manual-review-ui` (9);
+- QA passed: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no new/live migration; no payment flow; no production handoff; no customer-facing `total_price` mutation; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

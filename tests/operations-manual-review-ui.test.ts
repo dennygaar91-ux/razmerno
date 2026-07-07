@@ -49,6 +49,7 @@ const sampleReview = {
   approvalActionsImplemented: true,
   manualPricingDraft: null,
   latestDecisionAudit: null,
+  decisionHistory: [],
 };
 
 test("operations manual review view exists and uses approval summary", () => {
@@ -66,8 +67,18 @@ test("manual review approve and reject actions are wired through API section", (
   assert.match(section, /submitOperationsOrderDecision/);
   assert.match(section, /data-status="success"/);
   assert.match(section, /data-status="error"/);
-  assert.match(section, /latestDecisionAudit/);
+  assert.doesNotMatch(section, /latestDecisionAudit/);
   assert.doesNotMatch(section, /createClient|supabase/i);
+});
+
+test("operations decision history section renders on manual review screen", () => {
+  const view = readFileSync("src/operations/OperationsManualReviewView.tsx", "utf8");
+  const history = readFileSync("src/operations/OperationsOrderDecisionHistorySection.tsx", "utf8");
+  assert.match(view, /OperationsOrderDecisionHistorySection/);
+  assert.match(history, /getOperationsDecisionHistoryTitle/);
+  assert.match(history, /getOperationsDecisionHistoryEmptyMessage/);
+  assert.match(history, /entry\.reason/);
+  assert.doesNotMatch(history, /createClient|supabase/i);
 });
 
 test("operations workspace routes queue to manual review view", () => {
