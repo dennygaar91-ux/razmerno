@@ -1524,6 +1524,20 @@ Do-not-touch constraints:
 - do not close admin visual or production-editor tasks from docs-only reconciliation;
 - do not change API/order semantics here.
 
+Branch implementation evidence (2026-07-07, P1-27 / P1-28 Product Scope Reconciliation Package — Local Decision Prep, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (decision package prepared, QA PASS, not closure)**;
+- created: `docs/planning/p1-27-p1-28-reconciliation.md`;
+- reconciled branch-local customer/operations implementation against P1-27 and P1-28 using `mvp-scope.md`, RPES VII/VIII, `accepted-backlog-decisions-v1.md` §12/§18, and ~59 existing branch evidence blocks;
+- identified: MVP-included, out-of-scope, product-decision (16 items), live-verification, and visual-QA gaps;
+- key gaps flagged for user decision: customer cancellation request, Approval View / manual pricing → customer price, email-code profile edit, email retry, visual QA, branch PR split;
+- **P1-27 status remains `needs reconciliation`**;
+- **P1-28 status remains `needs reconciliation`**;
+- no push/merge/PR;
+- no live migration apply;
+- no live data mutation;
+- not closure.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
