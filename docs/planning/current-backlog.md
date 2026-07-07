@@ -1574,6 +1574,26 @@ Branch implementation evidence (2026-07-07, MVP Scope Decisions User Sign-off �
 - no live data mutation;
 - not closure.
 
+Branch implementation evidence (2026-07-07, D-12 Live Verification Plan & Preflight — Signed MVP Path, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **blocked/needs-live-migration-approval** (preflight prepared, QA PASS, not live verification);
+- created: `docs/planning/d12-live-verification-preflight.md`;
+- updated: `docs/production/vercel-deploy-runbook.md` §12 preflight pointer;
+- verified local branch `task/epic-b-projects-foundation` @ `5aa79d6f`, clean tree, QA PASS;
+- Supabase MCP read-only audit: project `gxfpgulkrpmlxfeuegpg` — core MVP tables present; `next_public_order_number` present; deny-all RLS on orders/profiles/notifications/CR/manual pricing;
+- **blocker:** `order_status_events.reason` column missing; migration `20260707_add_order_status_event_reason.sql` not applied — blocks approve/reject/payment/completion audit writes;
+- secondary: `order_status_events` RLS disabled (security follow-up, not applied);
+- existing safe test order id: `RZ-20260706-7048` (`Проверка`) reusable after migration;
+- Vercel MCP: project `razmerno` (`prj_gf7NNzfwtFNGctPYpyJeCYVfCQJW`); production deploy tracks `main`, not epic-b branch — use local runtime or future preview;
+- prepared signed-MVP verification matrix, safe test data strategy, execution plan for next task;
+- **M8-P1-02 not marked PASS**;
+- **P1-27 status remains `needs reconciliation`**;
+- **P1-28 status remains `needs reconciliation`**;
+- no live data mutation;
+- no live migration apply;
+- no push/merge/PR;
+- not closure.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence

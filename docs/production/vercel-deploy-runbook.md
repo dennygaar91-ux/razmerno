@@ -330,3 +330,15 @@ npm run test:operations-manual-review-ui
 - no `total_price` / `production_export` mutation;
 - frontend API-only; Service Role server-side only; RLS deny-all unchanged;
 - P1-27 / P1-28 not closed; live verification separate; `.env.local` remains local.
+
+## 12. D-12 live verification — preflight pointer (branch)
+
+Signed MVP path live verification (D-12) preflight documented in:
+
+```text
+docs/planning/d12-live-verification-preflight.md
+```
+
+**Preflight verdict (2026-07-07):** `blocked/needs-live-migration-approval` — live project missing `order_status_events.reason` (`20260707_add_order_status_event_reason.sql` not applied). Do not run mutating ops audit smokes until user approves migration apply.
+
+Execution uses local `vercel dev` + `.env.local` until `task/epic-b-projects-foundation` preview deploy exists. See preflight doc for matrix, safe test data strategy, and step-by-step execution plan.
