@@ -1381,6 +1381,18 @@ Branch implementation evidence (2026-07-07, Customer Payment Instructions Block 
 - explicit non-scope: no payment provider; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Operations Manual Payment Confirmation API — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `POST /api/operations/payment-confirmation` — admin auth, `Оплата` → `В работе`, audit `operations:payment_confirm`;
+- store: `operations-payment-confirmation-store.ts`; optional note in `order_status_events.reason`;
+- lifecycle per RPES VII: manual confirmation only, no payment provider, no `total_price`/`production_export` mutation;
+- tests: `tests/operations-payment-confirmation.test.ts`;
+- explicit non-scope: no email/push in this task commit; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
