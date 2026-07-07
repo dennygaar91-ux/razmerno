@@ -1594,6 +1594,39 @@ Branch implementation evidence (2026-07-07, D-12 Live Verification Plan & Prefli
 - no push/merge/PR;
 - not closure.
 
+### Live Migration Apply — order_status_events.reason — 2026-07-07
+
+branch local status: done (approved live migration applied, QA PASS, not D-12 PASS, not closure)
+
+Evidence:
+
+- User approved applying migration `20260707_add_order_status_event_reason.sql` to live Supabase project `gxfpgulkrpmlxfeuegpg`.
+- Pre-apply: `order_status_events` columns `id`, `order_id`, `from_status`, `to_status`, `changed_by`, `created_at`; `reason` missing; RLS **disabled**; 0 rows.
+- Applied idempotent schema change via Supabase MCP `apply_migration`:
+
+```sql
+alter table if exists public.order_status_events
+  add column if not exists reason text;
+```
+
+- Post-apply: `order_status_events.reason` exists, type `text`, nullable; existing rows readable (0 rows); no other schema changes observed.
+- Live migration tracked: `20260707182355` / `20260707_add_order_status_event_reason`.
+- Did not mutate application data.
+- Did not create test orders.
+- Did not run full D-12 live verification.
+- Runtime compatibility check: **skipped** (not required for schema-only apply; D-12 execution will run `/api/health` first).
+- **M8-P1-02 remains not PASS**.
+- **P1-27 remains `needs reconciliation`**.
+- **P1-28 remains `needs reconciliation`**.
+- No push/merge/PR.
+- No deploy.
+- Not closure.
+
+Follow-up:
+
+- `order_status_events` RLS status: **disabled** — track as security follow-up before release (separate approval required).
+- D-12 execution unblocked for audit writes; remaining blockers: RLS follow-up, runtime target (local `vercel dev` vs preview), env availability, safe test data strategy.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
