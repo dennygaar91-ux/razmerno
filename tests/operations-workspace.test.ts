@@ -74,6 +74,7 @@ function installOperationsOrdersFetchMock() {
         {
           order_id: "RZ-20260705-1001",
           status: "new",
+          domain_status: "Проверка",
           created_at: "2026-07-05T10:00:00.000Z",
           updated_at: "2026-07-05T11:30:00.000Z",
           product_type: "wardrobe",
@@ -140,6 +141,7 @@ test("operations workspace mapper exposes only safe queue fields", () => {
   assert.deepEqual(mapOperationsWorkspaceOrder(sampleAdminSummary), {
     orderId: "RZ-20260705-1001",
     status: "new",
+    domainStatus: "Проверка",
     createdAt: "2026-07-05T10:00:00.000Z",
     updatedAt: "2026-07-05T11:30:00.000Z",
     customerNameMasked: "И•••",
@@ -225,6 +227,7 @@ test("operations workspace GET returns safe read model for authorized admin sess
     workspace: {
       orders: Array<{
         orderId: string;
+        domainStatus: string;
         customerNameMasked: string;
         productSummary: string;
         updatedAt: string | null;
@@ -236,6 +239,7 @@ test("operations workspace GET returns safe read model for authorized admin sess
   assert.equal(body.ok, true);
   assert.equal(body.workspace.stats.total, 1);
   assert.equal(body.workspace.orders[0]?.orderId, "RZ-20260705-1001");
+  assert.equal(body.workspace.orders[0]?.domainStatus, "Проверка");
   assert.equal(body.workspace.orders[0]?.updatedAt, "2026-07-05T11:30:00.000Z");
   assert.notEqual(body.workspace.orders[0]?.customerNameMasked, "Иван Петров");
   assert.match(body.workspace.orders[0]?.customerNameMasked ?? "", /[•*]/);

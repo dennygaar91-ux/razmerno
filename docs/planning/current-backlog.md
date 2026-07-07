@@ -1189,6 +1189,17 @@ Branch implementation evidence (2026-07-07, Operations Decision History — Loca
 - explicit non-scope: no new/live migration; no payment flow; no production handoff; no customer-facing `total_price` mutation; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Workspace Status Filters & Decision Badges — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API/read model: `OperationsWorkspaceOrder` now includes safe `domainStatus` mapped from admin summary; no new migration;
+- UI: domain status badge per queue row (`OperationsDomainStatusBadge`), filter controls (Все / Проверка / Оплата / Отмена), filtered empty state, review navigation preserved;
+- helpers: `src/shared/operations/workspaceFilters.ts` for frontend-side filtering;
+- tests: updated `operations-workspace` (6), `operations-workspace-ui` (10);
+- QA passed: `npm run test:operations-workspace`, `npm run test:operations-workspace-ui`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no payment flow; no production handoff; no customer-facing `total_price` mutation; no live migration apply; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

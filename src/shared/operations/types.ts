@@ -1,6 +1,7 @@
 export type OperationsWorkspaceOrder = {
   orderId: string;
   status: string;
+  domainStatus: string;
   createdAt: string | null;
   updatedAt: string | null;
   customerNameMasked: string;

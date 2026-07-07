@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { OperationsManualReviewView } from "./OperationsManualReviewView";
+import { OperationsDomainStatusBadge } from "./OperationsDomainStatusBadge";
 import { ADMIN_SESSION_KEY, loginAdmin } from "../admin/adminClient";
 import { formatOperationsDate, formatOperationsPrice } from "../shared/operations/formatOperations";
 import { buildOperationsOrderDetailPath, parseOperationsRouteOrderId } from "../shared/operations/orderDetailRoutes";
@@ -12,6 +13,12 @@ import {
   getOperationsWorkspaceEmptyMessage,
   getOperationsWorkspaceErrorMessage,
 } from "../shared/operations/types";
+import {
+  OPERATIONS_DOMAIN_STATUS_FILTER_OPTIONS,
+  filterOperationsWorkspaceByDomainStatus,
+  getOperationsWorkspaceFilteredEmptyMessage,
+  type OperationsDomainStatusFilter,
+} from "../shared/operations/workspaceFilters";
 
 export function OperationsWorkspacePage({ routePath = "/operations" }: { routePath?: string }) {
   const [input, setInput] = useState("");
@@ -96,6 +103,7 @@ function OperationsWorkspaceDashboard({
   onLogout: () => void;
 }) {
   const { state, workspace, errorMessage, reload } = useOperationsWorkspace(accessToken, true);
+  const [domainStatusFilter, setDomainStatusFilter] = useState<OperationsDomainStatusFilter>("all");
   const {
     state: reviewState,
     review,
@@ -105,6 +113,11 @@ function OperationsWorkspaceDashboard({
 
   const isLoading = state === "loading" || state === "idle";
   const orders = workspace?.orders ?? [];
+  const filteredOrders = filterOperationsWorkspaceByDomainStatus(orders, domainStatusFilter);
+  const queueEmptyMessage =
+    orders.length === 0
+      ? getOperationsWorkspaceEmptyMessage()
+      : getOperationsWorkspaceFilteredEmptyMessage(domainStatusFilter);
 
   function handleBackToQueue() {
     window.history.pushState({}, "", "/operations");
@@ -153,21 +166,41 @@ function OperationsWorkspaceDashboard({
 
         {!routeOrderId && (
           <div className="mt-6 rzm-card overflow-hidden">
-            <div className="flex flex-col gap-3 border-b border-[var(--rzm-line-soft)] px-4 py-4 md:flex-row md:items-center md:justify-between md:px-5">
-              <div>
-                <div className="font-semibold">Очередь заявок</div>
-                <div className="mt-1 text-[13px] text-[var(--rzm-text-muted)]">
-                  {isLoading ? "Загрузка..." : state === "success" ? "Данные получены через API." : "Ожидание данных."}
+            <div className="flex flex-col gap-3 border-b border-[var(--rzm-line-soft)] px-4 py-4 md:px-5">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <div className="font-semibold">Очередь заявок</div>
+                  <div className="mt-1 text-[13px] text-[var(--rzm-text-muted)]">
+                    {isLoading ? "Загрузка..." : state === "success" ? "Данные получены через API." : "Ожидание данных."}
+                  </div>
                 </div>
+                <div className="rzm-chip">{state === "success" ? "Operations API connected" : "Pending"}</div>
               </div>
-              <div className="rzm-chip">{state === "success" ? "Operations API connected" : "Pending"}</div>
+
+              <div className="flex flex-wrap gap-2">
+                {OPERATIONS_DOMAIN_STATUS_FILTER_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setDomainStatusFilter(option.id)}
+                    className={[
+                      "btn btn-sm focus-ring",
+                      domainStatusFilter === option.id ? "btn-primary" : "btn-outline",
+                    ].join(" ")}
+                    aria-pressed={domainStatusFilter === option.id}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[860px] text-left text-[13px]">
+              <table className="w-full min-w-[920px] text-left text-[13px]">
                 <thead className="bg-[var(--rzm-surface-soft)] text-[var(--rzm-text-muted)]">
                   <tr>
                     <Th>№ заявки</Th>
+                    <Th>Domain status</Th>
                     <Th>Статус</Th>
                     <Th>Клиент</Th>
                     <Th>Изделие</Th>
@@ -179,16 +212,19 @@ function OperationsWorkspaceDashboard({
                   </tr>
                 </thead>
                 <tbody>
-                  {!isLoading && orders.length === 0 ? (
+                  {!isLoading && filteredOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="px-4 py-6 text-[13px] text-[var(--rzm-text-muted)] md:px-5">
-                        {getOperationsWorkspaceEmptyMessage()}
+                      <td colSpan={10} className="px-4 py-6 text-[13px] text-[var(--rzm-text-muted)] md:px-5">
+                        {queueEmptyMessage}
                       </td>
                     </tr>
                   ) : (
-                    orders.map((order) => (
+                    filteredOrders.map((order) => (
                       <tr key={order.orderId} className="border-t border-[var(--rzm-line-soft)]">
                         <Td mono>{order.orderId}</Td>
+                        <Td>
+                          <OperationsDomainStatusBadge domainStatus={order.domainStatus} />
+                        </Td>
                         <Td>{getOperationsOrderStatusLabel(order.status)}</Td>
                         <Td>{order.customerNameMasked}</Td>
                         <Td>{order.productSummary}</Td>

@@ -3,6 +3,7 @@ import type { AdminOrderSummary } from './admin-orders'
 export type OperationsWorkspaceOrder = {
   orderId: string
   status: string
+  domainStatus: string
   createdAt: string | null
   updatedAt: string | null
   customerNameMasked: string
@@ -38,6 +39,7 @@ export function mapOperationsWorkspaceOrder(summary: AdminOrderSummary): Operati
   return {
     orderId: summary.id,
     status: summary.status,
+    domainStatus: summary.domainStatus,
     createdAt: summary.createdAt,
     updatedAt: summary.updatedAt,
     customerNameMasked: summary.customer.nameMasked,
