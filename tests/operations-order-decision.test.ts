@@ -21,11 +21,14 @@ function test(name: string, run: AsyncTest) {
 
 const ADMIN_API_KEY = "test-admin-api-key-with-minimum-length";
 const ORDER_ID = "RZ-20260705-1001";
+const ORDER_UUID = "660e8400-e29b-41d4-a716-446655440030";
+const ORDER_USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const ORIGINAL_ENV = { ...process.env };
 const ORIGINAL_FETCH = globalThis.fetch;
 
 let orderUpdates: Array<Record<string, unknown>> = [];
 let auditEvents: Array<Record<string, unknown>> = [];
+let notificationInserts: Array<Record<string, unknown>> = [];
 let productionMutations = 0;
 let totalPriceMutations = 0;
 
@@ -37,6 +40,7 @@ function restoreEnvironment() {
   globalThis.fetch = ORIGINAL_FETCH;
   orderUpdates = [];
   auditEvents = [];
+  notificationInserts = [];
   productionMutations = 0;
   totalPriceMutations = 0;
 }
@@ -79,6 +83,8 @@ const sampleOrderRow = {
   order_id: ORDER_ID,
   status: "new",
   domain_status: INITIAL_ORDER_DOMAIN_STATUS,
+  user_id: ORDER_USER_ID,
+  public_order_number: "RZM_0001",
   created_at: "2026-07-05T10:00:00.000Z",
   updated_at: "2026-07-05T11:30:00.000Z",
   product_type: "wardrobe",
@@ -129,8 +135,25 @@ function installDecisionFetchMock(options: { orderFound?: boolean; domainStatus?
       if (url.includes("select=status%2Cdomain_status") || url.includes("select=status,domain_status")) {
         return jsonResponse({ status: currentLegacyStatus, domain_status: currentDomainStatus });
       }
+      if (
+        (url.includes("select=id%2Cuser_id%2Cpublic_order_number") ||
+          url.includes("select=id,user_id,public_order_number")) &&
+        !url.includes("total_price")
+      ) {
+        return jsonResponse({
+          id: ORDER_UUID,
+          user_id: ORDER_USER_ID,
+          public_order_number: "RZM_0001",
+        });
+      }
       if (url.includes(ORDER_ID)) return jsonResponse(row());
       return jsonResponse([row()]);
+    }
+
+    if (url.includes("/rest/v1/order_notifications") && method === "POST") {
+      const body = init?.body ? JSON.parse(String(init.body)) : {};
+      notificationInserts.push(body);
+      return jsonResponse(body);
     }
 
     if (url.includes("/rest/v1/order_status_events") && method === "POST") {
@@ -321,6 +344,11 @@ test("operations order decision POST approve returns safe review DTO", async () 
   const serialized = JSON.stringify(body);
   assert.equal(serialized.includes("ivan.petrov@example.com"), false);
   assert.equal(serialized.includes("production_export"), false);
+  assert.equal(notificationInserts.length, 1);
+  assert.equal(notificationInserts[0]?.type, "order_updated");
+  assert.equal(notificationInserts[0]?.user_id, ORDER_USER_ID);
+  assert.equal(notificationInserts[0]?.order_id, ORDER_UUID);
+  assert.match(String(notificationInserts[0]?.title ?? ""), /проверена/i);
 });
 
 test("operations order decision POST reject requires reason", async () => {

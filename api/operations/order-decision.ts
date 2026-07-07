@@ -1,4 +1,5 @@
 import { validateAdminRequest } from '../_shared/admin-auth'
+import { createOperationsDecisionNotificationBestEffort } from '../_shared/customer-notification-events'
 import { applyJsonHeaders } from '../_shared/headers'
 import { logEvent } from '../_shared/logger'
 import { applyOperationsOrderDecision } from '../_shared/operations-order-decision-store'
@@ -77,6 +78,12 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       orderId: validated.value.orderId,
       decision: validated.value.decision,
       domainStatus: applied.result.domainStatus,
+    })
+
+    await createOperationsDecisionNotificationBestEffort({
+      requestId,
+      businessOrderId: validated.value.orderId,
+      decision: validated.value.decision,
     })
 
     return res.status(200).json({

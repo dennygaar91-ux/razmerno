@@ -6,6 +6,7 @@ import notificationsReadAllHandler from "../api/customer/notifications/read-all"
 import { CUSTOMER_UNAUTHORIZED_MESSAGE } from "../api/_shared/customer-api-auth";
 import {
   createChangeRequestNotificationBestEffort,
+  createOperationsDecisionNotificationBestEffort,
   createOrderCreatedNotificationBestEffort,
 } from "../api/_shared/customer-notification-events";
 import {
@@ -357,6 +358,7 @@ function installNotificationStoreMock() {
         return jsonResponse({
           id: ORDER_ID,
           user_id: USER_ID,
+          public_order_number: "RZM_0001",
         });
       }
     }
@@ -584,6 +586,45 @@ test("read-all updates only current user unread notifications", async () => {
   assert.equal(snapshot().statusCode, 200);
   assert.equal(body.ok, true);
   assert.equal(body.updatedCount, 1);
+});
+
+test("operations approve creates safe customer notification", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const store = installNotificationStoreMock();
+
+  await createOperationsDecisionNotificationBestEffort({
+    requestId: "req-ops-approve",
+    businessOrderId: "RZ-20260705-1001",
+    decision: "approve",
+  });
+
+  const inserts = store.getInserts();
+  assert.equal(inserts.length, 1);
+  assert.equal(inserts[0]?.type, "order_updated");
+  assert.equal(inserts[0]?.title, "Заявка проверена");
+  assert.match(inserts[0]?.message ?? "", /ожидает оплаты/i);
+  assert.equal(inserts[0]?.user_id, USER_ID);
+  assert.equal(inserts[0]?.order_id, ORDER_ID);
+  assert.doesNotMatch(inserts[0]?.message ?? "", /Dimensions mismatch|audit|changed_by/i);
+});
+
+test("operations reject creates safe customer notification without internal reason", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const store = installNotificationStoreMock();
+
+  await createOperationsDecisionNotificationBestEffort({
+    requestId: "req-ops-reject",
+    businessOrderId: "RZ-20260705-1001",
+    decision: "reject",
+  });
+
+  const inserts = store.getInserts();
+  assert.equal(inserts.length, 1);
+  assert.equal(inserts[0]?.title, "Заявка отменена");
+  assert.match(inserts[0]?.message ?? "", /отменена на этапе проверки/i);
+  assert.doesNotMatch(inserts[0]?.message ?? "", /Dimensions mismatch|причина/i);
 });
 
 async function runTests() {

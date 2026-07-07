@@ -1258,6 +1258,15 @@ Branch implementation evidence (2026-07-07, Customer Order Detail Status Timelin
 - explicit non-scope: no payment flow; no internal reject reason exposure; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Notification on Operations Decision — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `createOperationsDecisionNotificationBestEffort` on successful `POST /api/operations/order-decision`; approve → «Заявка проверена» / «ожидает оплаты»; reject → «Заявка отменена» without internal audit reason;
+- tests: updated `customer-notifications` (approve/reject), `operations-order-decision` (notification insert on approve POST);
+- QA passed: `npm run test:customer-notifications`, `npm run test:operations-order-decision`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no email/push; no payment creation; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
