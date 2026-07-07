@@ -13,6 +13,10 @@ import {
   CUSTOMER_CHANGE_REQUEST_MESSAGE_MAX_LENGTH,
   validateCustomerChangeRequestBody,
 } from "../api/_shared/customer-change-request-validation";
+import {
+  CUSTOMER_CHANGE_REQUEST_STATUS_NOT_ALLOWED_MESSAGE,
+  isCustomerChangeRequestAllowedForDomainStatus,
+} from "../api/_shared/customer-change-request-policy";
 
 type AsyncTest = () => void | Promise<void>;
 
@@ -114,8 +118,12 @@ function createMockResponse() {
   return { res, snapshot: () => ({ ...state, headers: { ...state.headers } }) };
 }
 
-function installChangeRequestFetchMock(options?: { notificationInsertFails?: boolean }) {
+function installChangeRequestFetchMock(options?: {
+  notificationInsertFails?: boolean;
+  domainStatus?: string;
+}) {
   const notificationInserts: Array<Record<string, unknown>> = [];
+  const domainStatus = options?.domainStatus ?? sampleOrderRow.domain_status;
 
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
@@ -134,7 +142,7 @@ function installChangeRequestFetchMock(options?: { notificationInsertFails?: boo
       const idFilter = parsed.searchParams.get("id");
       const orderId = idFilter?.startsWith("eq.") ? decodeURIComponent(idFilter.slice(3)) : null;
       if (orderId === ORDER_ID) {
-        return jsonResponse(sampleOrderRow);
+        return jsonResponse({ ...sampleOrderRow, domain_status: domainStatus });
       }
       if (orderId === FOREIGN_ORDER_ID) {
         return jsonResponse({ ...sampleOrderRow, id: FOREIGN_ORDER_ID, user_id: OTHER_USER_ID });
@@ -321,6 +329,41 @@ test("change request POST returns 404 for missing order", async () => {
   );
 
   assert.equal(snapshot().statusCode, 404);
+});
+
+test("change request POST returns 409 when order status disallows changes", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installChangeRequestFetchMock({ domainStatus: "Отмена" });
+  const { res, snapshot } = createMockResponse();
+
+  await changeRequestHandler(
+    {
+      method: "POST",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+      body: {
+        orderId: ORDER_ID,
+        requestType: "dimensions",
+        message: "Нужно изменить размеры.",
+      },
+    },
+    res,
+  );
+
+  const result = snapshot();
+  assert.equal(result.statusCode, 409);
+  const body = result.body as { ok: boolean; message: string };
+  assert.equal(body.message, CUSTOMER_CHANGE_REQUEST_STATUS_NOT_ALLOWED_MESSAGE);
+});
+
+test("change request eligibility allows only Проверка domain status", () => {
+  assert.equal(isCustomerChangeRequestAllowedForDomainStatus("Проверка"), true);
+  assert.equal(isCustomerChangeRequestAllowedForDomainStatus("Оплата"), false);
+  assert.equal(isCustomerChangeRequestAllowedForDomainStatus("Отмена"), false);
+  assert.equal(isCustomerChangeRequestAllowedForDomainStatus(null), false);
 });
 
 test("change request POST returns safe read model", async () => {

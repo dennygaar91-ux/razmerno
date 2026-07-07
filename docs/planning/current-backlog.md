@@ -1294,6 +1294,16 @@ Branch implementation evidence (2026-07-07, Customer Local Workflow Runbook Upda
 - explicit non-scope: no live migration apply; no P1-27 closure; no P1-28 change; `.env.local` remains local;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Change Request API Foundation — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `POST /api/customer/change-request` enforces ownership and allows submissions only when `domain_status === Проверка`; order detail exposes `changeRequestAllowed`;
+- policy: `isCustomerChangeRequestAllowedForDomainStatus` in `customer-change-request-policy.ts`;
+- tests: updated `customer-change-request` (eligibility, 409 for `Отмена`);
+- QA passed: `npm run test:customer-change-request`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no operations response workflow; no email/push beyond existing submit notification; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

@@ -3,6 +3,10 @@ import {
   parseCustomerApiBody,
   prepareCustomerApi,
 } from '../_shared/customer-api-auth'
+import {
+  CUSTOMER_CHANGE_REQUEST_STATUS_NOT_ALLOWED_MESSAGE,
+  isCustomerChangeRequestAllowedForDomainStatus,
+} from '../_shared/customer-change-request-policy'
 import { createChangeRequestNotificationBestEffort } from '../_shared/customer-notification-events'
 import { validateCustomerChangeRequestBody } from '../_shared/customer-change-request-validation'
 import { createCustomerChangeRequest } from '../_shared/customer-change-requests-store'
@@ -38,6 +42,10 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       reason: owned.error,
     })
     return res.status(500).json({ ok: false, message: CHANGE_REQUEST_UNAVAILABLE_MESSAGE })
+  }
+
+  if (!isCustomerChangeRequestAllowedForDomainStatus(owned.order.domain_status)) {
+    return res.status(409).json({ ok: false, message: CUSTOMER_CHANGE_REQUEST_STATUS_NOT_ALLOWED_MESSAGE })
   }
 
   const created = await createCustomerChangeRequest(auth.user.userId, validated.value)
