@@ -157,6 +157,8 @@ test("operations workspace domain status badges and filtered empty state", () =>
   assert.equal(getOperationsDomainStatusLabel("Проверка"), "Проверка");
   assert.equal(getOperationsDomainStatusLabel("Оплата"), "Оплата");
   assert.equal(getOperationsDomainStatusLabel("Отмена"), "Отмена");
+  assert.equal(getOperationsDomainStatusLabel("В работе"), "В работе");
+  assert.equal(getOperationsDomainStatusLabel("Завершено"), "Завершено");
   assert.equal(getOperationsDomainStatusLabel("unknown-status"), "unknown-status");
   assert.equal(
     getOperationsWorkspaceFilteredEmptyMessage("Проверка"),
@@ -180,6 +182,8 @@ test("operations workspace status counts render from loaded queue rows", () => {
     all: 3,
     Проверка: 1,
     Оплата: 1,
+    "В работе": 0,
+    Завершено: 0,
     Отмена: 1,
   });
   assert.equal(formatOperationsDomainStatusFilterLabel("Все", counts.all), "Все 3");
