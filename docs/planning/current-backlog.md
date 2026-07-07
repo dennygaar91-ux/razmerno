@@ -1664,6 +1664,26 @@ Follow-ups:
 - Visual QA (D-13) remains required.
 - PR/merge/main evidence remains required (D-14).
 
+### D-14 PR Strategy & Branch Review Plan — 2026-07-07
+
+branch local status: done (PR strategy prepared, QA PASS, not PR, not closure)
+
+Evidence:
+
+- created: `docs/planning/d14-pr-strategy.md`;
+- analyzed branch `task/epic-b-projects-foundation` @ `55305edc` vs `main` @ `57f739d1`: **126 commits**, **351 files**, **+48,405 / −775**;
+- classified changes: Customer Platform (A), Operations Workspace (B), Manual Pricing/Live Schema (C), Product/Planning Docs (D), QA/Verification (E), Mixed History (F);
+- evaluated PR options: single PR, single PR + logical sections, split/stacked PRs;
+- **recommended strategy:** single PR with logical review sections (Option 2) — avoid history rewrite;
+- prepared PR description draft and reviewer checklists (Product, Engineering, QA, Security);
+- **no push/merge/PR**;
+- **no deploy**;
+- **P1-27 remains `needs reconciliation`**;
+- **P1-28 remains `needs reconciliation`**;
+- D-13 visual QA remains required;
+- `order_status_events` RLS disabled remains security follow-up;
+- not closure.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
