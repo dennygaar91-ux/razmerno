@@ -4,6 +4,14 @@ import { getBusinessOrderIdByOrderUuid, getPublicOrderNumberByOrderUuid } from '
 import { applyJsonHeaders } from '../_shared/headers'
 import { logEvent } from '../_shared/logger'
 import {
+  isFailureResult,
+  isNotFoundResult,
+  isReasonedFailureResult,
+  readFailureError,
+  readFailureMessage,
+  readReasonedFailureMessage,
+} from '../_shared/result-utils'
+import {
   applyOperationsChangeRequestDecision,
   getOperationsChangeRequestById,
 } from '../_shared/operations-change-request-store'
@@ -40,20 +48,20 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (auth.ok === false) return res.status(auth.status).json({ ok: false, message: auth.message })
 
   const validated = validateOperationsChangeRequestDecisionBody(parseBody(req.body))
-  if (!validated.ok) {
-    return res.status(400).json({ ok: false, message: validated.message })
+  if (isFailureResult(validated)) {
+    return res.status(400).json({ ok: false, message: readFailureMessage(validated) })
   }
 
   try {
     const existing = await getOperationsChangeRequestById(validated.value.changeRequestId)
-    if (!existing.ok) {
-      if ('notFound' in existing && existing.notFound) {
+    if (isFailureResult(existing)) {
+      if (isNotFoundResult(existing)) {
         return res.status(404).json({ ok: false, message: CHANGE_REQUEST_NOT_FOUND_MESSAGE })
       }
       logEvent('error', 'operations_change_request_decision.lookup_failed', {
         requestId,
         changeRequestId: validated.value.changeRequestId,
-        reason: existing.error,
+        reason: readFailureError(existing),
       })
       return res.status(500).json({ ok: false, message: DECISION_UNAVAILABLE_MESSAGE })
     }
@@ -63,19 +71,19 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       validated.value.decision,
     )
 
-    if (!applied.ok) {
+    if (isReasonedFailureResult(applied)) {
       if (applied.reason === 'not_found') {
         return res.status(404).json({ ok: false, message: CHANGE_REQUEST_NOT_FOUND_MESSAGE })
       }
       if (applied.reason === 'invalid_state') {
-        return res.status(409).json({ ok: false, message: applied.message })
+        return res.status(409).json({ ok: false, message: readReasonedFailureMessage(applied) })
       }
 
       logEvent('error', 'operations_change_request_decision.apply_failed', {
         requestId,
         changeRequestId: validated.value.changeRequestId,
         decision: validated.value.decision,
-        reason: applied.message.slice(0, 300),
+        reason: readReasonedFailureMessage(applied).slice(0, 300),
       })
       return res.status(500).json({ ok: false, message: DECISION_UNAVAILABLE_MESSAGE })
     }

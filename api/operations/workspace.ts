@@ -3,6 +3,7 @@ import { applyJsonHeaders } from '../_shared/headers'
 import { logEvent } from '../_shared/logger'
 import { buildOperationsWorkspaceFromStore } from '../_shared/operations-workspace'
 import { applyRequestIdHeader, getRequestId } from '../_shared/request-context'
+import { isFailureResult, readFailureError } from '../_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from '../_shared/serverless-types'
 
 const WORKSPACE_UNAVAILABLE_MESSAGE = 'Operations workspace is temporarily unavailable.'
@@ -29,10 +30,10 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   try {
     const limit = queryNumber(req.query?.limit, 50)
     const built = await buildOperationsWorkspaceFromStore(limit)
-    if (!built.ok) {
+    if (isFailureResult(built)) {
       logEvent('error', 'operations_workspace.load_failed', {
         requestId,
-        reason: built.error.slice(0, 300),
+        reason: readFailureError(built).slice(0, 300),
       })
       return res.status(500).json({ ok: false, message: WORKSPACE_UNAVAILABLE_MESSAGE })
     }

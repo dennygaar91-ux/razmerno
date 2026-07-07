@@ -1774,6 +1774,8 @@ Evidence:
 - D-13 Preview Visual QA remains blocked until preview deployment succeeds.
 - Not closure.
 
+Follow-up after push `90ba7e51`: Fast CI `typecheck:api` **PASS** on GitHub Actions; Vercel preview still failed on per-route TS checks in `api/customer/*` and `api/operations/*` (not in `npm run typecheck:api` glob). Second fix batch applied locally for Vercel route typecheck parity; preview redeploy pending after push.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence

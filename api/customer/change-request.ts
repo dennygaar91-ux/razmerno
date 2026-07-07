@@ -12,6 +12,7 @@ import { validateCustomerChangeRequestBody } from '../_shared/customer-change-re
 import { createCustomerChangeRequest } from '../_shared/customer-change-requests-store'
 import { getCustomerOrderByIdForUser } from '../_shared/customer-orders-store'
 import { logEvent } from '../_shared/logger'
+import { isFailureResult, isNotFoundResult, readFailureError, readFailureMessage } from '../_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from '../_shared/serverless-types'
 
 const ORDER_NOT_FOUND_MESSAGE = 'Заказ не найден.'
@@ -25,13 +26,13 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (!auth) return
 
   const validated = validateCustomerChangeRequestBody(parseCustomerApiBody(req.body))
-  if (!validated.ok) {
-    return res.status(400).json({ ok: false, message: validated.message })
+  if (isFailureResult(validated)) {
+    return res.status(400).json({ ok: false, message: readFailureMessage(validated) })
   }
 
   const owned = await getCustomerOrderByIdForUser(validated.value.orderId, auth.user.userId)
-  if (!owned.ok) {
-    if ('notFound' in owned && owned.notFound) {
+  if (isFailureResult(owned)) {
+    if (isNotFoundResult(owned)) {
       return res.status(404).json({ ok: false, message: ORDER_NOT_FOUND_MESSAGE })
     }
 
@@ -39,7 +40,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       requestId: prepared.requestId,
       orderId: validated.value.orderId,
       userId: auth.user.userId,
-      reason: owned.error,
+      reason: readFailureError(owned),
     })
     return res.status(500).json({ ok: false, message: CHANGE_REQUEST_UNAVAILABLE_MESSAGE })
   }
@@ -49,12 +50,12 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   }
 
   const created = await createCustomerChangeRequest(auth.user.userId, validated.value)
-  if (!created.ok) {
+  if (isFailureResult(created)) {
     logEvent('error', 'customer_change_request.create_failed', {
       requestId: prepared.requestId,
       orderId: validated.value.orderId,
       userId: auth.user.userId,
-      reason: created.error,
+      reason: readFailureError(created),
     })
     return res.status(500).json({ ok: false, message: CHANGE_REQUEST_UNAVAILABLE_MESSAGE })
   }

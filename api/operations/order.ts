@@ -3,6 +3,7 @@ import { applyJsonHeaders } from '../_shared/headers'
 import { logEvent } from '../_shared/logger'
 import { buildOperationsOrderReviewByOrderId } from '../_shared/operations-order-review'
 import { applyRequestIdHeader, getRequestId } from '../_shared/request-context'
+import { isReasonedFailureResult, readReasonedFailureMessage } from '../_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from '../_shared/serverless-types'
 
 const REVIEW_UNAVAILABLE_MESSAGE = 'Operations order review is temporarily unavailable.'
@@ -32,14 +33,14 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
   try {
     const built = await buildOperationsOrderReviewByOrderId(orderId)
-    if (!built.ok) {
+    if (isReasonedFailureResult(built)) {
       if (built.reason === 'not_found') {
         return res.status(404).json({ ok: false, message: 'Order not found' })
       }
       logEvent('error', 'operations_order_review.load_failed', {
         requestId,
         orderId,
-        reason: built.message.slice(0, 300),
+        reason: readReasonedFailureMessage(built).slice(0, 300),
       })
       return res.status(500).json({ ok: false, message: REVIEW_UNAVAILABLE_MESSAGE })
     }

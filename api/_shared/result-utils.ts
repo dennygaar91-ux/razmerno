@@ -15,3 +15,17 @@ export function isNotFoundResult(
 ): result is { ok: false; notFound: true } {
   return result.notFound === true
 }
+
+export function isReasonedFailureResult<R extends string>(
+  result: { ok: boolean; reason?: R; message?: string },
+): result is { ok: false; reason: R; message: string } {
+  return result.ok === false && typeof result.reason === 'string'
+}
+
+export function readReasonedFailureMessage(result: { ok: false; message: string }): string {
+  return result.message
+}
+
+export function readReasonedFailureReason<R extends string>(result: { ok: false; reason: R }): R {
+  return result.reason
+}

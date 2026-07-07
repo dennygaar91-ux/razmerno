@@ -1,6 +1,7 @@
 import { authorizeCustomerApi, prepareCustomerApi } from '../_shared/customer-api-auth'
 import { buildCustomerWorkspaceForUser } from '../_shared/customer-workspace'
 import { logEvent } from '../_shared/logger'
+import { isFailureResult, readFailureError } from '../_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from '../_shared/serverless-types'
 
 const WORKSPACE_UNAVAILABLE_MESSAGE = 'Рабочая область временно недоступна. Попробуйте позже.'
@@ -18,11 +19,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     fullName: auth.user.fullName,
   })
 
-  if (!built.ok) {
+  if (isFailureResult(built)) {
     logEvent('error', 'customer_workspace.load_failed', {
       requestId: prepared.requestId,
       userId: auth.user.userId,
-      reason: built.error,
+      reason: readFailureError(built),
     })
     return res.status(500).json({ ok: false, message: WORKSPACE_UNAVAILABLE_MESSAGE })
   }

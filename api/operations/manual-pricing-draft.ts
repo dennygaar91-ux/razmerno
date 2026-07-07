@@ -5,6 +5,7 @@ import { logEvent } from '../_shared/logger'
 import { validateOperationsManualPricingDraftBody } from '../_shared/operations-manual-pricing-draft-validation'
 import { upsertOperationsManualPricingDraft } from '../_shared/operations-manual-pricing-drafts-store'
 import { applyRequestIdHeader, getRequestId } from '../_shared/request-context'
+import { isFailureResult, readFailureError, readFailureMessage } from '../_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from '../_shared/serverless-types'
 
 const SAVE_UNAVAILABLE_MESSAGE = 'Manual pricing draft is temporarily unavailable.'
@@ -35,8 +36,8 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (auth.ok === false) return res.status(auth.status).json({ ok: false, message: auth.message })
 
   const validated = validateOperationsManualPricingDraftBody(parseBody(req.body))
-  if (!validated.ok) {
-    return res.status(400).json({ ok: false, message: validated.message })
+  if (isFailureResult(validated)) {
+    return res.status(400).json({ ok: false, message: readFailureMessage(validated) })
   }
 
   try {
@@ -46,11 +47,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     }
 
     const saved = await upsertOperationsManualPricingDraft(validated.value, auth.authType === 'session' ? 'admin' : 'admin')
-    if (!saved.ok) {
+    if (isFailureResult(saved)) {
       logEvent('error', 'operations_manual_pricing_draft.save_failed', {
         requestId,
         orderId: validated.value.orderId,
-        reason: saved.error.slice(0, 300),
+        reason: readFailureError(saved).slice(0, 300),
       })
       return res.status(500).json({ ok: false, message: SAVE_UNAVAILABLE_MESSAGE })
     }

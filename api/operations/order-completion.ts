@@ -6,6 +6,12 @@ import { applyOperationsOrderCompletion } from '../_shared/operations-order-comp
 import { validateOperationsOrderCompletionBody } from '../_shared/operations-order-completion-validation'
 import { buildOperationsOrderReviewByOrderId } from '../_shared/operations-order-review'
 import { applyRequestIdHeader, getRequestId } from '../_shared/request-context'
+import {
+  isFailureResult,
+  isReasonedFailureResult,
+  readFailureMessage,
+  readReasonedFailureMessage,
+} from '../_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from '../_shared/serverless-types'
 
 const COMPLETION_UNAVAILABLE_MESSAGE = 'Operations order completion is temporarily unavailable.'
@@ -36,33 +42,33 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (auth.ok === false) return res.status(auth.status).json({ ok: false, message: auth.message })
 
   const validated = validateOperationsOrderCompletionBody(parseBody(req.body))
-  if (!validated.ok) {
-    return res.status(400).json({ ok: false, message: validated.message })
+  if (isFailureResult(validated)) {
+    return res.status(400).json({ ok: false, message: readFailureMessage(validated) })
   }
 
   try {
     const applied = await applyOperationsOrderCompletion(validated.value, 'operations')
-    if (!applied.ok) {
+    if (isReasonedFailureResult(applied)) {
       if (applied.reason === 'not_found') {
         return res.status(404).json({ ok: false, message: ORDER_NOT_FOUND_MESSAGE })
       }
       if (applied.reason === 'invalid_state') {
-        return res.status(409).json({ ok: false, message: applied.message })
+        return res.status(409).json({ ok: false, message: readReasonedFailureMessage(applied) })
       }
       logEvent('error', 'operations_order_completion.apply_failed', {
         requestId,
         orderId: validated.value.orderId,
-        reason: applied.message.slice(0, 300),
+        reason: readReasonedFailureMessage(applied).slice(0, 300),
       })
       return res.status(500).json({ ok: false, message: COMPLETION_UNAVAILABLE_MESSAGE })
     }
 
     const built = await buildOperationsOrderReviewByOrderId(validated.value.orderId)
-    if (!built.ok) {
+    if (isReasonedFailureResult(built)) {
       logEvent('error', 'operations_order_completion.review_reload_failed', {
         requestId,
         orderId: validated.value.orderId,
-        reason: built.message.slice(0, 300),
+        reason: readReasonedFailureMessage(built).slice(0, 300),
       })
       return res.status(200).json({
         ok: true,

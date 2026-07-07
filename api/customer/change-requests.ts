@@ -3,6 +3,7 @@ import { isValidCustomerChangeRequestOrderId } from '../_shared/customer-change-
 import { listCustomerChangeRequestsForOrder } from '../_shared/customer-change-requests-store'
 import { getCustomerOrderByIdForUser } from '../_shared/customer-orders-store'
 import { logEvent } from '../_shared/logger'
+import { isFailureResult, isNotFoundResult, readFailureError } from '../_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from '../_shared/serverless-types'
 
 const ORDER_NOT_FOUND_MESSAGE = 'Заказ не найден.'
@@ -22,8 +23,8 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (!auth) return
 
   const owned = await getCustomerOrderByIdForUser(orderId, auth.user.userId)
-  if (!owned.ok) {
-    if ('notFound' in owned && owned.notFound) {
+  if (isFailureResult(owned)) {
+    if (isNotFoundResult(owned)) {
       return res.status(404).json({ ok: false, message: ORDER_NOT_FOUND_MESSAGE })
     }
 
@@ -31,18 +32,18 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       requestId: prepared.requestId,
       orderId,
       userId: auth.user.userId,
-      reason: owned.error,
+      reason: readFailureError(owned),
     })
     return res.status(500).json({ ok: false, message: CHANGE_REQUEST_UNAVAILABLE_MESSAGE })
   }
 
   const listed = await listCustomerChangeRequestsForOrder(orderId, auth.user.userId)
-  if (!listed.ok) {
+  if (isFailureResult(listed)) {
     logEvent('error', 'customer_change_requests.list_failed', {
       requestId: prepared.requestId,
       orderId,
       userId: auth.user.userId,
-      reason: listed.error,
+      reason: readFailureError(listed),
     })
     return res.status(500).json({ ok: false, message: CHANGE_REQUEST_UNAVAILABLE_MESSAGE })
   }

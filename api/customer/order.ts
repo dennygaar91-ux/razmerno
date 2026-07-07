@@ -5,6 +5,7 @@ import {
   mapCustomerOrderDetail,
 } from '../_shared/customer-order-detail-types'
 import { logEvent } from '../_shared/logger'
+import { isFailureResult, isNotFoundResult, readFailureError } from '../_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from '../_shared/serverless-types'
 
 const ORDER_NOT_FOUND_MESSAGE = 'Заказ не найден.'
@@ -24,8 +25,8 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (!auth) return
 
   const loaded = await getCustomerOrderByIdForUser(orderId, auth.user.userId)
-  if (!loaded.ok) {
-    if ('notFound' in loaded && loaded.notFound) {
+  if (isFailureResult(loaded)) {
+    if (isNotFoundResult(loaded)) {
       return res.status(404).json({ ok: false, message: ORDER_NOT_FOUND_MESSAGE })
     }
 
@@ -33,7 +34,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       requestId: prepared.requestId,
       orderId,
       userId: auth.user.userId,
-      reason: loaded.error,
+      reason: readFailureError(loaded),
     })
     return res.status(500).json({ ok: false, message: ORDER_UNAVAILABLE_MESSAGE })
   }
