@@ -1776,6 +1776,12 @@ Evidence:
 
 Follow-up after push `90ba7e51`: Fast CI `typecheck:api` **PASS** on GitHub Actions; Vercel preview still failed on per-route TS checks in `api/customer/*` and `api/operations/*` (not in `npm run typecheck:api` glob). Second fix batch applied locally for Vercel route typecheck parity; preview redeploy pending after push.
 
+Follow-up after push `25b1b236`:
+- GitHub Actions `typecheck:api` step **PASS** (run `28896865460`).
+- Vercel deployment `dpl_5PESiXLJuGVNCVyXvvpsq57t1rPg` — build + per-route API TypeScript **PASS**; failed at `Deploying outputs...` with **no preview URL** (deploy-phase blocker, not verified in CLI logs).
+- Fast CI gate overall **FAILURE** on `P1-10 WebGL fallback E2E` (out of `typecheck:api` scope).
+- D-13 Preview Visual QA remains blocked until preview URL is available.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
