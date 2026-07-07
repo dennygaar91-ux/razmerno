@@ -1277,6 +1277,15 @@ Branch implementation evidence (2026-07-07, Customer Notification Bell / Unread 
 - explicit non-scope: no realtime/polling; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Decision Notification Contract Tests — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- tests: `tests/customer-decision-notification-contract.test.ts` — approve path, reject path, mark-read decreases unread count, second decision blocked (409);
+- wired: `test:customer-decision-notification-contract` in `npm test`;
+- QA passed: `npm run test:customer-decision-notification-contract`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no payment/production mutation; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
