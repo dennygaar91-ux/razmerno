@@ -1538,6 +1538,23 @@ Branch implementation evidence (2026-07-07, P1-27 / P1-28 Product Scope Reconcil
 - no live data mutation;
 - not closure.
 
+Branch implementation evidence (2026-07-07, MVP Scope Decision Sign-off Pack — Local Decision Prep, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (decision sign-off package prepared, QA PASS, not closure)**;
+- created: `docs/planning/mvp-scope-decision-signoff.md`;
+- converted P1-27/P1-28 reconciliation recommendations into explicit D-01–D-16 decision register with status legend;
+- documented recommended MVP customer boundary (accepted / deferred / out / verification);
+- documented recommended MVP Operations/Admin boundary;
+- documented closure rules for P1-27 and P1-28;
+- reconciliation conflict check: **none** vs `p1-27-p1-28-reconciliation.md`;
+- **P1-27 status remains `needs reconciliation`**;
+- **P1-28 status remains `needs reconciliation`**;
+- no implementation changes;
+- no push/merge/PR;
+- no live migration apply;
+- no live data mutation;
+- not closure.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
