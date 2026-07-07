@@ -1435,6 +1435,61 @@ Branch implementation evidence (2026-07-07, Manual Payment Local Runbook Update 
 - explicit non-scope: no live migration apply; no P1-27 closure; no P1-28 change; `.env.local` remains local;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Order Lifecycle Read Model Extension — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- domain: `ORDER_COMPLETED_DOMAIN_STATUS = Завершено` in `order-domain.ts`;
+- customer status stages: `in_progress`, `completed` in `customer-order-status.ts`;
+- timeline: `CustomerOrderStatusTimeline` full RPES VII ladder;
+- tests: updated `customer-order-detail.test.ts`;
+- explicit non-scope: no operations write for completion in this block; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Operations Workspace Lifecycle Filters — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- filters: `В работе`, `Завершено` in `workspaceFilters.ts` with counts and badge tones;
+- tests: updated `operations-workspace-ui.test.ts`;
+- traceability: M9-P1-02 partial (real order list usability);
+- explicit non-scope: no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Operations Order Completion API — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `POST /api/operations/order-completion` — admin auth, `В работе` → `Завершено`, audit `operations:order_complete`;
+- store: `operations-order-completion-store.ts`; policy: `order-completion-domain.ts`;
+- DTO: `orderCompletionAllowed` on operations review;
+- tests: `order-completion-domain.test.ts`, `operations-order-completion.test.ts`;
+- explicit non-scope: no production mutation; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Operations Order Completion UI — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- UI: `OperationsOrderCompletionSection` in manual review; enabled when `orderCompletionAllowed`;
+- API client: `operationsOrderCompletionApi.ts`;
+- tests: updated `operations-manual-review-ui.test.ts`;
+- explicit non-scope: no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Customer Notification on Order Completion — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- notification: `createOrderCompletionNotificationBestEffort` on order completion; type `order_updated`;
+- copy: `Заказ завершён`; no internal note leak;
+- tests: `operations-order-completion.test.ts`;
+- explicit non-scope: no email/push; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Order Lifecycle Completion Local Runbook Update — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- docs: `docs/production/vercel-deploy-runbook.md` §11 order lifecycle completion local workflow;
+- QA passed: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no live migration apply; no P1-27 closure; no P1-28 change; `.env.local` remains local;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

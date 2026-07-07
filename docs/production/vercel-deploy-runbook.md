@@ -291,3 +291,42 @@ npm run test:manual-payment-flow-contract
 - no production handoff automation;
 - frontend API-only; Service Role server-side only; RLS deny-all unchanged;
 - P1-27 / P1-28 not closed; live verification separate; `.env.local` remains local.
+
+## 11. Order lifecycle completion — local foundation (branch)
+
+Local-only RV1-D lifecycle extension on `task/epic-b-projects-foundation`. Not merged/main closure.
+
+### Customer lifecycle read model
+
+- `mapCustomerOrderStatus` stages: `in_progress` (`В работе`), `completed` (`Завершено`);
+- `CustomerOrderStatusTimeline` shows full ladder: На проверке → Ожидает оплаты → В работе → Завершено;
+- cancelled branch unchanged.
+
+### Operations workspace filters
+
+- workspace filters include `В работе` and `Завершено` with counts;
+- badge tones: `in_progress`, `completed`.
+
+### Operations order completion
+
+- `POST /api/operations/order-completion` — admin auth; allowed only when `domain_status === В работе`;
+- transition: `В работе` → `Завершено` (RPES VII lifecycle); audit `operations:order_complete`;
+- manual review UI: `OperationsOrderCompletionSection`;
+- customer notification: `Заказ завершён`.
+
+### Local verification commands
+
+```bash
+npm run test:order-completion-domain
+npm run test:customer-order-detail
+npm run test:operations-workspace-ui
+npm run test:operations-order-completion
+npm run test:operations-manual-review-ui
+```
+
+### Local-only caveats
+
+- no production handoff automation;
+- no `total_price` / `production_export` mutation;
+- frontend API-only; Service Role server-side only; RLS deny-all unchanged;
+- P1-27 / P1-28 not closed; live verification separate; `.env.local` remains local.
