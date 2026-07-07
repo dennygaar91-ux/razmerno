@@ -1723,6 +1723,34 @@ Evidence:
 - P1-28 remains `needs reconciliation`.
 - Not closure.
 
+### D-13 Preview Visual QA — PR #111 — 2026-07-07
+
+branch local status: blocked/needs-preview-deployment (preview visual QA BLOCKED, QA PASS, not closure)
+
+Evidence:
+
+- Attempted preview visual QA on PR #111: https://github.com/dennygaar91-ux/razmerno/pull/111
+- Vercel deployment `dpl_54NjjHsRUQcMKX3XAGYNpF234EHV` — **Error**; **no preview URL** assigned.
+- Fast CI gate — **FAILURE** (`typecheck:api` on commit `4e039f91`).
+- `/api/health` on preview — **not run** (no preview URL).
+- Customer/Operations MVP visual screens — **not reviewed on preview** (blocked).
+- Responsive desktop/tablet/mobile — **not run** (blocked).
+- D-13 local baseline P2/P3 re-check — **not reproducible** (blocked).
+- Created `docs/planning/d13-preview-visual-qa-pr-111.md`.
+- No preview screenshots captured; `artifacts/visual-qa/d13-preview/pr-111/` not created.
+- Human approval: **pending** (blocked).
+- No merge.
+- No production deploy.
+- P1-27 remains `needs reconciliation`.
+- P1-28 remains `needs reconciliation`.
+- Not closure.
+
+Follow-ups:
+
+- Fix API `typecheck:api` / Vercel preview build errors; redeploy preview; re-run D-13 preview visual QA.
+- `order_status_events` RLS disabled remains security/release follow-up.
+- P0 infra blockers: failed Vercel preview + failed Fast CI gate.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
