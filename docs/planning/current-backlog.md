@@ -1230,6 +1230,14 @@ Branch implementation evidence (2026-07-07, Operations Decision Flow Contract Te
 - explicit non-scope: no production code changes unless bug found; no payment flow; no live migration apply; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Local Runbook Update — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- docs: extended `docs/production/vercel-deploy-runbook.md` §7 with Operations local workflow — env loading before `vercel dev`, stale port 3000 caveat, `SMOKE_BASE_URL`, safe order `RZ-20260706-7048`, decision actions local-only scope, `20260707_add_order_status_event_reason.sql` live migration caveat, P1-27/P1-28 non-closure;
+- QA passed: `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no merge/push/PR; no live migration apply; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
