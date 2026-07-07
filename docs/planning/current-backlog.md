@@ -1343,6 +1343,15 @@ Branch implementation evidence (2026-07-07, Customer Notification on Change Requ
 - explicit non-scope: no email/push; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Change Request Contract Tests — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- tests: `tests/customer-change-request-contract.test.ts` — submit, operations readback, decision, notification, unread count, non-owner blocked;
+- wired: `test:customer-change-request-contract` in `npm test`;
+- QA passed: `npm run test:customer-change-request-contract`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no payment/production mutation; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
