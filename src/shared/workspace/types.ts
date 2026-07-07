@@ -1,3 +1,5 @@
+import type { CustomerOrderStatus } from "./customerOrderStatus";
+
 export type CustomerWorkspaceProfile = {
   fullName: string;
   email: string;
@@ -15,7 +17,7 @@ export type CustomerWorkspaceProject = {
 export type CustomerWorkspaceOrder = {
   id: string;
   publicOrderNumber: string | null;
-  domainStatus: string;
+  status: CustomerOrderStatus;
   createdAt: string;
   totalPrice: number;
   customerName: string;

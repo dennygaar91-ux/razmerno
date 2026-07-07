@@ -5,6 +5,7 @@ import {
 import { useCustomerOrderDetail } from "../../shared/workspace/useCustomerOrderDetail";
 import type { CustomerOrderDetail } from "../../shared/workspace/orderDetailTypes";
 import { CustomerOrderChangeRequestsSection } from "./CustomerOrderChangeRequestsSection";
+import { CustomerOrderStatusTimeline } from "./CustomerOrderStatusTimeline";
 
 function CustomerOrderPricingSection({ order }: { order: CustomerOrderDetail }) {
   const { pricingSummary } = order;
@@ -93,10 +94,10 @@ export function CustomerOrderDetailCard({ orderId }: { orderId: string }) {
       <header className="rzm-account-hero">
         <p className="rzm-kicker">Карточка заказа</p>
         <h1 className="rzm-account-title">{order.publicOrderNumber ?? "Заявка без номера"}</h1>
-        <p className="rzm-step-text">
-          {order.domainStatus || "Статус уточняется"} · {formatWorkspaceDate(order.createdAt)}
-        </p>
+        <p className="rzm-step-text">{formatWorkspaceDate(order.createdAt)}</p>
       </header>
+
+      <CustomerOrderStatusTimeline status={order.status} createdAt={order.createdAt} />
 
       <section className="rzm-account-section" aria-labelledby="order-contacts-title">
         <div className="rzm-account-section-head">

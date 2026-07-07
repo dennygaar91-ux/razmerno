@@ -1,3 +1,5 @@
+import type { CustomerOrderStatus } from "./customerOrderStatus";
+
 export type CustomerOrderPricingSummary = {
   furnitureTotal: number;
   deliveryTotal: number | null;
@@ -7,7 +9,7 @@ export type CustomerOrderPricingSummary = {
 export type CustomerOrderDetail = {
   id: string;
   publicOrderNumber: string | null;
-  domainStatus: string;
+  status: CustomerOrderStatus;
   createdAt: string;
   totalPrice: number;
   customerName: string;

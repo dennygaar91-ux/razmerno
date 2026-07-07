@@ -222,7 +222,12 @@ test("workspace mappers expose only customer-safe fields", () => {
   assert.deepEqual(mapWorkspaceOrder(sampleOrder), {
     id: sampleOrder.id,
     publicOrderNumber: "RZM_0001",
-    domainStatus: "Проверка",
+    status: {
+      label: "На проверке",
+      stage: "review",
+      description: "Мы проверяем заявку и уточняем детали перед следующим шагом.",
+      nextStep: "После проверки вы получите уведомление о дальнейших действиях.",
+    },
     createdAt: "2026-07-03T12:00:00.000Z",
     totalPrice: 79_800,
     customerName: "Workspace User",
@@ -238,7 +243,12 @@ test("workspace mappers expose only customer-safe fields", () => {
     {
       id: sampleOrder.id,
       publicOrderNumber: "RZM_0001",
-      domainStatus: "Проверка",
+      status: {
+        label: "На проверке",
+        stage: "review",
+        description: "Мы проверяем заявку и уточняем детали перед следующим шагом.",
+        nextStep: "После проверки вы получите уведомление о дальнейших действиях.",
+      },
       createdAt: "2026-07-03T12:00:00.000Z",
       totalPrice: 79_800,
       customerName: "Workspace User",
@@ -303,7 +313,7 @@ test("workspace GET returns customer-owned read model for authenticated user", a
     workspace: {
       profile: { fullName: string; email: string; phone: string | null };
       projects: Array<{ id: string; title: string }>;
-      orders: Array<{ publicOrderNumber: string | null; domainStatus: string }>;
+      orders: Array<{ publicOrderNumber: string | null; status: { label: string; stage: string } }>;
       stats: { activeProjects: number; orders: number };
     };
   };
@@ -314,7 +324,8 @@ test("workspace GET returns customer-owned read model for authenticated user", a
   assert.equal(body.workspace.projects[0]?.title, "Активный проект");
   assert.equal(body.workspace.orders.length, 2);
   assert.equal(body.workspace.orders[0]?.publicOrderNumber, "RZM_0001");
-  assert.equal(body.workspace.orders[0]?.domainStatus, "Проверка");
+  assert.equal(body.workspace.orders[0]?.status.label, "На проверке");
+  assert.equal(body.workspace.orders[0]?.status.stage, "review");
   assert.equal(body.workspace.stats.activeProjects, 1);
   assert.equal(body.workspace.stats.orders, 2);
 
@@ -326,7 +337,8 @@ test("workspace GET returns customer-owned read model for authenticated user", a
   const serialized = JSON.stringify(body.workspace);
   assert.equal(serialized.includes("snapshot"), false);
   assert.equal(serialized.includes("production_export"), false);
-  assert.equal(serialized.includes("pricing_source_diagnostic"), false);
+  assert.equal(serialized.includes("domainStatus"), false);
+  assert.equal(serialized.includes("domain_status"), false);
   assert.equal(serialized.includes(OTHER_USER_ID), false);
 });
 

@@ -1,4 +1,5 @@
 import { isValidProjectId } from './constructor-project-types'
+import { mapCustomerOrderStatus, type CustomerOrderStatus } from './customer-order-status'
 
 export type CustomerOrderDetailRow = {
   id: string
@@ -32,7 +33,7 @@ export type CustomerOrderPricingSummary = {
 export type CustomerOrderDetail = {
   id: string
   publicOrderNumber: string | null
-  domainStatus: string
+  status: CustomerOrderStatus
   createdAt: string
   totalPrice: number
   customerName: string
@@ -113,7 +114,7 @@ export function mapCustomerOrderDetail(row: CustomerOrderDetailRow): CustomerOrd
   return {
     id: row.id,
     publicOrderNumber: row.public_order_number,
-    domainStatus: row.domain_status ?? '',
+    status: mapCustomerOrderStatus(row.domain_status),
     createdAt: row.created_at,
     totalPrice: row.total_price,
     customerName: row.customer_name,
@@ -134,6 +135,8 @@ export function getCustomerOrderFurnitureLabel(productType: string | null): stri
 export const CUSTOMER_ORDER_DETAIL_FORBIDDEN_RESPONSE_KEYS = [
   'order_id',
   'orderId',
+  'domain_status',
+  'domainStatus',
   'production_export',
   'productionExport',
   'price_breakdown',

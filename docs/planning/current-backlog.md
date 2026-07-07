@@ -1238,6 +1238,16 @@ Branch implementation evidence (2026-07-07, Operations Local Runbook Update — 
 - explicit non-scope: no merge/push/PR; no live migration apply; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Order Status Safe Read Model — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `mapCustomerOrderStatus` maps internal `domain_status` to safe customer `status` DTO (`label`, `stage`, `description`, `nextStep`); raw `domainStatus` removed from customer order detail and workspace read models;
+- mapping: `Проверка` → `На проверке`, `Оплата` → `Ожидает оплаты`, `Отмена` → `Отменён`;
+- tests: updated `customer-order-detail` (9), `customer-workspace` (5), `customer-account` (10);
+- QA passed: `npm run test:customer-order-detail`, `npm run test:customer-workspace`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no DB migration; no payment flow; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

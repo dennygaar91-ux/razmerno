@@ -39,7 +39,12 @@ const sampleWorkspace: CustomerWorkspace = {
     {
       id: "660e8400-e29b-41d4-a716-446655440030",
       publicOrderNumber: "RZM_0001",
-      domainStatus: "Проверка",
+      status: {
+        label: "На проверке",
+        stage: "review",
+        description: "Мы проверяем заявку и уточняем детали перед следующим шагом.",
+        nextStep: "После проверки вы получите уведомление о дальнейших действиях.",
+      },
       createdAt: "2026-07-03T12:00:00.000Z",
       totalPrice: 79_800,
       customerName: "Иван Петров",

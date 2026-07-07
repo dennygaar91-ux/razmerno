@@ -10,6 +10,10 @@ import {
   formatCustomerOrderMaterialsDecorSummary,
   mapCustomerOrderDetail,
 } from "../api/_shared/customer-order-detail-types";
+import {
+  CUSTOMER_ORDER_STATUS_FORBIDDEN_RESPONSE_KEYS,
+  mapCustomerOrderStatus,
+} from "../api/_shared/customer-order-status";
 import type { CustomerOrderDetailRow } from "../api/_shared/customer-order-detail-types";
 
 type AsyncTest = () => void | Promise<void>;
@@ -218,12 +222,34 @@ test("order detail response uses publicOrderNumber and safe fields only", async 
   const body = result.body as { ok: boolean; order: Record<string, unknown> };
   assert.equal(body.ok, true);
   assert.equal(body.order.publicOrderNumber, "RZM_0001");
-  assert.equal(body.order.domainStatus, "Проверка");
+  assert.equal(body.order.status.label, "На проверке");
+  assert.equal(body.order.status.stage, "review");
   assert.equal(body.order.customerPhone, "+7 999 111-22-33");
 
   for (const forbiddenKey of CUSTOMER_ORDER_DETAIL_FORBIDDEN_RESPONSE_KEYS) {
     assert.equal(forbiddenKey in body.order, false, `forbidden field leaked: ${forbiddenKey}`);
   }
+  for (const forbiddenKey of CUSTOMER_ORDER_STATUS_FORBIDDEN_RESPONSE_KEYS) {
+    assert.equal(forbiddenKey in body.order, false, `forbidden status field leaked: ${forbiddenKey}`);
+  }
+});
+
+test("customer order status mapping covers lifecycle states and unknown fallback", () => {
+  assert.equal(mapCustomerOrderStatus("Проверка").label, "На проверке");
+  assert.equal(mapCustomerOrderStatus("Проверка").stage, "review");
+  assert.equal(mapCustomerOrderStatus("Оплата").label, "Ожидает оплаты");
+  assert.equal(mapCustomerOrderStatus("Оплата").stage, "payment");
+  assert.equal(mapCustomerOrderStatus("Отмена").label, "Отменён");
+  assert.equal(mapCustomerOrderStatus("Отмена").stage, "cancelled");
+  assert.equal(mapCustomerOrderStatus("Черновик").label, "Черновик");
+  assert.equal(mapCustomerOrderStatus("Черновик").stage, "unknown");
+  assert.equal(mapCustomerOrderStatus(null).label, "Статус уточняется");
+  assert.equal(mapCustomerOrderStatus("").stage, "unknown");
+
+  const mapped = mapCustomerOrderDetail({ ...sampleOrderRow, domain_status: "Оплата" });
+  assert.equal(mapped.status.label, "Ожидает оплаты");
+  assert.equal("domainStatus" in mapped, false);
+  assert.equal("changed_by" in mapped, false);
 });
 
 test("dimensions/materials/pricing summary mapping", () => {
@@ -279,6 +305,20 @@ test("order card UI is read-only", () => {
   assert.doesNotMatch(card, /<textarea\b/i);
   assert.doesNotMatch(card, /Отменить/i);
   assert.doesNotMatch(card, /Оплат/i);
+});
+
+test("customer order status timeline renders safe customer-facing states", () => {
+  const card = readFileSync("src/static-pages/account/CustomerOrderDetailCard.tsx", "utf8");
+  const timeline = readFileSync("src/static-pages/account/CustomerOrderStatusTimeline.tsx", "utf8");
+
+  assert.match(card, /CustomerOrderStatusTimeline/);
+  assert.match(timeline, /На проверке/);
+  assert.match(timeline, /Ожидает оплаты/);
+  assert.match(timeline, /Отменён/);
+  assert.match(timeline, /status\.description/);
+  assert.match(timeline, /status\.nextStep/);
+  assert.doesNotMatch(timeline, /changed_by|auditReason|domainStatus|order_status_events/i);
+  assert.doesNotMatch(card, /createClient|supabase/i);
 });
 
 async function runTests() {

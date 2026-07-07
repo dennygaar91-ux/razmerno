@@ -1,6 +1,7 @@
 import type { ConstructorProject } from './constructor-project-types'
 import type { CustomerProfile } from './customer-profile'
 import type { CustomerOrderListRow } from './customer-orders-store'
+import { mapCustomerOrderStatus, type CustomerOrderStatus } from './customer-order-status'
 
 export type CustomerWorkspaceProfile = {
   fullName: string
@@ -19,7 +20,7 @@ export type CustomerWorkspaceProject = {
 export type CustomerWorkspaceOrder = {
   id: string
   publicOrderNumber: string | null
-  domainStatus: string
+  status: CustomerOrderStatus
   createdAt: string
   totalPrice: number
   customerName: string
@@ -60,7 +61,7 @@ export function mapWorkspaceOrder(row: CustomerOrderListRow): CustomerWorkspaceO
   return {
     id: row.id,
     publicOrderNumber: row.public_order_number,
-    domainStatus: row.domain_status ?? '',
+    status: mapCustomerOrderStatus(row.domain_status),
     createdAt: row.created_at,
     totalPrice: row.total_price,
     customerName: row.customer_name,

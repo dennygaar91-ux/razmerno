@@ -93,7 +93,7 @@ function AccountOrdersSection({ workspace }: { workspace: CustomerWorkspace }) {
                   {order.publicOrderNumber ?? "Заявка без номера"}
                 </a>
                 <p className="rzm-account-list-meta">
-                  {order.domainStatus || "Статус уточняется"} · {formatWorkspaceDate(order.createdAt)}
+                  {order.status?.label || "Статус уточняется"} · {formatWorkspaceDate(order.createdAt)}
                 </p>
                 {order.deliveryAddress ? (
                   <p className="rzm-account-list-sub">{order.deliveryAddress}</p>
