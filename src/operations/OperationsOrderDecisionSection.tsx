@@ -4,6 +4,7 @@ import {
   getOperationsApproveButtonLabel,
   getOperationsDecisionApprovedMessage,
   getOperationsDecisionErrorMessage,
+  getOperationsDecisionIneligibleMessage,
   getOperationsDecisionRejectReasonRequiredMessage,
   getOperationsDecisionRejectedMessage,
   getOperationsRejectButtonLabel,
@@ -30,7 +31,20 @@ export function OperationsOrderDecisionSection({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const canAct = review.reviewDecisionAllowed && actionState !== "loading";
+  if (!review.reviewDecisionAllowed) {
+    return (
+      <div className="mt-5 border-t border-[var(--rzm-line-soft)] pt-5" data-testid="operations-decision-readonly">
+        <div className="rzm-status" data-status="info">
+          <span>{getOperationsDecisionIneligibleMessage(review.domainStatus)}</span>
+        </div>
+        <p className="mt-2 text-[12px] leading-[1.55] text-[var(--rzm-text-muted)]">
+          Текущий domain status — {review.domainStatus}. Повторное решение недоступно.
+        </p>
+      </div>
+    );
+  }
+
+  const canAct = actionState !== "loading";
 
   async function handleApprove() {
     setActionState("loading");
@@ -84,7 +98,7 @@ export function OperationsOrderDecisionSection({
   }
 
   return (
-    <div className="mt-5 border-t border-[var(--rzm-line-soft)] pt-5">
+    <div className="mt-5 border-t border-[var(--rzm-line-soft)] pt-5" data-testid="operations-decision-actions">
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
@@ -107,7 +121,7 @@ export function OperationsOrderDecisionSection({
         </button>
       </div>
 
-      {showRejectForm && review.reviewDecisionAllowed && (
+      {showRejectForm && (
         <div className="mt-4 space-y-3">
           <label className="block">
             <span className="rzm-field-label mb-2">{getOperationsRejectReasonLabel()}</span>
@@ -139,12 +153,6 @@ export function OperationsOrderDecisionSection({
         <div className="mt-3 rzm-status" data-status="error">
           <span>{errorMessage}</span>
         </div>
-      )}
-
-      {!review.reviewDecisionAllowed && (
-        <p className="mt-3 text-[12px] leading-[1.55] text-[var(--rzm-text-muted)]">
-          Решение недоступно: текущий domain status — {review.domainStatus}.
-        </p>
       )}
     </div>
   );

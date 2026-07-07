@@ -1200,6 +1200,17 @@ Branch implementation evidence (2026-07-07, Operations Workspace Status Filters 
 - explicit non-scope: no payment flow; no production handoff; no customer-facing `total_price` mutation; no live migration apply; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Review Decision Eligibility Guardrails — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- UI: `OperationsOrderDecisionSection` now renders read-only eligibility state when `reviewDecisionAllowed=false`; approve/reject controls hidden outside `Проверка`;
+- copy: `getOperationsDecisionIneligibleMessage` — `Решение уже принято` for `Оплата`/`Отмена`, generic guard for other statuses;
+- backend 409 protection unchanged;
+- tests: updated `operations-manual-review-ui` (13);
+- QA passed: `npm run test:operations-manual-review-ui`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no payment flow; no production handoff; no customer-facing `total_price` mutation; no live migration apply; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

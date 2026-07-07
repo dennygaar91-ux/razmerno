@@ -84,6 +84,13 @@ export function getOperationsApprovalActionsNotImplementedMessage(): string {
   return "Решение уже принято или недоступно для текущего статуса заказа.";
 }
 
+export function getOperationsDecisionIneligibleMessage(domainStatus: string): string {
+  if (domainStatus === "Оплата" || domainStatus === "Отмена") {
+    return "Решение уже принято";
+  }
+  return "Действия недоступны для текущего статуса";
+}
+
 export function getOperationsApproveButtonLabel(): string {
   return "Одобрить";
 }

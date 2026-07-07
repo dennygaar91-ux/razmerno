@@ -5,6 +5,7 @@ import { mapOperationsReviewToAdminDetailSummary } from "../src/shared/operation
 import {
   getOperationsApproveButtonLabel,
   getOperationsDecisionApprovedMessage,
+  getOperationsDecisionIneligibleMessage,
   getOperationsManualReviewTitle,
   getOperationsRejectButtonLabel,
 } from "../src/shared/operations/reviewTypes";
@@ -127,6 +128,43 @@ test("manual review decision labels exist", () => {
   assert.equal(getOperationsApproveButtonLabel(), "Одобрить");
   assert.equal(getOperationsRejectButtonLabel(), "Отклонить");
   assert.match(getOperationsDecisionApprovedMessage(), /одобрен/i);
+});
+
+test("decision controls stay active when order is in review state", () => {
+  const section = readFileSync("src/operations/OperationsOrderDecisionSection.tsx", "utf8");
+  assert.match(section, /review\.reviewDecisionAllowed/);
+  assert.match(section, /data-testid="operations-decision-actions"/);
+  assert.match(section, /getOperationsApproveButtonLabel/);
+  assert.match(section, /submitOperationsOrderDecision/);
+});
+
+test("decision controls become read-only when order is no longer in review state", () => {
+  const section = readFileSync("src/operations/OperationsOrderDecisionSection.tsx", "utf8");
+  const readonlyBlock = section.slice(
+    section.indexOf("if (!review.reviewDecisionAllowed)"),
+    section.indexOf("const canAct = actionState"),
+  );
+  assert.match(section, /data-testid="operations-decision-readonly"/);
+  assert.match(readonlyBlock, /getOperationsDecisionIneligibleMessage/);
+  assert.doesNotMatch(readonlyBlock, /getOperationsApproveButtonLabel/);
+  assert.doesNotMatch(readonlyBlock, /submitOperationsOrderDecision/);
+  assert.equal(getOperationsDecisionIneligibleMessage("Оплата"), "Решение уже принято");
+  assert.equal(getOperationsDecisionIneligibleMessage("Отмена"), "Решение уже принято");
+  assert.equal(getOperationsDecisionIneligibleMessage("Черновик"), "Действия недоступны для текущего статуса");
+});
+
+test("decision history remains visible regardless of decision eligibility", () => {
+  const view = readFileSync("src/operations/OperationsManualReviewView.tsx", "utf8");
+  assert.match(view, /OperationsOrderDecisionHistorySection/);
+  const historyIndex = view.indexOf("OperationsOrderDecisionHistorySection");
+  const decisionIndex = view.indexOf("OperationsOrderDecisionSection");
+  assert.ok(historyIndex > -1 && decisionIndex > -1);
+  assert.ok(historyIndex > decisionIndex, "history section should render after decision section");
+});
+
+test("backend decision conflict protection remains in API tests", () => {
+  const apiTest = readFileSync("tests/operations-order-decision.test.ts", "utf8");
+  assert.match(apiTest, /409 when order is not in review state/);
 });
 
 async function runTests() {
