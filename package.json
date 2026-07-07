@@ -127,6 +127,7 @@
     "check:stage4-fail-fast": "node scripts/check-stage4-fail-fast.mjs",
     "smoke:deploy": "node scripts/deploy-smoke.mjs",
     "verify:live-manual-pricing-draft": "node scripts/live-manual-pricing-draft-verify.mjs",
+    "verify:live-signed-mvp-path": "node scripts/live-signed-mvp-path-verify.mjs",
     "check:live-manual-pricing-draft-verify": "node scripts/check-live-manual-pricing-draft-verify.mjs",
     "check:stage4-deploy-smoke": "node scripts/check-stage4-deploy-smoke.mjs",
     "predeploy:guard": "node scripts/predeploy-guard.mjs",

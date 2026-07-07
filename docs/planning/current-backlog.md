@@ -1627,6 +1627,43 @@ Follow-up:
 - `order_status_events` RLS status: **disabled** — track as security follow-up before release (separate approval required).
 - D-12 execution unblocked for audit writes; remaining blockers: RLS follow-up, runtime target (local `vercel dev` vs preview), env availability, safe test data strategy.
 
+### D-12 Live Verification Execution — Signed MVP Path — 2026-07-07
+
+branch local status: done (live verification PASS, QA PASS, not closure)
+
+Evidence:
+
+- Ran D-12 live verification against Supabase project `gxfpgulkrpmlxfeuegpg` using local runtime `http://localhost:3004` (`vercel dev` + `.env.local` via `scripts/start-vercel-dev-with-env.mjs`).
+- `/api/health` PASS (Supabase env present).
+- Verified order submit through normal API with safe test order `RZ-20260707-5271` / `RZM_0007` (contract-test user; no real customer data).
+- Verified customer order detail (`На проверке` → `Ожидает оплаты` → `Завершено` via status DTO).
+- Verified customer notifications/unread/mark-read (unread decreased after PATCH mark-read).
+- Verified customer change request path (submitted before approve).
+- Verified operations workspace/readback.
+- Verified manual pricing draft write/readback (`125000`, status unchanged).
+- Verified operations change request decision (`reviewed`).
+- Verified approve path `Проверка` → `Оплата`.
+- Verified manual payment confirmation `Оплата` → `В работе`.
+- Verified order completion `В работе` → `Завершено`.
+- Verified `order_status_events` audit writes with `reason` column present (approve null reason; payment/completion notes persisted).
+- Verified basic auth/admin negative checks (401 unauth/wrong admin; no audit leak in customer DTO).
+- Added `scripts/live-signed-mvp-path-verify.mjs`, `scripts/start-vercel-dev-with-env.mjs`, `npm run verify:live-signed-mvp-path`.
+- Artifact: `artifacts/d12-live-verification-report.json` (local, not committed).
+- Additional debug-safe test order from same run family: `RZ-20260707-9806` / `RZM_0006` (partial script assertion fix run; also completed lifecycle).
+- **M8-P1-02 not marked PASS**.
+- **P1-27 remains `needs reconciliation`**.
+- **P1-28 remains `needs reconciliation`**.
+- No real customer data mutation.
+- No push/merge/PR.
+- No deploy.
+- Not closure.
+
+Follow-ups:
+
+- `order_status_events` RLS status: **disabled** — security follow-up before release.
+- Visual QA (D-13) remains required.
+- PR/merge/main evidence remains required (D-14).
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
