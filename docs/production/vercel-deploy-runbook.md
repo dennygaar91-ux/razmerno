@@ -158,3 +158,56 @@ This migration was prepared locally and may still be unapplied on live. Do not c
 - No merge / push / PR / production deploy from local batch evidence alone
 - Do not commit `.env.local`
 - Do not mutate live Supabase data from agent workflows unless explicitly scoped and approved
+
+## 8. Customer platform — local workflow (branch foundation)
+
+Local-only customer-facing workflow connected to Operations decisions on `task/epic-b-projects-foundation`. This section is **not** merged/main closure evidence.
+
+### Customer order status model
+
+Customer APIs expose safe `status` DTO (not raw `domain_status`):
+
+| Internal `domain_status` | Customer label |
+| --- | --- |
+| `Проверка` | `На проверке` |
+| `Оплата` | `Ожидает оплаты` |
+| `Отмена` | `Отменён` |
+
+Order detail UI shows `CustomerOrderStatusTimeline` with description and next-step copy only.
+
+### Operations decision effect
+
+When `POST /api/operations/order-decision` succeeds:
+
+- approve → customer status `Ожидает оплаты`, notification `Заявка проверена`;
+- reject → customer status `Отменён`, notification `Заявка отменена`;
+- internal audit reason from Operations is **not** exposed to customer notifications or order status DTO.
+
+### Customer notifications
+
+- Stored in `order_notifications` via server-side Service Role only;
+- list: `GET /api/customer/notifications`;
+- unread count: `GET /api/customer/notifications/unread-count`;
+- mark read: existing read/read-all endpoints;
+- no email/push in this local foundation unless separately implemented and verified.
+
+### Header unread indicator
+
+Authenticated header shows bell link to `/account#account-notifications-title` with unread badge from unread-count API.
+
+### Local verification commands
+
+```bash
+npm run test:customer-order-detail
+npm run test:customer-notifications
+npm run test:customer-notifications-ui
+npm run test:customer-decision-notification-contract
+npm run test:operations-order-decision
+```
+
+### Local-only caveats
+
+- Decision notifications are local branch foundation unless explicitly live-verified later;
+- P1-27 / P1-28 are not closed by this local work;
+- live verification remains separate and is not implied by local tests alone;
+- `.env.local` must remain local/uncommitted.
