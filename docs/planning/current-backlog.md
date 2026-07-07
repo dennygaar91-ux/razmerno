@@ -1221,6 +1221,15 @@ Branch implementation evidence (2026-07-07, Operations Workspace Status Counts �
 - explicit non-scope: no DB migration; no separate analytics endpoint; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Decision Flow Contract Tests — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- tests: new `tests/operations-decision-flow-contract.test.ts` (5) covering workspace queue → manual review → approve/reject → audit/history readback, 409 guardrails, no production/total_price mutation;
+- npm: `test:operations-decision-flow-contract` wired into `npm test`;
+- QA passed: `npm run test:operations-decision-flow-contract`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no production code changes unless bug found; no payment flow; no live migration apply; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:
