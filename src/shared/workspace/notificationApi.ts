@@ -3,11 +3,13 @@ import type {
   CustomerNotificationListApiResult,
   CustomerNotificationReadAllApiResult,
   CustomerNotificationReadApiResult,
+  CustomerNotificationUnreadCountApiResult,
 } from "./notificationTypes";
 
 const DEFAULT_NOTIFICATIONS_API_URL = "/api/customer/notifications";
 const DEFAULT_NOTIFICATION_READ_API_URL = "/api/customer/notification/read";
 const DEFAULT_NOTIFICATIONS_READ_ALL_API_URL = "/api/customer/notifications/read-all";
+const DEFAULT_NOTIFICATIONS_UNREAD_COUNT_API_URL = "/api/customer/notifications/unread-count";
 
 function getNotificationsApiUrl(): string {
   const configured = import.meta.env.VITE_CUSTOMER_NOTIFICATIONS_API_URL?.trim();
@@ -22,6 +24,11 @@ function getNotificationReadApiUrl(): string {
 function getNotificationsReadAllApiUrl(): string {
   const configured = import.meta.env.VITE_CUSTOMER_NOTIFICATIONS_READ_ALL_API_URL?.trim();
   return configured || DEFAULT_NOTIFICATIONS_READ_ALL_API_URL;
+}
+
+function getNotificationsUnreadCountApiUrl(): string {
+  const configured = import.meta.env.VITE_CUSTOMER_NOTIFICATIONS_UNREAD_COUNT_API_URL?.trim();
+  return configured || DEFAULT_NOTIFICATIONS_UNREAD_COUNT_API_URL;
 }
 
 export async function fetchCustomerNotifications(
@@ -114,5 +121,35 @@ export async function markAllCustomerNotificationsRead(
     return { ok: true, updatedCount: payload.updatedCount };
   } catch {
     return { ok: false, message: "Сетевая ошибка при обновлении уведомлений." };
+  }
+}
+
+export async function fetchCustomerNotificationUnreadCount(
+  accessToken: string,
+): Promise<CustomerNotificationUnreadCountApiResult> {
+  try {
+    const response = await fetch(getNotificationsUnreadCountApiUrl(), {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const payload = (await response.json().catch(() => null)) as
+      | { ok?: boolean; unreadCount?: number; message?: string }
+      | null;
+
+    if (!response.ok || !payload?.ok || typeof payload.unreadCount !== "number") {
+      return {
+        ok: false,
+        status: response.status,
+        message: payload?.message || "Не удалось загрузить счётчик уведомлений.",
+      };
+    }
+
+    return { ok: true, unreadCount: payload.unreadCount };
+  } catch {
+    return { ok: false, message: "Сетевая ошибка при загрузке счётчика уведомлений." };
   }
 }

@@ -1267,6 +1267,16 @@ Branch implementation evidence (2026-07-07, Customer Notification on Operations 
 - explicit non-scope: no email/push; no payment creation; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Notification Bell / Unread Count — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `GET /api/customer/notifications/unread-count` with ownership filter; `countUnreadCustomerNotificationsForUser` store helper;
+- UI: `CustomerNotificationBellLink` in header with unread badge; `useCustomerNotificationUnreadCount` hook; mark-as-read compatibility preserved;
+- tests: updated `customer-notifications` (unread count store/endpoint), `customer-notifications-ui` (bell/unread entry point);
+- QA passed: `npm run test:customer-notifications`, `npm run test:customer-notifications-ui`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no realtime/polling; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

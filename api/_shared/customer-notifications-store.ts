@@ -125,3 +125,20 @@ export async function markAllCustomerNotificationsReadForUser(
 
   return { ok: true, updatedCount: data?.length ?? 0 }
 }
+
+export async function countUnreadCustomerNotificationsForUser(
+  userId: string,
+): Promise<{ ok: true; unreadCount: number } | { ok: false; error: string }> {
+  const client = getSupabaseClient()
+  if (!client) return { ok: false, error: 'notification_storage_unavailable' }
+
+  const { count, error } = await client
+    .from('order_notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('is_read', false)
+
+  if (error) return { ok: false, error: error.message }
+
+  return { ok: true, unreadCount: count ?? 0 }
+}

@@ -110,12 +110,25 @@ test("UI updates local state without reload", () => {
   assert.doesNotMatch(section, /window\.location\.reload|location\.reload/);
 });
 
-test("no bell UI", () => {
-  const section = readFileSync("src/static-pages/account/CustomerNotificationsSection.tsx", "utf8");
-  const cabinet = readFileSync("src/static-pages/account/CustomerAccountCabinet.tsx", "utf8");
+test("header bell renders unread count entry point", () => {
+  const header = readFileSync("src/shared/auth/HeaderAuthControls.tsx", "utf8");
+  const bell = readFileSync("src/shared/auth/CustomerNotificationBellLink.tsx", "utf8");
+  const hook = readFileSync("src/shared/workspace/useCustomerNotificationUnreadCount.ts", "utf8");
+  const api = readFileSync("src/shared/workspace/notificationApi.ts", "utf8");
 
-  assert.doesNotMatch(section, /notification-bell|header-bell|unread-badge|🔔/i);
-  assert.doesNotMatch(cabinet, /notification-bell|header-bell|unread-badge|🔔/i);
+  assert.match(header, /CustomerNotificationBellLink/);
+  assert.match(bell, /customer-notification-unread-badge/);
+  assert.match(bell, /\/account#account-notifications-title/);
+  assert.match(hook, /fetchCustomerNotificationUnreadCount/);
+  assert.match(api, /\/api\/customer\/notifications\/unread-count/);
+  assert.doesNotMatch(bell, /createClient|supabase/i);
+});
+
+test("mark-as-read hook remains compatible with unread count reload", () => {
+  const hook = readFileSync("src/shared/workspace/useCustomerNotifications.ts", "utf8");
+  assert.match(hook, /markOneAsRead/);
+  assert.match(hook, /markAllAsRead/);
+  assert.match(hook, /setNotifications/);
 });
 
 test("no realtime or polling", () => {

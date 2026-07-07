@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 
 import notificationsHandler from "../api/customer/notifications";
+import unreadCountHandler from "../api/customer/notifications/unread-count";
 import notificationReadHandler from "../api/customer/notification/read";
 import notificationsReadAllHandler from "../api/customer/notifications/read-all";
 import { CUSTOMER_UNAUTHORIZED_MESSAGE } from "../api/_shared/customer-api-auth";
@@ -16,7 +17,7 @@ import {
   mapCustomerNotification,
 } from "../api/_shared/customer-notification-types";
 import type { CustomerNotificationRow } from "../api/_shared/customer-notification-types";
-import { listCustomerNotificationsForUser } from "../api/_shared/customer-notifications-store";
+import { listCustomerNotificationsForUser, countUnreadCustomerNotificationsForUser } from "../api/_shared/customer-notifications-store";
 
 const tests: Array<{ name: string; run: AsyncTest }> = [];
 
@@ -625,6 +626,75 @@ test("operations reject creates safe customer notification without internal reas
   assert.equal(inserts[0]?.title, "Заявка отменена");
   assert.match(inserts[0]?.message ?? "", /отменена на этапе проверки/i);
   assert.doesNotMatch(inserts[0]?.message ?? "", /Dimensions mismatch|причина/i);
+});
+
+test("unread count returns only owned unread notifications", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    if (url.includes("/rest/v1/order_notifications")) {
+      const parsed = new URL(url);
+      const userFilter = parsed.searchParams.get("user_id");
+      const userId = userFilter?.startsWith("eq.") ? decodeURIComponent(userFilter.slice(3)) : null;
+      if (userId !== USER_ID) {
+        return new Response(null, {
+          status: 200,
+          headers: { "Content-Range": "*/0" },
+        });
+      }
+      if (parsed.searchParams.get("is_read") === "eq.false") {
+        return new Response(null, {
+          status: 200,
+          headers: { "Content-Range": "*/2" },
+        });
+      }
+      return jsonResponse([sampleNotificationRow]);
+    }
+    return jsonResponse([]);
+  }) as typeof fetch;
+
+  const counted = await countUnreadCustomerNotificationsForUser(USER_ID);
+  assert.equal(counted.ok, true);
+  if (counted.ok) assert.equal(counted.unreadCount, 2);
+});
+
+test("unread count endpoint returns zero for user without unread notifications", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    if (url.includes("/auth/v1/user")) {
+      return jsonResponse({ id: USER_ID, email: "ivan@example.com", user_metadata: {} });
+    }
+    if (url.includes("/rest/v1/order_notifications")) {
+      return new Response(null, {
+        status: 200,
+        headers: { "Content-Range": "*/0" },
+      });
+    }
+    return jsonResponse([]);
+  }) as typeof fetch;
+
+  const { res, snapshot } = createMockResponse();
+  await unreadCountHandler(
+    {
+      method: "GET",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+      body: null,
+    },
+    res,
+  );
+
+  const body = snapshot().body as { ok: boolean; unreadCount: number };
+  assert.equal(snapshot().statusCode, 200);
+  assert.equal(body.ok, true);
+  assert.equal(body.unreadCount, 0);
 });
 
 async function runTests() {

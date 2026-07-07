@@ -26,6 +26,10 @@ export type CustomerNotificationReadAllApiResult =
   | { ok: true; updatedCount: number }
   | { ok: false; message: string; status?: number };
 
+export type CustomerNotificationUnreadCountApiResult =
+  | { ok: true; unreadCount: number }
+  | { ok: false; message: string; status?: number };
+
 const CUSTOMER_NOTIFICATION_TYPE_LABELS: Record<CustomerNotificationType, string> = {
   order_created: "Заказ создан",
   order_updated: "Заказ обновлён",

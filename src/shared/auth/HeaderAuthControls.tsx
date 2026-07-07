@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AuthModal } from "./AuthModal";
+import { CustomerNotificationBellLink } from "./CustomerNotificationBellLink";
 import { useAuth } from "./useAuth";
 import { useProfile } from "./useProfile";
 
@@ -21,6 +22,7 @@ export function HeaderAuthControls({ className, compact = false }: HeaderAuthCon
   if (isAuthenticated) {
     return (
       <div className={rootClassName} aria-label="Аккаунт">
+        <CustomerNotificationBellLink compact={compact} />
         <a className="rzm-header-auth-user rzm-header-auth-link" href="/account" title={displayName ?? undefined}>
           {compact ? "Кабинет" : displayName ?? "Кабинет"}
         </a>

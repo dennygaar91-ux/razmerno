@@ -26,6 +26,36 @@
   margin-right:0;
 }
 
+.rzm-header-notification-bell{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;
+  height:36px;
+  border-radius:999px;
+  text-decoration:none;
+  color:var(--rzm-dark, #2A2C41);
+  background:rgba(255,255,255,.72);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.9);
+}
+
+.rzm-header-notification-badge{
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  min-width:18px;
+  height:18px;
+  padding:0 5px;
+  border-radius:999px;
+  background:#4f46e5;
+  color:#fff;
+  font-size:11px;
+  font-weight:700;
+  line-height:18px;
+  text-align:center;
+}
+
 .rzm-auth-modal-root{
   position:fixed;
   inset:0;
