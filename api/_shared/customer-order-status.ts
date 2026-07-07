@@ -1,5 +1,6 @@
 import {
   INITIAL_ORDER_DOMAIN_STATUS,
+  MANUAL_PAYMENT_CONFIRMED_DOMAIN_STATUS,
   OPERATIONS_APPROVED_DOMAIN_STATUS,
   OPERATIONS_REJECTED_DOMAIN_STATUS,
 } from './order-domain'
@@ -31,6 +32,15 @@ export function mapCustomerOrderStatus(domainStatus: string | null | undefined):
       stage: 'payment',
       description: 'Заявка проверена. Следующий шаг — оплата по инструкции менеджера.',
       nextStep: 'Дождитесь связи с менеджером или проверьте уведомления в кабинете.',
+    }
+  }
+
+  if (normalized === MANUAL_PAYMENT_CONFIRMED_DOMAIN_STATUS) {
+    return {
+      label: 'В работе',
+      stage: 'unknown',
+      description: 'Оплата подтверждена. Заявка передана на следующий этап.',
+      nextStep: 'Следите за уведомлениями в кабинете.',
     }
   }
 

@@ -4,6 +4,9 @@ export const INITIAL_ORDER_DOMAIN_STATUS = 'Проверка' as const
 /** Next domain status after operations manual review approval (no payment automation). */
 export const OPERATIONS_APPROVED_DOMAIN_STATUS = 'Оплата' as const
 
+/** Domain status after operations manual payment confirmation (no payment provider). */
+export const MANUAL_PAYMENT_CONFIRMED_DOMAIN_STATUS = 'В работе' as const
+
 /** Terminal domain status after operations manual review rejection. */
 export const OPERATIONS_REJECTED_DOMAIN_STATUS = 'Отмена' as const
 

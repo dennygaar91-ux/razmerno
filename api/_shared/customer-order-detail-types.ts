@@ -1,6 +1,10 @@
 import { isValidProjectId } from './constructor-project-types'
 import { isCustomerChangeRequestAllowedForDomainStatus } from './customer-change-request-policy'
 import { mapCustomerOrderStatus, type CustomerOrderStatus } from './customer-order-status'
+import {
+  derivePaymentReadinessState,
+  type PaymentReadinessState,
+} from './payment-readiness-domain'
 
 export type CustomerOrderDetailRow = {
   id: string
@@ -46,6 +50,7 @@ export type CustomerOrderDetail = {
   materialsDecorSummary: string | null
   pricingSummary: CustomerOrderPricingSummary
   changeRequestAllowed: boolean
+  paymentState: PaymentReadinessState
 }
 
 export function isValidCustomerOrderId(value: string): boolean {
@@ -128,6 +133,7 @@ export function mapCustomerOrderDetail(row: CustomerOrderDetailRow): CustomerOrd
     materialsDecorSummary: formatCustomerOrderMaterialsDecorSummary(row.materials, row.style),
     pricingSummary: buildCustomerOrderPricingSummary(row),
     changeRequestAllowed: isCustomerChangeRequestAllowedForDomainStatus(row.domain_status),
+    paymentState: derivePaymentReadinessState(row.domain_status),
   }
 }
 

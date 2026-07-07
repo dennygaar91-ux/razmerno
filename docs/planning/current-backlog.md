@@ -1360,6 +1360,18 @@ Branch implementation evidence (2026-07-07, Change Request Local Runbook Update 
 - explicit non-scope: no live migration apply; no P1-27 closure; no P1-28 change; `.env.local` remains local;
 - branch-only evidence, not merged/main closure.
 
+- branch-only evidence, not merged/main closure.
+
+Branch implementation evidence (2026-07-07, Payment Readiness Safe Domain Model — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- domain: `api/_shared/payment-readiness-domain.ts` — `awaiting_manual_confirmation` for `Оплата`, `confirmed` for `В работе`, transition guardrails;
+- constants: `MANUAL_PAYMENT_CONFIRMED_DOMAIN_STATUS = В работе` in `order-domain.ts`;
+- DTO: `paymentState` on customer order detail; `paymentState` + `paymentConfirmationAllowed` on operations review;
+- tests: `tests/payment-readiness-domain.test.ts`;
+- explicit non-scope: no payment provider; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

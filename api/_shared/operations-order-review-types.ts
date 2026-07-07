@@ -5,6 +5,11 @@ import { deriveLatestOperationsDecisionAudit } from './operations-order-decision
 
 import type { OperationsManualPricingDraft } from './operations-manual-pricing-draft-types'
 import type { OperationsChangeRequest } from './operations-change-request-types'
+import {
+  derivePaymentReadinessState,
+  isManualPaymentConfirmationAllowedForDomainStatus,
+  type PaymentReadinessState,
+} from './payment-readiness-domain'
 
 export type OperationsOrderReview = {
   orderId: string
@@ -40,6 +45,8 @@ export type OperationsOrderReview = {
   latestDecisionAudit: OperationsDecisionAudit | null
   decisionHistory: OperationsDecisionHistoryEntry[]
   changeRequests: OperationsChangeRequest[]
+  paymentState: PaymentReadinessState
+  paymentConfirmationAllowed: boolean
 }
 
 export const OPERATIONS_ORDER_REVIEW_FORBIDDEN_RESPONSE_KEYS = [
@@ -171,5 +178,7 @@ export function buildOperationsOrderReview(
     latestDecisionAudit,
     decisionHistory,
     changeRequests,
+    paymentState: derivePaymentReadinessState(order.domainStatus),
+    paymentConfirmationAllowed: isManualPaymentConfirmationAllowedForDomainStatus(order.domainStatus),
   }
 }
