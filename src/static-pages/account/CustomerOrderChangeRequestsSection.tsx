@@ -7,6 +7,7 @@ import {
   CUSTOMER_CHANGE_REQUEST_TYPE_OPTIONS,
   getCustomerChangeRequestStatusLabel,
   getCustomerChangeRequestSuccessMessage,
+  getCustomerChangeRequestIneligibleMessage,
   getCustomerChangeRequestTypeLabel,
   getCustomerChangeRequestsEmptyMessage,
   type CustomerChangeRequest,
@@ -30,7 +31,13 @@ function CustomerChangeRequestHistoryItem({ request }: { request: CustomerChange
   );
 }
 
-export function CustomerOrderChangeRequestsSection({ orderId }: { orderId: string }) {
+export function CustomerOrderChangeRequestsSection({
+  orderId,
+  changeRequestAllowed,
+}: {
+  orderId: string;
+  changeRequestAllowed: boolean;
+}) {
   const {
     state,
     changeRequests,
@@ -99,7 +106,7 @@ export function CustomerOrderChangeRequestsSection({ orderId }: { orderId: strin
           <h2 id="order-change-requests-title">Изменения заказа</h2>
           <p className="rzm-step-text">Запросы на изменение уже отправленной заявки.</p>
         </div>
-        {!showForm ? (
+        {!showForm && changeRequestAllowed ? (
           <button
             type="button"
             className="rzm-ui-btn rzm-ui-btn--secondary"
@@ -137,7 +144,13 @@ export function CustomerOrderChangeRequestsSection({ orderId }: { orderId: strin
         </div>
       ) : null}
 
-      {showForm ? (
+      {!changeRequestAllowed ? (
+        <p className="rzm-account-panel-text" data-testid="change-request-ineligible">
+          {getCustomerChangeRequestIneligibleMessage()}
+        </p>
+      ) : null}
+
+      {changeRequestAllowed && showForm ? (
         <form className="rzm-account-change-request-form" onSubmit={(event) => void handleSubmit(event)}>
           <label className="rzm-auth-field">
             <span>Тип изменения</span>

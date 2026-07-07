@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 
 import {
   CUSTOMER_CHANGE_REQUEST_TYPE_OPTIONS,
+  getCustomerChangeRequestIneligibleMessage,
   getCustomerChangeRequestStatusLabel,
   getCustomerChangeRequestSuccessMessage,
   getCustomerChangeRequestsEmptyMessage,
@@ -21,6 +22,7 @@ test("change request section exists on order detail", () => {
   const section = readFileSync("src/static-pages/account/CustomerOrderChangeRequestsSection.tsx", "utf8");
 
   assert.match(orderCard, /CustomerOrderChangeRequestsSection/);
+  assert.match(orderCard, /changeRequestAllowed=\{order\.changeRequestAllowed\}/);
   assert.match(section, /Изменения заказа/);
 });
 
@@ -30,9 +32,35 @@ test("empty state text exists", () => {
   assert.match(section, /getCustomerChangeRequestsEmptyMessage/);
 });
 
-test("request button exists", () => {
+test("request button exists only when change request is allowed", () => {
   const section = readFileSync("src/static-pages/account/CustomerOrderChangeRequestsSection.tsx", "utf8");
   assert.match(section, /Запросить изменение/);
+  assert.match(section, /changeRequestAllowed &&/);
+});
+
+test("ineligible order shows read-only explanation", () => {
+  const section = readFileSync("src/static-pages/account/CustomerOrderChangeRequestsSection.tsx", "utf8");
+  assert.equal(
+    getCustomerChangeRequestIneligibleMessage(),
+    "Изменения недоступны для текущего статуса заявки.",
+  );
+  assert.match(section, /getCustomerChangeRequestIneligibleMessage/);
+  assert.match(section, /data-testid="change-request-ineligible"/);
+});
+
+test("submit form calls API through hook", () => {
+  const section = readFileSync("src/static-pages/account/CustomerOrderChangeRequestsSection.tsx", "utf8");
+  const hook = readFileSync("src/shared/workspace/useCustomerChangeRequests.ts", "utf8");
+  assert.match(section, /submitChangeRequest/);
+  assert.match(hook, /createCustomerChangeRequest/);
+  assert.doesNotMatch(section, /createClient|supabase/i);
+});
+
+test("API error state renders in form", () => {
+  const section = readFileSync("src/static-pages/account/CustomerOrderChangeRequestsSection.tsx", "utf8");
+  assert.match(section, /submitError/);
+  assert.match(section, /setSubmitError/);
+  assert.match(section, /role="alert"/);
 });
 
 test("request type labels map to API values", () => {

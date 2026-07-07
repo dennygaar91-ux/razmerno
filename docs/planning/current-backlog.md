@@ -1304,6 +1304,15 @@ Branch implementation evidence (2026-07-07, Customer Change Request API Foundati
 - explicit non-scope: no operations response workflow; no email/push beyond existing submit notification; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Change Request UI — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- UI: order detail passes `changeRequestAllowed` from API; form/button only when eligible; ineligible copy `Изменения недоступны для текущего статуса заявки`;
+- tests: updated `customer-change-request-ui` (eligibility, API-only, error state);
+- QA passed: `npm run test:customer-change-request-ui`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no operations response UI; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

@@ -153,7 +153,10 @@ export function CustomerOrderDetailCard({ orderId }: { orderId: string }) {
 
       <CustomerOrderPricingSection order={order} />
 
-      <CustomerOrderChangeRequestsSection orderId={orderId} />
+      <CustomerOrderChangeRequestsSection
+        orderId={orderId}
+        changeRequestAllowed={order.changeRequestAllowed}
+      />
 
       <div className="rzm-account-panel-actions">
         <a className="rzm-secondary-cta" href="/account">Вернуться в кабинет</a>

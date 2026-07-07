@@ -64,3 +64,7 @@ export function getCustomerChangeRequestsEmptyMessage(): string {
 export function getCustomerChangeRequestSuccessMessage(): string {
   return "Запрос отправлен менеджеру.";
 }
+
+export function getCustomerChangeRequestIneligibleMessage(): string {
+  return "Изменения недоступны для текущего статуса заявки.";
+}

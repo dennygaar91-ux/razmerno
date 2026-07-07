@@ -20,6 +20,7 @@ export type CustomerOrderDetail = {
   dimensionsSummary: string | null;
   materialsDecorSummary: string | null;
   pricingSummary: CustomerOrderPricingSummary;
+  changeRequestAllowed: boolean;
 };
 
 export type CustomerOrderDetailApiResult =
