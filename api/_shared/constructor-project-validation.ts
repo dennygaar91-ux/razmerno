@@ -51,17 +51,17 @@ export function validateProjectCreateBody(body: unknown): ProjectValidationResul
 
   const record = body as Record<string, unknown>
   const title = normalizeTitle(record.title)
-  if (!title.ok) return title
+  if (title.ok === false) return { ok: false, message: title.message }
 
   const furnitureType = normalizeFurnitureType(record.furniture_type)
-  if (!furnitureType.ok) return furnitureType
+  if (furnitureType.ok === false) return { ok: false, message: furnitureType.message }
 
   if (!isValidProjectSnapshot(record.snapshot)) {
     return { ok: false, message: 'snapshot must be a versioned constructor project payload.' }
   }
 
   const previewPath = normalizePreviewPath(record.preview_path)
-  if (!previewPath.ok) return previewPath
+  if (previewPath.ok === false) return { ok: false, message: previewPath.message }
 
   return {
     ok: true,
@@ -84,13 +84,13 @@ export function validateProjectPatchBody(body: unknown): ProjectValidationResult
 
   if ('title' in record) {
     const title = normalizeTitle(record.title, '')
-    if (!title.ok) return title
+    if (title.ok === false) return { ok: false, message: title.message }
     patch.title = title.value
   }
 
   if ('furniture_type' in record) {
     const furnitureType = normalizeFurnitureType(record.furniture_type)
-    if (!furnitureType.ok) return furnitureType
+    if (furnitureType.ok === false) return { ok: false, message: furnitureType.message }
     patch.furniture_type = furnitureType.value
   }
 
@@ -103,7 +103,7 @@ export function validateProjectPatchBody(body: unknown): ProjectValidationResult
 
   if ('preview_path' in record) {
     const previewPath = normalizePreviewPath(record.preview_path)
-    if (!previewPath.ok) return previewPath
+    if (previewPath.ok === false) return { ok: false, message: previewPath.message }
     patch.preview_path = previewPath.value ?? null
   }
 

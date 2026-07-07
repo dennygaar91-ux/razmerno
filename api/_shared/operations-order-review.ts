@@ -5,6 +5,7 @@ import { listOperationsOrderStatusHistoryByOrderId } from './operations-order-de
 import { getOperationsManualPricingDraftByOrderId } from './operations-manual-pricing-drafts-store'
 import type { OperationsChangeRequest } from './operations-change-request-types'
 import { buildOperationsOrderReview } from './operations-order-review-types'
+import { isFailureResult, isNotFoundResult, readFailureError } from './result-utils'
 
 export async function buildOperationsOrderReviewByOrderId(orderId: string): Promise<
   | { ok: true; review: ReturnType<typeof buildOperationsOrderReview> }
@@ -16,8 +17,8 @@ export async function buildOperationsOrderReviewByOrderId(orderId: string): Prom
 
     const detail = await getAdminProductionDetail(orderId)
     const draftResult = await getOperationsManualPricingDraftByOrderId(orderId)
-    if (!draftResult.ok) {
-      return { ok: false, reason: 'error', message: draftResult.error }
+    if (isFailureResult(draftResult)) {
+      return { ok: false, reason: 'error', message: readFailureError(draftResult) }
     }
 
     const decisionHistory = await listOperationsOrderStatusHistoryByOrderId(orderId)
@@ -26,13 +27,14 @@ export async function buildOperationsOrderReviewByOrderId(orderId: string): Prom
     const orderUuid = await getOrderUuidByBusinessOrderIdForService(orderId)
     if (orderUuid.ok) {
       const listed = await listOperationsChangeRequestsByOrderUuid(orderUuid.orderUuid)
-      if (listed.ok) {
-        changeRequests = listed.changeRequests
-      } else {
-        return { ok: false, reason: 'error', message: listed.error }
+      if (isFailureResult(listed)) {
+        return { ok: false, reason: 'error', message: readFailureError(listed) }
       }
-    } else if (!('notFound' in orderUuid && orderUuid.notFound)) {
-      return { ok: false, reason: 'error', message: orderUuid.error }
+      changeRequests = listed.changeRequests
+    } else if (isFailureResult(orderUuid)) {
+      if (!isNotFoundResult(orderUuid)) {
+        return { ok: false, reason: 'error', message: readFailureError(orderUuid) }
+      }
     }
 
     const review = buildOperationsOrderReview(order, detail.productionExport, decisionHistory, changeRequests)

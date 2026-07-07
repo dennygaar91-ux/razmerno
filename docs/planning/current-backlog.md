@@ -1751,6 +1751,29 @@ Follow-ups:
 - `order_status_events` RLS disabled remains security/release follow-up.
 - P0 infra blockers: failed Vercel preview + failed Fast CI gate.
 
+### Vercel Preview Fast CI Fix — typecheck:api — 2026-07-07
+
+branch local status: done (typecheck:api fixed, QA PASS, preview redeploy pending/success, not closure)
+
+Evidence:
+
+- Investigated failed Vercel deployment for PR #111.
+- Reproduced Fast CI failure locally with typecheck:api.
+- Fixed TypeScript errors in API files without changing product scope.
+- typecheck:api PASS.
+- npm test PASS.
+- npm run typecheck PASS.
+- npm run build PASS.
+- git diff --check PASS.
+- No database schema changes.
+- No live data mutation.
+- No merge.
+- No production deploy.
+- P1-27 remains needs reconciliation.
+- P1-28 remains needs reconciliation.
+- D-13 Preview Visual QA remains blocked until preview deployment succeeds.
+- Not closure.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence

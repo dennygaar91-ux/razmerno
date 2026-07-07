@@ -15,6 +15,12 @@ import {
 } from './_shared/constructor-projects-store'
 import { isValidProjectId } from './_shared/constructor-project-types'
 import { logEvent } from './_shared/logger'
+import {
+  isFailureResult,
+  isNotFoundResult,
+  readFailureError,
+  readFailureMessage,
+} from './_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types'
 
 const PROJECT_NOT_FOUND_MESSAGE = 'Проект не найден.'
@@ -35,12 +41,14 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
   if (req.method === 'GET') {
     const loaded = await getConstructorProjectById(projectId)
-    if (!loaded.ok) {
-      if (loaded.notFound) return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+    if (isFailureResult(loaded)) {
+      if (isNotFoundResult(loaded)) {
+        return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+      }
       logEvent('error', 'project.get_failed', {
         requestId: prepared.requestId,
         projectId,
-        reason: loaded.error,
+        reason: readFailureError(loaded),
       })
       return res.status(500).json({ ok: false, message: PROJECT_UNAVAILABLE_MESSAGE })
     }
@@ -54,8 +62,10 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
 
   if (req.method === 'PATCH') {
     const existing = await getConstructorProjectById(projectId)
-    if (!existing.ok) {
-      if (existing.notFound) return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+    if (isFailureResult(existing)) {
+      if (isNotFoundResult(existing)) {
+        return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+      }
       return res.status(500).json({ ok: false, message: PROJECT_UNAVAILABLE_MESSAGE })
     }
 
@@ -64,18 +74,20 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     }
 
     const validation = validateProjectPatchBody(parseCustomerApiBody(req.body))
-    if (!validation.ok) {
-      return res.status(400).json({ ok: false, message: validation.message })
+    if (isFailureResult(validation)) {
+      return res.status(400).json({ ok: false, message: readFailureMessage(validation) })
     }
 
     const updated = await updateConstructorProject(projectId, auth.user.userId, validation.value)
-    if (!updated.ok) {
-      if (updated.notFound) return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+    if (isFailureResult(updated)) {
+      if (isNotFoundResult(updated)) {
+        return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+      }
       logEvent('error', 'project.patch_failed', {
         requestId: prepared.requestId,
         projectId,
         userId: auth.user.userId,
-        reason: updated.error,
+        reason: readFailureError(updated),
       })
       return res.status(500).json({ ok: false, message: PROJECT_UNAVAILABLE_MESSAGE })
     }
@@ -84,13 +96,15 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   }
 
   const archived = await archiveConstructorProject(projectId, auth.user.userId)
-  if (!archived.ok) {
-    if (archived.notFound) return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+  if (isFailureResult(archived)) {
+    if (isNotFoundResult(archived)) {
+      return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+    }
     logEvent('error', 'project.archive_failed', {
       requestId: prepared.requestId,
       projectId,
       userId: auth.user.userId,
-      reason: archived.error,
+      reason: readFailureError(archived),
     })
     return res.status(500).json({ ok: false, message: PROJECT_UNAVAILABLE_MESSAGE })
   }

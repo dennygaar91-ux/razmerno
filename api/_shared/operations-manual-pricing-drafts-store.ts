@@ -65,30 +65,41 @@ export async function upsertOperationsManualPricingDraft(
 
   if (readError) return { ok: false, error: readError.message }
 
-  const payload = existing
-    ? {
+  if (existing) {
+    const { data, error } = await client
+      .from('order_manual_pricing_drafts')
+      .update({
         manual_total_price: input.manualTotalPrice,
         reason: input.reason,
         status: OPERATIONS_MANUAL_PRICING_DRAFT_STATUS,
         updated_by: actor,
         updated_at: now,
-      }
-    : {
-        order_id: input.orderId,
-        manual_total_price: input.manualTotalPrice,
-        reason: input.reason,
-        status: OPERATIONS_MANUAL_PRICING_DRAFT_STATUS,
-        created_by: actor,
-        updated_by: actor,
-        created_at: now,
-        updated_at: now,
-      }
+      })
+      .eq('order_id', input.orderId)
+      .select(DRAFT_SELECT)
+      .single()
 
-  const writeQuery = existing
-    ? client.from('order_manual_pricing_drafts').update(payload).eq('order_id', input.orderId)
-    : client.from('order_manual_pricing_drafts').insert(payload)
+    if (error || !data) {
+      return { ok: false, error: error?.message || 'manual_pricing_draft_upsert_failed' }
+    }
 
-  const { data, error } = await writeQuery.select(DRAFT_SELECT).single()
+    return { ok: true, draft: mapOperationsManualPricingDraft(data as OperationsManualPricingDraftRow) }
+  }
+
+  const { data, error } = await client
+    .from('order_manual_pricing_drafts')
+    .insert({
+      order_id: input.orderId,
+      manual_total_price: input.manualTotalPrice,
+      reason: input.reason,
+      status: OPERATIONS_MANUAL_PRICING_DRAFT_STATUS,
+      created_by: actor,
+      updated_by: actor,
+      created_at: now,
+      updated_at: now,
+    })
+    .select(DRAFT_SELECT)
+    .single()
 
   if (error || !data) {
     return { ok: false, error: error?.message || 'manual_pricing_draft_upsert_failed' }

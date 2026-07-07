@@ -5,6 +5,7 @@ import {
   type OperationsChangeRequestDecision,
 } from './operations-change-request-policy'
 import { mapOperationsChangeRequest, type OperationsChangeRequest } from './operations-change-request-types'
+import { isFailureResult, isNotFoundResult, readFailureError } from './result-utils'
 import { normalizeSupabaseProjectUrl } from './supabase-url'
 
 const CHANGE_REQUEST_SELECT = 'id, order_id, user_id, request_type, message, status, created_at, updated_at'
@@ -59,11 +60,11 @@ export async function applyOperationsChangeRequestDecision(
   | { ok: false; reason: 'error'; message: string }
 > {
   const existing = await getOperationsChangeRequestById(changeRequestId)
-  if (!existing.ok) {
-    if ('notFound' in existing && existing.notFound) {
+  if (isFailureResult(existing)) {
+    if (isNotFoundResult(existing)) {
       return { ok: false, reason: 'not_found', message: 'Change request not found' }
     }
-    return { ok: false, reason: 'error', message: existing.error }
+    return { ok: false, reason: 'error', message: readFailureError(existing) }
   }
 
   if (!isValidOperationsChangeRequestDecisionTransition(existing.row.status, decision)) {

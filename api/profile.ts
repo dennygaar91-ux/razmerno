@@ -6,6 +6,7 @@ import { applyNoStoreHeaders } from './_shared/headers'
 import { logEvent } from './_shared/logger'
 import { isAllowedOrigin, getHeader } from './_shared/order-cors'
 import { applyRequestIdHeader, getRequestId } from './_shared/request-context'
+import { isFailureResult, readFailureError, readFailureMessage } from './_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types'
 
 const UNAUTHORIZED_MESSAGE = 'Требуется авторизация.'
@@ -54,8 +55,8 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   let patchValidation: ReturnType<typeof validateCustomerProfilePatch> | null = null
   if (req.method === 'PATCH') {
     patchValidation = validateCustomerProfilePatch(parseBody(req.body))
-    if (!patchValidation.ok) {
-      return res.status(400).json({ ok: false, message: patchValidation.message })
+    if (isFailureResult(patchValidation)) {
+      return res.status(400).json({ ok: false, message: readFailureMessage(patchValidation) })
     }
   }
 
@@ -77,8 +78,12 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       fullName: verified.fullName,
     })
 
-    if (!ensured.ok) {
-      logEvent('error', 'profile.ensure_failed', { requestId, userId: verified.userId, reason: ensured.error })
+    if (isFailureResult(ensured)) {
+      logEvent('error', 'profile.ensure_failed', {
+        requestId,
+        userId: verified.userId,
+        reason: readFailureError(ensured),
+      })
       return res.status(500).json({ ok: false, message: PROFILE_UNAVAILABLE_MESSAGE })
     }
 
@@ -91,19 +96,27 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       email: verified.email,
       fullName: verified.fullName,
     })
-    if (!ensured.ok) {
+    if (isFailureResult(ensured)) {
       logEvent('error', 'profile.ensure_failed_before_patch', {
         requestId,
         userId: verified.userId,
-        reason: ensured.error,
+        reason: readFailureError(ensured),
       })
       return res.status(500).json({ ok: false, message: PROFILE_UNAVAILABLE_MESSAGE })
     }
   }
 
-  const updated = await updateCustomerProfile(verified.userId, patchValidation!.patch)
-  if (!updated.ok) {
-    logEvent('error', 'profile.patch_failed', { requestId, userId: verified.userId, reason: updated.error })
+  if (!patchValidation || isFailureResult(patchValidation)) {
+    return res.status(500).json({ ok: false, message: PROFILE_UNAVAILABLE_MESSAGE })
+  }
+
+  const updated = await updateCustomerProfile(verified.userId, patchValidation.patch)
+  if (isFailureResult(updated)) {
+    logEvent('error', 'profile.patch_failed', {
+      requestId,
+      userId: verified.userId,
+      reason: readFailureError(updated),
+    })
     return res.status(500).json({ ok: false, message: PROFILE_UNAVAILABLE_MESSAGE })
   }
 

@@ -16,6 +16,7 @@ import { logEvent, safeErrorMessage } from './_shared/logger.js'
 import { getClientKey, isRateLimited } from './_shared/order-rate-limit.js'
 import { applyRequestIdHeader, getRequestId } from './_shared/request-context.js'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types.js'
+import { isFailureResult, isNotFoundResult, readFailureError } from './_shared/result-utils.js'
 import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus, allocatePublicOrderNumber } from './_shared/supabase-orders.js'
 import { validateOrder } from './_shared/order-validation.js'
 import { buildProductionExportFromPayload } from '../src/constructor/production/orderExportPackage.js'
@@ -52,11 +53,11 @@ async function resolveConstructorProjectLink(
   }
 
   const loaded = await getConstructorProjectById(normalized)
-  if (!loaded.ok) {
-    if (loaded.notFound) {
+  if (isFailureResult(loaded)) {
+    if (isNotFoundResult(loaded)) {
       return { ok: false, status: 404, message: PROJECT_NOT_FOUND_MESSAGE }
     }
-    logEvent('error', 'orders.project_lookup_failed', { projectId: normalized, reason: loaded.error })
+    logEvent('error', 'orders.project_lookup_failed', { projectId: normalized, reason: readFailureError(loaded) })
     return { ok: false, status: 502, message: GENERIC_ORDER_SUBMIT_FAILED }
   }
 
@@ -175,7 +176,7 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (validationError) return res.status(400).json({ ok: false, message: validationError })
 
   const projectLink = await resolveConstructorProjectLink(body.projectId, customer.userId)
-  if (!projectLink.ok) {
+  if (isFailureResult(projectLink)) {
     return res.status(projectLink.status).json({ ok: false, message: projectLink.message })
   }
 
@@ -207,8 +208,12 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   const managerEmail = process.env.ORDER_MANAGER_EMAIL
 
   const publicNumberResult = await allocatePublicOrderNumber()
-  if (!publicNumberResult.ok) {
-    logEvent('error', 'orders.public_number_allocation_failed', { requestId, orderId, reason: publicNumberResult.error })
+  if (isFailureResult(publicNumberResult)) {
+    logEvent('error', 'orders.public_number_allocation_failed', {
+      requestId,
+      orderId,
+      reason: readFailureError(publicNumberResult),
+    })
     return res.status(502).json({ ok: false, message: DB_INSERT_FAILED_MESSAGE })
   }
 

@@ -84,9 +84,9 @@ export async function insertOrderRecord(record: OrderDbInsert) {
   return { ok: true as const, skipped: false as const };
 }
 
-export async function allocatePublicOrderNumber():
-  | { ok: true; value: string }
-  | { ok: false; error: string } {
+export async function allocatePublicOrderNumber(): Promise<
+  { ok: true; value: string } | { ok: false; error: string }
+> {
   const client = getSupabaseClient();
 
   if (!client) {

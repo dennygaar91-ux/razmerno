@@ -3,6 +3,7 @@ export type ServerlessRequest = {
   headers: Record<string, string | string[] | undefined>
   socket: { remoteAddress?: string }
   body: unknown
+  query?: Record<string, string | string[] | undefined>
 }
 
 export type ServerlessResponse = {

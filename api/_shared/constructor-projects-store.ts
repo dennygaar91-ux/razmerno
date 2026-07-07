@@ -82,9 +82,13 @@ export async function listConstructorProjectsForUser(
   return { ok: true, projects: mapRows(data) }
 }
 
+export type ProjectStoreFailure =
+  | { ok: false; notFound: true }
+  | { ok: false; error: string }
+
 export async function getConstructorProjectById(
   projectId: string,
-): Promise<{ ok: true; project: ConstructorProject } | { ok: false; error: string; notFound?: boolean }> {
+): Promise<{ ok: true; project: ConstructorProject } | ProjectStoreFailure> {
   const client = getSupabaseClient()
   if (!client) return { ok: false, error: 'project_storage_unavailable' }
 
@@ -95,7 +99,7 @@ export async function getConstructorProjectById(
     .maybeSingle<ProjectRow>()
 
   if (error) return { ok: false, error: error.message }
-  if (!data) return { ok: false, error: 'project_not_found', notFound: true }
+  if (!data) return { ok: false, notFound: true }
 
   const project = mapConstructorProjectRow(data)
   if (!project) return { ok: false, error: 'project_snapshot_invalid' }
@@ -140,7 +144,7 @@ export async function updateConstructorProject(
   projectId: string,
   userId: string,
   patch: ConstructorProjectPatchInput,
-): Promise<{ ok: true; project: ConstructorProject } | { ok: false; error: string; notFound?: boolean }> {
+): Promise<{ ok: true; project: ConstructorProject } | ProjectStoreFailure> {
   const client = getSupabaseClient()
   if (!client) return { ok: false, error: 'project_storage_unavailable' }
 
@@ -162,7 +166,7 @@ export async function updateConstructorProject(
     .maybeSingle<ProjectRow>()
 
   if (error) return { ok: false, error: error.message }
-  if (!data) return { ok: false, error: 'project_not_found', notFound: true }
+  if (!data) return { ok: false, notFound: true }
 
   const project = mapConstructorProjectRow(data)
   if (!project) return { ok: false, error: 'project_snapshot_invalid' }
@@ -173,7 +177,7 @@ export async function updateConstructorProject(
 export async function archiveConstructorProject(
   projectId: string,
   userId: string,
-): Promise<{ ok: true; project: ConstructorProject } | { ok: false; error: string; notFound?: boolean }> {
+): Promise<{ ok: true; project: ConstructorProject } | ProjectStoreFailure> {
   const client = getSupabaseClient()
   if (!client) return { ok: false, error: 'project_storage_unavailable' }
 
@@ -187,7 +191,7 @@ export async function archiveConstructorProject(
     .maybeSingle<ProjectRow>()
 
   if (error) return { ok: false, error: error.message }
-  if (!data) return { ok: false, error: 'project_not_found', notFound: true }
+  if (!data) return { ok: false, notFound: true }
 
   const project = mapConstructorProjectRow(data)
   if (!project) return { ok: false, error: 'project_snapshot_invalid' }

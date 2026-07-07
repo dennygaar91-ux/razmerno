@@ -11,6 +11,7 @@ import {
 } from './_shared/constructor-projects-store'
 import { MAX_ACTIVE_PROJECTS_PER_USER } from './_shared/constructor-project-types'
 import { logEvent } from './_shared/logger'
+import { isFailureResult, readFailureError, readFailureMessage } from './_shared/result-utils'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types'
 
 const PROJECT_LIMIT_MESSAGE = `Можно хранить не более ${MAX_ACTIVE_PROJECTS_PER_USER} активных проектов. Архивируйте старый проект и попробуйте снова.`
@@ -26,11 +27,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   if (req.method === 'GET') {
     const includeArchived = readIncludeArchived(req)
     const listed = await listConstructorProjectsForUser(auth.user.userId, { includeArchived })
-    if (!listed.ok) {
+    if (isFailureResult(listed)) {
       logEvent('error', 'projects.list_failed', {
         requestId: prepared.requestId,
         userId: auth.user.userId,
-        reason: listed.error,
+        reason: readFailureError(listed),
       })
       return res.status(500).json({ ok: false, message: PROJECT_UNAVAILABLE_MESSAGE })
     }
@@ -39,8 +40,8 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   }
 
   const validation = validateProjectCreateBody(parseCustomerApiBody(req.body))
-  if (!validation.ok) {
-    return res.status(400).json({ ok: false, message: validation.message })
+  if (isFailureResult(validation)) {
+    return res.status(400).json({ ok: false, message: readFailureMessage(validation) })
   }
 
   const activeCount = await countActiveProjectsForUser(auth.user.userId)
@@ -49,11 +50,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   }
 
   const created = await createConstructorProject(auth.user.userId, validation.value)
-  if (!created.ok) {
+  if (isFailureResult(created)) {
     logEvent('error', 'projects.create_failed', {
       requestId: prepared.requestId,
       userId: auth.user.userId,
-      reason: created.error,
+      reason: readFailureError(created),
     })
     return res.status(500).json({ ok: false, message: PROJECT_UNAVAILABLE_MESSAGE })
   }

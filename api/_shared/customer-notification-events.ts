@@ -5,6 +5,7 @@ import {
 import { createCustomerNotification } from './customer-notifications-store'
 import { logEvent } from './logger'
 import type { OperationsChangeRequestDecision } from './operations-change-request-policy'
+import { isFailureResult, isNotFoundResult, readFailureError } from './result-utils'
 function formatPublicOrderNumber(publicOrderNumber: string | null | undefined): string {
   const normalized = publicOrderNumber?.trim()
   return normalized || 'без номера'
@@ -17,12 +18,12 @@ export async function createOrderCreatedNotificationBestEffort(input: {
   publicOrderNumber: string
 }): Promise<void> {
   const orderUuid = await getOrderUuidByBusinessOrderId(input.userId, input.businessOrderId)
-  if (!orderUuid.ok) {
+  if (isFailureResult(orderUuid)) {
     logEvent('error', 'customer_notifications.order_created_lookup_failed', {
       requestId: input.requestId,
       userId: input.userId,
       businessOrderId: input.businessOrderId,
-      reason: 'notFound' in orderUuid && orderUuid.notFound ? 'order_not_found' : orderUuid.error,
+      reason: isNotFoundResult(orderUuid) ? 'order_not_found' : readFailureError(orderUuid),
     })
     return
   }
@@ -36,12 +37,12 @@ export async function createOrderCreatedNotificationBestEffort(input: {
     message: `Ваш заказ ${publicOrderNumber} отправлен на проверку.`,
   })
 
-  if (!created.ok) {
+  if (isFailureResult(created)) {
     logEvent('error', 'customer_notifications.order_created_insert_failed', {
       requestId: input.requestId,
       userId: input.userId,
       orderId: orderUuid.id,
-      reason: created.error,
+      reason: readFailureError(created),
     })
   }
 }
@@ -61,12 +62,12 @@ export async function createChangeRequestNotificationBestEffort(input: {
     message: `Ваш запрос по заказу ${publicOrderNumber} передан менеджеру.`,
   })
 
-  if (!created.ok) {
+  if (isFailureResult(created)) {
     logEvent('error', 'customer_notifications.change_request_insert_failed', {
       requestId: input.requestId,
       userId: input.userId,
       orderId: input.orderId,
-      reason: created.error,
+      reason: readFailureError(created),
     })
   }
 }
@@ -77,8 +78,8 @@ export async function createOperationsDecisionNotificationBestEffort(input: {
   decision: 'approve' | 'reject'
 }): Promise<void> {
   const target = await getOrderNotificationTargetByBusinessOrderId(input.businessOrderId)
-  if (!target.ok) {
-    if ('notFound' in target && target.notFound) {
+  if (isFailureResult(target)) {
+    if (isNotFoundResult(target)) {
       logEvent('warn', 'customer_notifications.operations_decision_order_not_found', {
         requestId: input.requestId,
         businessOrderId: input.businessOrderId,
@@ -91,7 +92,7 @@ export async function createOperationsDecisionNotificationBestEffort(input: {
       requestId: input.requestId,
       businessOrderId: input.businessOrderId,
       decision: input.decision,
-      reason: target.error,
+      reason: readFailureError(target),
     })
     return
   }
@@ -116,13 +117,13 @@ export async function createOperationsDecisionNotificationBestEffort(input: {
     message: notification.message,
   })
 
-  if (!created.ok) {
+  if (isFailureResult(created)) {
     logEvent('error', 'customer_notifications.operations_decision_insert_failed', {
       requestId: input.requestId,
       userId: target.userId,
       orderId: target.orderUuid,
       decision: input.decision,
-      reason: created.error,
+      reason: readFailureError(created),
     })
   }
 }
@@ -159,13 +160,13 @@ export async function createChangeRequestDecisionNotificationBestEffort(input: {
     message: notification.message,
   })
 
-  if (!created.ok) {
+  if (isFailureResult(created)) {
     logEvent('error', 'customer_notifications.change_request_decision_insert_failed', {
       requestId: input.requestId,
       userId: input.userId,
       orderId: input.orderUuid,
       decision: input.decision,
-      reason: created.error,
+      reason: readFailureError(created),
     })
   }
 }
@@ -175,8 +176,8 @@ export async function createManualPaymentConfirmationNotificationBestEffort(inpu
   businessOrderId: string
 }): Promise<void> {
   const target = await getOrderNotificationTargetByBusinessOrderId(input.businessOrderId)
-  if (!target.ok) {
-    if ('notFound' in target && target.notFound) {
+  if (isFailureResult(target)) {
+    if (isNotFoundResult(target)) {
       logEvent('warn', 'customer_notifications.payment_confirmation_order_not_found', {
         requestId: input.requestId,
         businessOrderId: input.businessOrderId,
@@ -187,7 +188,7 @@ export async function createManualPaymentConfirmationNotificationBestEffort(inpu
     logEvent('error', 'customer_notifications.payment_confirmation_lookup_failed', {
       requestId: input.requestId,
       businessOrderId: input.businessOrderId,
-      reason: target.error,
+      reason: readFailureError(target),
     })
     return
   }
@@ -201,12 +202,12 @@ export async function createManualPaymentConfirmationNotificationBestEffort(inpu
     message: `Оплата по заявке ${publicOrderNumber} подтверждена. Заявка передана на следующий этап.`,
   })
 
-  if (!created.ok) {
+  if (isFailureResult(created)) {
     logEvent('error', 'customer_notifications.payment_confirmation_insert_failed', {
       requestId: input.requestId,
       userId: target.userId,
       orderId: target.orderUuid,
-      reason: created.error,
+      reason: readFailureError(created),
     })
   }
 }
@@ -216,8 +217,8 @@ export async function createOrderCompletionNotificationBestEffort(input: {
   businessOrderId: string
 }): Promise<void> {
   const target = await getOrderNotificationTargetByBusinessOrderId(input.businessOrderId)
-  if (!target.ok) {
-    if ('notFound' in target && target.notFound) {
+  if (isFailureResult(target)) {
+    if (isNotFoundResult(target)) {
       logEvent('warn', 'customer_notifications.order_completion_order_not_found', {
         requestId: input.requestId,
         businessOrderId: input.businessOrderId,
@@ -228,7 +229,7 @@ export async function createOrderCompletionNotificationBestEffort(input: {
     logEvent('error', 'customer_notifications.order_completion_lookup_failed', {
       requestId: input.requestId,
       businessOrderId: input.businessOrderId,
-      reason: target.error,
+      reason: readFailureError(target),
     })
     return
   }
@@ -242,12 +243,12 @@ export async function createOrderCompletionNotificationBestEffort(input: {
     message: `Заказ ${publicOrderNumber} завершён.`,
   })
 
-  if (!created.ok) {
+  if (isFailureResult(created)) {
     logEvent('error', 'customer_notifications.order_completion_insert_failed', {
       requestId: input.requestId,
       userId: target.userId,
       orderId: target.orderUuid,
-      reason: created.error,
+      reason: readFailureError(created),
     })
   }
 }

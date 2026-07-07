@@ -3,6 +3,7 @@ import { isActiveProject } from './constructor-project-types'
 import { listCustomerOrdersForUser } from './customer-orders-store'
 import { ensureCustomerProfile } from './customer-profiles'
 import { buildCustomerWorkspace } from './customer-workspace-types'
+import { isFailureResult, readFailureError } from './result-utils'
 
 export async function buildCustomerWorkspaceForUser(input: {
   userId: string
@@ -17,13 +18,13 @@ export async function buildCustomerWorkspaceForUser(input: {
     email: input.email,
     fullName: input.fullName,
   })
-  if (!ensured.ok) return { ok: false, error: ensured.error }
+  if (isFailureResult(ensured)) return { ok: false, error: readFailureError(ensured) }
 
   const listedProjects = await listConstructorProjectsForUser(input.userId)
-  if (!listedProjects.ok) return { ok: false, error: listedProjects.error }
+  if (isFailureResult(listedProjects)) return { ok: false, error: readFailureError(listedProjects) }
 
   const listedOrders = await listCustomerOrdersForUser(input.userId)
-  if (!listedOrders.ok) return { ok: false, error: listedOrders.error }
+  if (isFailureResult(listedOrders)) return { ok: false, error: readFailureError(listedOrders) }
 
   const activeProjects = listedProjects.projects.filter(isActiveProject)
 
