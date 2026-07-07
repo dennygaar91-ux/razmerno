@@ -251,3 +251,43 @@ npm run test:customer-change-request-contract
 - frontend uses API only; Service Role server-side only; RLS deny-all unchanged;
 - no payment/production/customer final price mutation in this foundation;
 - P1-27 / P1-28 not closed; live migration apply not implied; `.env.local` remains local.
+
+## 10. Manual payment workflow — local foundation (branch)
+
+Local-only manual payment readiness on `task/epic-b-projects-foundation`. Not merged/main closure. **No real money is processed.**
+
+### Customer payment instructions
+
+- order detail shows `CustomerPaymentInstructionsSection` when `paymentState === awaiting_manual_confirmation` (`domain_status === Оплата`);
+- copy: verified / awaiting payment / manager contact;
+- no payment button, card input, or payment provider link.
+
+### Operations manual payment confirmation
+
+- `POST /api/operations/payment-confirmation` — admin auth; allowed only when `domain_status === Оплата`;
+- transition: `Оплата` → `В работе` (RPES VII lifecycle); audit `operations:payment_confirm`;
+- optional internal note stored in `order_status_events.reason` (not exposed to customer);
+- manual review UI: `OperationsPaymentConfirmationSection`.
+
+### Customer notifications
+
+- payment confirmation creates `order_updated` notification (`Оплата подтверждена`);
+- unread count via `GET /api/customer/notifications/unread-count`;
+- no email/push in this foundation.
+
+### Local verification commands
+
+```bash
+npm run test:payment-readiness-domain
+npm run test:customer-payment-instructions-ui
+npm run test:operations-payment-confirmation
+npm run test:manual-payment-flow-contract
+```
+
+### Local-only caveats
+
+- no payment provider / webhook / card credentials;
+- no `total_price` / `production_export` mutation;
+- no production handoff automation;
+- frontend API-only; Service Role server-side only; RLS deny-all unchanged;
+- P1-27 / P1-28 not closed; live verification separate; `.env.local` remains local.
