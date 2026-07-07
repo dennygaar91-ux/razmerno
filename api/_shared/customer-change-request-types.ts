@@ -10,7 +10,14 @@ export type CustomerChangeRequestType = (typeof CUSTOMER_CHANGE_REQUEST_TYPES)[n
 
 export const CUSTOMER_CHANGE_REQUEST_STATUS_SUBMITTED = 'submitted' as const
 
-export type CustomerChangeRequestStatus = typeof CUSTOMER_CHANGE_REQUEST_STATUS_SUBMITTED
+export const CUSTOMER_CHANGE_REQUEST_STATUSES = [
+  CUSTOMER_CHANGE_REQUEST_STATUS_SUBMITTED,
+  'reviewed',
+  'resolved',
+  'rejected',
+] as const
+
+export type CustomerChangeRequestStatus = (typeof CUSTOMER_CHANGE_REQUEST_STATUSES)[number]
 
 export type CustomerChangeRequestRow = {
   id: string
@@ -43,11 +50,15 @@ export function isCustomerChangeRequestType(value: string): value is CustomerCha
 }
 
 export function mapCustomerChangeRequest(row: CustomerChangeRequestRow): CustomerChangeRequest {
+  const status = (CUSTOMER_CHANGE_REQUEST_STATUSES as readonly string[]).includes(row.status)
+    ? (row.status as CustomerChangeRequestStatus)
+    : CUSTOMER_CHANGE_REQUEST_STATUS_SUBMITTED
+
   return {
     id: row.id,
     orderId: row.order_id,
     requestType: row.request_type,
-    status: CUSTOMER_CHANGE_REQUEST_STATUS_SUBMITTED,
+    status,
     message: row.message,
     createdAt: row.created_at,
   }

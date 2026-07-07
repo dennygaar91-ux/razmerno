@@ -19,6 +19,7 @@ function test(name: string, run: AsyncTest) {
 
 const ADMIN_API_KEY = "test-admin-api-key-with-minimum-length";
 const ORDER_ID = "RZ-20260705-1001";
+const ORDER_UUID = "660e8400-e29b-41d4-a716-446655440030";
 const ORIGINAL_ENV = { ...process.env };
 const ORIGINAL_FETCH = globalThis.fetch;
 
@@ -65,6 +66,7 @@ function createMockResponse() {
 }
 
 const sampleOrderRow = {
+  id: ORDER_UUID,
   order_id: ORDER_ID,
   status: "new",
   domain_status: "Проверка",
@@ -116,20 +118,54 @@ const sampleStatusHistory = [
   },
 ];
 
-function installOrderReviewFetchMock(options: { orderFound?: boolean; withDraft?: boolean; withHistory?: boolean } = {}) {
+const sampleChangeRequestRow = {
+  id: "770e8400-e29b-41d4-a716-446655440040",
+  order_id: ORDER_UUID,
+  user_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  request_type: "dimensions",
+  message: "Нужно увеличить глубину до 650 мм.",
+  status: "submitted",
+  created_at: "2026-07-05T14:00:00.000Z",
+  updated_at: "2026-07-05T14:00:00.000Z",
+};
+
+function installOrderReviewFetchMock(options: {
+  orderFound?: boolean;
+  withDraft?: boolean;
+  withHistory?: boolean;
+  withChangeRequests?: boolean;
+} = {}) {
   const orderFound = options.orderFound !== false;
   const withDraft = options.withDraft === true;
   const withHistory = options.withHistory === true;
+  const withChangeRequests = options.withChangeRequests === true;
 
   globalThis.fetch = (async (input: RequestInfo | URL) => {
     const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
 
     if (url.includes("/rest/v1/orders")) {
       if (!orderFound) return jsonResponse(null, 404);
+      const parsed = new URL(url);
+      const idFilter = parsed.searchParams.get("id");
+      const orderUuid = idFilter?.startsWith("eq.") ? decodeURIComponent(idFilter.slice(3)) : null;
+      if (orderUuid === ORDER_UUID) {
+        return jsonResponse({ id: ORDER_UUID });
+      }
       if (url.includes(`order_id=eq.${encodeURIComponent(ORDER_ID)}`) || url.includes(ORDER_ID)) {
         return jsonResponse(sampleOrderRow);
       }
       return jsonResponse([sampleOrderRow]);
+    }
+
+    if (url.includes("/rest/v1/order_change_requests")) {
+      if (!withChangeRequests) return jsonResponse([]);
+      const parsed = new URL(url);
+      const orderFilter = parsed.searchParams.get("order_id");
+      const orderUuid = orderFilter?.startsWith("eq.") ? decodeURIComponent(orderFilter.slice(3)) : null;
+      if (orderUuid === ORDER_UUID) {
+        return jsonResponse([sampleChangeRequestRow]);
+      }
+      return jsonResponse([]);
     }
 
     if (url.includes("/rest/v1/order_manual_pricing_drafts")) {
@@ -197,6 +233,7 @@ test("operations order review exposes safe manual review fields only", () => {
   assert.equal(review.domainStatus, "Проверка");
   assert.equal(review.latestDecisionAudit, null);
   assert.deepEqual(review.decisionHistory, []);
+  assert.deepEqual(review.changeRequests, []);
   assert.equal(review.manualPricingDraft, null);
   assert.equal(review.productionReviewStatus, "requires-review");
   assert.match(review.priceBreakdownSummary, /stored breakdown keys/);
@@ -310,6 +347,47 @@ test("operations order review GET returns safe review read model for authorized 
   assert.equal(body.review.manualPricingDraft, null);
   assert.deepEqual(body.review.decisionHistory, []);
   assert.notEqual(body.review.customerNameMasked, "Иван Петров");
+});
+
+test("operations order review GET includes customer change requests", async () => {
+  setRequiredServerEnv();
+  installOrderReviewFetchMock({ withChangeRequests: true });
+  const token = createAdminSessionToken(Date.now());
+  const { res, snapshot } = createMockResponse();
+
+  await orderReviewHandler(
+    {
+      method: "GET",
+      headers: { authorization: `Bearer ${token}` },
+      query: { orderId: ORDER_ID },
+      body: null,
+    },
+    res,
+  );
+
+  const result = snapshot();
+  assert.equal(result.statusCode, 200);
+  const body = result.body as {
+    ok: boolean;
+    review: {
+      changeRequests: Array<{
+        id: string;
+        requestType: string;
+        status: string;
+        message: string;
+        createdAt: string;
+      }>;
+    };
+  };
+
+  assert.equal(body.ok, true);
+  assert.equal(body.review.changeRequests.length, 1);
+  assert.equal(body.review.changeRequests[0]?.status, "submitted");
+  assert.match(body.review.changeRequests[0]?.message ?? "", /650/);
+
+  const serialized = JSON.stringify(body);
+  assert.equal(serialized.includes("user_id"), false);
+  assert.equal(serialized.includes("userId"), false);
 });
 
 test("operations order review GET returns decision history newest-first", async () => {

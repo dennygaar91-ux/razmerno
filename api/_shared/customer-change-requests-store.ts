@@ -7,6 +7,7 @@ import {
   type CustomerChangeRequestCreateInput,
   type CustomerChangeRequestRow,
 } from './customer-change-request-types'
+import { mapOperationsChangeRequest, type OperationsChangeRequest } from './operations-change-request-types'
 
 const CHANGE_REQUEST_SELECT = 'id, order_id, user_id, request_type, message, status, created_at, updated_at'
 
@@ -75,5 +76,26 @@ export async function listCustomerChangeRequestsForOrder(
   return {
     ok: true,
     changeRequests: (data ?? []).map(mapCustomerChangeRequest),
+  }
+}
+
+export async function listOperationsChangeRequestsByOrderUuid(
+  orderUuid: string,
+): Promise<{ ok: true; changeRequests: OperationsChangeRequest[] } | { ok: false; error: string }> {
+  const client = getSupabaseClient()
+  if (!client) return { ok: false, error: 'change_request_storage_unavailable' }
+
+  const { data, error } = await client
+    .from('order_change_requests')
+    .select(CHANGE_REQUEST_SELECT)
+    .eq('order_id', orderUuid)
+    .order('created_at', { ascending: false })
+    .returns<CustomerChangeRequestRow[]>()
+
+  if (error) return { ok: false, error: error.message }
+
+  return {
+    ok: true,
+    changeRequests: (data ?? []).map(mapOperationsChangeRequest),
   }
 }

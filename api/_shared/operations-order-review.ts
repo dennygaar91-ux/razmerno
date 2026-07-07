@@ -1,6 +1,9 @@
 import { getAdminOrderByOrderId, getAdminProductionDetail } from './admin-orders'
+import { listOperationsChangeRequestsByOrderUuid } from './customer-change-requests-store'
+import { getOrderUuidByBusinessOrderIdForService } from './customer-orders-store'
 import { listOperationsOrderStatusHistoryByOrderId } from './operations-order-decision-store'
 import { getOperationsManualPricingDraftByOrderId } from './operations-manual-pricing-drafts-store'
+import type { OperationsChangeRequest } from './operations-change-request-types'
 import { buildOperationsOrderReview } from './operations-order-review-types'
 
 export async function buildOperationsOrderReviewByOrderId(orderId: string): Promise<
@@ -18,7 +21,21 @@ export async function buildOperationsOrderReviewByOrderId(orderId: string): Prom
     }
 
     const decisionHistory = await listOperationsOrderStatusHistoryByOrderId(orderId)
-    const review = buildOperationsOrderReview(order, detail.productionExport, decisionHistory)
+    let changeRequests: OperationsChangeRequest[] = []
+
+    const orderUuid = await getOrderUuidByBusinessOrderIdForService(orderId)
+    if (orderUuid.ok) {
+      const listed = await listOperationsChangeRequestsByOrderUuid(orderUuid.orderUuid)
+      if (listed.ok) {
+        changeRequests = listed.changeRequests
+      } else {
+        return { ok: false, reason: 'error', message: listed.error }
+      }
+    } else if (!('notFound' in orderUuid && orderUuid.notFound)) {
+      return { ok: false, reason: 'error', message: orderUuid.error }
+    }
+
+    const review = buildOperationsOrderReview(order, detail.productionExport, decisionHistory, changeRequests)
     return { ok: true, review: { ...review, manualPricingDraft: draftResult.draft } }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

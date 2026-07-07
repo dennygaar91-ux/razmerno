@@ -176,6 +176,10 @@ function installDecisionFetchMock(options: { orderFound?: boolean; domainStatus?
       );
     }
 
+    if (url.includes("/rest/v1/order_change_requests")) {
+      return jsonResponse([]);
+    }
+
     if (url.includes("/rest/v1/order_manual_pricing_drafts")) {
       return jsonResponse(null);
     }

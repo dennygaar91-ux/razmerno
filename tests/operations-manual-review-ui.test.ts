@@ -51,7 +51,18 @@ const sampleReview = {
   manualPricingDraft: null,
   latestDecisionAudit: null,
   decisionHistory: [],
+  changeRequests: [],
 };
+
+test("operations change requests section renders on manual review screen", () => {
+  const view = readFileSync("src/operations/OperationsManualReviewView.tsx", "utf8");
+  const section = readFileSync("src/operations/OperationsChangeRequestsSection.tsx", "utf8");
+  assert.match(view, /OperationsChangeRequestsSection/);
+  assert.match(section, /getOperationsChangeRequestsSectionTitle/);
+  assert.match(section, /getOperationsChangeRequestsEmptyMessage/);
+  assert.match(section, /data-testid="operations-change-requests-empty"/);
+  assert.doesNotMatch(section, /createClient|supabase/i);
+});
 
 test("operations manual review view exists and uses approval summary", () => {
   const view = readFileSync("src/operations/OperationsManualReviewView.tsx", "utf8");

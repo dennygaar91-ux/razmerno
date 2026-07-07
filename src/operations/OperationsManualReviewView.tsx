@@ -1,5 +1,6 @@
 import { AdminOrderDetailPage } from "../admin/AdminOrderDetailPage";
 import type { AdminOrderDetailSummary } from "../admin/orderSummary";
+import { OperationsChangeRequestsSection } from "./OperationsChangeRequestsSection";
 import { OperationsManualPricingDraftSection } from "./OperationsManualPricingDraftSection";
 import { OperationsOrderDecisionSection } from "./OperationsOrderDecisionSection";
 import { OperationsOrderDecisionHistorySection } from "./OperationsOrderDecisionHistorySection";
@@ -104,6 +105,10 @@ export function OperationsManualReviewView({
             />
           )}
         </div>
+      )}
+
+      {review && (
+        <OperationsChangeRequestsSection review={review} />
       )}
 
       {review && (

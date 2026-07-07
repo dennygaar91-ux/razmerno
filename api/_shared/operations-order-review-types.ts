@@ -4,6 +4,7 @@ import type { OperationsDecisionAudit, OperationsDecisionHistoryEntry } from './
 import { deriveLatestOperationsDecisionAudit } from './operations-order-decision-history'
 
 import type { OperationsManualPricingDraft } from './operations-manual-pricing-draft-types'
+import type { OperationsChangeRequest } from './operations-change-request-types'
 
 export type OperationsOrderReview = {
   orderId: string
@@ -38,6 +39,7 @@ export type OperationsOrderReview = {
   manualPricingDraft: OperationsManualPricingDraft | null
   latestDecisionAudit: OperationsDecisionAudit | null
   decisionHistory: OperationsDecisionHistoryEntry[]
+  changeRequests: OperationsChangeRequest[]
 }
 
 export const OPERATIONS_ORDER_REVIEW_FORBIDDEN_RESPONSE_KEYS = [
@@ -130,6 +132,7 @@ export function buildOperationsOrderReview(
   order: AdminOrderSummary,
   productionExport: unknown | null,
   decisionHistory: OperationsDecisionHistoryEntry[] = [],
+  changeRequests: OperationsChangeRequest[] = [],
 ): OperationsOrderReview {
   const production = summarizeProductionReview(productionExport)
   const latestDecisionAudit = deriveLatestOperationsDecisionAudit(decisionHistory)
@@ -167,5 +170,6 @@ export function buildOperationsOrderReview(
     manualPricingDraft: null,
     latestDecisionAudit,
     decisionHistory,
+    changeRequests,
   }
 }

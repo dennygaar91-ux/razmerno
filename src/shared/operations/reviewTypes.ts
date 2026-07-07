@@ -25,6 +25,15 @@ export type OperationsDecisionHistoryEntry = {
   createdAt: string;
 };
 
+export type OperationsChangeRequest = {
+  id: string;
+  requestType: string;
+  requestTypeLabel: string;
+  status: string;
+  message: string;
+  createdAt: string;
+};
+
 export type OperationsOrderReview = {
   orderId: string;
   status: string;
@@ -58,6 +67,7 @@ export type OperationsOrderReview = {
   manualPricingDraft: OperationsManualPricingDraft | null;
   latestDecisionAudit: OperationsDecisionAudit | null;
   decisionHistory: OperationsDecisionHistoryEntry[];
+  changeRequests: OperationsChangeRequest[];
 };
 
 export type OperationsOrderReviewApiResult =
@@ -187,4 +197,20 @@ export function getOperationsManualPricingDraftInputLabel(): string {
 
 export function getOperationsManualPricingSaveButtonLabel(): string {
   return "Сохранить ручную цену";
+}
+
+export function getOperationsChangeRequestsSectionTitle(): string {
+  return "Запросы на изменение";
+}
+
+export function getOperationsChangeRequestsEmptyMessage(): string {
+  return "Запросов на изменение от клиента пока нет.";
+}
+
+export function getOperationsChangeRequestStatusLabel(status: string): string {
+  if (status === "submitted") return "Открыт";
+  if (status === "reviewed") return "На рассмотрении";
+  if (status === "resolved") return "Принят";
+  if (status === "rejected") return "Отклонён";
+  return status;
 }
