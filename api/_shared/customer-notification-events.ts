@@ -4,6 +4,7 @@ import {
 } from './customer-orders-store'
 import { createCustomerNotification } from './customer-notifications-store'
 import { logEvent } from './logger'
+import type { OperationsChangeRequestDecision } from './operations-change-request-policy'
 function formatPublicOrderNumber(publicOrderNumber: string | null | undefined): string {
   const normalized = publicOrderNumber?.trim()
   return normalized || 'без номера'
@@ -120,6 +121,49 @@ export async function createOperationsDecisionNotificationBestEffort(input: {
       requestId: input.requestId,
       userId: target.userId,
       orderId: target.orderUuid,
+      decision: input.decision,
+      reason: created.error,
+    })
+  }
+}
+
+export async function createChangeRequestDecisionNotificationBestEffort(input: {
+  requestId: string
+  userId: string
+  orderUuid: string
+  publicOrderNumber: string | null
+  decision: OperationsChangeRequestDecision
+}): Promise<void> {
+  const publicOrderNumber = formatPublicOrderNumber(input.publicOrderNumber)
+  const notification =
+    input.decision === 'reviewed'
+      ? {
+          title: 'Запрос на изменение рассмотрен',
+          message: `Ваш запрос по заказу ${publicOrderNumber} рассмотрен.`,
+        }
+      : input.decision === 'resolved'
+        ? {
+            title: 'Изменения приняты в работу',
+            message: `Изменения по заказу ${publicOrderNumber} приняты в работу.`,
+          }
+        : {
+            title: 'Запрос на изменение отклонён',
+            message: `Ваш запрос по заказу ${publicOrderNumber} отклонён.`,
+          }
+
+  const created = await createCustomerNotification({
+    userId: input.userId,
+    orderId: input.orderUuid,
+    type: 'order_updated',
+    title: notification.title,
+    message: notification.message,
+  })
+
+  if (!created.ok) {
+    logEvent('error', 'customer_notifications.change_request_decision_insert_failed', {
+      requestId: input.requestId,
+      userId: input.userId,
+      orderId: input.orderUuid,
       decision: input.decision,
       reason: created.error,
     })

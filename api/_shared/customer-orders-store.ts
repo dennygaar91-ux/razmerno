@@ -189,3 +189,18 @@ export async function getBusinessOrderIdByOrderUuid(
 
   return { ok: true, businessOrderId: data.order_id }
 }
+
+export async function getPublicOrderNumberByOrderUuid(
+  orderUuid: string,
+): Promise<string | null> {
+  const client = getSupabaseClient()
+  if (!client) return null
+
+  const { data } = await client
+    .from('orders')
+    .select('public_order_number')
+    .eq('id', orderUuid)
+    .maybeSingle()
+
+  return typeof data?.public_order_number === 'string' ? data.public_order_number : null
+}

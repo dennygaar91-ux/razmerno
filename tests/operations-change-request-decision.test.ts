@@ -25,6 +25,7 @@ const ORIGINAL_FETCH = globalThis.fetch;
 let changeRequestStatus = "submitted";
 let totalPriceMutations = 0;
 let productionMutations = 0;
+let notificationInserts: Array<Record<string, unknown>> = [];
 
 const sampleOrderRow = {
   id: ORDER_UUID,
@@ -74,6 +75,7 @@ function restoreEnvironment() {
   changeRequestStatus = "submitted";
   totalPriceMutations = 0;
   productionMutations = 0;
+  notificationInserts = [];
 }
 
 function setRequiredServerEnv() {
@@ -135,7 +137,21 @@ function installDecisionFetchMock() {
       if (url.includes(`order_id=eq.${encodeURIComponent(ORDER_ID)}`) || url.includes(ORDER_ID)) {
         return jsonResponse(sampleOrderRow);
       }
+      if (parsed.searchParams.get("select") === "public_order_number") {
+        return jsonResponse({ public_order_number: "RZM_0001" });
+      }
       return jsonResponse([sampleOrderRow]);
+    }
+
+    if (url.includes("/rest/v1/order_notifications") && method === "POST") {
+      const body = init?.body ? JSON.parse(String(init.body)) : {};
+      notificationInserts.push(body as Record<string, unknown>);
+      return jsonResponse({
+        id: `990e8400-e29b-41d4-a716-44665544${String(notificationInserts.length).padStart(4, "0")}`,
+        ...(body ?? {}),
+        is_read: false,
+        created_at: new Date().toISOString(),
+      });
     }
 
     if (url.includes("/rest/v1/order_change_requests")) {
@@ -235,6 +251,8 @@ test("operations change request decision POST resolves submitted request", async
   assert.equal(body.review?.totalPrice, 86400);
   assert.equal(totalPriceMutations, 0);
   assert.equal(productionMutations, 0);
+  assert.equal(notificationInserts.length, 1);
+  assert.equal(notificationInserts[0]?.type, "order_updated");
 });
 
 test("operations change request decision POST rejects invalid transition", async () => {

@@ -1,5 +1,6 @@
 import { validateAdminRequest } from '../_shared/admin-auth'
-import { getBusinessOrderIdByOrderUuid } from '../_shared/customer-orders-store'
+import { createChangeRequestDecisionNotificationBestEffort } from '../_shared/customer-notification-events'
+import { getBusinessOrderIdByOrderUuid, getPublicOrderNumberByOrderUuid } from '../_shared/customer-orders-store'
 import { applyJsonHeaders } from '../_shared/headers'
 import { logEvent } from '../_shared/logger'
 import {
@@ -85,6 +86,15 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
       const built = await buildOperationsOrderReviewByOrderId(businessOrder.businessOrderId)
       if (built.ok) review = built.review
     }
+
+    const publicOrderNumber = await getPublicOrderNumberByOrderUuid(existing.row.order_id)
+    await createChangeRequestDecisionNotificationBestEffort({
+      requestId,
+      userId: existing.row.user_id,
+      orderUuid: existing.row.order_id,
+      publicOrderNumber,
+      decision: validated.value.decision,
+    })
 
     logEvent('info', 'operations_change_request_decision.applied', {
       requestId,

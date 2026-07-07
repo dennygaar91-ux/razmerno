@@ -1333,6 +1333,16 @@ Branch implementation evidence (2026-07-07, Operations Change Request Decision â
 - explicit non-scope: no customer notification on decision yet; no payment/production mutation; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Customer Notification on Change Request Decision â€” Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `createChangeRequestDecisionNotificationBestEffort` on successful operations change request decision;
+- notifications: reviewed / resolved / rejected customer-safe copy via `order_updated`; no internal note leak;
+- tests: updated `customer-notifications`, `operations-change-request-decision`;
+- QA passed: `npm run test:customer-notifications`, `npm run test:operations-change-request-decision`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no email/push; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

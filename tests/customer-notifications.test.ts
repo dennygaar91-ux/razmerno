@@ -6,6 +6,7 @@ import notificationReadHandler from "../api/customer/notification/read";
 import notificationsReadAllHandler from "../api/customer/notifications/read-all";
 import { CUSTOMER_UNAUTHORIZED_MESSAGE } from "../api/_shared/customer-api-auth";
 import {
+  createChangeRequestDecisionNotificationBestEffort,
   createChangeRequestNotificationBestEffort,
   createOperationsDecisionNotificationBestEffort,
   createOrderCreatedNotificationBestEffort,
@@ -467,6 +468,44 @@ test("change request creates change_request notification best-effort", async () 
   assert.equal(inserts[0]?.type, "change_request");
   assert.equal(inserts[0]?.title, "Запрос на изменение отправлен");
   assert.equal(inserts[0]?.message, "Ваш запрос по заказу RZM_0008 передан менеджеру.");
+});
+
+test("change request decision creates safe customer notification", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const store = installNotificationStoreMock();
+
+  await createChangeRequestDecisionNotificationBestEffort({
+    requestId: "req-change-request-decision",
+    userId: USER_ID,
+    orderId: ORDER_ID,
+    publicOrderNumber: "RZM_0009",
+    decision: "resolved",
+  });
+
+  const inserts = store.getInserts();
+  assert.equal(inserts.length, 1);
+  assert.equal(inserts[0]?.type, "order_updated");
+  assert.equal(inserts[0]?.title, "Изменения приняты в работу");
+  assert.doesNotMatch(String(inserts[0]?.message ?? ""), /internal|audit|changed_by/i);
+});
+
+test("change request reject decision notification stays customer-safe", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const store = installNotificationStoreMock();
+
+  await createChangeRequestDecisionNotificationBestEffort({
+    requestId: "req-change-request-reject",
+    userId: USER_ID,
+    orderId: ORDER_ID,
+    publicOrderNumber: "RZM_0010",
+    decision: "rejected",
+  });
+
+  const inserts = store.getInserts();
+  assert.equal(inserts[0]?.title, "Запрос на изменение отклонён");
+  assert.doesNotMatch(String(inserts[0]?.message ?? ""), /Internal|причина/i);
 });
 
 test("notification generation failure does not throw for primary helper", async () => {
