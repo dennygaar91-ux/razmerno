@@ -383,6 +383,7 @@ test("operations order review GET includes customer change requests", async () =
   assert.equal(body.ok, true);
   assert.equal(body.review.changeRequests.length, 1);
   assert.equal(body.review.changeRequests[0]?.status, "submitted");
+  assert.equal(body.review.changeRequests[0]?.decisionAllowed, true);
   assert.match(body.review.changeRequests[0]?.message ?? "", /650/);
 
   const serialized = JSON.stringify(body);

@@ -167,3 +167,25 @@ export async function getOrderUuidByBusinessOrderIdForService(
 
   return { ok: true, orderUuid: data.id }
 }
+
+export async function getBusinessOrderIdByOrderUuid(
+  orderUuid: string,
+): Promise<
+  | { ok: true; businessOrderId: string }
+  | { ok: false; notFound: true }
+  | { ok: false; error: string }
+> {
+  const client = getSupabaseClient()
+  if (!client) return { ok: false, error: 'order_storage_unavailable' }
+
+  const { data, error } = await client
+    .from('orders')
+    .select('order_id')
+    .eq('id', orderUuid)
+    .maybeSingle()
+
+  if (error) return { ok: false, error: error.message }
+  if (!data || typeof data.order_id !== 'string') return { ok: false, notFound: true }
+
+  return { ok: true, businessOrderId: data.order_id }
+}

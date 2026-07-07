@@ -64,6 +64,20 @@ test("operations change requests section renders on manual review screen", () =>
   assert.doesNotMatch(section, /createClient|supabase/i);
 });
 
+test("operations change request decision actions are wired through API section", () => {
+  const section = readFileSync("src/operations/OperationsChangeRequestsSection.tsx", "utf8");
+  assert.match(section, /submitOperationsChangeRequestDecision/);
+  assert.match(section, /data-testid="operations-change-request-actions"/);
+  assert.match(section, /getOperationsChangeRequestResolvedButtonLabel/);
+  assert.doesNotMatch(section, /createClient|supabase/i);
+});
+
+test("operations change request decision API client uses operations endpoint", () => {
+  const api = readFileSync("src/shared/operations/operationsChangeRequestDecisionApi.ts", "utf8");
+  assert.match(api, /\/api\/operations\/change-request-decision/);
+  assert.match(api, /Authorization/);
+});
+
 test("operations manual review view exists and uses approval summary", () => {
   const view = readFileSync("src/operations/OperationsManualReviewView.tsx", "utf8");
   assert.match(view, /OperationsManualReviewView/);

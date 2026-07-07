@@ -7,7 +7,7 @@ export type CustomerChangeRequestType =
   | "delivery"
   | "other";
 
-export type CustomerChangeRequestStatus = "submitted";
+export type CustomerChangeRequestStatus = "submitted" | "reviewed" | "resolved" | "rejected";
 
 export type CustomerChangeRequest = {
   id: string;
@@ -54,6 +54,9 @@ export function getCustomerChangeRequestTypeLabel(
 
 export function getCustomerChangeRequestStatusLabel(status: CustomerChangeRequestStatus): string {
   if (status === "submitted") return "Отправлен";
+  if (status === "reviewed") return "На рассмотрении";
+  if (status === "resolved") return "Принят";
+  if (status === "rejected") return "Отклонён";
   return status;
 }
 

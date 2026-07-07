@@ -108,7 +108,11 @@ export function OperationsManualReviewView({
       )}
 
       {review && (
-        <OperationsChangeRequestsSection review={review} />
+        <OperationsChangeRequestsSection
+          review={review}
+          accessToken={accessToken}
+          onDecisionApplied={onDecisionApplied}
+        />
       )}
 
       {review && (

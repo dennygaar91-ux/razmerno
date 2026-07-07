@@ -1323,6 +1323,16 @@ Branch implementation evidence (2026-07-07, Operations Change Request Readback �
 - explicit non-scope: no operations decision actions yet; no P1-27 closure; no P1-28 change;
 - branch-only evidence, not merged/main closure.
 
+Branch implementation evidence (2026-07-07, Operations Change Request Decision — Local Foundation, `task/epic-b-projects-foundation`, not closure):
+
+- branch local status: **done (QA PASS, local-only)**;
+- API: `POST /api/operations/change-request-decision` with transitions `submitted|reviewed` → `reviewed|resolved|rejected`;
+- UI: decision actions on `OperationsChangeRequestsSection`; reload review after success;
+- tests: `tests/operations-change-request-decision.test.ts`, updated manual review UI tests;
+- QA passed: `npm run test:operations-change-request-decision`, `npm run test:operations-manual-review-ui`, `npm test`, `npm run typecheck`, `npm run build`, `git diff --check`;
+- explicit non-scope: no customer notification on decision yet; no payment/production mutation; no P1-27 closure; no P1-28 change;
+- branch-only evidence, not merged/main closure.
+
 Dependencies: `docs/specification/volume-07-customer-platform/README.md`, `docs/planning/accepted-backlog-decisions-v1.md`, `docs/planning/role-audit-reconciliation-v1.md`.
 
 Do-not-touch constraints:

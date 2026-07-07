@@ -32,7 +32,10 @@ export type OperationsChangeRequest = {
   status: string;
   message: string;
   createdAt: string;
+  decisionAllowed: boolean;
 };
+
+export type OperationsChangeRequestDecision = "reviewed" | "resolved" | "rejected";
 
 export type OperationsOrderReview = {
   orderId: string;
@@ -213,4 +216,26 @@ export function getOperationsChangeRequestStatusLabel(status: string): string {
   if (status === "resolved") return "Принят";
   if (status === "rejected") return "Отклонён";
   return status;
+}
+
+export function getOperationsChangeRequestReviewedButtonLabel(): string {
+  return "На рассмотрении";
+}
+
+export function getOperationsChangeRequestResolvedButtonLabel(): string {
+  return "Принять";
+}
+
+export function getOperationsChangeRequestRejectedButtonLabel(): string {
+  return "Отклонить";
+}
+
+export function getOperationsChangeRequestDecisionSuccessMessage(decision: OperationsChangeRequestDecision): string {
+  if (decision === "reviewed") return "Запрос отмечен как рассмотренный.";
+  if (decision === "resolved") return "Запрос принят в работу.";
+  return "Запрос отклонён.";
+}
+
+export function getOperationsChangeRequestDecisionErrorMessage(): string {
+  return "Не удалось обработать запрос на изменение.";
 }

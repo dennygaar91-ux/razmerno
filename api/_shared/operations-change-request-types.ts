@@ -3,6 +3,7 @@ import {
   type CustomerChangeRequestRow,
   type CustomerChangeRequestType,
 } from './customer-change-request-types'
+import { isOperationsChangeRequestDecisionAllowed } from './operations-change-request-policy'
 
 export type OperationsChangeRequest = {
   id: string
@@ -11,6 +12,7 @@ export type OperationsChangeRequest = {
   status: string
   message: string
   createdAt: string
+  decisionAllowed: boolean
 }
 
 const REQUEST_TYPE_LABELS: Record<CustomerChangeRequestType, string> = {
@@ -53,6 +55,7 @@ export function mapOperationsChangeRequest(row: CustomerChangeRequestRow): Opera
     status: row.status,
     message: row.message,
     createdAt: row.created_at,
+    decisionAllowed: isOperationsChangeRequestDecisionAllowed(row.status),
   }
 }
 
