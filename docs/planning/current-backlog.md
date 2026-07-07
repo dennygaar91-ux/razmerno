@@ -1705,6 +1705,24 @@ Evidence:
 - Final preview visual QA remains required.
 - Not closure.
 
+### Draft PR Created — Epic B Customer/Operations Foundation — 2026-07-07
+
+branch local status: done (draft PR created, QA PASS, not merged, not closure)
+
+Evidence:
+
+- Pushed branch `task/epic-b-projects-foundation` to origin.
+- Created Draft PR to main: https://github.com/dennygaar91-ux/razmerno/pull/111
+- Used D-14 one-PR logical review sections strategy.
+- PR body includes D-12 PASS and D-13 Local Visual QA PARTIAL.
+- D-13 preview visual QA + human approval remain required.
+- `order_status_events` RLS disabled remains security follow-up.
+- No merge.
+- No production deploy.
+- P1-27 remains `needs reconciliation`.
+- P1-28 remains `needs reconciliation`.
+- Not closure.
+
 ---
 
 ## P2 — Production-ready Visual QA / UX Evidence
