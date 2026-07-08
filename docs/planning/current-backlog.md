@@ -954,6 +954,34 @@ Do-not-touch constraints:
 - do not mass-clean runtime CSS/components;
 - do not close visual tasks without fresh screenshots and human review.
 
+### Branch implementation evidence — P1-26 Design-system Direction Reconciliation Backlog-only Pass — 2026-07-08
+
+branch local status: done (direction conflict documented in backlog, QA PASS, not closure)
+
+Evidence:
+
+- Confirmed active Release v1 direction: desktop-first / website-first.
+- Confirmed mobile redesign is deferred and must not drive Release v1 constructor shell, stepper, fallback layout or visual gate decisions.
+- Confirmed `docs/design-system/README.md` still contains mobile-first wording and should be treated as stale/conflicting until explicitly reconciled in a separate approved design-system doc edit task.
+- Mapped affected backlog tasks: `P1-21`, `P2-20`, `P2-21`, `TASK 08-UX-07`, `P2-26A`, `P2-26B`, `P2-26C`, `P2-26D`.
+- Future UX / Design System agents must use `current-backlog.md` + accepted decisions as the active direction source.
+- No design-system README edits.
+- No runtime changes.
+- No CSS changes.
+- No component changes.
+- No visual QA execution.
+- No push/PR/merge/deploy.
+- P1-26 remains `needs reconciliation`.
+- Not closure.
+
+Guardrail for future UX tasks:
+
+- Release v1 visual decisions must optimize desktop / website-first experience unless a task explicitly says otherwise.
+- Mobile checks remain compatibility / non-breakage checks, not redesign authority.
+- Do not create mobile-first layout rewrites under visual QA tasks.
+- Do not close P1-26 from this backlog-only note.
+- A separate approved task is required to edit `docs/design-system/README.md`.
+
 ### P1-27 — Customer Platform MVP Scope Reconciliation
 
 Статус: needs reconciliation.
