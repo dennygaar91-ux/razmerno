@@ -364,19 +364,19 @@ async function waitForScreen(page, shot) {
       await page.locator('.rzm-info-main--assembly').first().waitFor({ state: 'visible', timeout: 45_000 })
       return
     case 'constructor-3d-sizes':
-      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 45_000 })
+      await page.locator('.rzm-3d-page, [data-testid="constructor-3d-viewport"]').first().waitFor({ state: 'visible', timeout: 90_000 })
       return
     case 'constructor-webgl-fallback':
-      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 45_000 })
+      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 90_000 })
       await page
         .locator('.rzm-3d-blueprint-fallback')
         .first()
-        .waitFor({ state: 'visible', timeout: 45_000 })
+        .waitFor({ state: 'visible', timeout: 90_000 })
       return
     case 'constructor-checkout':
-      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 45_000 })
-      await page.locator('button:has-text("Заявка")').first().click({ timeout: 15_000 })
-      await page.locator('.rzm-3d-checkout').first().waitFor({ state: 'visible', timeout: 45_000 })
+      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 90_000 })
+      await page.locator('button:has-text("Заявка")').first().click({ timeout: 30_000 })
+      await page.locator('.rzm-3d-checkout').first().waitFor({ state: 'visible', timeout: 90_000 })
       return
     case 'customer-auth-gate':
       await page
@@ -463,6 +463,9 @@ function filterShots(shots) {
         filtered.every((shot) => CUSTOMER_ORDER_DETAIL_SHOTS.includes(shot.slug))
       ) {
         // Isolated customer order detail on fresh dev (explicit override).
+      } else if (explicit.length > 0) {
+        // Stale D13_SHOTS from another batch must not zero-out unrelated batches.
+        filtered = shots.filter((shot) => allowed.includes(shot.slug))
       } else {
         filtered = []
       }
