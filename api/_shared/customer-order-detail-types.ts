@@ -5,6 +5,10 @@ import {
   derivePaymentReadinessState,
   type PaymentReadinessState,
 } from './payment-readiness-domain'
+import {
+  deriveFurnitureTotalFromStoredSnapshot,
+  readStoredOrderPricingSnapshot,
+} from './stored-order-pricing-snapshot'
 
 export type CustomerOrderDetailRow = {
   id: string
@@ -104,16 +108,12 @@ export function formatCustomerOrderMaterialsDecorSummary(
 }
 
 export function buildCustomerOrderPricingSummary(row: CustomerOrderDetailRow): CustomerOrderPricingSummary {
-  const deliveryTotal = row.delivery_enabled ? Math.max(0, row.delivery_price ?? 0) : null
-  const assemblyTotal = row.assembly_enabled ? Math.max(0, row.assembly_price ?? 0) : null
-  const deliveryPart = deliveryTotal ?? 0
-  const assemblyPart = assemblyTotal ?? 0
-  const furnitureTotal = Math.max(0, row.total_price - deliveryPart - assemblyPart)
+  const snapshot = readStoredOrderPricingSnapshot(row)
 
   return {
-    furnitureTotal,
-    deliveryTotal,
-    assemblyTotal,
+    furnitureTotal: deriveFurnitureTotalFromStoredSnapshot(snapshot),
+    deliveryTotal: snapshot.deliveryPrice,
+    assemblyTotal: snapshot.assemblyPrice,
   }
 }
 
