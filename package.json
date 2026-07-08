@@ -19,7 +19,7 @@
     "test:ui-e2e": "node --no-warnings --import tsx tests/ui-e2e-smoke.test.ts",
     "test:browser": "playwright test",
     "report:bundle": "npm run build && node scripts/bundle-size-report.mjs",
-    "typecheck:api": "tsc --noEmit --module ESNext --moduleResolution bundler --target ES2022 --jsx react-jsx --types node --resolveJsonModule --allowSyntheticDefaultImports api/*.ts api/admin/*.ts api/_shared/*.ts src/shared/lib/pricing-core.ts src/pricing/*.ts src/constructor/production/*.ts src/constructor/geometry/*.ts",
+    "typecheck:api": "tsc --noEmit -p tsconfig.api.json",
     "build:price-seed": "node scripts/build-price-seed.mjs",
     "test:pricing-catalog": "node --no-warnings --import tsx src/pricing/catalog.test.ts",
     "test:pricing-engine": "node --no-warnings --import tsx src/pricing/engine.test.ts",
@@ -201,6 +201,13 @@
     "test:constructor-state-ownership-contract": "node --no-warnings --import tsx tests/constructor-state-ownership-contract.test.ts",
     "test:d13-visual-capture-batch-contract": "node --no-warnings --import tsx tests/d13-visual-capture-batch-contract.test.ts",
     "test:design-system-token-guard-contract": "node --no-warnings --import tsx tests/design-system-token-guard-contract.test.ts",
+    "test:cross-browser-visual-smoke": "playwright test --config=playwright.cross-browser.config.ts",
+    "test:release-e2e": "npm run test:customer-order-submit && npm run test:checkout-submit-hook && npm run test:pricing-parity-contract && npm run test:production-export-contract && npm run test:production-snapshots && npm run test:customer-order-detail && npm run test:operations-order-review && npm run check:webgl-fallback-e2e && npm run test:webgl-fallback-e2e",
+    "test:email-retry-failure-contract": "node --no-warnings --import tsx tests/email-retry-failure-contract.test.ts",
+    "test:operations-workflow-security-contract": "node --no-warnings --import tsx tests/operations-workflow-security-contract.test.ts",
+    "test:observability-contract": "node --no-warnings --import tsx tests/observability-contract.test.ts",
+    "check:release-security": "node scripts/check-release-security.mjs",
+    "check:bundle-baseline": "node scripts/check-bundle-baseline.mjs",
     "test:production-snapshots": "npm run test:production-export-contract && npm run test:production-export && node --no-warnings --import tsx src/constructor/production/orderExportPackage.payload.test.ts",
     "test:production-json-v4": "node --no-warnings --import tsx tests/production-json-v4.test.ts",
     "test:production-json-v4-adapter": "node --no-warnings --import tsx tests/production-json-v4-adapter.test.ts",
@@ -435,6 +442,5 @@
     "vite": "7.3.2",
     "vite-plugin-singlefile": "2.3.0",
     "@playwright/test": "^1.57.0"
-  },
-  "typecheck:api": "tsc --noEmit --module ESNext --moduleResolution bundler --target ES2022 --types node --resolveJsonModule --allowSyntheticDefaultImports api/*.ts api/admin/*.ts api/_shared/*.ts src/shared/lib/pricing-core.ts src/pricing/*.ts src/constructor/production/*.ts src/constructor/geometry/*.ts"
+  }
 }
