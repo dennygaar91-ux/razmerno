@@ -2119,6 +2119,48 @@ Evidence:
 - Human visual approval remains pending.
 - Not closure.
 
+### Branch implementation evidence — D-13 Customer Order Detail Isolated Capture Triage — 2026-07-08
+
+branch local status: partial (customer order detail isolated capture triaged/fixed in capture script, not D-13 PASS, not closure)
+
+Evidence:
+
+- Used fresh local `vercel dev` on port **3004**; killed stale **3004/3005** listeners before restarts.
+- `/api/health`: **200**, `ok: true`, `missing: []` before isolated captures (degraded to **502** between back-to-back runs without restart).
+- Customer order detail isolated-first result (after capture-script wait fix):
+  - `customer-order-review`: **PASS** (`…-order-isolated-review-fixed`, desktop PNG captured)
+  - `customer-order-completed`: **PASS** (`…-order-isolated-completed-fixed`, desktop PNG captured)
+- Pre-fix isolated attempts misclassified failure: `D13_CAPTURE_BATCH` env leaked and overrode `D13_SHOTS`; success UI has no `.rzm-account-panel-title` but wait blocked 30s on that locator.
+- Direct API diagnosis (node fetch, no browser): `GET /api/customer/order?id=<uuid>` → **200** for `RZM_0002` / `RZM_0007` UUIDs; workspace **200** with 6 orders — **not** API id/auth bug.
+- Root cause classification: **F** (primary) — Playwright `waitForCustomerOrderReady` treated missing error-panel title as hard wait on success pages; **F** (secondary) — `filterShots` ignored `D13_SHOTS` when `D13_CAPTURE_BATCH` also set; **B + H** (residual) — combined `customer-data` batch on one dev process still **PARTIAL** (`workspace` timeout, `completed` API error) while isolated order shots pass on fresh dev.
+- Applied minimal fix (`scripts/d13-local-visual-qa-capture.mjs`):
+  - error-panel check only when visible (`isVisible`) before controlled-error assertion;
+  - intersect `D13_CAPTURE_BATCH` + `D13_SHOTS` filters.
+- Identifier/auth contract:
+  - workspace id source: `GET /api/customer/workspace` → `orders[].id` UUID by `RZM_0002` / `RZM_0007`;
+  - order detail request id: route + `?id=<uuid>` (internal UUID, not `RZ-*` display id);
+  - auth/session fixture: contract-test magic-link via `addInitScript` localStorage key (unchanged).
+- Focused verification:
+  - `npm run test:customer-order-detail`: **PASS** (10/10)
+  - isolated `customer-order-review` capture: **PASS**
+  - isolated `customer-order-completed` capture: **PASS**
+  - `customer-data` batch after fix (`…-customer-data-after-fix`): **PARTIAL** (1/3 — review PASS; workspace timeout; completed controlled API error in same session)
+- Full QA:
+  - `npm test`: **PASS**
+  - `npm run typecheck`: **PASS**
+  - `npm run build`: **PASS**
+  - `npm run check:webgl-fallback-e2e`: **PASS**
+  - `npm run test:webgl-fallback-e2e`: **PASS** (10/10)
+  - `git diff --check`: **PASS**
+- D-13 local visual status remains **improved but PARTIAL** (isolated order detail desktop capture reliable; combined customer-data batch still needs fresh-dev per shot or split order-detail batches).
+- D-13 Preview Visual QA remains blocked until remote preview URL exists.
+- No new planning docs.
+- No production auth weakening.
+- No Supabase live mutation.
+- No Vercel deploy.
+- No push/PR/merge/deploy.
+- Not closure.
+
 ### D-13 Local Visual QA Baseline — 2026-07-07
 
 branch local status: done (local visual QA baseline prepared, QA PASS, not final preview visual QA, not closure)

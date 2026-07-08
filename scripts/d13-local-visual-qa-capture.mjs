@@ -233,9 +233,13 @@ async function waitForCustomerOrderReady(page, statusText) {
     return !text.includes('Загружаем карточку заказа') && !text.includes('Загружаем страницу')
   }, { timeout: 45_000 })
 
-  const panelTitle = (await page.locator('.rzm-account-panel-title').first().textContent())?.trim() ?? ''
-  if (panelTitle === 'Заказ не найден' || panelTitle === 'Не удалось загрузить заказ') {
-    throw new Error(`Customer order detail entered controlled error state: ${panelTitle}`)
+  const errorPanel = page.locator('.rzm-account-panel-title').first()
+  const errorPanelVisible = await errorPanel.isVisible().catch(() => false)
+  if (errorPanelVisible) {
+    const panelTitle = ((await errorPanel.textContent()) ?? '').trim()
+    if (panelTitle === 'Заказ не найден' || panelTitle === 'Не удалось загрузить заказ') {
+      throw new Error(`Customer order detail entered controlled error state: ${panelTitle}`)
+    }
   }
 
   await page.locator('h1.rzm-account-title').first().waitFor({ state: 'visible', timeout: 45_000 })
@@ -330,6 +334,9 @@ async function preparePageAuth(context, shot, sessionPayload, storageKey, adminT
 
 function filterShots(shots) {
   const batch = process.env.D13_CAPTURE_BATCH?.trim()
+  const explicit = process.env.D13_SHOTS?.split(',').map((item) => item.trim()).filter(Boolean) ?? []
+
+  let filtered = shots
   if (batch) {
     const allowed = CAPTURE_BATCHES[batch]
     if (!allowed) {
@@ -337,12 +344,14 @@ function filterShots(shots) {
         `Unknown D13_CAPTURE_BATCH=${batch}. Allowed: ${Object.keys(CAPTURE_BATCHES).join(', ')}`,
       )
     }
-    return shots.filter((shot) => allowed.includes(shot.slug))
+    filtered = filtered.filter((shot) => allowed.includes(shot.slug))
   }
 
-  const explicit = process.env.D13_SHOTS?.split(',').map((item) => item.trim()).filter(Boolean) ?? []
-  if (explicit.length === 0) return shots
-  return shots.filter((shot) => explicit.includes(shot.slug))
+  if (explicit.length > 0) {
+    filtered = filtered.filter((shot) => explicit.includes(shot.slug))
+  }
+
+  return filtered
 }
 
 function buildShots(orderIds) {
