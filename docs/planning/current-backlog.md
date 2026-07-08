@@ -89,6 +89,48 @@ Evidence:
 - No push/PR/merge/deploy.
 - Not closure.
 
+### Branch implementation evidence — Vercel Deploy-phase Local Output / Config Investigation — 2026-07-08
+
+branch local status: partial (local deploy-output investigation completed without `vercel build` output; QA recorded, not closure)
+
+Evidence:
+
+- Investigated Vercel deploy-phase blocker **without** running `vercel deploy`.
+- Latest known failed deployment: `dpl_5PESiXLJuGVNCVyXvvpsq57t1rPg`.
+- Known failure stage: `Deploying outputs...`; preview URL unavailable.
+- Local Vercel build: **unavailable** — `vercel build` requires project settings; `vercel build --yes` failed (`The specified token is not valid. Use vercel login`). `.vercel/project.json` exists locally (`prj_gf7NNzfwtFNGctPYpyJeCYVfCQJW`) but CLI auth missing in agent runtime. **No `.vercel/output` produced.**
+- Static config audit:
+  - `vercel.json` — rewrites only (`/configurator` → `/index.html`); no `buildCommand` / `outputDirectory` override (Vite auto-detect expected).
+  - **`.vercelignore` — absent.**
+  - `.gitignore` — ignores `dist/`, `node_modules/`, `.vercel/`; does **not** ignore `artifacts/`, `playwright-report/`, `test-results/`, `coverage/`.
+  - Local untracked artifacts present: `artifacts/` (~2 MB), `playwright-report/`, `test-results/` (generated).
+- Output inspection (`npm run build` / `dist/`): build **PASS**; largest assets `three-core` ~667 KB, `price-catalog` ~564 KB, `react-vendor` ~245 KB, CSS ~404 KB — within normal SPA range; no Playwright/test artifact leakage into `dist/`.
+- API/serverless bundle risk audit: **29** route handlers under `api/` (excluding `_shared`); Epic B added `api/customer/*` + `api/operations/*`. No Playwright/Three.js imports in API routes; `@supabase/supabase-js` only. `api/orders.ts` imports `server-price.ts` + `src/constructor/production/orderExportPackage.js` (heavy pricing/production stack) — known pattern; remote build + per-route TS **already PASS** on `dpl_5PESiXLJuGVNCVyXvvpsq57t1rPg`, so compile-time bundle risk alone does not explain deploy-phase failure.
+- Hypothesis matrix:
+
+| Hypothesis | Evidence | Status | Recommended local action |
+|---|---|---|---|
+| Missing `.vercelignore` includes local artifacts | `.vercelignore` absent; `.gitignore` gaps for test artifacts; Git PR deploy uses tracked files only — untracked `artifacts/` not in remote checkout | **unlikely** (Git PR path) | Optional hygiene `.vercelignore` only after user approves; not applied — root cause not proven |
+| Invalid Vercel output structure | Cannot verify without `vercel build` / dashboard deploy logs | **unknown** | `vercel login` + `vercel build` locally or inspect dashboard deploy log for `dpl_5PESiXLJuGVNCVyXvvpsq57t1rPg` |
+| Oversized serverless output | 29 API routes; pricing engine in shared server modules; remote build PASS | **possible** | Compare function bundle sizes in Vercel build log; consider function consolidation only with separate approved scope |
+| Unsupported API bundle import | No browser/Playwright imports found in `api/` | **unlikely** | None |
+| Vercel config/root/output mismatch | Minimal `vercel.json`; standard Vite `dist/` output | **unlikely** | None |
+| Transient Vercel platform issue | Build succeeded then deploy-phase failed with no preview URL | **possible** | Retry preview deploy after auth/logs access (out of this task) |
+
+- Applied fix: **none** — root cause not proven locally; adding `.vercelignore` alone would not explain Git-based deploy failure at `Deploying outputs...` after successful remote build.
+- `npm test`: PASS.
+- `npm run typecheck`: PASS.
+- `npm run build`: PASS.
+- `npm run check:webgl-fallback-e2e`: PASS.
+- `npm run test:webgl-fallback-e2e`: PASS (10/10).
+- `git diff --check`: PASS.
+- No new planning docs.
+- No Vercel deploy.
+- No Supabase live changes.
+- No push/PR/merge/deploy.
+- D-13 Preview Visual QA remains **blocked** because no stable preview URL.
+- Not closure.
+
 ### Branch implementation evidence — P1-10 WebGL Fallback E2E Checkout/Auth Alignment — 2026-07-08
 
 branch local status: done (P1-10 WebGL fallback E2E restored locally, QA PASS, not closure)
