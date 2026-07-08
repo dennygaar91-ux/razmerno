@@ -1,3 +1,5 @@
+> Derived local report. Not an active source of truth. `docs/planning/current-backlog.md` remains the active operational backlog. Use this file as historical branch-local evidence only.
+
 # RPES / Backlog MVP Crosswalk — Local Package
 
 > **Date:** 2026-07-07  

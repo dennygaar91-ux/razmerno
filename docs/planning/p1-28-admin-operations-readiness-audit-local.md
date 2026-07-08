@@ -1,3 +1,5 @@
+> Derived local report. Not an active source of truth. `docs/planning/current-backlog.md` remains the active operational backlog. Use this file as historical branch-local evidence only.
+
 # P1-28 Admin / Operations Closure Readiness Audit — Local Package
 
 > **Date:** 2026-07-07  

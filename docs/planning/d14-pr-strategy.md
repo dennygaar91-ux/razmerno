@@ -1,3 +1,5 @@
+> Derived local report. Not an active source of truth. `docs/planning/current-backlog.md` remains the active operational backlog. Use this file as historical branch-local evidence only.
+
 # D-14 PR Strategy & Branch Review Plan — `task/epic-b-projects-foundation`
 
 > **Date:** 2026-07-07  

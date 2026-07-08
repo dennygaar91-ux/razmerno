@@ -13,6 +13,79 @@ Governance note:
 - If `current-backlog.md` and accepted decisions appear to conflict, stop and request reconciliation.
 - Release v1 documentation hierarchy: `accepted-backlog-decisions-v1.md` §18 → RPES → `mvp-scope.md` / `release-roadmap.md` → this backlog. Governance traceability below does not change task status or closure evidence.
 
+## Planning Layer Compression Note
+
+`current-backlog.md` is the only active operational backlog.
+
+Derived local planning reports may be used as evidence/reference, but they do not override this file and do not close tasks by themselves.
+
+Future Cursor tasks must not create new planning documents by default.
+
+Default output for planning tasks:
+
+- update `current-backlog.md` only;
+- add compact evidence / gap / decision blocks;
+- avoid creating derived reports unless explicitly approved.
+
+Active reference hierarchy:
+
+1. `current-backlog.md`
+2. `docs/planning/accepted-backlog-decisions-v1.md`
+3. RPES / release scope docs
+4. audit / reconciliation reports
+5. derived local reports
+
+Derived reports should be archived or deleted after their actionable evidence is reflected in `current-backlog.md`.
+
+No task may be closed from derived-report evidence alone.
+
+### Active branch blockers (retained from derived reports — not closure)
+
+- **P1-25 / P1-26 / P1-27 / P1-28:** `needs reconciliation`; not closure.
+- **P1-27 local readiness:** PARTIAL (customer platform audit local package).
+- **P1-28 local readiness:** PARTIAL (admin/operations audit local package).
+- **D-13 local visual QA:** PARTIAL; **D-13 preview visual QA:** BLOCKED — no stable preview URL.
+- **typecheck:api:** fixed on branch (GitHub Actions PASS); **Vercel deploy-phase** still failed with no preview URL after build PASS.
+- **P1-10 WebGL fallback E2E:** Fast CI gate FAILURE on branch (separate from `typecheck:api`).
+- **`order_status_events` RLS:** disabled on live Supabase — security follow-up / release blocker.
+- **Human visual approval:** missing.
+- **P0-03 / P0-13 pricing parity:** open.
+- **Production Golden Snapshots / P1-11A / P1-11B:** open; production handoff not closed.
+
+### Planning files inventory (2026-07-08)
+
+| Category | Count | Representative files |
+|---|---:|---|
+| active-source | 3 | `current-backlog.md`, `accepted-backlog-decisions-v1.md`, `agent-prompt-rules-v1.md` |
+| active-reference | 12 | `role-audit-reconciliation-v1.md`, `mvp-scope.md`, `release-roadmap.md`, `mvp-scope-decision-signoff.md`, `p1-27-p1-28-reconciliation.md`, `d12-live-verification-preflight.md`, `project-reconciliation-report-v1.md`, `agent-workflow.md`, `parallelization-rules.md`, `architecture-decisions.md`, `release-qa-maturity-matrix-v1.md`, `agent-responsibility-matrix-v1.md` |
+| derived-local-report | 6 | see index below |
+| archive-candidate | 21 | `master-development-plan-v1.md`, `architect-agent-master-roadmap-v1.md`, `final-lead-architect-handoff-v1.md`, `current-backlog-kanban-v1.md`, agent-task/handoff v1 docs, architecture review/closure v1 docs |
+| delete-candidate | 1 | `current-backlog-kanban-v1.md` (content superseded by `current-backlog.md`) |
+| unknown | 0 | — |
+
+## Derived Local Planning Reports Index
+
+These documents are branch-local derived reports. They are evidence/reference only and are not active source-of-truth.
+
+| File | Category | Keep active? | Key retained evidence in backlog | Recommended later action |
+|---|---|---:|---|---|
+| `docs/planning/rpes-backlog-mvp-crosswalk-local.md` | derived-local-report | no | P1-25 local crosswalk prepared; RV1-A…H map; not closure | archive or delete after review |
+| `docs/planning/p1-27-customer-platform-readiness-audit-local.md` | derived-local-report | no | P1-27 local readiness PARTIAL; not closure | archive or delete after review |
+| `docs/planning/p1-28-admin-operations-readiness-audit-local.md` | derived-local-report | no | P1-28 local readiness PARTIAL; not closure | archive or delete after review |
+| `docs/planning/d13-local-visual-qa-baseline.md` | derived-local-report | no | D-13 local PARTIAL; mixed RU/EN; ops workspace/review gaps | archive or delete after review |
+| `docs/planning/d13-preview-visual-qa-pr-111.md` | derived-local-report | no | D-13 preview BLOCKED; no preview URL | archive or delete after review |
+| `docs/planning/d14-pr-strategy.md` | derived-local-report | no | D-14 logical review sections (process only); not closure | archive or delete after review |
+
+### Active-reference planning docs (not derived; do not override backlog)
+
+| File | Role | Later action |
+|---|---|---|
+| `docs/planning/mvp-scope-decision-signoff.md` | User sign-off D-01…D-16 (2026-07-07) | keep as decision evidence reference |
+| `docs/planning/p1-27-p1-28-reconciliation.md` | P1-27/P1-28 boundary reconciliation package | keep until reconciled in accepted decisions |
+| `docs/planning/d12-live-verification-preflight.md` | D-12 live verification prep/runbook | keep as live QA reference |
+| `docs/planning/role-audit-reconciliation-v1.md` | RAR conflicts register | keep as audit reference |
+| `docs/planning/project-reconciliation-report-v1.md` | Last reconciliation pointer | keep as audit reference |
+
 ## Release v1 Governance Traceability
 
 Planning input integrated from `docs/planning/razmerno-release-v1-product-decisions-delta-final.md` on 2026-06-26.
@@ -826,6 +899,33 @@ Evidence:
 - No production logic changes.
 - No push/PR/merge/deploy.
 - P1-25 remains `needs reconciliation`.
+- P1-27 remains `needs reconciliation`.
+- P1-28 remains `needs reconciliation`.
+- Not closure.
+
+### Branch implementation evidence — Planning Layer Compression — 2026-07-08
+
+branch local status: done (planning layer compressed in backlog, QA PASS, not closure)
+
+Evidence:
+
+- Confirmed `current-backlog.md` as the only active operational backlog.
+- Classified recent planning files as active source, active reference, derived local report, archive candidate, delete candidate or unknown.
+- Added Planning Layer Compression Note and Derived Local Planning Reports Index to `current-backlog.md`.
+- Retained key evidence from recent derived reports directly in `current-backlog.md` (blockers summary).
+- Future planning tasks must update `current-backlog.md` by default and avoid creating new planning documents unless explicitly approved.
+- No runtime changes.
+- No API changes.
+- No pricing changes.
+- No Supabase changes.
+- No Vercel changes.
+- No Three.js changes.
+- No production logic changes.
+- No visual QA execution.
+- No live verification.
+- No push/PR/merge/deploy.
+- P1-25 remains `needs reconciliation`.
+- P1-26 remains `needs reconciliation`.
 - P1-27 remains `needs reconciliation`.
 - P1-28 remains `needs reconciliation`.
 - Not closure.
