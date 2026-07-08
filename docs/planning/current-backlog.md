@@ -131,6 +131,31 @@ Evidence:
 - D-13 Preview Visual QA remains **blocked** because no stable preview URL.
 - Not closure.
 
+### Branch implementation evidence — Local Vercel Dev Cleanup / Stability Check — 2026-07-08
+
+branch local status: done (local dev environment checked, QA recorded, not closure)
+
+Evidence:
+
+- Inspected local ports 3000–3010: only **3003** was occupied (`node` pid **20216**, stale dev listener).
+- Stopped stale processes: `node:20216` on port 3003 (ports 3000–3010 otherwise free).
+- Removed generated Playwright artifacts: `playwright-report/`, `test-results/` (untracked).
+- Started one clean local `vercel dev` via `VERCEL_DEV_PORT=3004` + `node scripts/start-vercel-dev-with-env.mjs` (loaded `.env.local`).
+- `/api/health`: **200**, `ok: true`; required env present (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_API_KEY`, email vars); no missing required keys.
+- API route stability: **stable for 60+ s** on single port 3004 — health re-check **200** after 45 s; no `EADDRINUSE` on 3004 during session. Intermittent Windows/Node 24 `UV_HANDLE_CLOSING` libuv assertion warnings observed (non-fatal).
+- Non-mutating smoke checks: `GET /api/customer/workspace` → **401** (controlled unauth); `GET /api/operations/workspace` → **401** (controlled unauth). No live data mutation.
+- Stopped dev server after checks; port 3004 released (TimeWait only).
+- No runtime code changes.
+- No API behavior changes.
+- No Supabase live mutation.
+- No Vercel deploy.
+- No visual QA execution.
+- No new planning docs.
+- No push/PR/merge/deploy.
+- D-13 Preview Visual QA remains **blocked** because no remote preview URL exists.
+- Remote Vercel deploy-phase blocker remains **open/unknown** (`Deploying outputs...` on `dpl_5PESiXLJuGVNCVyXvvpsq57t1rPg`).
+- Not closure.
+
 ### Branch implementation evidence — P1-10 WebGL Fallback E2E Checkout/Auth Alignment — 2026-07-08
 
 branch local status: done (P1-10 WebGL fallback E2E restored locally, QA PASS, not closure)
