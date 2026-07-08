@@ -2041,6 +2041,45 @@ Evidence:
 - D-13 local remains **PARTIAL** (not PASS).
 - Not closure.
 
+### Branch implementation evidence — D-13 Data-backed Route Reliability Triage — 2026-07-08
+
+branch local status: partial (data-backed route blocker triaged/fixed locally, not D-13 PASS, not closure)
+
+Evidence:
+
+- Reproduced targeted data-backed D-13 failures without full 24-screenshot capture.
+- Unauthenticated control checks on `http://localhost:3004`: `GET /api/customer/workspace`, `/api/customer/notifications`, `/api/operations/workspace`, `/api/operations/order` → controlled **401** (no auth weakening).
+- Root cause classification:
+  - Notifications stuck loading: **E + D** — local `vercel dev` **502** under Playwright load; capture wait stopped at workspace shell without waiting for notifications to settle.
+  - Operations workspace API/loading: **E + D** — API failures during degraded dev session; `table tbody tr` wait matched empty/error shell instead of data-ready or controlled error chip.
+  - Operations review loading: **E + D** — review API timeouts/502 during long capture; `Review RZ-*` heading only appears after `/api/operations/order` succeeds.
+  - Customer order detail splash/timeout: **E + C + D** — stale hardcoded UUID lookup by `RZ-*` in workspace (`publicOrderNumber` is `RZM_*`); order detail waits timed out when `/api/customer/order` returned 502 or loading shell persisted.
+  - Customer workspace tablet/mobile capture: **E** — runtime degraded after earlier shots in same long session (502 storm); not a separate responsive UI defect.
+- Applied minimal fix:
+  - `scripts/d13-local-visual-qa-capture.mjs` — resolve safe order UUIDs from authenticated workspace by documented `RZM_0002` / `RZM_0007` (maps to `RZ-20260706-7048` / `RZ-20260707-5271` for operations routes); `addInitScript` auth fixture per isolated browser context; data-ready waits for notifications/workspace/review; batch filters (`D13_CAPTURE_BATCH`, `D13_SHOTS`); fetch retry + shot cooldown; default base URL port **3004**.
+  - `scripts/start-vercel-dev-with-env.mjs` — extend smoke `ALLOWED_ORIGINS` with ports **3004**, **3005**, **3010**.
+- Production auth boundary preserved.
+- No Supabase live mutation.
+- Focused verification:
+  - customer notifications: **PASS** (`npm run test:customer-notifications`)
+  - customer workspace: **PASS** (`npm run test:customer-workspace`)
+  - customer order detail: **PASS** (`npm run test:customer-order-detail`)
+  - operations workspace: **PASS** (`npm run test:operations-workspace`)
+  - operations order review: **PASS** (`npm run test:operations-order-review`)
+  - targeted visual capture (`D13_CAPTURE_BATCH=customer-data`, `VISUAL_QA_BASE_URL=http://localhost:3004`, stamp `2026-07-08-d13-route-fix`): **partial** — `customer-workspace` desktop **PASS**; `customer-order-review` / `customer-order-completed` **FAIL** (502/timeout after ~3.5 min session); operations batch blocked when health returned **502** (stale port conflict during dev restart — kill ports **3004/3005** before capture).
+- Full QA:
+  - `npm test`: **PASS**
+  - `npm run typecheck`: **PASS**
+  - `npm run build`: **PASS**
+  - `npm run check:webgl-fallback-e2e`: **PASS**
+  - `npm run test:webgl-fallback-e2e`: **PASS** (10/10)
+  - `git diff --check`: **PASS**
+- D-13 local visual status remains **improved but PARTIAL** (data-backed customer workspace desktop capture reliable on fresh dev; order detail / operations review still blocked by local dev 502 under sustained capture).
+- D-13 Preview Visual QA remains blocked until remote preview URL exists.
+- No new planning docs.
+- No push/PR/merge/deploy.
+- Not closure.
+
 ### D-13 Local Visual QA Baseline — 2026-07-07
 
 branch local status: done (local visual QA baseline prepared, QA PASS, not final preview visual QA, not closure)

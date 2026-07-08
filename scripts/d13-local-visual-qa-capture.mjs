@@ -10,10 +10,14 @@ import { loadProjectEnvFiles, normalizeSupabaseProjectUrl } from './load-project
 const CONTRACT_TEST_EMAIL = 'contract-test@example.com'
 const ADMIN_SESSION_KEY = 'razmerno-admin-session'
 
-const ORDER_REVIEW_UUID = '99fddb29-4129-4dc6-8af0-45de50a1009d'
-const ORDER_COMPLETED_UUID = '62242cd0-f9b4-4b11-8003-bc9c368e8983'
 const ORDER_COMPLETED_RZ = 'RZ-20260707-5271'
 const ORDER_REVIEW_RZ = 'RZ-20260706-7048'
+const ORDER_COMPLETED_PUBLIC = 'RZM_0007'
+const ORDER_REVIEW_PUBLIC = 'RZM_0002'
+
+const DEFAULT_DEV_PORTS = ['3001', '3002', '3003', '3004', '3005', '3010']
+const SHOT_COOLDOWN_MS = Number(process.env.D13_SHOT_COOLDOWN_MS || 1800)
+const VIEWPORT_COOLDOWN_MS = Number(process.env.D13_VIEWPORT_COOLDOWN_MS || 2500)
 
 const VIEWPORTS = process.env.D13_ALL_VIEWPORTS === '1'
   ? [
@@ -22,6 +26,27 @@ const VIEWPORTS = process.env.D13_ALL_VIEWPORTS === '1'
       { name: 'mobile-390', width: 390, height: 844 },
     ]
   : [{ name: 'desktop-1440', width: 1440, height: 900 }]
+
+const CAPTURE_BATCHES = {
+  'customer-auth': ['customer-auth-gate'],
+  'customer-data': ['customer-workspace', 'customer-order-review', 'customer-order-completed'],
+  'operations-auth': ['operations-login'],
+  'operations-data': [
+    'operations-workspace',
+    'operations-order-review-completed',
+    'operations-order-review-queue',
+  ],
+  responsive: [
+    'customer-auth-gate',
+    'customer-workspace',
+    'customer-order-review',
+    'customer-order-completed',
+    'operations-login',
+    'operations-workspace',
+    'operations-order-review-completed',
+    'operations-order-review-queue',
+  ],
+}
 
 function signAdminToken(secret) {
   const payload = { sub: 'admin', role: 'admin', iat: Date.now(), exp: Date.now() + 1000 * 60 * 60 }
@@ -40,6 +65,25 @@ function mirrorViteSupabaseEnv() {
       process.env[viteKey] = process.env[sourceKey].trim()
     }
   }
+}
+
+function ensureAllowedOriginsForLocalCapture(baseUrl) {
+  const defaults = [
+    'http://localhost:5173',
+  ...DEFAULT_DEV_PORTS.map((port) => `http://localhost:${port}`),
+  ]
+  const current = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+  const merged = new Set([...defaults, ...current])
+  try {
+    const origin = new URL(baseUrl).origin
+    merged.add(origin)
+  } catch {
+    // keep defaults only
+  }
+  process.env.ALLOWED_ORIGINS = [...merged].join(',')
 }
 
 async function getCustomerSession(supabaseUrl, serviceRoleKey, anonKey) {
@@ -73,32 +117,184 @@ function supabaseStorageKey(supabaseUrl) {
   return `sb-${ref}-auth-token`
 }
 
-async function tryWaitForApiResponse(page, pathPart, timeout = 25_000) {
-  try {
-    await page.waitForResponse(
-      (response) => response.url().includes(pathPart) && response.status() === 200,
-      { timeout },
+async function fetchJsonWithRetry(url, options = {}, attempts = 3) {
+  let lastError = null
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, options)
+      const text = await response.text()
+      let payload = null
+      try {
+        payload = text ? JSON.parse(text) : null
+      } catch {
+        payload = null
+      }
+      if (response.status === 502 && attempt < attempts) {
+        await new Promise((resolve) => setTimeout(resolve, 800 * attempt))
+        continue
+      }
+      return { response, payload, text }
+    } catch (error) {
+      lastError = error
+      if (attempt < attempts) {
+        await new Promise((resolve) => setTimeout(resolve, 800 * attempt))
+      }
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error('fetch failed')
+}
+
+async function resolveVisualQaOrderIds(baseUrl, accessToken) {
+  const { response, payload } = await fetchJsonWithRetry(`${baseUrl}/api/customer/workspace`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
+
+  if (!response.ok || payload?.ok !== true || !Array.isArray(payload.workspace?.orders)) {
+    throw new Error(
+      `Failed to resolve visual QA order ids from workspace: HTTP ${response.status} ${payload?.message || ''}`.trim(),
     )
-  } catch {
-    // DOM selectors remain the primary readiness signal for local visual QA.
+  }
+
+  const orders = payload.workspace.orders
+  const byPublic = new Map(
+    orders
+      .filter((order) => typeof order.publicOrderNumber === 'string' && order.publicOrderNumber.trim())
+      .map((order) => [order.publicOrderNumber, order]),
+  )
+
+  const reviewOrder =
+    byPublic.get(ORDER_REVIEW_PUBLIC) ||
+    orders.find((order) => order.status?.stage === 'review')
+  const completedOrder =
+    byPublic.get(ORDER_COMPLETED_PUBLIC) ||
+    orders.find((order) => order.status?.stage === 'completed')
+
+  if (!reviewOrder?.id || !completedOrder?.id) {
+    throw new Error(
+      `Missing safe visual QA orders in workspace. Need ${ORDER_REVIEW_PUBLIC} (${ORDER_REVIEW_RZ}) and ${ORDER_COMPLETED_PUBLIC} (${ORDER_COMPLETED_RZ}); found: ${orders.map((order) => order.publicOrderNumber).filter(Boolean).join(', ') || 'none'}`,
+    )
+  }
+
+  return {
+    reviewUuid: reviewOrder.id,
+    completedUuid: completedOrder.id,
+    reviewPublic: reviewOrder.publicOrderNumber,
+    completedPublic: completedOrder.publicOrderNumber,
   }
 }
 
-async function waitForScreen(page, shot) {
-  const waits = {
-    'customer-auth-gate': () => page.locator('.rzm-account-panel-title', { hasText: 'Личный кабинет' }),
-    'customer-workspace': () => page.locator('#account-projects-title'),
-    'customer-order-review': () => page.locator('h1.rzm-account-title, .rzm-account-panel-title').first(),
-    'customer-order-completed': () => page.locator('h1.rzm-account-title, .rzm-account-panel-title').first(),
-    'operations-login': () => page.locator('text=Очередь заявок'),
-    'operations-workspace': () => page.locator('table tbody tr').first(),
-    'operations-order-review-completed': () =>
-      page.locator('h2', { hasText: `Review ${ORDER_COMPLETED_RZ}` }),
-    'operations-order-review-queue': () =>
-      page.locator('h2', { hasText: `Review ${ORDER_REVIEW_RZ}` }),
+async function waitForApiResponse(page, pathPart, acceptedStatuses = [200], timeout = 35_000) {
+  const response = await page.waitForResponse(
+    (item) => item.url().includes(pathPart) && acceptedStatuses.includes(item.status()),
+    { timeout },
+  )
+  return response
+}
+
+async function waitForCustomerAuthReady(page, authenticated) {
+  if (!authenticated) {
+    await page
+      .locator('.rzm-account-panel-title', { hasText: 'Личный кабинет' })
+      .first()
+      .waitFor({ state: 'visible', timeout: 45_000 })
+    return
   }
-  const locator = waits[shot.slug]?.() ?? page.locator('body')
-  await locator.first().waitFor({ state: 'visible', timeout: 45_000 })
+
+  await page.waitForFunction(() => {
+    const text = document.body.textContent || ''
+    return !text.includes('Загружаем сессию…') && !text.includes('Загружаем страницу')
+  }, { timeout: 45_000 })
+}
+
+async function waitForCustomerWorkspaceReady(page) {
+  await waitForCustomerAuthReady(page, true)
+  await page.locator('#account-projects-title').first().waitFor({ state: 'visible', timeout: 45_000 })
+  await page.locator('#account-notifications-title').first().waitFor({ state: 'visible', timeout: 45_000 })
+  await page.waitForFunction(() => {
+    const section = document.querySelector('#account-notifications-title')?.closest('section')
+    if (!section) return false
+    const text = section.textContent || ''
+    return !text.includes('Загружаем уведомления')
+  }, { timeout: 45_000 })
+}
+
+async function waitForCustomerOrderReady(page, statusText) {
+  await waitForCustomerAuthReady(page, true)
+  await page.waitForFunction(() => {
+    const text = document.body.textContent || ''
+    return !text.includes('Загружаем карточку заказа') && !text.includes('Загружаем страницу')
+  }, { timeout: 45_000 })
+
+  const panelTitle = (await page.locator('.rzm-account-panel-title').first().textContent())?.trim() ?? ''
+  if (panelTitle === 'Заказ не найден' || panelTitle === 'Не удалось загрузить заказ') {
+    throw new Error(`Customer order detail entered controlled error state: ${panelTitle}`)
+  }
+
+  await page.locator('h1.rzm-account-title').first().waitFor({ state: 'visible', timeout: 45_000 })
+  await page.locator('.rzm-account-order-status-label', { hasText: statusText }).first().waitFor({
+    state: 'visible',
+    timeout: 45_000,
+  })
+}
+
+async function waitForOperationsWorkspaceReady(page) {
+  await page.waitForFunction(() => {
+    const body = document.body.textContent || ''
+    if (body.includes('Не удалось загрузить operations workspace')) return true
+    if (body.includes('Сетевая ошибка при загрузке operations workspace')) return true
+    return [...document.querySelectorAll('.rzm-chip')].some((chip) =>
+      (chip.textContent || '').includes('Operations API connected'),
+    )
+  }, { timeout: 45_000 })
+  await page.locator('table tbody tr, .rzm-status[data-status="error"]').first().waitFor({
+    state: 'visible',
+    timeout: 45_000,
+  })
+}
+
+async function waitForOperationsReviewReady(page, orderId) {
+  await page
+    .locator(
+      `h2:has-text("Review ${orderId}"), .rzm-status[data-status="error"], text=Заявка не найдена`,
+    )
+    .first()
+    .waitFor({ state: 'visible', timeout: 45_000 })
+}
+
+async function waitForScreen(page, shot) {
+  switch (shot.slug) {
+    case 'customer-auth-gate':
+      await page
+        .locator('.rzm-account-panel-title', { hasText: 'Личный кабинет' })
+        .first()
+        .waitFor({ state: 'visible', timeout: 45_000 })
+      return
+    case 'customer-workspace':
+      await waitForCustomerWorkspaceReady(page)
+      return
+    case 'customer-order-review':
+    case 'customer-order-completed':
+      await waitForCustomerOrderReady(page, shot.statusText)
+      return
+    case 'operations-login':
+      await page.locator('text=Очередь заявок').first().waitFor({ state: 'visible', timeout: 45_000 })
+      return
+    case 'operations-workspace':
+      await waitForOperationsWorkspaceReady(page)
+      return
+    case 'operations-order-review-completed':
+      await waitForOperationsReviewReady(page, ORDER_COMPLETED_RZ)
+      return
+    case 'operations-order-review-queue':
+      await waitForOperationsReviewReady(page, ORDER_REVIEW_RZ)
+      return
+    default:
+      await page.locator('body').waitFor({ state: 'visible', timeout: 45_000 })
+  }
 }
 
 async function capture(page, outDir, slug, viewportName) {
@@ -107,131 +303,66 @@ async function capture(page, outDir, slug, viewportName) {
   return file
 }
 
-async function preparePageAuth(page, baseUrl, shot, sessionPayload, storageKey, adminToken) {
-  await page.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded', timeout: 30_000 })
-  await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
-  })
-
-  if (shot.auth) {
-    await page.evaluate(
-      ({ key, value }) => {
-        localStorage.setItem(key, JSON.stringify(value))
-      },
-      { key: storageKey, value: sessionPayload },
-    )
-  }
-
-  if (shot.admin) {
-    await page.evaluate(
-      ({ key, token }) => {
-        sessionStorage.setItem(key, token)
-      },
-      { key: ADMIN_SESSION_KEY, token: adminToken },
-    )
-  }
+async function preparePageAuth(context, shot, sessionPayload, storageKey, adminToken) {
+  await context.addInitScript(
+    ({ key, sessionValue, adminKey, adminValue }) => {
+      localStorage.clear()
+      sessionStorage.clear()
+      if (sessionValue) {
+        localStorage.setItem(key, JSON.stringify(sessionValue))
+      }
+      if (adminValue) {
+        sessionStorage.setItem(adminKey, adminValue)
+      }
+    },
+    {
+      key: storageKey,
+      sessionValue: shot.auth ? sessionPayload : null,
+      adminKey: ADMIN_SESSION_KEY,
+      adminValue: shot.admin ? adminToken : null,
+    },
+  )
 }
 
-async function main() {
-  loadProjectEnvFiles()
-  mirrorViteSupabaseEnv()
-
-  const smokeFallbacks = {
-    ALLOWED_ORIGINS: 'http://localhost:5173,http://localhost:3005',
-    RESEND_API_KEY: 're_local_smoke_placeholder_key',
-    ORDER_MANAGER_EMAIL: 'manager@example.test',
-    MAIL_FROM: 'Razmerno <noreply@example.test>',
-  }
-  for (const [key, value] of Object.entries(smokeFallbacks)) {
-    if (!process.env[key]?.trim()) process.env[key] = value
-  }
-
-  const baseUrl = (process.env.VISUAL_QA_BASE_URL || 'http://localhost:3005').replace(/\/$/, '')
-  const supabaseUrl = normalizeSupabaseProjectUrl(process.env.SUPABASE_URL)
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
-  const anonKey =
-    process.env.SUPABASE_ANON_KEY?.trim() || process.env.VITE_SUPABASE_ANON_KEY?.trim() || ''
-  const adminKey = process.env.ADMIN_API_KEY?.trim()
-  const viteSupabaseUrl = normalizeSupabaseProjectUrl(
-    process.env.VITE_SUPABASE_URL || supabaseUrl || '',
-  )
-  if (!supabaseUrl || !serviceRoleKey || !anonKey || !adminKey) {
-    throw new Error('Missing SUPABASE_URL, SERVICE_ROLE, anon key, or ADMIN_API_KEY')
-  }
-  if (!viteSupabaseUrl) {
-    throw new Error(
-      'VITE_SUPABASE_URL missing — restart local runtime with scripts/start-vercel-dev-with-env.mjs after SUPABASE_* env is set',
-    )
-  }
-
-  const stamp = process.env.D13_VISUAL_QA_STAMP || '2026-07-07-d13'
-  const outDir = join('artifacts', 'visual-qa', 'd13-local', stamp)
-  mkdirSync(outDir, { recursive: true })
-
-  const health = await fetch(`${baseUrl}/api/health`)
-  const healthText = await health.text()
-  let healthJson = null
-  try {
-    healthJson = healthText ? JSON.parse(healthText) : null
-  } catch {
-    throw new Error(`Health check returned non-JSON (${health.status}): ${healthText.slice(0, 120)}`)
-  }
-  if (!health.ok || healthJson?.ok !== true) {
-    throw new Error(`Health check failed: ${health.status}`)
-  }
-
-  const session = await getCustomerSession(supabaseUrl, serviceRoleKey, anonKey)
-  const storageKey = supabaseStorageKey(viteSupabaseUrl)
-  const adminToken = signAdminToken(adminKey)
-  const sessionPayload = {
-    access_token: session.access_token,
-    refresh_token: session.refresh_token,
-    expires_at: session.expires_at,
-    expires_in: session.expires_in,
-    token_type: session.token_type,
-    user: session.user,
-  }
-
-  const report = {
-    ok: true,
-    baseUrl,
-    viteSupabaseConfigured: Boolean(viteSupabaseUrl && anonKey),
-    outDir,
-    captures: [],
-    consoleErrors: [],
-    missingStates: [
-      'customer-order-detail-payment-awaiting (Ожидает оплаты) — no safe live order without mutation',
-      'customer-order-detail-in-progress (В работе) — no safe live order without mutation',
-      'operations-sections-mid-lifecycle — review order in Проверка used instead where applicable',
-    ],
-  }
-
-  const browser = await chromium.launch({ headless: true })
-  const context = await browser.newContext()
-  const page = await context.newPage()
-
-  page.on('console', (msg) => {
-    if (msg.type() === 'error') {
-      report.consoleErrors.push(msg.text().slice(0, 200))
+function filterShots(shots) {
+  const batch = process.env.D13_CAPTURE_BATCH?.trim()
+  if (batch) {
+    const allowed = CAPTURE_BATCHES[batch]
+    if (!allowed) {
+      throw new Error(
+        `Unknown D13_CAPTURE_BATCH=${batch}. Allowed: ${Object.keys(CAPTURE_BATCHES).join(', ')}`,
+      )
     }
-  })
+    return shots.filter((shot) => allowed.includes(shot.slug))
+  }
 
-  const shots = [
+  const explicit = process.env.D13_SHOTS?.split(',').map((item) => item.trim()).filter(Boolean) ?? []
+  if (explicit.length === 0) return shots
+  return shots.filter((shot) => explicit.includes(shot.slug))
+}
+
+function buildShots(orderIds) {
+  return [
     { slug: 'customer-auth-gate', path: '/account', auth: false },
-    { slug: 'customer-workspace', path: '/account', auth: true, apiWait: '/api/customer/workspace' },
+    {
+      slug: 'customer-workspace',
+      path: '/account',
+      auth: true,
+      apiWait: '/api/customer/workspace',
+      secondaryApiWait: '/api/customer/notifications',
+    },
     {
       slug: 'customer-order-review',
-      path: `/account/order/${ORDER_REVIEW_UUID}`,
+      path: `/account/order/${orderIds.reviewUuid}`,
       auth: true,
-      apiWait: `/api/customer/order?id=${ORDER_REVIEW_UUID}`,
+      apiWait: `/api/customer/order?id=${orderIds.reviewUuid}`,
       statusText: 'На проверке',
     },
     {
       slug: 'customer-order-completed',
-      path: `/account/order/${ORDER_COMPLETED_UUID}`,
+      path: `/account/order/${orderIds.completedUuid}`,
       auth: true,
-      apiWait: `/api/customer/order?id=${ORDER_COMPLETED_UUID}`,
+      apiWait: `/api/customer/order?id=${orderIds.completedUuid}`,
       statusText: 'Завершено',
     },
     { slug: 'operations-login', path: '/operations', admin: false },
@@ -254,36 +385,123 @@ async function main() {
       apiWait: `/api/operations/order?orderId=${ORDER_REVIEW_RZ}`,
     },
   ]
+}
+
+async function main() {
+  loadProjectEnvFiles()
+  mirrorViteSupabaseEnv()
+
+  const defaultPort = process.env.VERCEL_DEV_PORT?.trim() || '3004'
+  const baseUrl = (process.env.VISUAL_QA_BASE_URL || `http://localhost:${defaultPort}`).replace(/\/$/, '')
+  ensureAllowedOriginsForLocalCapture(baseUrl)
+
+  const smokeFallbacks = {
+    RESEND_API_KEY: 're_local_smoke_placeholder_key',
+    ORDER_MANAGER_EMAIL: 'manager@example.test',
+    MAIL_FROM: 'Razmerno <noreply@example.test>',
+  }
+  for (const [key, value] of Object.entries(smokeFallbacks)) {
+    if (!process.env[key]?.trim()) process.env[key] = value
+  }
+
+  const supabaseUrl = normalizeSupabaseProjectUrl(process.env.SUPABASE_URL)
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+  const anonKey =
+    process.env.SUPABASE_ANON_KEY?.trim() || process.env.VITE_SUPABASE_ANON_KEY?.trim() || ''
+  const adminKey = process.env.ADMIN_API_KEY?.trim()
+  const viteSupabaseUrl = normalizeSupabaseProjectUrl(
+    process.env.VITE_SUPABASE_URL || supabaseUrl || '',
+  )
+  if (!supabaseUrl || !serviceRoleKey || !anonKey || !adminKey) {
+    throw new Error('Missing SUPABASE_URL, SERVICE_ROLE, anon key, or ADMIN_API_KEY')
+  }
+  if (!viteSupabaseUrl) {
+    throw new Error(
+      'VITE_SUPABASE_URL missing — restart local runtime with scripts/start-vercel-dev-with-env.mjs after SUPABASE_* env is set',
+    )
+  }
+
+  const stamp = process.env.D13_VISUAL_QA_STAMP || '2026-07-07-d13'
+  const outDir = join('artifacts', 'visual-qa', 'd13-local', stamp)
+  mkdirSync(outDir, { recursive: true })
+
+  const health = await fetchJsonWithRetry(`${baseUrl}/api/health`)
+  if (!health.response.ok || health.payload?.ok !== true) {
+    throw new Error(`Health check failed: ${health.response.status}`)
+  }
+
+  const session = await getCustomerSession(supabaseUrl, serviceRoleKey, anonKey)
+  const orderIds = await resolveVisualQaOrderIds(baseUrl, session.access_token)
+  const storageKey = supabaseStorageKey(viteSupabaseUrl)
+  const adminToken = signAdminToken(adminKey)
+  const sessionPayload = {
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+    expires_at: session.expires_at,
+    expires_in: session.expires_in,
+    token_type: session.token_type,
+    user: session.user,
+  }
+
+  const report = {
+    ok: true,
+    baseUrl,
+    allowedOrigins: process.env.ALLOWED_ORIGINS,
+    resolvedOrderIds: orderIds,
+    viteSupabaseConfigured: Boolean(viteSupabaseUrl && anonKey),
+    outDir,
+    captures: [],
+    consoleErrors: [],
+    missingStates: [
+      'customer-order-detail-payment-awaiting (Ожидает оплаты) — no safe live order without mutation',
+      'customer-order-detail-in-progress (В работе) — no safe live order without mutation',
+      'operations-sections-mid-lifecycle — review order in Проверка used instead where applicable',
+    ],
+  }
+
+  const browser = await chromium.launch({ headless: true })
+
+  const shots = filterShots(buildShots(orderIds))
+  if (shots.length === 0) {
+    throw new Error('No D-13 shots selected after batch/filter configuration')
+  }
 
   for (const viewport of VIEWPORTS) {
-    await page.setViewportSize({ width: viewport.width, height: viewport.height })
-
     for (const shot of shots) {
-      try {
-        await context.clearCookies()
-        await preparePageAuth(page, baseUrl, shot, sessionPayload, storageKey, adminToken)
+      const context = await browser.newContext({
+        viewport: { width: viewport.width, height: viewport.height },
+      })
+      const page = await context.newPage()
 
-        const responseWait = shot.apiWait ? tryWaitForApiResponse(page, shot.apiWait) : null
+      page.on('console', (msg) => {
+        if (msg.type() === 'error') {
+          report.consoleErrors.push(msg.text().slice(0, 200))
+        }
+      })
+
+      try {
+        await preparePageAuth(context, shot, sessionPayload, storageKey, adminToken)
+
+        const responseWaits = []
+        if (shot.apiWait) {
+          responseWaits.push(waitForApiResponse(page, shot.apiWait))
+        }
+        if (shot.secondaryApiWait) {
+          responseWaits.push(waitForApiResponse(page, shot.secondaryApiWait))
+        }
 
         await page.goto(`${baseUrl}${shot.path}`, {
           waitUntil: 'domcontentloaded',
           timeout: 45_000,
         })
-        if (responseWait) {
-          await responseWait
+        if (responseWaits.length > 0) {
+          await Promise.allSettled(responseWaits)
         }
 
         await waitForScreen(page, shot)
-        if (shot.statusText) {
-          await page.locator(`text=${shot.statusText}`).first().waitFor({
-            state: 'visible',
-            timeout: 30_000,
-          })
-        }
         await page.waitForTimeout(600)
         const file = await capture(page, outDir, shot.slug, viewport.name)
         report.captures.push({ slug: shot.slug, viewport: viewport.name, file, ok: true })
-        await page.waitForTimeout(1200)
       } catch (error) {
         report.captures.push({
           slug: shot.slug,
@@ -292,8 +510,13 @@ async function main() {
           error: error instanceof Error ? error.message : String(error),
         })
         report.ok = false
+      } finally {
+        await context.close()
+        await new Promise((resolve) => setTimeout(resolve, SHOT_COOLDOWN_MS))
       }
     }
+
+    await new Promise((resolve) => setTimeout(resolve, VIEWPORT_COOLDOWN_MS))
   }
 
   await browser.close()

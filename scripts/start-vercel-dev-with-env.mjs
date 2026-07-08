@@ -17,7 +17,8 @@ for (const [viteKey, sourceKey] of viteMirrors) {
 }
 
 const smokeFallbacks = {
-  ALLOWED_ORIGINS: 'http://localhost:5173,http://localhost:3001,http://localhost:3002,http://localhost:3003',
+  ALLOWED_ORIGINS:
+    'http://localhost:5173,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:3005,http://localhost:3010',
   RESEND_API_KEY: 're_local_smoke_placeholder_key',
   ORDER_MANAGER_EMAIL: 'manager@example.test',
   MAIL_FROM: 'Razmerno <noreply@example.test>',
