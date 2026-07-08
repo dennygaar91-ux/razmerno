@@ -29,11 +29,34 @@ const VIEWPORTS = process.env.D13_ALL_VIEWPORTS === '1'
 
 const CUSTOMER_ORDER_DETAIL_SHOTS = ['customer-order-review', 'customer-order-completed']
 
+const VITE_PREVIEW_BATCHES = new Set(['marketing-static', 'constructor-visual'])
+
+const FAILURE_CLASSES = {
+  RUNTIME_UNAVAILABLE: 'runtime-unavailable',
+  API_HEALTH_FAILED: 'api-health-failed',
+  ROUTE_UNREACHABLE: 'route-unreachable',
+  DYNAMIC_IMPORT_FAILED: 'dynamic-import-failed',
+  NETWORK_RESET: 'network-reset',
+  SHOT_TIMEOUT: 'shot-timeout',
+  SELECTOR_TIMEOUT: 'selector-timeout',
+  CONSOLE_ERROR: 'console-error',
+}
+
+const PREFLIGHT_TIMEOUT_MS = Number(process.env.D13_PREFLIGHT_TIMEOUT_MS || 8000)
+
+const STUB_ORDER_IDS = {
+  reviewUuid: '00000000-0000-4000-8000-000000000001',
+  completedUuid: '00000000-0000-4000-8000-000000000002',
+  reviewPublic: 'STUB_REVIEW',
+  completedPublic: 'STUB_COMPLETED',
+}
+
 const CAPTURE_BATCHES = {
   'customer-auth': ['customer-auth-gate'],
   // Workspace + notifications only. Order detail must run as isolated shots on fresh dev.
   'customer-data': ['customer-workspace'],
   'customer-workspace': ['customer-workspace'],
+  'customer-workspace-only': ['customer-workspace'],
   'customer-order-review': ['customer-order-review'],
   'customer-order-completed': ['customer-order-completed'],
   'operations-auth': ['operations-login'],
@@ -45,6 +68,7 @@ const CAPTURE_BATCHES = {
   'marketing-static': ['landing', 'measurements-info', 'materials-page', 'assembly-page'],
   'constructor-visual': [
     'constructor-3d-sizes',
+    'constructor-3d-materials',
     'constructor-webgl-fallback',
     'constructor-checkout',
   ],
@@ -61,14 +85,172 @@ const CAPTURE_BATCHES = {
 }
 
 const VALID_WINDOWS_D13_WORKFLOW = [
-  '1. Start fresh vercel dev on port 3004 (VERCEL_DEV_PORT=3004 + scripts/start-vercel-dev-with-env.mjs).',
-  '2. D13_CAPTURE_BATCH=marketing-static → landing/measurements/materials/assembly static pages.',
-  '3. D13_CAPTURE_BATCH=constructor-visual → constructor 3D, WebGL fallback, checkout (one batch; restart dev if unstable).',
-  '4. D13_CAPTURE_BATCH=customer-data → workspace/notifications only; then restart dev.',
-  '5. D13_CAPTURE_BATCH=customer-data D13_SHOTS=customer-order-review → isolated first shot; restart dev.',
-  '6. D13_CAPTURE_BATCH=customer-data D13_SHOTS=customer-order-completed → isolated first shot; restart dev.',
-  '7. D13_CAPTURE_BATCH=operations-data → operations batch on fresh dev.',
+  '1. npm run build && npm run preview -- --host 127.0.0.1 --port 4173 for marketing-static / constructor-visual (D13_CAPTURE_RUNTIME=vite-preview).',
+  '2. Start fresh vercel dev on port 3004 for API/data-backed batches (customer/operations).',
+  '3. D13_CAPTURE_BATCH=marketing-static with VISUAL_QA_BASE_URL=http://localhost:4173.',
+  '4. D13_CAPTURE_BATCH=constructor-visual with VISUAL_QA_BASE_URL=http://localhost:4173 (isolated D13_SHOTS recommended).',
+  '5. D13_CAPTURE_BATCH=customer-data → workspace only; restart dev between isolated order shots.',
+  '6. D13_CAPTURE_BATCH=operations-data → operations batch on fresh vercel dev.',
 ]
+
+function resolveCaptureRuntime(batch, baseUrl) {
+  const explicit = process.env.D13_CAPTURE_RUNTIME?.trim().toLowerCase()
+  if (explicit === 'vite-preview' || explicit === 'preview') return 'vite-preview'
+  if (explicit === 'vercel-dev' || explicit === 'vercel') return 'vercel-dev'
+  try {
+    const { port } = new URL(baseUrl)
+    if (port === '4173') return 'vite-preview'
+  } catch {
+    // keep default
+  }
+  if (batch && VITE_PREVIEW_BATCHES.has(batch)) return 'vite-preview'
+  return 'vercel-dev'
+}
+
+function shotsNeedApiBackend(shots) {
+  return shots.some((shot) => shot.apiWait || shot.auth || shot.admin)
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = PREFLIGHT_TIMEOUT_MS) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { ...options, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+function classifyFetchError(error, defaultClass) {
+  const message = error instanceof Error ? error.message : String(error)
+  if (message.includes('aborted')) {
+    return { ok: false, failureClass: FAILURE_CLASSES.SHOT_TIMEOUT, detail: 'preflight timeout' }
+  }
+  if (message.includes('ECONNREFUSED') || message.includes('fetch failed')) {
+    return { ok: false, failureClass: FAILURE_CLASSES.RUNTIME_UNAVAILABLE, detail: message }
+  }
+  return { ok: false, failureClass: defaultClass, detail: message }
+}
+
+async function preflightBaseUrl(baseUrl) {
+  try {
+    const response = await fetchWithTimeout(baseUrl)
+    if (!response.ok) {
+      return {
+        ok: false,
+        failureClass: FAILURE_CLASSES.RUNTIME_UNAVAILABLE,
+        detail: `HTTP ${response.status}`,
+      }
+    }
+    return { ok: true }
+  } catch (error) {
+    return classifyFetchError(error, FAILURE_CLASSES.RUNTIME_UNAVAILABLE)
+  }
+}
+
+async function preflightApiHealth(baseUrl) {
+  try {
+    const health = await fetchJsonWithRetry(`${baseUrl}/api/health`, {}, 2)
+    if (!health.response.ok || health.payload?.ok !== true) {
+      return {
+        ok: false,
+        failureClass: FAILURE_CLASSES.API_HEALTH_FAILED,
+        detail: `HTTP ${health.response.status}`,
+      }
+    }
+    return { ok: true }
+  } catch (error) {
+    return classifyFetchError(error, FAILURE_CLASSES.API_HEALTH_FAILED)
+  }
+}
+
+async function preflightRoute(baseUrl, path) {
+  try {
+    const response = await fetchWithTimeout(`${baseUrl}${path}`)
+    const text = await response.text()
+    if (!response.ok) {
+      return {
+        ok: false,
+        failureClass: FAILURE_CLASSES.ROUTE_UNREACHABLE,
+        detail: `HTTP ${response.status}`,
+      }
+    }
+    if (!text.includes('<')) {
+      return { ok: false, failureClass: FAILURE_CLASSES.ROUTE_UNREACHABLE, detail: 'empty HTML' }
+    }
+    return { ok: true }
+  } catch (error) {
+    return classifyFetchError(error, FAILURE_CLASSES.ROUTE_UNREACHABLE)
+  }
+}
+
+function createShotDiagnostics() {
+  return {
+    consoleErrors: [],
+    networkErrors: [],
+    dynamicImportFailed: false,
+  }
+}
+
+function wirePageDiagnostics(page, diagnostics) {
+  page.on('console', (msg) => {
+    if (msg.type() !== 'error') return
+    const text = msg.text().slice(0, 300)
+    diagnostics.consoleErrors.push(text)
+    if (text.includes('Failed to fetch dynamically imported module')) {
+      diagnostics.dynamicImportFailed = true
+    }
+  })
+  page.on('requestfailed', (request) => {
+    const failure = request.failure()?.errorText || 'request failed'
+    diagnostics.networkErrors.push(`${failure}:${request.url().slice(0, 160)}`)
+    if (failure.includes('ERR_CONNECTION_RESET')) {
+      diagnostics.networkErrors.push('ERR_CONNECTION_RESET')
+    }
+    if (failure.includes('ERR_CONNECTION_REFUSED')) {
+      diagnostics.networkErrors.push('ERR_CONNECTION_REFUSED')
+    }
+  })
+}
+
+function classifyShotFailure(error, diagnostics) {
+  if (diagnostics.dynamicImportFailed) {
+    return { failureClass: FAILURE_CLASSES.DYNAMIC_IMPORT_FAILED, fatal: true }
+  }
+  const network = diagnostics.networkErrors.join(' ')
+  if (network.includes('ERR_CONNECTION_REFUSED')) {
+    return { failureClass: FAILURE_CLASSES.RUNTIME_UNAVAILABLE, fatal: true }
+  }
+  if (network.includes('ERR_CONNECTION_RESET')) {
+    return { failureClass: FAILURE_CLASSES.NETWORK_RESET, fatal: true }
+  }
+  const message = error instanceof Error ? error.message : String(error)
+  if (message.includes('ERR_CONNECTION_REFUSED')) {
+    return { failureClass: FAILURE_CLASSES.RUNTIME_UNAVAILABLE, fatal: true }
+  }
+  if (message.includes('ERR_CONNECTION_RESET')) {
+    return { failureClass: FAILURE_CLASSES.NETWORK_RESET, fatal: true }
+  }
+  if (message.includes('locator.waitFor: Timeout')) {
+    return { failureClass: FAILURE_CLASSES.SELECTOR_TIMEOUT, fatal: false }
+  }
+  if (message.includes('Timeout')) {
+    return { failureClass: FAILURE_CLASSES.SHOT_TIMEOUT, fatal: false }
+  }
+  if (diagnostics.consoleErrors.length > 0) {
+    return { failureClass: FAILURE_CLASSES.CONSOLE_ERROR, fatal: false }
+  }
+  return { failureClass: FAILURE_CLASSES.SHOT_TIMEOUT, fatal: false }
+}
+
+function isFatalFailureClass(failureClass) {
+  return [
+    FAILURE_CLASSES.RUNTIME_UNAVAILABLE,
+    FAILURE_CLASSES.NETWORK_RESET,
+    FAILURE_CLASSES.DYNAMIC_IMPORT_FAILED,
+    FAILURE_CLASSES.API_HEALTH_FAILED,
+  ].includes(failureClass)
+}
 
 function resolveCaptureWorkflow() {
   const batch = process.env.D13_CAPTURE_BATCH?.trim() || ''
@@ -289,14 +471,18 @@ async function waitForCustomerAuthReady(page, authenticated) {
 
 async function waitForCustomerWorkspaceReady(page) {
   await waitForCustomerAuthReady(page, true)
-  await page.locator('#account-projects-title').first().waitFor({ state: 'visible', timeout: 45_000 })
-  await page.locator('#account-notifications-title').first().waitFor({ state: 'visible', timeout: 45_000 })
+  await page.waitForFunction(() => {
+    const text = document.body.textContent || ''
+    return !text.includes('Failed to fetch dynamically imported module')
+  }, { timeout: 45_000 })
+  await page.locator('#account-projects-title').first().waitFor({ state: 'visible', timeout: 60_000 })
+  await page.locator('#account-notifications-title').first().waitFor({ state: 'visible', timeout: 60_000 })
   await page.waitForFunction(() => {
     const section = document.querySelector('#account-notifications-title')?.closest('section')
     if (!section) return false
     const text = section.textContent || ''
     return !text.includes('Загружаем уведомления')
-  }, { timeout: 45_000 })
+  }, { timeout: 60_000 })
 }
 
 async function waitForCustomerOrderReady(page, statusText) {
@@ -365,6 +551,11 @@ async function waitForScreen(page, shot) {
       return
     case 'constructor-3d-sizes':
       await page.locator('.rzm-3d-page, [data-testid="constructor-3d-viewport"]').first().waitFor({ state: 'visible', timeout: 90_000 })
+      return
+    case 'constructor-3d-materials':
+      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 90_000 })
+      await page.getByRole('button', { name: 'Материалы' }).first().click({ timeout: 30_000 })
+      await page.getByTestId('materials-step-panel').first().waitFor({ state: 'visible', timeout: 90_000 })
       return
     case 'constructor-webgl-fallback':
       await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 90_000 })
@@ -488,6 +679,10 @@ function buildShots(orderIds) {
       path: '/configurator-3d',
     },
     {
+      slug: 'constructor-3d-materials',
+      path: '/configurator-3d',
+    },
+    {
       slug: 'constructor-webgl-fallback',
       path: '/configurator-3d?rzm_webgl=off',
     },
@@ -548,6 +743,23 @@ async function main() {
   const baseUrl = (process.env.VISUAL_QA_BASE_URL || `http://localhost:${defaultPort}`).replace(/\/$/, '')
   ensureAllowedOriginsForLocalCapture(baseUrl)
 
+  const stamp = process.env.D13_VISUAL_QA_STAMP || '2026-07-08-d13'
+  const outDir = join('artifacts', 'visual-qa', 'd13-local', stamp)
+  mkdirSync(outDir, { recursive: true })
+
+  const captureWorkflow = resolveCaptureWorkflow()
+  const captureRuntime = resolveCaptureRuntime(captureWorkflow.batch, baseUrl)
+  console.log(
+    JSON.stringify({
+      event: 'd13_capture_workflow',
+      runtime: captureRuntime,
+      workflow: captureWorkflow.workflow,
+      batch: captureWorkflow.batch,
+      shots: captureWorkflow.explicit,
+      warnings: captureWorkflow.warnings,
+    }),
+  )
+
   const smokeFallbacks = {
     RESEND_API_KEY: 're_local_smoke_placeholder_key',
     ORDER_MANAGER_EMAIL: 'manager@example.test',
@@ -555,6 +767,24 @@ async function main() {
   }
   for (const [key, value] of Object.entries(smokeFallbacks)) {
     if (!process.env[key]?.trim()) process.env[key] = value
+  }
+
+  const basePreflight = await preflightBaseUrl(baseUrl)
+  if (!basePreflight.ok) {
+    const report = {
+      ok: false,
+      baseUrl,
+      captureRuntime,
+      outDir,
+      captureWorkflow,
+      captures: [],
+      consoleErrors: [],
+      preflightFailure: basePreflight,
+    }
+    const { writeFileSync } = await import('node:fs')
+    writeFileSync(join(outDir, 'manifest.json'), JSON.stringify(report, null, 2))
+    console.log(JSON.stringify(report, null, 2))
+    process.exit(1)
   }
 
   const supabaseUrl = normalizeSupabaseProjectUrl(process.env.SUPABASE_URL)
@@ -565,51 +795,61 @@ async function main() {
   const viteSupabaseUrl = normalizeSupabaseProjectUrl(
     process.env.VITE_SUPABASE_URL || supabaseUrl || '',
   )
-  if (!supabaseUrl || !serviceRoleKey || !anonKey || !adminKey) {
-    throw new Error('Missing SUPABASE_URL, SERVICE_ROLE, anon key, or ADMIN_API_KEY')
-  }
-  if (!viteSupabaseUrl) {
-    throw new Error(
-      'VITE_SUPABASE_URL missing — restart local runtime with scripts/start-vercel-dev-with-env.mjs after SUPABASE_* env is set',
-    )
-  }
 
-  const stamp = process.env.D13_VISUAL_QA_STAMP || '2026-07-07-d13'
-  const outDir = join('artifacts', 'visual-qa', 'd13-local', stamp)
-  mkdirSync(outDir, { recursive: true })
+  let orderIds = STUB_ORDER_IDS
+  let sessionPayload = null
+  let adminToken = null
+  let storageKey = null
 
-  const captureWorkflow = resolveCaptureWorkflow()
-  console.log(
-    JSON.stringify({
-      event: 'd13_capture_workflow',
-      workflow: captureWorkflow.workflow,
-      batch: captureWorkflow.batch,
-      shots: captureWorkflow.explicit,
-      warnings: captureWorkflow.warnings,
-    }),
-  )
+  const provisionalShots = filterShots(buildShots(orderIds))
+  const needsApiBackend = shotsNeedApiBackend(provisionalShots)
 
-  const health = await fetchJsonWithRetry(`${baseUrl}/api/health`)
-  if (!health.response.ok || health.payload?.ok !== true) {
-    throw new Error(`Health check failed: ${health.response.status}`)
-  }
+  if (needsApiBackend) {
+    if (!supabaseUrl || !serviceRoleKey || !anonKey || !adminKey) {
+      throw new Error('Missing SUPABASE_URL, SERVICE_ROLE, anon key, or ADMIN_API_KEY')
+    }
+    if (!viteSupabaseUrl) {
+      throw new Error(
+        'VITE_SUPABASE_URL missing — restart local runtime with scripts/start-vercel-dev-with-env.mjs after SUPABASE_* env is set',
+      )
+    }
 
-  const session = await getCustomerSession(supabaseUrl, serviceRoleKey, anonKey)
-  const orderIds = await resolveVisualQaOrderIds(baseUrl, session.access_token)
-  const storageKey = supabaseStorageKey(viteSupabaseUrl)
-  const adminToken = signAdminToken(adminKey)
-  const sessionPayload = {
-    access_token: session.access_token,
-    refresh_token: session.refresh_token,
-    expires_at: session.expires_at,
-    expires_in: session.expires_in,
-    token_type: session.token_type,
-    user: session.user,
+    const healthPreflight = await preflightApiHealth(baseUrl)
+    if (!healthPreflight.ok) {
+      const report = {
+        ok: false,
+        baseUrl,
+        captureRuntime,
+        outDir,
+        captureWorkflow,
+        captures: [],
+        consoleErrors: [],
+        preflightFailure: healthPreflight,
+      }
+      const { writeFileSync } = await import('node:fs')
+      writeFileSync(join(outDir, 'manifest.json'), JSON.stringify(report, null, 2))
+      console.log(JSON.stringify(report, null, 2))
+      process.exit(1)
+    }
+
+    const session = await getCustomerSession(supabaseUrl, serviceRoleKey, anonKey)
+    orderIds = await resolveVisualQaOrderIds(baseUrl, session.access_token)
+    storageKey = supabaseStorageKey(viteSupabaseUrl)
+    adminToken = signAdminToken(adminKey)
+    sessionPayload = {
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expires_at: session.expires_at,
+      expires_in: session.expires_in,
+      token_type: session.token_type,
+      user: session.user,
+    }
   }
 
   const report = {
     ok: true,
     baseUrl,
+    captureRuntime,
     allowedOrigins: process.env.ALLOWED_ORIGINS,
     resolvedOrderIds: orderIds,
     viteSupabaseConfigured: Boolean(viteSupabaseUrl && anonKey),
@@ -617,6 +857,10 @@ async function main() {
     captureWorkflow,
     captures: [],
     consoleErrors: [],
+    preflight: {
+      baseUrl: basePreflight,
+      apiHealth: needsApiBackend ? { ok: true } : { ok: true, skipped: true },
+    },
     missingStates: [
       'customer-order-detail-payment-awaiting (Ожидает оплаты) — no safe live order without mutation',
       'customer-order-detail-in-progress (В работе) — no safe live order without mutation',
@@ -631,18 +875,35 @@ async function main() {
     throw new Error('No D-13 shots selected after batch/filter configuration')
   }
 
+  let runtimeDead = false
+
   for (const viewport of VIEWPORTS) {
+    if (runtimeDead) break
     for (const shot of shots) {
+      if (runtimeDead) break
+
+      const routePreflight = await preflightRoute(baseUrl, shot.path.split('?')[0] || shot.path)
+      if (!routePreflight.ok) {
+        report.captures.push({
+          slug: shot.slug,
+          viewport: viewport.name,
+          ok: false,
+          failureClass: routePreflight.failureClass,
+          error: routePreflight.detail,
+        })
+        report.ok = false
+        if (isFatalFailureClass(routePreflight.failureClass)) {
+          runtimeDead = true
+        }
+        continue
+      }
+
       const context = await browser.newContext({
         viewport: { width: viewport.width, height: viewport.height },
       })
       const page = await context.newPage()
-
-      page.on('console', (msg) => {
-        if (msg.type() === 'error') {
-          report.consoleErrors.push(msg.text().slice(0, 200))
-        }
-      })
+      const diagnostics = createShotDiagnostics()
+      wirePageDiagnostics(page, diagnostics)
 
       try {
         await preparePageAuth(context, shot, sessionPayload, storageKey, adminToken)
@@ -668,13 +929,20 @@ async function main() {
         const file = await capture(page, outDir, shot.slug, viewport.name)
         report.captures.push({ slug: shot.slug, viewport: viewport.name, file, ok: true })
       } catch (error) {
+        const classified = classifyShotFailure(error, diagnostics)
         report.captures.push({
           slug: shot.slug,
           viewport: viewport.name,
           ok: false,
+          failureClass: classified.failureClass,
           error: error instanceof Error ? error.message : String(error),
+          consoleErrors: diagnostics.consoleErrors.slice(0, 5),
         })
+        report.consoleErrors.push(...diagnostics.consoleErrors.slice(0, 3))
         report.ok = false
+        if (classified.fatal) {
+          runtimeDead = true
+        }
       } finally {
         await context.close()
         await new Promise((resolve) => setTimeout(resolve, SHOT_COOLDOWN_MS))
