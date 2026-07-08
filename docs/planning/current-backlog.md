@@ -2008,6 +2008,39 @@ Evidence:
 - `order_status_events` RLS disabled remains security follow-up;
 - not closure.
 
+### Branch implementation evidence — D-13 Local Visual QA Retry on Stabilized Dev — 2026-07-08
+
+branch local status: partial (local visual retry completed on stable dev start, capture partial 11/24, not final D-13 PASS, not closure)
+
+Evidence:
+
+- Used stabilized local `vercel dev` on port **3004** (`VERCEL_DEV_PORT=3004` + `scripts/start-vercel-dev-with-env.mjs`).
+- `/api/health`: **200**, `ok: true`, `missing: []` before capture.
+- Screenshot artifact path: `artifacts/visual-qa/d13-local/2026-07-08-d13-retry/` (+ `manifest.json`, local untracked).
+- Capture command: `VISUAL_QA_BASE_URL=http://localhost:3004`, `D13_ALL_VIEWPORTS=1`, `npm run capture:d13-local-visual-qa`.
+- Capture result: **11/24** PNGs; manifest `ok: false`; many **502 Bad Gateway** console errors during long capture session (local dev degraded under load).
+- Re-checked previous local D-13 findings:
+  - **Auth gate contrast (P2 «Войти»):** **persists** — low-contrast white-on-white submit in auth modal (`customer-auth-gate__*`).
+  - **Notifications loading (P2):** **persists** — `Загружаем уведомления...` on customer workspace desktop (`customer-workspace__desktop-1440.png`).
+  - **Operations workspace API/loading (P2):** **persists** — `Не удалось загрузить operations workspace`, empty queue, `Pending` badge despite shell capture (`operations-workspace__*` all viewports captured).
+  - **Operations review loading shell (P2):** **persists/blocked** — review captures failed (timeouts waiting for `Review RZ-*` headings); likely 502/API instability during session.
+  - **Mixed RU/EN copy (P2):** **persists** — `Operations Workspace`, `Domain status`, `Production`, `Pending` in operations UI.
+  - **Order detail splash/timeout (P3):** **persists/blocked** — `customer-order-review` / `customer-order-completed` captures failed all viewports (status text timeout).
+  - **Tablet/mobile authenticated screens (P3):** **partial** — operations workspace tablet/mobile **captured**; customer workspace tablet/mobile **failed**; customer order detail all viewports **failed**.
+- New findings: local `vercel dev` **502 storm** under sustained Playwright capture; operations workspace waitFor passes on shell but screenshot shows API error state.
+- **P0/P1 visual blockers:** **P1** — operations workspace API load failure message; notifications stuck loading. No new P0 UI crash/blank-screen beyond existing loading/error states.
+- No UI fixes.
+- No runtime changes.
+- No API changes.
+- No Supabase live mutation.
+- No Vercel deploy.
+- No new planning docs.
+- No push/PR/merge/deploy.
+- Final D-13 Preview Visual QA remains **blocked** until remote preview URL exists.
+- Human visual approval remains **pending**.
+- D-13 local remains **PARTIAL** (not PASS).
+- Not closure.
+
 ### D-13 Local Visual QA Baseline — 2026-07-07
 
 branch local status: done (local visual QA baseline prepared, QA PASS, not final preview visual QA, not closure)
