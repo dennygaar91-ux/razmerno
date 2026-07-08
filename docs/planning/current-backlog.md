@@ -46,7 +46,7 @@ No task may be closed from derived-report evidence alone.
 - **P1-28 local readiness:** PARTIAL (admin/operations audit local package).
 - **D-13 local visual QA:** PARTIAL; **D-13 preview visual QA:** BLOCKED — no stable preview URL.
 - **typecheck:api:** fixed on branch (GitHub Actions PASS); **Vercel deploy-phase** still failed with no preview URL after build PASS.
-- **P1-10 WebGL fallback E2E:** Fast CI gate FAILURE on branch; local repro 2026-07-08 — guard PASS, E2E **2/10 fail** on checkout submit (auth config error in Playwright webserver, not pure visualization).
+- **P1-10 WebGL fallback E2E:** local gate **PASS** after 2026-07-08 auth-boundary alignment (see evidence below); Fast CI on branch may still need re-run.
 - **`order_status_events` RLS:** disabled on live Supabase — security follow-up / release blocker.
 - **Human visual approval:** missing.
 - **P0-03 / P0-13 pricing parity:** open.
@@ -86,6 +86,29 @@ Evidence:
 - No Supabase changes.
 - No visual QA execution.
 - No live verification.
+- No push/PR/merge/deploy.
+- Not closure.
+
+### Branch implementation evidence — P1-10 WebGL Fallback E2E Checkout/Auth Alignment — 2026-07-08
+
+branch local status: done (P1-10 WebGL fallback E2E restored locally, QA PASS, not closure)
+
+Evidence:
+
+- Reproduced P1-10 fallback E2E failure: 8 passed / 2 failed on checkout submit; `.rzm-3d-submit-message` showed `Авторизация недоступна из‑за ошибки конфигурации сервиса` instead of legacy unauthenticated submit success.
+- Root cause: Playwright webserver uses production `build && preview` (`import.meta.env.PROD`); without baked `VITE_SUPABASE_*` env, Epic B checkout auth gate correctly returns `blocked_misconfigured` in production — contract mismatch with pre–Epic B submit-success E2E expectations.
+- Applied minimal fix: updated `tests/browser/webgl-fallback.spec.ts` to assert controlled auth/config boundary (misconfigured message or auth modal), verify no `/api/orders` POST leak (`requests.toHaveLength(0)`), and keep fallback usable after submit attempt; updated `scripts/check-p1-10-webgl-fallback-e2e.mjs` guard fragments accordingly. Customer submit success remains covered by `tests/customer-order-submit.test.ts`.
+- Preserved Epic B customer auth boundary: unauthenticated real submit is not made valid by this test.
+- Preserved P1-10 safety intent: fallback mode keeps constructor/checkout path reachable and fails only through controlled auth/config boundary.
+- `npm run check:webgl-fallback-e2e`: PASS.
+- `npm run test:webgl-fallback-e2e`: PASS (10/10).
+- `npm test`: PASS.
+- `npm run typecheck`: PASS.
+- `npm run build`: PASS.
+- `git diff --check`: PASS.
+- No new planning docs.
+- No Supabase live changes.
+- No Vercel changes.
 - No push/PR/merge/deploy.
 - Not closure.
 

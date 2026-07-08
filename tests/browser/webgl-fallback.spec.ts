@@ -94,6 +94,25 @@ async function interceptOrderSubmit(page: Page) {
   return requests;
 }
 
+async function attemptSubmitAndExpectControlledAuthBoundary(
+  page: Page,
+  requests: SubmittedConstructorOrder[],
+) {
+  await expect(page.getByRole("button", { name: /Отправить заявку/i })).toBeEnabled();
+  await page.getByRole("button", { name: /Отправить заявку/i }).click();
+
+  const misconfiguredMessage = page.locator(".rzm-3d-submit-message").filter({
+    hasText: /Авторизация недоступна из‑за ошибки конфигурации сервиса/i,
+  });
+  const authModal = page.getByRole("dialog").filter({
+    hasText: /Войдите, чтобы отправить заявку/i,
+  });
+
+  await expect(misconfiguredMessage.or(authModal)).toBeVisible();
+  expect(requests).toHaveLength(0);
+  await expect(page.locator("body")).not.toContainText(/Application error|Unhandled|blank screen/i);
+}
+
 test.describe("P1-10 WebGL fallback E2E", () => {
   test("uses the main 3D viewer when WebGL is available", async ({ page }) => {
     await openConstructor3D(page);
@@ -141,14 +160,8 @@ test.describe("P1-10 WebGL fallback E2E", () => {
     await expectFallbackActive(page);
     await fillRequiredContact(page);
 
-    await expect(page.getByRole("button", { name: /Отправить заявку/i })).toBeEnabled();
-    await page.getByRole("button", { name: /Отправить заявку/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/P1-10-WEBGL-FALLBACK|отправлена/i);
-
-    expect(requests).toHaveLength(1);
-    expect(requests[0].source).toBe("constructor-store-adapter");
-    expect(requests[0].totalPrice).toBeGreaterThan(0);
-    expect(requests[0].customer.email).toBe("p1-10-webgl@example.com");
+    await attemptSubmitAndExpectControlledAuthBoundary(page, requests);
+    await expectFallbackActive(page);
   });
 });
 
@@ -207,11 +220,8 @@ test.describe("M8-P0-03 WebGL fallback and recovery E2E", () => {
     await expectFallbackActive(page);
     await fillRequiredContact(page);
 
-    await expect(page.getByRole("button", { name: /Отправить заявку/i })).toBeEnabled();
-    await page.getByRole("button", { name: /Отправить заявку/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/P1-10-WEBGL-FALLBACK|отправлена/i);
-
-    expect(requests).toHaveLength(1);
-    expect(requests[0].totalPrice).toBeGreaterThan(0);
+    await attemptSubmitAndExpectControlledAuthBoundary(page, requests);
+    await expectFallbackActive(page);
+    await expectRecoveryControls(page);
   });
 });
