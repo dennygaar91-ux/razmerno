@@ -42,6 +42,12 @@ const CAPTURE_BATCHES = {
     'operations-order-review-completed',
     'operations-order-review-queue',
   ],
+  'marketing-static': ['landing', 'measurements-info', 'materials-page', 'assembly-page'],
+  'constructor-visual': [
+    'constructor-3d-sizes',
+    'constructor-webgl-fallback',
+    'constructor-checkout',
+  ],
   responsive: [
     'customer-auth-gate',
     'customer-workspace',
@@ -56,10 +62,12 @@ const CAPTURE_BATCHES = {
 
 const VALID_WINDOWS_D13_WORKFLOW = [
   '1. Start fresh vercel dev on port 3004 (VERCEL_DEV_PORT=3004 + scripts/start-vercel-dev-with-env.mjs).',
-  '2. D13_CAPTURE_BATCH=customer-data → workspace/notifications only; then restart dev.',
-  '3. D13_CAPTURE_BATCH=customer-data D13_SHOTS=customer-order-review → isolated first shot; restart dev.',
-  '4. D13_CAPTURE_BATCH=customer-data D13_SHOTS=customer-order-completed → isolated first shot; restart dev.',
-  '5. D13_CAPTURE_BATCH=operations-data → operations batch on fresh dev.',
+  '2. D13_CAPTURE_BATCH=marketing-static → landing/measurements/materials/assembly static pages.',
+  '3. D13_CAPTURE_BATCH=constructor-visual → constructor 3D, WebGL fallback, checkout (one batch; restart dev if unstable).',
+  '4. D13_CAPTURE_BATCH=customer-data → workspace/notifications only; then restart dev.',
+  '5. D13_CAPTURE_BATCH=customer-data D13_SHOTS=customer-order-review → isolated first shot; restart dev.',
+  '6. D13_CAPTURE_BATCH=customer-data D13_SHOTS=customer-order-completed → isolated first shot; restart dev.',
+  '7. D13_CAPTURE_BATCH=operations-data → operations batch on fresh dev.',
 ]
 
 function resolveCaptureWorkflow() {
@@ -340,6 +348,36 @@ async function waitForOperationsReviewReady(page, orderId) {
 
 async function waitForScreen(page, shot) {
   switch (shot.slug) {
+    case 'landing':
+      await page.locator('.rzm-home-main').first().waitFor({ state: 'visible', timeout: 45_000 })
+      return
+    case 'measurements-info':
+      await page
+        .locator('.rzm-info-main--measurements')
+        .first()
+        .waitFor({ state: 'visible', timeout: 45_000 })
+      return
+    case 'materials-page':
+      await page.locator('.rzm-info-main--materials').first().waitFor({ state: 'visible', timeout: 45_000 })
+      return
+    case 'assembly-page':
+      await page.locator('.rzm-info-main--assembly').first().waitFor({ state: 'visible', timeout: 45_000 })
+      return
+    case 'constructor-3d-sizes':
+      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 45_000 })
+      return
+    case 'constructor-webgl-fallback':
+      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 45_000 })
+      await page
+        .locator('.rzm-3d-blueprint-fallback')
+        .first()
+        .waitFor({ state: 'visible', timeout: 45_000 })
+      return
+    case 'constructor-checkout':
+      await page.locator('.rzm-3d-page').first().waitFor({ state: 'visible', timeout: 45_000 })
+      await page.locator('button:has-text("Заявка")').first().click({ timeout: 15_000 })
+      await page.locator('.rzm-3d-checkout').first().waitFor({ state: 'visible', timeout: 45_000 })
+      return
     case 'customer-auth-gate':
       await page
         .locator('.rzm-account-panel-title', { hasText: 'Личный кабинет' })
@@ -438,6 +476,23 @@ function filterShots(shots) {
 
 function buildShots(orderIds) {
   return [
+    { slug: 'landing', path: '/' },
+    { slug: 'measurements-info', path: '/measurements' },
+    { slug: 'materials-page', path: '/materials' },
+    { slug: 'assembly-page', path: '/assembly' },
+    {
+      slug: 'constructor-3d-sizes',
+      path: '/configurator-3d',
+    },
+    {
+      slug: 'constructor-webgl-fallback',
+      path: '/configurator-3d?rzm_webgl=off',
+    },
+    {
+      slug: 'constructor-checkout',
+      path: '/configurator-3d',
+      openCheckoutStep: true,
+    },
     { slug: 'customer-auth-gate', path: '/account', auth: false },
     {
       slug: 'customer-workspace',

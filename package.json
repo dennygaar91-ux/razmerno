@@ -199,6 +199,7 @@
     "test:production-export-failure-contract": "node --no-warnings --import tsx tests/production-export-failure-contract.test.ts",
     "test:production-basis-boundary-contract": "node --no-warnings --import tsx tests/production-basis-boundary-contract.test.ts",
     "test:constructor-state-ownership-contract": "node --no-warnings --import tsx tests/constructor-state-ownership-contract.test.ts",
+    "test:d13-visual-capture-batch-contract": "node --no-warnings --import tsx tests/d13-visual-capture-batch-contract.test.ts",
     "test:production-snapshots": "npm run test:production-export-contract && npm run test:production-export && node --no-warnings --import tsx src/constructor/production/orderExportPackage.payload.test.ts",
     "test:production-json-v4": "node --no-warnings --import tsx tests/production-json-v4.test.ts",
     "test:production-json-v4-adapter": "node --no-warnings --import tsx tests/production-json-v4-adapter.test.ts",
