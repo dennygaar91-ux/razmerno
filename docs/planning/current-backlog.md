@@ -1547,6 +1547,29 @@ Do-not-touch constraints:
 - do not close admin visual or production-editor tasks from docs-only reconciliation;
 - do not change API/order semantics here.
 
+### Branch implementation evidence — P1-28 Admin / Operations Closure Readiness Audit Local Package — 2026-07-07
+
+branch local status: done (local readiness audit prepared, QA PASS, not closure)
+
+Evidence:
+
+- Created `docs/planning/p1-28-admin-operations-readiness-audit-local.md`.
+- Audited Admin / Operations capabilities against accepted decisions, RPES VIII / operations scope and current backlog evidence.
+- Classified operations capabilities by implementation, tests, live evidence, visual evidence, security follow-ups and product decision state.
+- Audited existing P1-28 branch/local evidence blocks.
+- Identified P1-28 gaps and recommended next local-only tasks.
+- Verdict: **P1-28 Local Readiness PARTIAL**; closure status **needs reconciliation, not closure**.
+- No runtime changes.
+- No API changes.
+- No Supabase changes.
+- No Vercel changes.
+- No visual QA execution.
+- No live verification.
+- No push/PR/merge/deploy.
+- P1-27 remains `needs reconciliation`.
+- P1-28 remains `needs reconciliation`.
+- Not closure.
+
 Branch implementation evidence (2026-07-07, P1-27 / P1-28 Product Scope Reconciliation Package — Local Decision Prep, `task/epic-b-projects-foundation`, not closure):
 
 - branch local status: **done (decision package prepared, QA PASS, not closure)**;
