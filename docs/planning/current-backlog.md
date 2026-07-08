@@ -46,11 +46,48 @@ No task may be closed from derived-report evidence alone.
 - **P1-28 local readiness:** PARTIAL (admin/operations audit local package).
 - **D-13 local visual QA:** PARTIAL; **D-13 preview visual QA:** BLOCKED — no stable preview URL.
 - **typecheck:api:** fixed on branch (GitHub Actions PASS); **Vercel deploy-phase** still failed with no preview URL after build PASS.
-- **P1-10 WebGL fallback E2E:** Fast CI gate FAILURE on branch (separate from `typecheck:api`).
+- **P1-10 WebGL fallback E2E:** Fast CI gate FAILURE on branch; local repro 2026-07-08 — guard PASS, E2E **2/10 fail** on checkout submit (auth config error in Playwright webserver, not pure visualization).
 - **`order_status_events` RLS:** disabled on live Supabase — security follow-up / release blocker.
 - **Human visual approval:** missing.
 - **P0-03 / P0-13 pricing parity:** open.
 - **Production Golden Snapshots / P1-11A / P1-11B:** open; production handoff not closed.
+
+### Branch implementation evidence — Infra / QA Blockers Inventory — 2026-07-08
+
+branch local status: done (blockers inventoried in backlog, QA recorded, not closure)
+
+Evidence:
+
+- Confirmed current infra / QA blockers are tracked in `current-backlog.md` only.
+- Local QA baseline: `npm test` **PASS**, `npm run typecheck` **PASS**, `npm run build` **PASS**, `git diff --check` **PASS**.
+- API typecheck status: `npm run typecheck:api` **FAIL locally on Windows** (`TS6053` — shell glob `api/*.ts` not expanded); **GitHub Actions/Linux PASS** on branch after `25b1b236` (run `28896865460`). Blocks local Windows API typecheck only; does **not** block D-13 preview directly.
+- P1-10 WebGL fallback gate status: `npm run check:webgl-fallback-e2e` **PASS**; `npm run test:webgl-fallback-e2e` **FAIL** — **8 passed / 2 failed** (`allows checkout path and submit flow in fallback mode`; `checkout path stays reachable after using fallback recovery controls`). Failure: `.rzm-3d-submit-message` shows `Авторизация недоступна из‑за ошибки конфигурации сервиса` instead of expected submit success (`P1-10-WEBGL-FALLBACK|отправлена`). Deterministic on local Playwright webserver; likely auth-gate / missing Supabase env in E2E runtime — intersects Epic B customer submit path, not isolated visualization-only gate.
+- D-13 Preview Visual QA remains **BLOCKED** because no stable preview URL; `/api/health` not checked on preview.
+- Vercel preview blocker (no deploy run in this task): latest known deployment `dpl_5PESiXLJuGVNCVyXvvpsq57t1rPg` — Vite build + per-route API TypeScript **PASS**; failed at **`Deploying outputs...`** with **no preview URL** (earlier `dpl_54NjjHsRUQcMKX3XAGYNpF234EHV` also Error). Local config: `vercel.json` rewrites only; **no `.vercelignore`**. Hypothesis categories (unresolved): output/package size; invalid Vercel output structure; missing `.vercelignore` for test/large artifacts; serverless function bundle issue; Vercel config/root/output mismatch; transient Vercel issue; **unknown**.
+- Relevant gates/scripts (read-only inventory): `npm test`, `npm run typecheck`, `npm run typecheck:api`, `npm run build`, `npm run check:webgl-fallback-e2e`, `npm run test:webgl-fallback-e2e`, `npm run capture:d13-local-visual-qa`, `npm run report:visual-qa`; CI `.github/workflows/qa.yml` (Fast CI gate: typecheck → typecheck:api → … → WebGL guard → WebGL E2E); `.github/workflows/vercel-visual-qa-screenshots.yml`.
+- Blocker categories:
+  - **A — D-13 preview blockers:** Vercel deploy-phase failure; no preview URL; D-13 Preview Visual QA blocked.
+  - **B — local QA confidence blockers:** P1-10 WebGL E2E checkout/submit failures (2 tests); `typecheck:api` Windows glob issue (local only).
+  - **C — CI/release gate blockers:** P1-10 WebGL fallback E2E failing Fast CI gate on branch.
+  - **D — security/release blockers:** `order_status_events` RLS disabled on live Supabase.
+  - **E — separate tracks (do not mix with D-13):** D-13 Local Visual QA PARTIAL; human visual approval missing; P0-03/P0-13 pricing parity open; Production Golden Snapshots open/blocked.
+- Recommended next local fix order:
+  1. **P1-10 WebGL fallback E2E checkout/submit triage** — diagnose Playwright webserver auth/Supabase env for fallback submit tests; align mock or test env with customer auth gate.
+  2. **Vercel deploy-phase local output/config investigation** — inspect build output size/structure, missing `.vercelignore`, serverless bundle limits (no deploy in planning task).
+  3. **D-13 preview visual QA rerun** — only after stable preview URL exists.
+  4. **`order_status_events` RLS local migration plan** — security follow-up before release-readiness claim.
+  5. **Pricing parity P0-13 local matrix task** — separate from D-13/preview infra track.
+- No implementation fixes.
+- No new planning docs.
+- No runtime changes.
+- No API changes.
+- No Three.js changes.
+- No Vercel changes.
+- No Supabase changes.
+- No visual QA execution.
+- No live verification.
+- No push/PR/merge/deploy.
+- Not closure.
 
 ### Planning files inventory (2026-07-08)
 
