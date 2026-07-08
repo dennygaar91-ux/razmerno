@@ -2080,6 +2080,45 @@ Evidence:
 - No push/PR/merge/deploy.
 - Not closure.
 
+### Branch implementation evidence — D-13 Batch Local Visual Capture Execution — 2026-07-08
+
+branch local status: partial (batch visual capture executed locally, not final D-13 PASS, not closure)
+
+Evidence:
+
+- Used fresh local `vercel dev` on port **3004** (`VERCEL_DEV_PORT=3004` + `scripts/start-vercel-dev-with-env.mjs`) per batch; killed stale **3004/3005** listeners before each restart.
+- `/api/health` before customer batch: **200**, `ok: true`, `missing: []`.
+- Customer-data batch (`D13_CAPTURE_BATCH=customer-data`, stamp `2026-07-08-d13-batch-customer-v2`): **1/3** captured, status **PARTIAL** — `customer-workspace` **PASS**; `customer-order-review` / `customer-order-completed` **FAIL** (`Не удалось загрузить заказ` after `/api/customer/order` 502 in same batch); first attempt (`…-batch-customer`) **0/3 BLOCKED** (502 storm).
+- `/api/health` before operations batch: **200**, `ok: true` (fresh restart between batches).
+- Operations-data batch (`D13_CAPTURE_BATCH=operations-data`, stamp `2026-07-08-d13-batch-operations-v2`): **3/3** captured, status **PASS** — `operations-workspace`, `operations-order-review-completed`, `operations-order-review-queue` desktop **PASS**; first attempt (`…-batch-operations`) **1/3 PARTIAL** (review waits failed on invalid Playwright selector — fixed in capture script).
+- Auth/shell batch (`customer-auth` + `operations-auth`): **not run** — health **502** immediately after operations v2 batch (degraded dev); task `auth-shell` alias not in script (uses `customer-auth` / `operations-auth`).
+- Screenshot artifact paths (local untracked):
+  - `artifacts/visual-qa/d13-local/2026-07-08-d13-batch-customer-v2/`
+  - `artifacts/visual-qa/d13-local/2026-07-08-d13-batch-operations-v2/`
+  - earlier partial: `…-batch-customer/`, `…-batch-operations/` manifests only.
+- Network/runtime summary: repeated console **502** even on successful ops batch (8 errors, manifest `ok: true`); customer order detail **502** after workspace shot in same batch; no **401** in authenticated batches; auth batch blocked by health **502**.
+- Minimal capture-script fixes during run: operations review wait selector (`.or()` chain); `waitForApiResponse` try/catch to avoid crash on closed page.
+- Group classification:
+  - customer workspace: **PASS** (desktop batch v2)
+  - notifications: **PASS** (workspace wait requires notifications settled; captured in workspace shot)
+  - order detail: **BLOCKED** (0/2 in customer batch v2 — API error state)
+  - operations workspace: **PASS** (batch v2)
+  - operations review: **PASS** (both review shots batch v2)
+  - responsive authenticated: **BLOCKED** (batches default desktop-only; `D13_ALL_VIEWPORTS` not used)
+  - customer-auth / operations-auth: **BLOCKED** (auth batch skipped — dev degraded)
+  - change-request / payment-instructions / ops sections (manual-pricing, payment, completion, history): **BLOCKED** (not separate capture slugs; review page captured as shell only)
+- P0/P1 blockers: **P1** — customer order detail fails in customer-data batch after workspace shot (`/api/customer/order` 502 → UI error); intermittent local **502** persists in console on otherwise successful ops batch.
+- Recommended next technical fix: **A** — local `vercel dev` on Windows cannot sustain monolithic 24-shot capture; **batch-only workflow on fresh dev per group is required** (operations-data **3/3 PASS** proves isolation works); add **customer-order-detail-only** isolated batch on fresh dev (candidate **B/E** follow-up if single-shot order detail still fails).
+- No UI fixes.
+- No runtime/API behavior changes.
+- No Supabase live mutation.
+- No Vercel deploy.
+- No new planning docs.
+- No push/PR/merge/deploy.
+- Final D-13 Preview Visual QA remains blocked until remote preview URL exists.
+- Human visual approval remains pending.
+- Not closure.
+
 ### D-13 Local Visual QA Baseline — 2026-07-07
 
 branch local status: done (local visual QA baseline prepared, QA PASS, not final preview visual QA, not closure)

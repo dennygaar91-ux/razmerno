@@ -188,11 +188,15 @@ async function resolveVisualQaOrderIds(baseUrl, accessToken) {
 }
 
 async function waitForApiResponse(page, pathPart, acceptedStatuses = [200], timeout = 35_000) {
-  const response = await page.waitForResponse(
-    (item) => item.url().includes(pathPart) && acceptedStatuses.includes(item.status()),
-    { timeout },
-  )
-  return response
+  try {
+    const response = await page.waitForResponse(
+      (item) => item.url().includes(pathPart) && acceptedStatuses.includes(item.status()),
+      { timeout },
+    )
+    return response
+  } catch {
+    return null
+  }
 }
 
 async function waitForCustomerAuthReady(page, authenticated) {
@@ -258,9 +262,9 @@ async function waitForOperationsWorkspaceReady(page) {
 
 async function waitForOperationsReviewReady(page, orderId) {
   await page
-    .locator(
-      `h2:has-text("Review ${orderId}"), .rzm-status[data-status="error"], text=Заявка не найдена`,
-    )
+    .locator('h2', { hasText: `Review ${orderId}` })
+    .or(page.locator('.rzm-status[data-status="error"]'))
+    .or(page.getByText('Заявка не найдена'))
     .first()
     .waitFor({ state: 'visible', timeout: 45_000 })
 }
