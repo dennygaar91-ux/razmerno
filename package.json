@@ -309,7 +309,7 @@
     "release:check": "node scripts/release-checklist.mjs",
     "report:visual-qa": "node scripts/visual-qa-inventory.mjs",
     "test:constructor-three": "node --no-warnings --import tsx src/static-pages/constructor/three/threeSceneAdapter.test.ts",
-    "test:constructor-three-safety": "node --no-warnings --import tsx src/static-pages/constructor/three/threeSceneSafety.test.ts",
+    "test:constructor-three-safety": "node --no-warnings --import tsx src/static-pages/constructor/three/threeSceneSafety.test.ts && node --no-warnings --import tsx src/static-pages/constructor/three/useWebGLAvailable.test.ts",
     "test:browser-smoke-static": "node scripts/browser-smoke-static.mjs",
     "test:browser-smoke": "playwright test tests/browser/configurator.spec.ts --project=chromium-desktop",
     "test:browser-smoke:system": "node scripts/run-browser-smoke-system.mjs",

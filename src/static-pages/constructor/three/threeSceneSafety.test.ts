@@ -167,6 +167,30 @@ test("three camera framing: viewer uses canonical model dimensions for camera po
   assert.ok(!page.includes("depthMm: depth,"));
 });
 
+test("three runtime recovery: fallback scene keeps constructor path usable", () => {
+  const page = read("src/static-pages/Constructor3DPage.tsx");
+  const runtime = read("src/static-pages/constructor/components/SceneRuntimePanels.tsx");
+  const lazyViewer = read("src/static-pages/constructor/components/LazyThreeFurnitureViewer.tsx");
+
+  assert.ok(page.includes("TwoDFallbackScene"));
+  assert.ok(page.includes("useBlueprintFallback"));
+  assert.ok(runtime.includes("rzm-3d-blueprint-fallback"));
+  assert.ok(runtime.includes("onRetry3D"));
+  assert.ok(lazyViewer.includes("fallback"));
+  assert.ok(page.includes("retryThreeScene"));
+});
+
+test("three runtime recovery: webgl availability hook is wired into scene status", () => {
+  const scene = read("src/static-pages/constructor/components/ConstructorScene.tsx");
+  const webglHook = read("src/static-pages/constructor/three/useWebGLAvailable.ts");
+  const page = read("src/static-pages/Constructor3DPage.tsx");
+
+  assert.ok(scene.includes("useWebGLDiagnostics"));
+  assert.ok(webglHook.includes('get("rzm_webgl") === "off"'));
+  assert.ok(page.includes("threeFailed"));
+  assert.ok(page.includes("handleThreeRuntimeError"));
+});
+
 test("three camera framing: explicit runtime reset hook is not present", () => {
   const page = read("src/static-pages/Constructor3DPage.tsx");
   const viewer = read("src/static-pages/constructor/three/ThreeFurnitureViewer.tsx");
