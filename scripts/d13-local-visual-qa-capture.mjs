@@ -27,9 +27,15 @@ const VIEWPORTS = process.env.D13_ALL_VIEWPORTS === '1'
     ]
   : [{ name: 'desktop-1440', width: 1440, height: 900 }]
 
+const CUSTOMER_ORDER_DETAIL_SHOTS = ['customer-order-review', 'customer-order-completed']
+
 const CAPTURE_BATCHES = {
   'customer-auth': ['customer-auth-gate'],
-  'customer-data': ['customer-workspace', 'customer-order-review', 'customer-order-completed'],
+  // Workspace + notifications only. Order detail must run as isolated shots on fresh dev.
+  'customer-data': ['customer-workspace'],
+  'customer-workspace': ['customer-workspace'],
+  'customer-order-review': ['customer-order-review'],
+  'customer-order-completed': ['customer-order-completed'],
   'operations-auth': ['operations-login'],
   'operations-data': [
     'operations-workspace',
@@ -46,6 +52,65 @@ const CAPTURE_BATCHES = {
     'operations-order-review-completed',
     'operations-order-review-queue',
   ],
+}
+
+const VALID_WINDOWS_D13_WORKFLOW = [
+  '1. Start fresh vercel dev on port 3004 (VERCEL_DEV_PORT=3004 + scripts/start-vercel-dev-with-env.mjs).',
+  '2. D13_CAPTURE_BATCH=customer-data → workspace/notifications only; then restart dev.',
+  '3. D13_CAPTURE_BATCH=customer-data D13_SHOTS=customer-order-review → isolated first shot; restart dev.',
+  '4. D13_CAPTURE_BATCH=customer-data D13_SHOTS=customer-order-completed → isolated first shot; restart dev.',
+  '5. D13_CAPTURE_BATCH=operations-data → operations batch on fresh dev.',
+]
+
+function resolveCaptureWorkflow() {
+  const batch = process.env.D13_CAPTURE_BATCH?.trim() || ''
+  const explicit =
+    process.env.D13_SHOTS?.split(',').map((item) => item.trim()).filter(Boolean) ?? []
+  const allowMonolithic = process.env.D13_ALLOW_MONOLITHIC === '1'
+  const allViewports = process.env.D13_ALL_VIEWPORTS === '1'
+  const warnings = []
+
+  if (allViewports && !allowMonolithic) {
+    throw new Error(
+      'D13_ALL_VIEWPORTS=1 is unreliable on Windows local vercel dev. Use batch-only workflow or set D13_ALLOW_MONOLITHIC=1 to override.',
+    )
+  }
+
+  if (!batch && explicit.length === 0 && !allowMonolithic) {
+    throw new Error(
+      'D-13 capture requires D13_CAPTURE_BATCH or D13_SHOTS. Monolithic all-shots capture is disabled on Windows local dev. Set D13_ALLOW_MONOLITHIC=1 to override.',
+    )
+  }
+
+  if (batch === 'responsive' && !allowMonolithic) {
+    throw new Error(
+      'D13_CAPTURE_BATCH=responsive is not valid on Windows local vercel dev without D13_ALLOW_MONOLITHIC=1. Use batch-only workflow.',
+    )
+  }
+
+  if (batch === 'customer-data' && explicit.length === 0) {
+    warnings.push(
+      'customer-data captures workspace/notifications only. Run customer-order-review and customer-order-completed as isolated D13_SHOTS on fresh dev (restart vercel dev between shots).',
+    )
+  }
+
+  if (
+    explicit.some((slug) => CUSTOMER_ORDER_DETAIL_SHOTS.includes(slug)) &&
+    batch === 'customer-data' &&
+    explicit.length > 0
+  ) {
+    warnings.push(
+      'Customer order detail isolated shot: use a fresh vercel dev process as the first capture in this session.',
+    )
+  }
+
+  return {
+    batch: batch || null,
+    explicit,
+    warnings,
+    workflow: VALID_WINDOWS_D13_WORKFLOW,
+    allowMonolithic,
+  }
 }
 
 function signAdminToken(secret) {
@@ -337,6 +402,11 @@ function filterShots(shots) {
   const explicit = process.env.D13_SHOTS?.split(',').map((item) => item.trim()).filter(Boolean) ?? []
 
   let filtered = shots
+
+  if (explicit.length > 0) {
+    filtered = filtered.filter((shot) => explicit.includes(shot.slug))
+  }
+
   if (batch) {
     const allowed = CAPTURE_BATCHES[batch]
     if (!allowed) {
@@ -344,11 +414,23 @@ function filterShots(shots) {
         `Unknown D13_CAPTURE_BATCH=${batch}. Allowed: ${Object.keys(CAPTURE_BATCHES).join(', ')}`,
       )
     }
-    filtered = filtered.filter((shot) => allowed.includes(shot.slug))
-  }
 
-  if (explicit.length > 0) {
-    filtered = filtered.filter((shot) => explicit.includes(shot.slug))
+    if (explicit.length > 0) {
+      const intersected = filtered.filter((shot) => allowed.includes(shot.slug))
+      if (intersected.length > 0) {
+        filtered = intersected
+      } else if (
+        batch === 'customer-data' &&
+        filtered.length > 0 &&
+        filtered.every((shot) => CUSTOMER_ORDER_DETAIL_SHOTS.includes(shot.slug))
+      ) {
+        // Isolated customer order detail on fresh dev (explicit override).
+      } else {
+        filtered = []
+      }
+    } else {
+      filtered = filtered.filter((shot) => allowed.includes(shot.slug))
+    }
   }
 
   return filtered
@@ -438,6 +520,17 @@ async function main() {
   const outDir = join('artifacts', 'visual-qa', 'd13-local', stamp)
   mkdirSync(outDir, { recursive: true })
 
+  const captureWorkflow = resolveCaptureWorkflow()
+  console.log(
+    JSON.stringify({
+      event: 'd13_capture_workflow',
+      workflow: captureWorkflow.workflow,
+      batch: captureWorkflow.batch,
+      shots: captureWorkflow.explicit,
+      warnings: captureWorkflow.warnings,
+    }),
+  )
+
   const health = await fetchJsonWithRetry(`${baseUrl}/api/health`)
   if (!health.response.ok || health.payload?.ok !== true) {
     throw new Error(`Health check failed: ${health.response.status}`)
@@ -463,6 +556,7 @@ async function main() {
     resolvedOrderIds: orderIds,
     viteSupabaseConfigured: Boolean(viteSupabaseUrl && anonKey),
     outDir,
+    captureWorkflow,
     captures: [],
     consoleErrors: [],
     missingStates: [

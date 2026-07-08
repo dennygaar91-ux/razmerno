@@ -2161,6 +2161,51 @@ Evidence:
 - No push/PR/merge/deploy.
 - Not closure.
 
+### Branch implementation evidence — D-13 Batch-only Capture Workflow Hardening — 2026-07-08
+
+branch local status: done (local batch workflow hardened, not D-13 PASS, not closure)
+
+Evidence:
+
+- Confirmed monolithic 24-shot capture is not valid for Windows local Vercel dev (`D13_ALL_VIEWPORTS=1` / all-shots without batch blocked unless `D13_ALLOW_MONOLITHIC=1`).
+- Confirmed combined `customer-data` batch must not include order detail shots by default (`customer-data` → `customer-workspace` only).
+- Confirmed customer order detail shots are valid only as isolated first shots on fresh dev:
+  - `customer-order-review`: **PASS** (`…-workflow-order-review`, 1/1)
+  - `customer-order-completed`: **PASS** (`…-workflow-order-completed`, 1/1)
+- Confirmed operations-data batch remains valid:
+  - `operations-data`: **PASS** (`…-workflow-operations-data`, 3/3)
+- Applied minimal capture workflow hardening (`scripts/d13-local-visual-qa-capture.mjs`):
+  - `customer-data` batch = workspace/notifications only; explicit batches `customer-workspace`, `customer-order-review`, `customer-order-completed`;
+  - startup workflow JSON + warnings; block monolithic/responsive without override;
+  - `D13_SHOTS` isolated order-detail override when `D13_CAPTURE_BATCH=customer-data`.
+- Valid local D-13 workflow:
+  1. fresh dev → `D13_CAPTURE_BATCH=customer-data` (workspace/notifications)
+  2. fresh dev → `D13_CAPTURE_BATCH=customer-data` + `D13_SHOTS=customer-order-review`
+  3. fresh dev → `D13_CAPTURE_BATCH=customer-data` + `D13_SHOTS=customer-order-completed`
+  4. fresh dev → `D13_CAPTURE_BATCH=operations-data`
+- Screenshot artifact paths (local untracked):
+  - `artifacts/visual-qa/d13-local/2026-07-08-d13-workflow-customer-data/` (1/1 workspace)
+  - `artifacts/visual-qa/d13-local/2026-07-08-d13-workflow-order-review/`
+  - `artifacts/visual-qa/d13-local/2026-07-08-d13-workflow-order-completed/`
+  - `artifacts/visual-qa/d13-local/2026-07-08-d13-workflow-operations-data/`
+- Full QA:
+  - `npm test`: **PASS**
+  - `npm run typecheck`: **PASS**
+  - `npm run build`: **PASS**
+  - `npm run check:webgl-fallback-e2e`: **PASS**
+  - `npm run test:webgl-fallback-e2e`: **PASS** (10/10)
+  - `git diff --check`: **PASS**
+- No new planning docs.
+- No UI fixes.
+- No API changes.
+- No production auth weakening.
+- No Supabase live mutation.
+- No Vercel deploy.
+- No push/PR/merge/deploy.
+- D-13 local remains **improved but PARTIAL** (batch workflow hardened; preview/human approval still pending).
+- D-13 Preview Visual QA remains blocked until remote preview URL exists.
+- Not closure.
+
 ### D-13 Local Visual QA Baseline — 2026-07-07
 
 branch local status: done (local visual QA baseline prepared, QA PASS, not final preview visual QA, not closure)
