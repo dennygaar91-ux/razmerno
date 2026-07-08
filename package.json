@@ -194,6 +194,7 @@
     "test:production-export-contract": "node --no-warnings --import tsx tests/production-export-contract.test.ts",
     "test:production-hdf-thickness-contract": "node --no-warnings --import tsx tests/production-hdf-thickness-contract.test.ts",
     "test:production-edge-banding-contract": "node --no-warnings --import tsx tests/production-edge-banding-contract.test.ts",
+    "test:production-drilling-coordinate-contract": "node --no-warnings --import tsx tests/production-drilling-coordinate-contract.test.ts",
     "test:production-snapshots": "npm run test:production-export-contract && npm run test:production-export && node --no-warnings --import tsx src/constructor/production/orderExportPackage.payload.test.ts",
     "test:production-json-v4": "node --no-warnings --import tsx tests/production-json-v4.test.ts",
     "test:production-json-v4-adapter": "node --no-warnings --import tsx tests/production-json-v4-adapter.test.ts",
