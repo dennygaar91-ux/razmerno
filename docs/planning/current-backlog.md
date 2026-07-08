@@ -1597,6 +1597,29 @@ Branch implementation evidence (2026-07-07, MVP Scope Decisions User Sign-off �
 - no live data mutation;
 - not closure.
 
+### Branch implementation evidence — P1-27 Customer Platform Closure Readiness Audit Local Package — 2026-07-07
+
+branch local status: done (local readiness audit prepared, QA PASS, not closure)
+
+Evidence:
+
+- Created `docs/planning/p1-27-customer-platform-readiness-audit-local.md`.
+- Audited customer platform capabilities against RPES VII, accepted decisions and current backlog evidence.
+- Classified customer capabilities by implementation, tests, live evidence, visual evidence and product decision state.
+- Audited existing P1-27 branch/local evidence blocks.
+- Identified P1-27 gaps and recommended next local-only tasks.
+- Verdict: **P1-27 Local Readiness PARTIAL**; closure status **needs reconciliation, not closure**.
+- No runtime changes.
+- No API changes.
+- No Supabase changes.
+- No Vercel changes.
+- No visual QA execution.
+- No live verification.
+- No push/PR/merge/deploy.
+- P1-27 remains `needs reconciliation`.
+- P1-28 remains `needs reconciliation`.
+- Not closure.
+
 Branch implementation evidence (2026-07-07, D-12 Live Verification Plan & Preflight — Signed MVP Path, `task/epic-b-projects-foundation`, not closure):
 
 - branch local status: **blocked/needs-live-migration-approval** (preflight prepared, QA PASS, not live verification);
