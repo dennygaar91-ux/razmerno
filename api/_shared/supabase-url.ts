@@ -6,5 +6,12 @@ export function normalizeSupabaseProjectUrl(raw: string | undefined): string | n
   const trimmed = raw?.trim()
   if (!trimmed) return null
 
-  return trimmed.replace(/\/rest\/v1\/?$/iu, '').replace(/\/+$/u, '')
+  const stripped = trimmed.replace(/\/rest\/v1\/?$/iu, "").replace(/\/+$/u, "")
+  try {
+    const parsed = new URL(stripped)
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null
+    return `${parsed.protocol}//${parsed.host}`
+  } catch {
+    return null
+  }
 }

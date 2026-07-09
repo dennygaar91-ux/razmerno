@@ -25,7 +25,22 @@ function parseEnvLine(line) {
 export function normalizeSupabaseProjectUrl(raw) {
   const trimmed = raw?.trim()
   if (!trimmed) return null
-  return trimmed.replace(/\/rest\/v1\/?$/iu, '').replace(/\/+$/u, '')
+
+  const stripped = trimmed.replace(/\/rest\/v1\/?$/iu, '').replace(/\/+$/u, '')
+  try {
+    const parsed = new URL(stripped)
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null
+    return `${parsed.protocol}//${parsed.host}`
+  } catch {
+    return null
+  }
+}
+
+export function buildSupabaseRestUrl(projectRootUrl, restPath) {
+  const normalized = normalizeSupabaseProjectUrl(projectRootUrl)
+  if (!normalized) return null
+  const path = restPath.startsWith('/') ? restPath : `/${restPath}`
+  return `${normalized}${path}`
 }
 
 export function loadProjectEnvFiles(files = DEFAULT_ENV_FILES, root = process.cwd()) {
@@ -39,7 +54,7 @@ export function loadProjectEnvFiles(files = DEFAULT_ENV_FILES, root = process.cw
     for (const line of content.split(/\r?\n/u)) {
       const parsed = parseEnvLine(line)
       if (!parsed) continue
-      if (parsed.key === 'SUPABASE_URL') {
+      if (parsed.key === 'SUPABASE_URL' || parsed.key === 'VITE_SUPABASE_URL') {
         parsed.value = normalizeSupabaseProjectUrl(parsed.value) ?? parsed.value
       }
       if (process.env[parsed.key] === undefined || process.env[parsed.key] === '') {
