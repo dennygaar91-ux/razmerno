@@ -11,7 +11,8 @@ export const PACKAGE_COMMIT_MARKERS = [
   { package: 'Package 03', pattern: /d13|visual|port hygiene|human review/i },
   { package: 'Package 04', pattern: /mvp boundary|live verification dry|release candidate gate|order status events rls/i },
   { package: 'Package 05', pattern: /email retry|pricing final branch|production final branch|live rls apply plan/i },
-  { package: 'Package 06', pattern: /pre pr branch summary|package script integration|generated local artifacts/i },
+  { package: 'Package 06', pattern: /package script integration|generated local artifacts|local branch summary/i },
+  { package: 'Package 07', pattern: /local branch terminology|local branch summary/i },
 ]
 
 export const NON_CLOSURE_BLOCKERS = [
@@ -22,7 +23,15 @@ export const NON_CLOSURE_BLOCKERS = [
   'Formal closure requires merge/main + GitHub QA/main verification',
 ]
 
-export function parsePrePrSummaryArgs(argv = process.argv.slice(2)) {
+export const RECOMMENDED_LOCAL_NEXT_STEPS = [
+  'Keep visual/UX work deferred unless the user explicitly reopens it',
+  'Optionally run npm run check:release-candidate-local -- --execute after major local changes',
+  'Apply live Supabase RLS only after explicit user approval',
+  'Do not push, merge, or deploy unless the user explicitly requests that workflow',
+  'Formal closure still requires main/GitHub QA only when the user chooses that workflow',
+]
+
+export function parseLocalBranchSummaryArgs(argv = process.argv.slice(2)) {
   const baseIndex = argv.indexOf('--base')
   return {
     baseRef: baseIndex >= 0 ? argv[baseIndex + 1] : DEFAULT_BASE_REF,
@@ -58,11 +67,11 @@ export function listBranchScripts() {
     'test:live-',
     'test:release-candidate',
     'test:package-script',
-    'test:branch-pre-pr',
+    'test:local-branch-summary',
     'verify:live',
     'plan:live',
     'check:release-candidate',
-    'report:branch',
+    'report:local-branch',
     'report:d13',
     'dev:ports',
   ]
@@ -85,8 +94,8 @@ export function groupCommitsByPackage(commits) {
   return { groups, other }
 }
 
-export function buildPrePrSummary(options = {}) {
-  const args = options.args || parsePrePrSummaryArgs([])
+export function buildLocalBranchSummary(options = {}) {
+  const args = options.args || parseLocalBranchSummaryArgs([])
   const branch = runGit(['branch', '--show-current'])
   const head = runGit(['rev-parse', 'HEAD'])
   let baseRef = args.baseRef
@@ -99,12 +108,12 @@ export function buildPrePrSummary(options = {}) {
   }
 
   const commits = readGitLog(range)
-
   const { groups, other } = groupCommitsByPackage(commits)
   const scriptsAdded = listBranchScripts()
 
   return {
     generatedAt: new Date().toISOString(),
+    localBranchSummary: true,
     branch,
     head,
     baseRef,
@@ -118,6 +127,8 @@ export function buildPrePrSummary(options = {}) {
     scriptsAdded,
     aggregateVerification: options.aggregateVerification || null,
     releaseCandidate: options.releaseCandidate || null,
+    localIntegrationStatus: 'local branch integration evidence only',
+    localIntegrationReady: false,
     liveStatus: {
       liveMutationPerformed: false,
       liveMigrationApplyPerformed: false,
@@ -131,34 +142,27 @@ export function buildPrePrSummary(options = {}) {
     closureClaimed: false,
     releaseReady: false,
     blockers: NON_CLOSURE_BLOCKERS,
-    prDraft: {
-      title: 'feat: epic B projects foundation — non-visual MVP contracts and release gates',
-      body: [
-        '## Summary',
-        '- Adds non-visual contract tests, verification packs, and local release gates from Packages 01–06.',
-        '- Defers visual QA / D-13 closure; no live Supabase apply, email send, or deploy in this branch evidence.',
-        '',
-        '## Test plan',
-        '- [ ] npm test',
-        '- [ ] npm run typecheck && npm run typecheck:api',
-        '- [ ] npm run build',
-        '- [ ] npm run check:release-candidate-local -- --execute',
-        '- [ ] GitHub QA on main after merge',
-      ].join('\n'),
-    },
+    localSummaryTitle: 'Local branch integration — non-visual MVP contracts and release gates',
+    recommendedLocalNextSteps: RECOMMENDED_LOCAL_NEXT_STEPS,
+    localHandoffSummary: [
+      'Local-only branch integration summary for ongoing development.',
+      'Visual QA / D-13 remain deferred; no live Supabase apply, email send, or deploy in this evidence.',
+    ].join(' '),
   }
 }
 
-export function renderPrePrSummaryMarkdown(summary) {
+export function renderLocalBranchSummaryMarkdown(summary) {
   const lines = [
-    '# Branch Pre-PR Summary',
+    '# Local Branch Integration Summary',
     '',
     `- Branch: \`${summary.branch}\``,
     `- HEAD: \`${summary.head}\``,
     `- Range: \`${summary.commitRange}\` (${summary.commitCount} commits)`,
     `- Generated: ${summary.generatedAt}`,
     '',
-    '## Status',
+    '## Local integration status',
+    `- localIntegrationStatus: ${summary.localIntegrationStatus}`,
+    `- localIntegrationReady: ${summary.localIntegrationReady}`,
     `- closureClaimed: ${summary.closureClaimed}`,
     `- releaseReady: ${summary.releaseReady}`,
     `- visual QA: deferred`,
@@ -192,26 +196,28 @@ export function renderPrePrSummaryMarkdown(summary) {
   for (const script of summary.scriptsAdded) lines.push(`- \`${script}\``)
   lines.push('', '## Non-closure blockers')
   for (const blocker of summary.blockers) lines.push(`- ${blocker}`)
-  lines.push('', '## PR draft', `**Title:** ${summary.prDraft.title}`, '', summary.prDraft.body)
+  lines.push('', '## Recommended Next Local Steps')
+  for (const step of summary.recommendedLocalNextSteps) lines.push(`1. ${step}`)
+  lines.push('', '## Local handoff summary', summary.localHandoffSummary)
   return `${lines.join('\n')}\n`
 }
 
-export function writePrePrSummaryArtifacts(summary, outputDir = resolve('artifacts/branch')) {
+export function writeLocalBranchSummaryArtifacts(summary, outputDir = resolve('artifacts/branch')) {
   mkdirSync(outputDir, { recursive: true })
-  const jsonPath = resolve(outputDir, 'pre-pr-summary.json')
-  const mdPath = resolve(outputDir, 'pre-pr-summary.md')
+  const jsonPath = resolve(outputDir, 'local-branch-summary.json')
+  const mdPath = resolve(outputDir, 'local-branch-summary.md')
   writeFileSync(jsonPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8')
-  writeFileSync(mdPath, renderPrePrSummaryMarkdown(summary), 'utf8')
+  writeFileSync(mdPath, renderLocalBranchSummaryMarkdown(summary), 'utf8')
   return { jsonPath, mdPath }
 }
 
 function main() {
-  const args = parsePrePrSummaryArgs()
-  const summary = buildPrePrSummary({ args })
-  const paths = writePrePrSummaryArtifacts(summary, args.outputDir)
-  console.log(JSON.stringify({ event: 'branch_pre_pr_summary', paths, ...summary }, null, 2))
+  const args = parseLocalBranchSummaryArgs()
+  const summary = buildLocalBranchSummary({ args })
+  const paths = writeLocalBranchSummaryArtifacts(summary, args.outputDir)
+  console.log(JSON.stringify({ event: 'local_branch_summary', paths, ...summary }, null, 2))
 }
 
-if (process.argv[1]?.includes('generate-branch-pre-pr-summary.mjs')) {
+if (process.argv[1]?.includes('generate-local-branch-summary.mjs')) {
   main()
 }
