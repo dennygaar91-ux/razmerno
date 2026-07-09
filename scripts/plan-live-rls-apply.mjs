@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
+import { resolve } from 'node:path'
 import { getEnvPresenceReport, loadProjectEnvFiles } from './load-project-env.mjs'
+
+export const LIVE_RLS_APPROVAL_ENV_KEY = 'RAZMERNO_APPROVE_LIVE_RLS_APPLY'
+export const LIVE_RLS_APPROVAL_PHRASE = 'I_APPROVE_LIVE_RLS_APPLY_FOR_ORDER_STATUS_EVENTS'
 
 export const RLS_MIGRATION_FILE = 'supabase/migrations/20260708_enable_order_status_events_rls.sql'
 export const RLS_REFERENCE_FILE = 'db/order-status-events.sql'
@@ -42,6 +45,24 @@ export function parseRlsApplyPlanArgs(argv = process.argv.slice(2)) {
   }
 }
 
+export function validateLiveRlsApprovalPhrase(env = process.env) {
+  const value = env[LIVE_RLS_APPROVAL_ENV_KEY]?.trim()
+  if (!value) return { ok: false, reason: 'missing-approval-phrase' }
+  if (value !== LIVE_RLS_APPROVAL_PHRASE) return { ok: false, reason: 'wrong-approval-phrase' }
+  return { ok: true }
+}
+
+export function resolveLiveRlsApplyBlockReason(args, approval = validateLiveRlsApprovalPhrase()) {
+  if (!args.apply) return null
+  if (!approval.ok) {
+    if (approval.reason === 'wrong-approval-phrase') {
+      return `Live apply refused: ${LIVE_RLS_APPROVAL_ENV_KEY} must equal the exact approval phrase.`
+    }
+    return `Live apply refused: set ${LIVE_RLS_APPROVAL_ENV_KEY}=${LIVE_RLS_APPROVAL_PHRASE} before using --apply.`
+  }
+  return 'Live apply is intentionally refused by this generator. Use explicit approved migration pipeline.'
+}
+
 export function extractOrderStatusEventsRlsSql(migrationSource) {
   const statements = []
   const lines = migrationSource.split(/\r?\n/)
@@ -59,12 +80,17 @@ export function buildLiveRlsApplyPlan(options = {}) {
   const migrationSource = readFileSync(migrationPath, 'utf8')
   const referenceSource = readFileSync(resolve(RLS_REFERENCE_FILE), 'utf8')
 
+  const approval = validateLiveRlsApprovalPhrase()
+
   return {
     generatedAt: new Date().toISOString(),
     mode: 'plan-only',
     liveMutationPerformed: false,
     closureClaimed: false,
     requiresExplicitApproval: true,
+    approvalEnvKey: LIVE_RLS_APPROVAL_ENV_KEY,
+    approvalPhraseRequired: LIVE_RLS_APPROVAL_PHRASE,
+    approvalPhrasePresent: approval.ok,
     migrationFiles: [RLS_MIGRATION_FILE, RLS_REFERENCE_FILE],
     extractedSql: extractOrderStatusEventsRlsSql(migrationSource),
     preflightChecks: PREFLIGHT_CHECKS,
@@ -72,9 +98,7 @@ export function buildLiveRlsApplyPlan(options = {}) {
     rollbackSteps: ROLLBACK_STEPS,
     verificationQueries: VERIFICATION_QUERIES,
     applyFlagPassed: args.apply,
-    applyBlockedReason: args.apply
-      ? 'Live apply is intentionally refused by this generator. Use explicit approved migration pipeline.'
-      : null,
+    applyBlockedReason: resolveLiveRlsApplyBlockReason(args, approval),
     referenceMirrorsMigration: referenceSource.includes('order_status_events_deny_all'),
     envPresence: getEnvPresenceReport(['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']).map((item) => ({
       name: item.name,
@@ -95,6 +119,8 @@ export function renderLiveRlsApplyPlanMarkdown(plan) {
     `- mode: ${plan.mode}`,
     `- liveMutationPerformed: ${plan.liveMutationPerformed}`,
     `- requiresExplicitApproval: ${plan.requiresExplicitApproval}`,
+    `- approvalEnvKey: ${plan.approvalEnvKey}`,
+    `- approvalPhrasePresent: ${plan.approvalPhrasePresent}`,
     '',
     '## Migration files',
     ...plan.migrationFiles.map((file) => `- ${file}`),
