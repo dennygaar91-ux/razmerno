@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
 import {
+  LIVE_RLS_APPROVAL_ENV_KEY,
+  LIVE_RLS_APPROVAL_PHRASE,
+  validateLiveRlsApprovalPhrase,
+} from './plan-live-rls-apply.mjs'
+import {
   getEnvPresenceReport,
   loadProjectEnvFiles,
   normalizeSupabaseProjectUrl,
@@ -28,6 +33,19 @@ export const SAFE_RECIPIENT_PATTERNS = [
   /manager@example\.test/i,
 ]
 
+export const BLOCKED_BY_DEFAULT_STEPS = [
+  {
+    id: 'live-migration-apply',
+    status: 'blocked-requires-explicit-approval',
+    description: 'Live Supabase migration apply (including order_status_events RLS)',
+  },
+  {
+    id: 'live-email-send',
+    status: 'blocked-requires-explicit-approval',
+    description: 'Live transactional email send',
+  },
+]
+
 export const MUTATION_STEPS = [
   {
     id: 'order-submit-live',
@@ -42,6 +60,7 @@ export const MUTATION_STEPS = [
   {
     id: 'rls-live-probe',
     requiresFlag: '--allow-live-rls-probe',
+    requiresApprovalEnv: LIVE_RLS_APPROVAL_ENV_KEY,
     description: 'Live order_status_events RLS probe',
   },
 ]
@@ -84,6 +103,34 @@ export function isSafeRecipientEmail(email) {
   return SAFE_RECIPIENT_PATTERNS.some((pattern) => pattern.test(email.trim()))
 }
 
+export function classifyHealthResult(health) {
+  if (!health || health.skipped) {
+    return { classification: 'not-configured', ok: false }
+  }
+  if (health.ok) {
+    return { classification: 'healthy', ok: true }
+  }
+  const errorText = String(health.error || '')
+  if (/fetch failed|ECONNREFUSED|ENOTFOUND|ECONNRESET|network/i.test(errorText)) {
+    return { classification: 'environment-not-running', ok: false }
+  }
+  if (typeof health.status === 'number' && health.status >= 400) {
+    return { classification: 'unhealthy-response', ok: false }
+  }
+  return { classification: 'unhealthy', ok: false }
+}
+
+export function resolveLiveRlsProbeBlockReason(args, approval = validateLiveRlsApprovalPhrase()) {
+  if (!args.allowLiveRlsProbe) return null
+  if (!approval.ok) {
+    if (approval.reason === 'wrong-approval-phrase') {
+      return `Live RLS probe refused: ${LIVE_RLS_APPROVAL_ENV_KEY} must equal the exact approval phrase.`
+    }
+    return `Live RLS probe refused: set ${LIVE_RLS_APPROVAL_ENV_KEY}=${LIVE_RLS_APPROVAL_PHRASE} before using --allow-live-rls-probe.`
+  }
+  return 'Live RLS probe is intentionally refused by this dry-run harness.'
+}
+
 export function buildLiveDryRunPlan(options = {}) {
   const args = options.args || parseLiveDryRunArgs([])
   const envPresence = getEnvPresenceReport([...REQUIRED_ENV_KEYS, ...OPTIONAL_ENV_KEYS])
@@ -118,23 +165,34 @@ export function buildLiveDryRunPlan(options = {}) {
       status: 'ready',
       printsSecrets: false,
     },
+    ...BLOCKED_BY_DEFAULT_STEPS.map((step) => ({
+      ...step,
+      printsSecrets: false,
+    })),
     ...MUTATION_STEPS.map((step) => {
-      const enabled =
+      const flagEnabled =
         (step.requiresFlag === '--allow-mutation' && args.allowMutation) ||
         (step.requiresFlag === '--allow-manual-pricing-live' && args.allowManualPricingLive) ||
         (step.requiresFlag === '--allow-live-rls-probe' && args.allowLiveRlsProbe)
+      const approvalOk = step.requiresApprovalEnv ? validateLiveRlsApprovalPhrase().ok : true
+      const enabled = flagEnabled && approvalOk
       return {
         id: step.id,
         status: enabled ? 'would-run-with-explicit-flag' : 'blocked-requires-explicit-approval',
         requiresFlag: step.requiresFlag,
+        requiresApprovalEnv: step.requiresApprovalEnv || null,
+        approvalPhraseRequired: step.requiresApprovalEnv ? LIVE_RLS_APPROVAL_PHRASE : null,
         description: step.description,
         printsSecrets: false,
       }
     }),
   ]
 
+  const rlsProbeAllowed =
+    args.allowLiveRlsProbe && validateLiveRlsApprovalPhrase().ok
+
   const mutationAllowed =
-    args.allowMutation || args.allowManualPricingLive || args.allowLiveRlsProbe
+    args.allowMutation || args.allowManualPricingLive || rlsProbeAllowed
 
   return {
     generatedAt: new Date().toISOString(),
@@ -142,6 +200,9 @@ export function buildLiveDryRunPlan(options = {}) {
     mutationAllowed,
     closureClaimed: false,
     liveMutationPerformed: false,
+    approvalEnvKey: LIVE_RLS_APPROVAL_ENV_KEY,
+    approvalPhraseRequired: LIVE_RLS_APPROVAL_PHRASE,
+    rlsProbeBlockedReason: resolveLiveRlsProbeBlockReason(args),
     envPresence,
     steps,
     nonClosureReminder:
@@ -176,7 +237,10 @@ async function main() {
 
   const report = {
     ...plan,
-    health,
+    health: {
+      ...health,
+      classification: classifyHealthResult(health).classification,
+    },
     envPresence: redactEnvReport(plan.envPresence),
   }
 
@@ -187,6 +251,11 @@ async function main() {
     .some((item) => !item.present)
 
   if (requiredMissing && !args.allowMutation) {
+    process.exit(1)
+  }
+
+  if (args.allowLiveRlsProbe && !validateLiveRlsApprovalPhrase().ok) {
+    console.error(resolveLiveRlsProbeBlockReason(args))
     process.exit(1)
   }
 
