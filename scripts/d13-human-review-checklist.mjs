@@ -2,7 +2,10 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { buildD13LocalVisualIndex } from './d13-local-visual-qa-report.mjs'
+import {
+  buildCanonicalD13LocalVisualIndex,
+  buildD13LocalVisualIndex,
+} from './d13-local-visual-qa-report.mjs'
 
 const ROOT = process.cwd()
 const D13_ROOT = join(ROOT, 'artifacts', 'visual-qa', 'd13-local')
@@ -21,16 +24,27 @@ const GLOBAL_SECTIONS = [
   { id: 'operations-auth', title: 'Operations auth gates', match: (item) => item.batch === 'operations-auth' || item.shot === 'operations-login' },
 ]
 
-const NON_CLOSURE_REMINDER =
+export const NON_CLOSURE_REMINDER =
   'This local checklist does not close D-13. Visual closure requires explicit human review result, preview visual QA when preview exists, and required main/GitHub QA/main verification.'
 
-export function buildHumanReviewChecklist(index = buildD13LocalVisualIndex()) {
+export const CANONICAL_CHECKLIST_REMINDER =
+  'This checklist is a human review aid, not D-13 closure evidence by itself.'
+
+export function parseChecklistArgs(argv = process.argv.slice(2)) {
+  return { canonical: argv.includes('--canonical') }
+}
+
+export function buildHumanReviewChecklist(index) {
+  const reviewableEntries = index.entries.filter(
+    (item) => item.status === 'PASS' || item.status === 'PARTIAL' || item.status === 'BLOCKED',
+  )
+
   const sections = GLOBAL_SECTIONS.map((section) => ({
     ...section,
-    shots: index.entries.filter(section.match),
+    shots: reviewableEntries.filter(section.match),
   }))
 
-  const ungrouped = index.entries.filter(
+  const ungrouped = reviewableEntries.filter(
     (item) => !GLOBAL_SECTIONS.some((section) => section.match(item)),
   )
   if (ungrouped.length > 0) {
@@ -39,17 +53,23 @@ export function buildHumanReviewChecklist(index = buildD13LocalVisualIndex()) {
 
   return {
     generatedAt: index.generatedAt,
+    canonical: Boolean(index.canonical),
     needsHumanReview: true,
     closureClaimed: false,
     nonClosureReminder: NON_CLOSURE_REMINDER,
+    canonicalReminder: CANONICAL_CHECKLIST_REMINDER,
     sections,
-    entries: index.entries,
+    entries: reviewableEntries,
   }
 }
 
 export function renderHumanReviewChecklistMarkdown(checklist) {
+  const title = checklist.canonical
+    ? '# D-13 Canonical Human Visual Review Checklist'
+    : '# D-13 Human Visual Review Checklist'
+
   const lines = [
-    '# D-13 Human Visual Review Checklist',
+    title,
     '',
     `Generated: ${checklist.generatedAt}`,
     '',
@@ -64,6 +84,10 @@ export function renderHumanReviewChecklistMarkdown(checklist) {
     checklist.nonClosureReminder,
     '',
   ]
+
+  if (checklist.canonical) {
+    lines.push('## Canonical review aid', '', checklist.canonicalReminder, '')
+  }
 
   for (const section of checklist.sections) {
     lines.push(`## ${section.title}`, '')
@@ -89,25 +113,40 @@ export function renderHumanReviewChecklistMarkdown(checklist) {
   }
 
   lines.push('## Known non-closure reminders', '', `- ${checklist.nonClosureReminder}`)
+  if (checklist.canonical) {
+    lines.push(`- ${checklist.canonicalReminder}`)
+  }
   return lines.join('\n')
 }
 
-function main() {
-  const indexPath = join(D13_ROOT, 'index.json')
-  const index = existsSync(indexPath)
-    ? JSON.parse(readFileSync(indexPath, 'utf8'))
-  : buildD13LocalVisualIndex()
+export function loadChecklistIndex(canonical) {
+  const indexPath = join(D13_ROOT, canonical ? 'index.canonical.json' : 'index.json')
+  if (existsSync(indexPath)) {
+    return JSON.parse(readFileSync(indexPath, 'utf8'))
+  }
+  return canonical ? buildCanonicalD13LocalVisualIndex() : buildD13LocalVisualIndex()
+}
 
-  const checklist = buildHumanReviewChecklist(index)
+export function writeHumanReviewChecklistArtifacts(checklist, options = {}) {
+  const canonical = options.canonical ?? checklist.canonical
   mkdirSync(D13_ROOT, { recursive: true })
-  const outPath = join(D13_ROOT, 'human-review-checklist.md')
+  const outPath = join(D13_ROOT, canonical ? 'human-review-checklist.canonical.md' : 'human-review-checklist.md')
   writeFileSync(outPath, renderHumanReviewChecklistMarkdown(checklist))
+  return relative(ROOT, outPath).replace(/\\/g, '/')
+}
+
+function main() {
+  const args = parseChecklistArgs()
+  const index = loadChecklistIndex(args.canonical)
+  const checklist = buildHumanReviewChecklist(index)
+  const outPath = writeHumanReviewChecklistArtifacts(checklist, { canonical: args.canonical })
 
   console.log(
     JSON.stringify({
-      event: 'd13_human_review_checklist',
-      outPath: relative(ROOT, outPath).replace(/\\/g, '/'),
+      event: args.canonical ? 'd13_human_review_checklist_canonical' : 'd13_human_review_checklist',
+      outPath,
       shotCount: checklist.entries.length,
+      canonical: Boolean(args.canonical),
       closureClaimed: false,
     }),
   )
