@@ -32,6 +32,13 @@ test("migration enables RLS on order_status_events", () => {
   assert.match(MIGRATION_SQL, /alter table public\.order_status_events enable row level security/);
 });
 
+test("migration is idempotent with stable policy name", () => {
+  assert.match(MIGRATION_SQL, /Safe to run multiple times/i);
+  assert.match(MIGRATION_SQL, /drop policy if exists order_status_events_deny_all/i);
+  assert.match(MIGRATION_SQL, /create policy order_status_events_deny_all/);
+  assert.equal((MIGRATION_SQL.match(/order_status_events_deny_all/g) ?? []).length, 2);
+});
+
 test("migration adds deny-all policy only (blocks anon and authenticated direct access)", () => {
   assert.match(MIGRATION_SQL, /order_status_events_deny_all/);
   assert.match(MIGRATION_SQL, /for all/);
