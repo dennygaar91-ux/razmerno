@@ -113,13 +113,24 @@ test("live dry-run allows approval-gated RLS probe planning only with exact phra
   const plan = buildLiveDryRunPlan({
     args: parseLiveDryRunArgs(["--allow-live-rls-probe"]),
   });
-  assert.equal(plan.mutationAllowed, true);
+  assert.equal(plan.mutationAllowed, false);
+  assert.equal(plan.rlsProbeRequested, true);
+  assert.equal(plan.rlsProbeExecuted, false);
+  assert.equal(plan.rlsProbeMode, "dry-run-only");
+  assert.match(plan.rlsProbeNextStep || "", /read-only probe|manual verification/i);
   assert.equal(
     plan.steps.find((step) => step.id === "rls-live-probe")?.status,
-    "would-run-with-explicit-flag",
+    "dry-run-only-approval-ready",
   );
   if (previous === undefined) delete process.env[LIVE_RLS_APPROVAL_ENV_KEY];
   else process.env[LIVE_RLS_APPROVAL_ENV_KEY] = previous;
+});
+
+test("live dry-run dry-run-only RLS probe fields remain false execution by default", () => {
+  const plan = buildLiveDryRunPlan({ args: parseLiveDryRunArgs([]) });
+  assert.equal(plan.rlsProbeRequested, false);
+  assert.equal(plan.rlsProbeExecuted, false);
+  assert.equal(plan.liveMutationPerformed, false);
 });
 
 const SOURCE = readFileSync("scripts/verify-live-dry-run.mjs", "utf8");
@@ -127,6 +138,7 @@ const SOURCE = readFileSync("scripts/verify-live-dry-run.mjs", "utf8");
 test("live dry-run script does not claim closure or perform live mutation by default", () => {
   assert.match(SOURCE, /closureClaimed:\s*false/);
   assert.match(SOURCE, /liveMutationPerformed:\s*false/);
+  assert.match(SOURCE, /rlsProbeExecuted:\s*false/);
   assert.match(SOURCE, /dry-run only/i);
   assert.match(SOURCE, /LIVE_RLS_APPROVAL_PHRASE/);
   for (const key of REQUIRED_ENV_KEYS) {
@@ -134,4 +146,4 @@ test("live dry-run script does not claim closure or perform live mutation by def
   }
 });
 
-console.log("\n9 passed");
+console.log("\n10 passed");

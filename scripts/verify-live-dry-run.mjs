@@ -175,10 +175,16 @@ export function buildLiveDryRunPlan(options = {}) {
         (step.requiresFlag === '--allow-manual-pricing-live' && args.allowManualPricingLive) ||
         (step.requiresFlag === '--allow-live-rls-probe' && args.allowLiveRlsProbe)
       const approvalOk = step.requiresApprovalEnv ? validateLiveRlsApprovalPhrase().ok : true
-      const enabled = flagEnabled && approvalOk
+      const isRlsProbe = step.id === 'rls-live-probe'
+      let status = 'blocked-requires-explicit-approval'
+      if (isRlsProbe && flagEnabled && approvalOk) {
+        status = 'dry-run-only-approval-ready'
+      } else if (!isRlsProbe && flagEnabled && approvalOk) {
+        status = 'would-run-with-explicit-flag'
+      }
       return {
         id: step.id,
-        status: enabled ? 'would-run-with-explicit-flag' : 'blocked-requires-explicit-approval',
+        status,
         requiresFlag: step.requiresFlag,
         requiresApprovalEnv: step.requiresApprovalEnv || null,
         approvalPhraseRequired: step.requiresApprovalEnv ? LIVE_RLS_APPROVAL_PHRASE : null,
@@ -188,11 +194,7 @@ export function buildLiveDryRunPlan(options = {}) {
     }),
   ]
 
-  const rlsProbeAllowed =
-    args.allowLiveRlsProbe && validateLiveRlsApprovalPhrase().ok
-
-  const mutationAllowed =
-    args.allowMutation || args.allowManualPricingLive || rlsProbeAllowed
+  const mutationAllowed = args.allowMutation || args.allowManualPricingLive
 
   return {
     generatedAt: new Date().toISOString(),
@@ -202,6 +204,12 @@ export function buildLiveDryRunPlan(options = {}) {
     liveMutationPerformed: false,
     approvalEnvKey: LIVE_RLS_APPROVAL_ENV_KEY,
     approvalPhraseRequired: LIVE_RLS_APPROVAL_PHRASE,
+    rlsProbeRequested: args.allowLiveRlsProbe,
+    rlsProbeExecuted: false,
+    rlsProbeMode: args.allowLiveRlsProbe ? 'dry-run-only' : null,
+    rlsProbeNextStep: args.allowLiveRlsProbe
+      ? 'Use dedicated read-only probe/manual verification.'
+      : null,
     rlsProbeBlockedReason: resolveLiveRlsProbeBlockReason(args),
     envPresence,
     steps,
@@ -260,7 +268,10 @@ async function main() {
   }
 
   if (args.allowMutation || args.allowManualPricingLive || args.allowLiveRlsProbe) {
-    console.error('Mutation flags detected, but this harness performs dry-run only. Use dedicated live verify scripts with explicit approval.')
+    const message = args.allowLiveRlsProbe
+      ? 'RLS probe flag detected, but this harness performs dry-run only and does not execute the live probe. Use npm run verify:order-status-events-rls-live for read-only verification.'
+      : 'Mutation flags detected, but this harness performs dry-run only. Use dedicated live verify scripts with explicit approval.'
+    console.error(message)
     process.exit(1)
   }
 }
