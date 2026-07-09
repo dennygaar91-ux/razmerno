@@ -23,6 +23,7 @@ test("release candidate gate includes required commands", () => {
     "npm run test:release-e2e",
     "npm run check:release-security",
     "npm run verify:live:dry-run",
+    "npm run test:observability-contract",
     "npm run test:pricing-final-branch-verification",
     "npm run test:production-final-branch-verification",
   ];
@@ -80,6 +81,7 @@ test("release candidate gate composes boundary live dry-run and excludes visual/
   assert.match(SOURCE, /test:customer-platform-mvp-boundary-contract/);
   assert.match(SOURCE, /test:operations-mvp-boundary-contract/);
   assert.match(SOURCE, /verify:live:dry-run/);
+  assert.match(SOURCE, /test:observability-contract/);
   assert.match(SOURCE, /D-13 visual capture/);
   assert.match(SOURCE, /Live mutation scripts/);
   assert.match(SOURCE, /process\.exit\(1\)/);

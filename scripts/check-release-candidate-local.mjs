@@ -10,6 +10,7 @@ export const RELEASE_CANDIDATE_COMMANDS = [
   'npm run test:release-e2e',
   'npm run check:release-security',
   'npm run check:bundle-baseline',
+  'npm run test:observability-contract',
   'npm run test:pricing-final-branch-verification',
   'npm run test:production-final-branch-verification',
   'npm run test:production-export-contract',
@@ -64,7 +65,7 @@ export function summarizeCommandOutput(stdout = '', stderr = '') {
 }
 
 export function runReleaseCandidateCommand(command, options = {}) {
-  const shell = options.shell ?? true
+  const shell = options.shell ?? (process.platform === 'win32' ? 'cmd.exe' : true)
   const result = spawnSync(command, {
     shell,
     encoding: 'utf8',
