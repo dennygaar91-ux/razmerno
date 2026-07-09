@@ -4,6 +4,8 @@ import {
   NON_CLOSURE_BLOCKERS,
   RELEASE_CANDIDATE_COMMANDS,
   buildReleaseCandidatePlan,
+  parseReleaseCandidateArgs,
+  summarizeCommandOutput,
   summarizeReleaseCandidateResults,
 } from "../scripts/check-release-candidate-local.mjs";
 
@@ -21,10 +23,21 @@ test("release candidate gate includes required commands", () => {
     "npm run test:release-e2e",
     "npm run check:release-security",
     "npm run verify:live:dry-run",
+    "npm run test:pricing-final-branch-verification",
+    "npm run test:production-final-branch-verification",
   ];
   for (const command of required) {
     assert.ok(RELEASE_CANDIDATE_COMMANDS.includes(command));
   }
+});
+
+test("release candidate gate defaults to list-only and supports execute mode", () => {
+  const defaultArgs = parseReleaseCandidateArgs([]);
+  const executeArgs = parseReleaseCandidateArgs(["--execute"]);
+  assert.equal(defaultArgs.listOnly, true);
+  assert.equal(defaultArgs.execute, false);
+  assert.equal(executeArgs.execute, true);
+  assert.equal(executeArgs.listOnly, false);
 });
 
 test("release candidate gate reports non-closure blockers", () => {
@@ -54,13 +67,22 @@ test("release candidate gate handles failed commands clearly", () => {
   assert.deepEqual(summary.failedCommands, ["npm run build"]);
 });
 
+test("release candidate gate summarizes command output and supports continue-on-error", () => {
+  const output = summarizeCommandOutput("line1\nline2\nline3", "warn");
+  assert.equal(output.lineCount, 4);
+  assert.ok(output.tail.length > 0);
+  assert.equal(parseReleaseCandidateArgs(["--execute", "--continue-on-error"]).continueOnError, true);
+});
+
 const SOURCE = readFileSync("scripts/check-release-candidate-local.mjs", "utf8");
 
-test("release candidate gate composes boundary and live dry-run checks", () => {
+test("release candidate gate composes boundary live dry-run and excludes visual/live mutation", () => {
   assert.match(SOURCE, /test:customer-platform-mvp-boundary-contract/);
   assert.match(SOURCE, /test:operations-mvp-boundary-contract/);
   assert.match(SOURCE, /verify:live:dry-run/);
+  assert.match(SOURCE, /D-13 visual capture/);
+  assert.match(SOURCE, /Live mutation scripts/);
   assert.match(SOURCE, /process\.exit\(1\)/);
 });
 
-console.log("\n5 passed");
+console.log("\n7 passed");
