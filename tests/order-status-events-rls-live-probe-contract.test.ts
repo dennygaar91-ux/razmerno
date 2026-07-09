@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import {
   ARTIFACT_JSON,
-  REST_PATH,
   buildOrderStatusEventsRlsProbeUrl,
   classifyAnonRlsProbeResult,
   classifyServiceRoleRlsProbeResult,
@@ -118,7 +117,7 @@ enqueue("order status events RLS live probe script is read-only", () => {
   assert.match(SOURCE, /readOnlyProbe:\s*true/);
   assert.match(SOURCE, /liveMutationPerformed:\s*false/);
   assert.doesNotMatch(SOURCE, /\b(INSERT|UPDATE|DELETE|ALTER|DROP|CREATE)\b/);
-  assert.match(SOURCE, REST_PATH);
+  assert.match(SOURCE, /\/rest\/v1\/order_status_events/);
 });
 
 await Promise.all(tests);
