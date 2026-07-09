@@ -6,3 +6,7 @@ node_modules/
 .env.local
 .env.*.local
 .vercel
+artifacts/
+playwright-report/
+test-results/
+coverage/
