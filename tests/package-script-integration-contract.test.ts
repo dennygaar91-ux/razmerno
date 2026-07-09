@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import {
   EXCLUDED_FROM_GATE,
+  NON_CLOSURE_BLOCKERS,
   RELEASE_CANDIDATE_COMMANDS,
 } from "../scripts/check-release-candidate-local.mjs";
 
@@ -22,10 +23,13 @@ const KEY_SCRIPTS = [
   "test:customer-platform-mvp-boundary-contract",
   "test:operations-mvp-boundary-contract",
   "test:email-retry-failure-contract",
+  "report:local-branch-summary",
   "report:d13-local-visual-review-package",
   "dev:ports:check",
   "dev:ports:clean",
 ] as const;
+
+const FORBIDDEN_SCRIPT_NAME_PATTERNS = [/pre-pr/i, /pr-ready/i, /branch-pre-pr/i] as const;
 
 function test(name: string, run: () => void) {
   run();
@@ -38,6 +42,15 @@ test("package script integration: key scripts exist once", () => {
   for (const script of KEY_SCRIPTS) {
     assert.ok(PACKAGE_JSON.scripts[script], `missing script ${script}`);
   }
+});
+
+test("package script integration: no PR/pre-pr script names in package.json", () => {
+  for (const name of Object.keys(PACKAGE_JSON.scripts)) {
+    for (const pattern of FORBIDDEN_SCRIPT_NAME_PATTERNS) {
+      assert.doesNotMatch(name, pattern, `forbidden script name ${name}`);
+    }
+  }
+  assert.doesNotMatch(JSON.stringify(PACKAGE_JSON.scripts), /report:branch-pre-pr-summary/);
 });
 
 test("package script integration: node script targets exist on disk", () => {
@@ -62,7 +75,15 @@ test("package script integration: release candidate gate references existing scr
 test("package script integration: aggregate gate excludes D-13 visual closure scripts", () => {
   const serialized = JSON.stringify(RELEASE_CANDIDATE_COMMANDS);
   assert.doesNotMatch(serialized, /report:d13|capture:d13/i);
+  assert.doesNotMatch(serialized, /report:local-branch-summary/i);
   assert.ok(EXCLUDED_FROM_GATE.some((item) => /D-13 visual/i.test(item)));
+});
+
+test("package script integration: RC gate reports formal GitHub QA only as non-closure blocker", () => {
+  assert.ok(NON_CLOSURE_BLOCKERS.some((item) => /GitHub QA/i.test(item)));
+  const rcSource = readFileSync("scripts/check-release-candidate-local.mjs", "utf8");
+  assert.doesNotMatch(rcSource, /PR-ready|PR handoff|Pull Request|Recommended PR/i);
+  assert.match(rcSource, /closureClaimed:\s*false/);
 });
 
 test("package script integration: live scripts are dry-run or plan-only by default", () => {
@@ -73,4 +94,4 @@ test("package script integration: live scripts are dry-run or plan-only by defau
   assert.match(plan, /process\.exit\(1\)/);
 });
 
-console.log("\n5 passed");
+console.log("\n7 passed");

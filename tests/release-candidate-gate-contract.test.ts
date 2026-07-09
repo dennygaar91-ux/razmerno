@@ -85,6 +85,7 @@ test("release candidate gate composes boundary live dry-run and excludes visual/
   assert.match(SOURCE, /D-13 visual capture/);
   assert.match(SOURCE, /Live mutation scripts/);
   assert.match(SOURCE, /process\.exit\(1\)/);
+  assert.doesNotMatch(SOURCE, /report:local-branch-summary|PR-ready|PR handoff|Pull Request/i);
 });
 
-console.log("\n7 passed");
+console.log("\n8 passed");
