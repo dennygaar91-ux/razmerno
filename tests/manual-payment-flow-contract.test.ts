@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 
 import orderDecisionHandler from "../api/operations/order-decision";
 import paymentConfirmationHandler from "../api/operations/payment-confirmation";
+import orderCompletionHandler from "../api/operations/order-completion";
 import orderDetailHandler from "../api/customer/order";
 import unreadCountHandler from "../api/customer/notifications/unread-count";
 import { createAdminSessionToken } from "../api/_shared/admin-auth";
@@ -9,6 +10,7 @@ import {
   INITIAL_ORDER_DOMAIN_STATUS,
   MANUAL_PAYMENT_CONFIRMED_DOMAIN_STATUS,
   OPERATIONS_APPROVED_DOMAIN_STATUS,
+  ORDER_COMPLETED_DOMAIN_STATUS,
 } from "../api/_shared/order-domain";
 import { isPaymentInstructionsVisibleForState } from "../api/_shared/payment-readiness-domain";
 
@@ -248,6 +250,21 @@ async function postPaymentConfirmation(note?: string) {
   return snapshot();
 }
 
+async function postOrderCompletion(note?: string) {
+  const token = createAdminSessionToken(Date.now());
+  const { res, snapshot } = createMockResponse();
+  await orderCompletionHandler(
+    {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}` },
+      body: { orderId: ORDER_ID, note: note ?? null },
+      query: {},
+    },
+    res,
+  );
+  return snapshot();
+}
+
 async function getCustomerOrder() {
   const { res, snapshot } = createMockResponse();
   await orderDetailHandler(
@@ -339,6 +356,83 @@ test("contract: payment confirmation blocked outside Оплата", async () => 
   assert.equal(blocked.statusCode, 409);
   assert.equal(notificationRows.length, 0);
   assert.equal(auditEvents.length, 0);
+});
+
+test("contract: confirm payment → complete order lifecycle with safe customer state", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installContractFetchMock();
+
+  await postApprove();
+  await postPaymentConfirmation("Оплата подтверждена");
+
+  const complete = await postOrderCompletion("Заказ завершён");
+  assert.equal(complete.statusCode, 200);
+  assert.equal(currentDomainStatus, ORDER_COMPLETED_DOMAIN_STATUS);
+  assert.equal(auditEvents.length, 3);
+  assert.equal(auditEvents[2]?.changed_by, "operations:order_complete");
+  assert.equal(productionMutations, 0);
+  assert.equal(totalPriceMutations, 0);
+
+  const completedOrder = await getCustomerOrder();
+  const completedBody = completedOrder.body as {
+    order: { status: { label: string; stage: string; nextStep: string | null }; totalPrice: number };
+  };
+  assert.equal(completedBody.order.status.label, "Завершено");
+  assert.equal(completedBody.order.status.stage, "completed");
+  assert.equal(completedBody.order.status.nextStep, null);
+  assert.equal(completedBody.order.totalPrice, 86400);
+});
+
+test("contract: order completion blocked outside В работе", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installContractFetchMock();
+
+  await postApprove();
+  const blocked = await postOrderCompletion();
+  assert.equal(blocked.statusCode, 409);
+  assert.notEqual(currentDomainStatus, ORDER_COMPLETED_DOMAIN_STATUS);
+});
+
+test("contract: approve/reject blocked after completion", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installContractFetchMock();
+
+  await postApprove();
+  await postPaymentConfirmation();
+  await postOrderCompletion();
+
+  const token = createAdminSessionToken(Date.now());
+  const { res, snapshot } = createMockResponse();
+  await orderDecisionHandler(
+    {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}` },
+      body: { orderId: ORDER_ID, decision: "reject", reason: "late reject" },
+      query: {},
+    },
+    res,
+  );
+
+  assert.equal(snapshot().statusCode, 409);
+  assert.equal(currentDomainStatus, ORDER_COMPLETED_DOMAIN_STATUS);
+});
+
+test("contract: repeated completion is rejected after order already completed", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installContractFetchMock();
+
+  await postApprove();
+  await postPaymentConfirmation();
+  const first = await postOrderCompletion();
+  assert.equal(first.statusCode, 200);
+
+  const second = await postOrderCompletion();
+  assert.equal(second.statusCode, 409);
+  assert.equal(currentDomainStatus, ORDER_COMPLETED_DOMAIN_STATUS);
 });
 
 async function runTests() {
