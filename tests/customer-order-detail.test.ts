@@ -327,6 +327,34 @@ test("customer order status timeline renders safe customer-facing states", () =>
   assert.doesNotMatch(card, /createClient|supabase/i);
 });
 
+test("customer order status matrix covers all domain statuses with safe labels and timeline stages", () => {
+  const timeline = readFileSync("src/static-pages/account/CustomerOrderStatusTimeline.tsx", "utf8");
+  const statusCases = [
+    { domain: "Черновик", label: "Черновик", stage: "unknown" },
+    { domain: "Проверка", label: "На проверке", stage: "review" },
+    { domain: "Оплата", label: "Ожидает оплаты", stage: "payment" },
+    { domain: "В работе", label: "В работе", stage: "in_progress" },
+    { domain: "Завершено", label: "Завершено", stage: "completed", nextStep: null },
+    { domain: "Отмена", label: "Отменён", stage: "cancelled", nextStep: null },
+    { domain: "Неизвестный статус", label: "Неизвестный статус", stage: "unknown" },
+  ] as const;
+
+  for (const statusCase of statusCases) {
+    const mapped = mapCustomerOrderStatus(statusCase.domain);
+    assert.equal(mapped.label, statusCase.label, `label for ${statusCase.domain}`);
+    assert.equal(mapped.stage, statusCase.stage, `stage for ${statusCase.domain}`);
+    if ("nextStep" in statusCase) {
+      assert.equal(mapped.nextStep, statusCase.nextStep);
+    }
+    assert.doesNotMatch(mapped.description, /audit|manager_email|production_export|decisionHistory/i);
+  }
+
+  assert.match(timeline, /HAPPY_PATH_STEPS/);
+  assert.match(timeline, /cancelled/);
+  assert.match(timeline, /getCustomerOrderStatusTimelineSteps/);
+  assert.doesNotMatch(timeline, /manufacturing|drilling|basisExport/i);
+});
+
 async function runTests() {
   for (const item of tests) {
     await item.run();
