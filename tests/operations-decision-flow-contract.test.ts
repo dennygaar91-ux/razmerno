@@ -352,6 +352,89 @@ test("contract: workspace mapper keeps domain status in safe queue DTO after dec
   );
 });
 
+test("contract: reject after approve is blocked with 409", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installFlowFetchMock();
+  const token = createAdminSessionToken(Date.now());
+
+  const approve = await postDecision(token, { orderId: ORDER_ID, decision: "approve", reason: null });
+  assert.equal(approve.statusCode, 200);
+
+  const reject = await postDecision(token, {
+    orderId: ORDER_ID,
+    decision: "reject",
+    reason: "Too late",
+  });
+  assert.equal(reject.statusCode, 409);
+  assert.equal(auditEvents.length, 1);
+  assert.equal(productionMutations, 0);
+  assert.equal(totalPriceMutations, 0);
+});
+
+test("contract: approve after reject is blocked with 409", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installFlowFetchMock();
+  const token = createAdminSessionToken(Date.now());
+
+  const reject = await postDecision(token, {
+    orderId: ORDER_ID,
+    decision: "reject",
+    reason: "Dimensions mismatch",
+  });
+  assert.equal(reject.statusCode, 200);
+
+  const approve = await postDecision(token, { orderId: ORDER_ID, decision: "approve", reason: null });
+  assert.equal(approve.statusCode, 409);
+  assert.equal(auditEvents.length, 1);
+  assert.equal(auditEvents[0]?.changed_by, "operations:reject");
+  assert.equal(productionMutations, 0);
+  assert.equal(totalPriceMutations, 0);
+});
+
+test("contract: second reject is blocked with 409", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installFlowFetchMock();
+  const token = createAdminSessionToken(Date.now());
+
+  const first = await postDecision(token, {
+    orderId: ORDER_ID,
+    decision: "reject",
+    reason: "First reason",
+  });
+  assert.equal(first.statusCode, 200);
+
+  const second = await postDecision(token, {
+    orderId: ORDER_ID,
+    decision: "reject",
+    reason: "Second reason",
+  });
+  assert.equal(second.statusCode, 409);
+  assert.equal(auditEvents.length, 1);
+  assert.equal(auditEvents[0]?.reason, "First reason");
+});
+
+test("contract: decision history remains newest-first after reject", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installFlowFetchMock();
+  const token = createAdminSessionToken(Date.now());
+
+  await postDecision(token, {
+    orderId: ORDER_ID,
+    decision: "reject",
+    reason: "Audit reason",
+  });
+
+  const review = await loadReview(token);
+  const history = (review.body as { review: { decisionHistory: Array<{ changedBy: string; reason: string | null }> } })
+    .review.decisionHistory;
+  assert.equal(history[0]?.changedBy, "operations:reject");
+  assert.equal(history[0]?.reason, "Audit reason");
+});
+
 async function runTests() {
   try {
     for (const item of tests) {
