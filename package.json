@@ -454,6 +454,7 @@
     "test:operations-manual-pricing-migration-prep": "node --no-warnings --import tsx tests/operations-manual-pricing-migration-prep.test.ts",
     "test:live-verification-dry-run-contract": "node --no-warnings --import tsx tests/live-verification-dry-run-contract.test.ts",
     "test:release-candidate-gate-contract": "node --no-warnings --import tsx tests/release-candidate-gate-contract.test.ts",
+    "test:cloudflare-spa-routing-contract": "node --no-warnings --import tsx tests/cloudflare-spa-routing-contract.test.ts",
     "test:api-supabase-url": "node --no-warnings --import tsx tests/api-supabase-url.test.ts"
   },
   "dependencies": {

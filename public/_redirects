@@ -1,0 +1,3 @@
+# Cloudflare Pages SPA fallback for client-side routes (App.tsx).
+# Pages Functions under /functions/api/* take precedence over these rules when deployed.
+/* /index.html 200
