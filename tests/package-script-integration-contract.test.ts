@@ -27,6 +27,21 @@ const KEY_SCRIPTS = [
   "report:d13-local-visual-review-package",
   "dev:ports:check",
   "dev:ports:clean",
+  "test:customer-supabase-rls-static-contract",
+  "test:production-json-v4-support-policy",
+  "check:governance-closure-wording",
+  "report:local-final-state",
+  "test:governance-closure-wording-contract",
+  "test:local-final-state-contract",
+] as const;
+
+const PACKAGE_15_SCRIPTS = [
+  "test:customer-supabase-rls-static-contract",
+  "test:production-json-v4-support-policy",
+  "check:governance-closure-wording",
+  "report:local-final-state",
+  "test:governance-closure-wording-contract",
+  "test:local-final-state-contract",
 ] as const;
 
 const FORBIDDEN_SCRIPT_NAME_PATTERNS = [/pre-pr/i, /pr-ready/i, /branch-pre-pr/i] as const;
@@ -94,4 +109,11 @@ test("package script integration: live scripts are dry-run or plan-only by defau
   assert.match(plan, /process\.exit\(1\)/);
 });
 
-console.log("\n7 passed");
+test("package script integration: package 15 scripts are discoverable in KEY_SCRIPTS", () => {
+  for (const script of PACKAGE_15_SCRIPTS) {
+    assert.ok(KEY_SCRIPTS.includes(script), `KEY_SCRIPTS must include ${script}`);
+    assert.ok(PACKAGE_JSON.scripts[script], `package.json must define ${script}`);
+  }
+});
+
+console.log("\n8 passed");
