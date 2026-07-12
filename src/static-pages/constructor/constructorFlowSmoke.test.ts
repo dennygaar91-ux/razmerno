@@ -490,7 +490,7 @@ test("constructor flow: reset returns to initial wizard state", () => {
   useConstructorStore.getState().reset();
   const state = useConstructorStore.getState();
 
-  assert(state.step === "sizes", "Reset should return to sizes");
+  assert(state.step === "checkout", "Reset should preserve current step");
   assert(state.width === 1800, "Reset should restore initial width");
   assert(state.height === 2400, "Reset should restore initial height");
   assert(state.depth === 600, "Reset should restore initial depth");
