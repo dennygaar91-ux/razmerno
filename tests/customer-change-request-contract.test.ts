@@ -5,7 +5,8 @@ import changeRequestDecisionHandler from "../api/operations/change-request-decis
 import orderReviewHandler from "../api/operations/order";
 import unreadCountHandler from "../api/customer/notifications/unread-count";
 import { createAdminSessionToken } from "../api/_shared/admin-auth";
-import { INITIAL_ORDER_DOMAIN_STATUS } from "../api/_shared/order-domain";
+import { INITIAL_ORDER_DOMAIN_STATUS, OPERATIONS_APPROVED_DOMAIN_STATUS } from "../api/_shared/order-domain";
+import { CUSTOMER_CHANGE_REQUEST_STATUS_NOT_ALLOWED_MESSAGE } from "../api/_shared/customer-change-request-policy";
 
 type AsyncTest = () => void | Promise<void>;
 
@@ -28,6 +29,7 @@ let changeRequestRows: Array<Record<string, unknown>> = [];
 let notificationRows: Array<Record<string, unknown>> = [];
 let totalPriceMutations = 0;
 let productionMutations = 0;
+let currentDomainStatus = INITIAL_ORDER_DOMAIN_STATUS;
 
 function restoreEnvironment() {
   for (const key of Object.keys(process.env)) {
@@ -39,6 +41,7 @@ function restoreEnvironment() {
   notificationRows = [];
   totalPriceMutations = 0;
   productionMutations = 0;
+  currentDomainStatus = INITIAL_ORDER_DOMAIN_STATUS;
 }
 
 function setRequiredServerEnv() {
@@ -117,15 +120,22 @@ function installContractFetchMock() {
         const body = init?.body ? JSON.parse(String(init.body)) : {};
         if ("production_export" in body) productionMutations += 1;
         if ("total_price" in body) totalPriceMutations += 1;
-        return jsonResponse({ ...sampleOrderRow, ...body });
+        if (typeof body.domain_status === "string") currentDomainStatus = body.domain_status;
+        return jsonResponse({ ...sampleOrderRow, domain_status: currentDomainStatus, ...body });
       }
 
       const parsed = new URL(url);
       const idFilter = parsed.searchParams.get("id");
       const orderUuid = idFilter?.startsWith("eq.") ? decodeURIComponent(idFilter.slice(3)) : null;
-      if (orderUuid === ORDER_UUID) return jsonResponse(sampleOrderRow);
-      if (url.includes(`order_id=eq.${encodeURIComponent(ORDER_ID)}`)) return jsonResponse(sampleOrderRow);
-      if (url.includes(ORDER_UUID)) return jsonResponse(sampleOrderRow);
+      if (orderUuid === ORDER_UUID) {
+        return jsonResponse({ ...sampleOrderRow, domain_status: currentDomainStatus });
+      }
+      if (url.includes(`order_id=eq.${encodeURIComponent(ORDER_ID)}`)) {
+        return jsonResponse({ ...sampleOrderRow, domain_status: currentDomainStatus });
+      }
+      if (url.includes(ORDER_UUID)) {
+        return jsonResponse({ ...sampleOrderRow, domain_status: currentDomainStatus });
+      }
       return jsonResponse(null, 200);
     }
 
@@ -332,6 +342,58 @@ test("contract: non-owner cannot submit change request", async () => {
   );
 
   assert.equal(snapshot().statusCode, 404);
+});
+
+test("contract: customer cannot submit change request after order leaves Проверка", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installContractFetchMock();
+  currentDomainStatus = OPERATIONS_APPROVED_DOMAIN_STATUS;
+
+  const blocked = await submitCustomerChangeRequest();
+  assert.equal(blocked.statusCode, 409);
+  const body = blocked.body as { message: string };
+  assert.equal(body.message, CUSTOMER_CHANGE_REQUEST_STATUS_NOT_ALLOWED_MESSAGE);
+  assert.equal(changeRequestRows.length, 0);
+});
+
+test("contract: operations decision locks resolved change request from repeat decision", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installContractFetchMock();
+
+  await submitCustomerChangeRequest();
+  const firstDecision = await resolveChangeRequest();
+  assert.equal(firstDecision.statusCode, 200);
+
+  const token = createAdminSessionToken(Date.now());
+  const { res, snapshot } = createMockResponse();
+  await changeRequestDecisionHandler(
+    {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}` },
+      body: { changeRequestId: CHANGE_REQUEST_ID, decision: "rejected" },
+      query: {},
+    },
+    res,
+  );
+
+  assert.equal(snapshot().statusCode, 409);
+  assert.equal(changeRequestRows[0]?.status, "resolved");
+});
+
+test("contract: post-decision customer notification stays safe without internal operations notes", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installContractFetchMock();
+
+  await submitCustomerChangeRequest();
+  await resolveChangeRequest();
+
+  assert.equal(notificationRows.length, 2);
+  const serialized = JSON.stringify(notificationRows);
+  assert.doesNotMatch(serialized, /Internal|audit reason|decisionHistory|manager_email/i);
+  assert.match(serialized, /change_request|приняты/i);
 });
 
 async function runTests() {

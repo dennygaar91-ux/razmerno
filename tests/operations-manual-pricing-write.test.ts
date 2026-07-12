@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import manualPricingDraftHandler from "../api/operations/manual-pricing-draft";
 import { createAdminSessionToken } from "../api/_shared/admin-auth";
@@ -356,6 +357,18 @@ test("manual pricing draft mapper returns safe read model", () => {
   assert.equal(draft.manualTotalPrice, 123000);
   assert.equal(draft.status, "draft");
   assert.match(draft.manualTotalPriceLabel, /123/);
+});
+
+test("manual pricing draft does not leak into customer order detail DTO", () => {
+  const customerOrderDetailTypes = readFileSync("api/_shared/customer-order-detail-types.ts", "utf8");
+  const customerOrderDetailCard = readFileSync("src/static-pages/account/CustomerOrderDetailCard.tsx", "utf8");
+  const customerWorkspace = readFileSync("api/customer/workspace.ts", "utf8");
+  const productionExportContract = readFileSync("tests/production-export-contract.test.ts", "utf8");
+
+  assert.doesNotMatch(customerOrderDetailTypes, /manualPricingDraft|manual_pricing_draft/i);
+  assert.doesNotMatch(customerOrderDetailCard, /manualPricingDraft|manual_pricing_draft/i);
+  assert.doesNotMatch(customerWorkspace, /order_manual_pricing_drafts/i);
+  assert.match(productionExportContract, /excludes customer, pricing and internal operations fields/);
 });
 
 async function runTests() {
