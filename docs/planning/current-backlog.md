@@ -9,9 +9,11 @@
 Governance note:
 
 - `docs/planning/accepted-backlog-decisions-v1.md` is a mandatory decision layer for interpreting backlog tasks.
+- `docs/planning/local-vs-formal-closure-governance.md` defines **Closed — Local** vs **Closed — Formal** (Package 13).
 - `docs/planning/current-backlog.md` remains the main backlog source of truth.
 - If `current-backlog.md` and accepted decisions appear to conflict, stop and request reconciliation.
-- Release v1 documentation hierarchy: `accepted-backlog-decisions-v1.md` §18 → RPES → `mvp-scope.md` / `release-roadmap.md` → this backlog. Governance traceability below does not change task status or closure evidence.
+- Source hierarchy: accepted decisions §19 → local closure governance → RPES → planning → backlog → code/tests.
+- **Closed — Local** is not release readiness and does not replace merge/main/live/deploy verification.
 
 ## Planning Layer Compression Note
 
@@ -39,7 +41,46 @@ Derived reports should be archived or deleted after their actionable evidence is
 
 No task may be closed from derived-report evidence alone.
 
-### Active branch blockers (retained from derived reports — not closure)
+### Package 13 — Local vs Formal Status Reconciliation (2026-07-12)
+
+Governance model: `docs/planning/local-vs-formal-closure-governance.md`. RPES mapping: `docs/planning/rpes-local-formal-reconciliation.md`. Audit input: `artifacts/audit/full-project-audit/`. **Not formal closure. Not release readiness.**
+
+| Item | Local status | Formal status | Evidence | Deferred gaps | Formal closure blockers |
+|------|--------------|---------------|----------|---------------|-------------------------|
+| **P0-03** | Closed — Local eligible | Formal Pending | `test:pricing-parity-contract`, `test:pricing-final-branch-verification-contract`, `test:checkout-submit-hook`; migration `20260626_add_order_pricing_source_attribution.sql` | Legacy constructor pricing paths remain for Basis export | merge/main; optional live pricing smoke |
+| **P0-13** | Closed — Local eligible | Formal Pending | same + P0-13 fixtures in checkout hook | PR #43 not merged | merge/main release workflow |
+| **P1-11A** | Closed — Local eligible | Formal Pending | `test:production-final-branch-verification-contract` | v2/v3 scope decision on main | merge/main; factory acceptance |
+| **P1-11B** | Closed — Local eligible | Formal Pending | `test:production-export-contract`, production-final contracts | golden count expansion | merge/main |
+| **P1-27** | Closed — Local (MVP subset) | Formal Pending | `test:customer-platform-mvp-boundary-contract`, `npm test` customer suite | D-16 email-code, D-15 cancellation, D-13 visual | merge/main; visual approval |
+| **P1-28** | Closed — Local (MVP subset) | Formal Pending | `test:operations-mvp-boundary-contract`, operations flow tests | D-07 Approval View, extended P2-09/P2-25, D-13 visual | merge/main; visual approval |
+| **M8-P1-02** | Partially verified (RLS live only) | Formal Pending | `verify:order-status-events-rls-live` PASS; `verify:live:dry-run` | Full live provider/order-flow not executed | live order-flow smoke; merge/main |
+| **M8-P1-05** | Verified — Local RC | Formal Pending | RC gate 15/15 PASS; `closureClaimed: false` | D-13 excluded from gate | visual; deploy; merge/main |
+| **M9-P1-02** | Verified — Local (partial hardening) | Formal Pending | operations workspace/decision tests | extended auth hardening on main | merge/main |
+| **M9-P1-03** | Closed — Local (manual retry semantics) | Formal Pending | `test:email-retry-failure-contract` | **Not claimed:** automatic retry queue | merge/main |
+| **D-13** | Deferred by User | Not Closed | D-13 tooling; no human PASS | human visual approval | preview URL; user reopens scope |
+| **D-14** | Documented only (process) | Not Closed | `d14-pr-strategy.md` | N/A | N/A |
+| **D-16** | Deferred by User | Not Closed | `test:customer-platform-mvp-boundary-contract` | email-code profile flow | user scope |
+| **order_status_events RLS** | Verified — Live; Closed — Local eligible | Formal Pending | live probe PASS; anon `[]`; service_role 200 | Does not close full M8-P1-02 | merge/main |
+| **manual payment flow** | Closed — Local | Formal Pending | `test:manual-payment-flow-contract`, payment confirmation tests | — | merge/main |
+| **customer change request** | Closed — Local | Formal Pending | `test:customer-change-request*`, change-request contract | D-15 cancellation separate | merge/main |
+| **operations decision history** | Closed — Local | Formal Pending | `test:operations-decision-flow-contract`, RLS migration prep | — | merge/main |
+| **manual pricing draft** | Closed — Local | Formal Pending | `test:operations-manual-pricing-*` | draft-only boundary | merge/main |
+| **production/Basis manual boundary** | Closed — Local | Formal Pending | `test:production-export-contract`; no auto-B3D | v4 RPES vs v3 runtime | P1-11A; merge/main |
+| **visual QA deferred scope** | Deferred by User | Not Closed | user deferral; RC excludes D-13 | all visual surfaces | user reopens D-13 |
+| **remote preview/deploy** | Future explicit workflow | Not Verified | no stable preview URL on branch | — | user-approved deploy workflow |
+| **formal merge/main QA** | Future explicit workflow | Not Performed | branch-local evidence only | — | user chooses merge workflow |
+
+### Active branch snapshot (Package 13 — supersede stale 2026-07-08 blockers where noted)
+
+- **P1-27 / P1-28:** **Closed — Local (MVP subset)**; Formal Pending — governance reconciled; see Package 13 table.
+- **D-13:** **Deferred by User**; Formal Not Closed.
+- **order_status_events RLS:** **Verified — Live** (manual SQL + read-only probe PASS) — supersedes prior "RLS disabled" note.
+- **RC gate:** **15/15 PASS** local; not release readiness.
+- **P0-03 / P0-13 / P1-11A/B:** **Closed — Local eligible**; Formal Pending.
+- **Remote Vercel preview/deploy:** not verified on current branch.
+- **Formal merge/main/GitHub QA:** not performed.
+
+### Active branch blockers (retained from derived reports — formal layer only)
 
 - **P1-25 / P1-26 / P1-27 / P1-28:** `needs reconciliation`; not closure.
 - **P1-27 local readiness:** PARTIAL (customer platform audit local package).
@@ -367,7 +408,22 @@ Local branch evidence note:
 
 ### P0-03 Pricing Engine Validation
 
-Статус: open.
+Статус: open (legacy field). **Local status:** Closed — Local eligible. **Formal status:** Formal Pending.
+
+Local status:
+Closed — Local eligible (local-contract verified).
+
+Formal status:
+Formal Pending.
+
+Evidence:
+`test:pricing-parity-contract`, `test:pricing-final-branch-verification-contract`, `test:checkout-submit-hook`; migration `20260626_add_order_pricing_source_attribution.sql`.
+
+Deferred gaps:
+Legacy constructor/manual export pricing under `src/constructor/**` retained for Basis paths.
+
+Formal closure blockers:
+merge/main release workflow; optional live pricing smoke.
 
 Зачем: цена должна быть точной.
 
@@ -528,7 +584,22 @@ Reconciliation note: базовая QA/CI/testing foundation закрыта ин
 
 ### P0-13 Pricing Golden Fixtures & Parity
 
-Статус: open.
+Статус: open (legacy field). **Local status:** Closed — Local eligible. **Formal status:** Formal Pending.
+
+Local status:
+Closed — Local eligible (local-contract verified).
+
+Formal status:
+Formal Pending.
+
+Evidence:
+`test:pricing-parity-contract`, `test:pricing-final-branch-verification-contract`, `test:checkout-submit-hook` (P0-13 fixtures).
+
+Deferred gaps:
+PR #43 open/not merged.
+
+Formal closure blockers:
+merge/main release workflow.
 
 Зачем: гарантировать точную цену на клиенте и сервере.
 
@@ -916,7 +987,22 @@ Accepted decisions note: PR #51 must not be merged as-is; MVP production snapsho
 
 ### P1-11A — Resolve Production Golden Snapshot Scope
 
-Статус: open.
+Статус: open (legacy field). **Local status:** Closed — Local eligible. **Formal status:** Formal Pending.
+
+Local status:
+Closed — Local eligible (local-contract verified for active v3 path).
+
+Formal status:
+Formal Pending.
+
+Evidence:
+`test:production-final-branch-verification-contract`.
+
+Deferred gaps:
+Formal v2/v3 scope decision on main.
+
+Formal closure blockers:
+merge/main; PR #51 reconciliation.
 
 Owner: 07 Production / Manufacturing Agent + 05 Infrastructure / QA Agent.
 
@@ -933,7 +1019,22 @@ Closure condition:
 
 ### P1-11B — Production v3 Golden Snapshots
 
-Статус: open.
+Статус: open (legacy field). **Local status:** Closed — Local eligible. **Formal status:** Formal Pending.
+
+Local status:
+Closed — Local eligible (local-contract verified).
+
+Formal status:
+Formal Pending.
+
+Evidence:
+`test:production-export-contract`, `test:production-final-branch-verification-contract`.
+
+Deferred gaps:
+Expand golden case count per backlog closure conditions.
+
+Formal closure blockers:
+merge/main; factory/Basis acceptance if required.
 
 Owner: 07 Production / Manufacturing Agent.
 
@@ -1111,9 +1212,24 @@ Guardrail for future UX tasks:
 
 ### P1-27 — Customer Platform MVP Scope Reconciliation
 
-Статус: needs reconciliation.
+Статус: needs reconciliation (legacy field). **Local status:** Closed — Local (MVP subset). **Formal status:** Formal Pending.
 
-Why: RPES Volume VII requires auth, cabinet, saved configuration continuity, project/order lists and post-submit visibility, while current backlog has no dedicated scope-decision task for this gap and current repo evidence does not confirm a matching customer UI surface.
+Local status:
+Closed — Local for MVP subset (auth, cabinet, projects, orders, notifications, change requests).
+
+Formal status:
+Formal Pending.
+
+Evidence:
+`test:customer-platform-mvp-boundary-contract`; `npm test` customer flow suite; `api/customer/**`, `src/static-pages/account/**`.
+
+Deferred gaps:
+D-16 email-code profile verification; D-15 cancellation request; D-13 human visual approval.
+
+Formal closure blockers:
+merge/main; visual approval when scope reopens.
+
+Why: RPES Volume VII requires auth, cabinet, saved configuration continuity, project/order lists and post-submit visibility. Branch implementation now covers MVP subset; governance reconciled Package 13 — supersede stale "UI not confirmed" wording below where it conflicts.
 
 Governance traceability note (2026-06-26 final pass): Release v1 planning (`mvp-scope.md`, RPES VII, `accepted-backlog-decisions-v1.md` §18) now explicitly treats customer platform as Release v1-required. This task remains `needs reconciliation` until merged/main implementation inventory and closure evidence exist — documentation alignment alone does not close the task.
 
@@ -1778,9 +1894,24 @@ Do-not-touch constraints:
 
 ### P1-28 — Admin MVP Scope Boundary Reconciliation
 
-Статус: needs reconciliation.
+Статус: needs reconciliation (legacy field). **Local status:** Closed — Local (MVP subset). **Formal status:** Formal Pending.
 
-Why: RPES Volume VIII and accepted decisions define a minimal MVP admin scope, but open tasks such as `P2-09` and `P2-25` already point toward a broader operations platform without an explicit planning boundary.
+Local status:
+Closed — Local for MVP subset (operations workspace, manual review, decisions, manual pricing draft, payment confirmation, completion).
+
+Formal status:
+Formal Pending.
+
+Evidence:
+`test:operations-mvp-boundary-contract`, `test:operations-workflow-security-contract`; `api/operations/**`.
+
+Deferred gaps:
+D-07 standalone Approval View; extended P2-09/P2-25; D-13 visual approval.
+
+Formal closure blockers:
+merge/main; visual approval when scope reopens.
+
+Why: RPES Volume VIII and accepted decisions define MVP operations boundary. Branch implements Order Operations Workspace MVP subset; Package 13 governance reconciled local vs formal layers.
 
 Governance traceability note (2026-06-26 final pass): `accepted-backlog-decisions-v1.md` §18 reconciles §12 minimal admin floor with Release v1 Order Operations Workspace (RPES VIII). Extended tracks (`P2-09`, `P2-25`) remain open; this task stays `needs reconciliation` until merged/main boundary evidence closes the gap between floor and workspace scope.
 
@@ -2892,7 +3023,19 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
   - main verification passed after merge: local `main` fast-forwarded to `723a0351`, working tree clean.
 
 #### M8-P1-02 — Live provider and Supabase persistence verification
-- Status: open
+- Status: open (legacy field)
+- **Local status:** Partially verified (order_status_events RLS live PASS only; full live provider/order-flow not executed)
+- **Formal status:** Formal Pending
+- Local status:
+  Partially verified — RLS live probe PASS does **not** equal full M8-P1-02 completion.
+- Formal status:
+  Formal Pending.
+- Evidence:
+  `npm run verify:order-status-events-rls-live` PASS; `verify:live:dry-run`; anon `[]`, service_role 200.
+- Deferred gaps:
+  Full production-like insert/read order flow; safe email live smoke.
+- Formal closure blockers:
+  Live order-flow smoke; merge/main.
 - Area: Supabase / live providers
 - Product-visible: no
 - Related existing task: Live Provider / Supabase Order Flow Verification, P0-14
@@ -2939,7 +3082,19 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Suggested agent: 05 Infrastructure / QA Agent
 
 #### M8-P1-05 — MVP release candidate checklist
-- Status: open
+- Status: open (legacy field)
+- **Local status:** Verified — Local RC (15/15 PASS; not release readiness)
+- **Formal status:** Formal Pending
+- Local status:
+  Verified — Local RC — `check:release-candidate-local --execute` 15/15; `closureClaimed: false`.
+- Formal status:
+  Formal Pending.
+- Evidence:
+  RC gate script; `test:release-candidate-gate-contract`.
+- Deferred gaps:
+  D-13 visual excluded from gate by design.
+- Formal closure blockers:
+  visual; deploy; merge/main; live provider beyond scoped checks.
 - Area: release readiness
 - Product-visible: yes
 - Related existing task: QA Release Maturity Matrix, P1-21, P2-26
@@ -2958,7 +3113,17 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Suggested agent: 05 Infrastructure / QA Agent
 
 #### M9-P1-02 — Admin and manager workflow hardening
-- Status: open
+- Status: open (legacy field)
+- **Local status:** Verified — Local (partial hardening on branch)
+- **Formal status:** Formal Pending
+- Local status:
+  Verified — Local — workspace, decisions, audit paths covered by operations tests.
+- Formal status:
+  Formal Pending.
+- Evidence:
+  `test:operations-workspace`, `test:operations-decision-flow-contract`.
+- Formal closure blockers:
+  merge/main; extended auth hardening evidence.
 - Area: admin / operations
 - Product-visible: yes
 - Related existing task: P2-25, P2-09
@@ -2967,7 +3132,19 @@ Decision-layer note: all `M8-*` tasks must be interpreted through `docs/planning
 - Committed evidence note: `020ba133` adds a safe admin order summary baseline, and `b433fa2e` aligns admin pricing semantics with persisted stored snapshot fields. This is partial evidence only; status change, manager notes, auth hardening and audit trail closure evidence are still `not verified`.
 
 #### M9-P1-03 — Email retry and failure queue
-- Status: open
+- Status: open (legacy field)
+- **Local status:** Closed — Local (manual retry / manual attention semantics)
+- **Formal status:** Formal Pending
+- Local status:
+  Closed — Local for manual retry and manual attention semantics.
+- Formal status:
+  Formal Pending.
+- Evidence:
+  `test:email-retry-failure-contract`, `test:checkout-submit-hook` notification policy locks.
+- Deferred gaps:
+  **Not claimed:** automatic retry queue.
+- Formal closure blockers:
+  merge/main if formal queue scope is later approved.
 - Area: notifications
 - Product-visible: yes
 - Related existing task: API Order Notification Failure Contracts
