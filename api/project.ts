@@ -13,7 +13,7 @@ import {
   getConstructorProjectById,
   updateConstructorProject,
 } from './_shared/constructor-projects-store'
-import { isValidProjectId } from './_shared/constructor-project-types'
+import { isValidProjectId, isActiveProject } from './_shared/constructor-project-types'
 import { logEvent } from './_shared/logger'
 import {
   isFailureResult,
@@ -54,6 +54,10 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     }
 
     if (!isProjectOwnedByUser(loaded.project.user_id, auth.user.userId)) {
+      return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
+    }
+
+    if (!isActiveProject(loaded.project)) {
       return res.status(404).json({ ok: false, message: PROJECT_NOT_FOUND_MESSAGE })
     }
 
