@@ -22,8 +22,10 @@ const BLOCKED_KEYS = [
 
 const EMAIL_PATTERN = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
 const RU_PHONE_PATTERN = /(?:\+?7|8)[\s\-()]*\d{3}[\s\-()]*\d{3}[\s\-()]*\d{2}[\s\-()]*\d{2}/g;
-const STREET_ADDRESS_PATTERN = /(?:ул\.|улица|проспект|пр-т|дом|д\.|квартира|кв\.)\s*[^,;\n]{1,80}/gi;
-const REGION_ADDRESS_PATTERN = /(?:Москва|Московская область)\s*,\s*[^;\n]{1,120}/gi;
+const STREET_ADDRESS_PATTERN =
+  /(?:ул\.?|улица|проспект|пр-т|дом|д\.?|квартира|кв\.?)\s*[^,;\n]{1,80}/gi;
+const REGION_ADDRESS_PATTERN =
+  /(?:Москва|Московская область)\s*,\s*[^;\n]{1,120}/gi;
 
 function truncate(value: string): string {
   return value.length > 500 ? `${value.slice(0, 500)}...` : value;
@@ -33,8 +35,8 @@ function redactText(value: string): string {
   return value
     .replace(EMAIL_PATTERN, "[redacted-email]")
     .replace(RU_PHONE_PATTERN, "[redacted-phone]")
-    .replace(STREET_ADDRESS_PATTERN, "[redacted-address]")
-    .replace(REGION_ADDRESS_PATTERN, "[redacted-address]");
+    .replace(REGION_ADDRESS_PATTERN, "[redacted-address]")
+    .replace(STREET_ADDRESS_PATTERN, "[redacted-address]");
 }
 
 function redactValue(key: string, value: LogValue): LogValue {
