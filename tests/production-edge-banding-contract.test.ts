@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import { DEFAULT_FACTORY_PROFILE } from "../src/constructor/production/factoryProfile";
 import { buildProductionExportFromPayload } from "../src/constructor/production/orderExportPackage";
@@ -27,6 +28,35 @@ const BODY_EDGE_ROLES = new Set([
 ]);
 const FACADE_EDGE_ROLES = new Set(["facade-door", "drawer-front"]);
 const NO_EDGE_ROLES = new Set(["back-panel", "drawer-bottom"]);
+
+const FORBIDDEN_EXPORT_PATTERNS = [
+  /"totalPrice"/,
+  /"priceBreakdown"/,
+  /"price_breakdown"/,
+  /"customer_name"/,
+  /"customer_phone"/,
+  /"customer_email"/,
+  /"customerEmail"/,
+  /"manualPricingDraft"/,
+  /"catalog_source_used"/,
+  /"pricing_source_diagnostic"/,
+  /"pricing_fallback_reason"/,
+] as const;
+
+const PII_FIXTURES = {
+  name: "Иван Петров",
+  phone: "+7 999 111-22-33",
+  email: "client@example.com",
+} as const;
+
+function assertForbiddenFieldsAbsent(serialized: string, label: string) {
+  for (const pattern of FORBIDDEN_EXPORT_PATTERNS) {
+    assert.doesNotMatch(serialized, pattern, `${label}: forbidden field pattern ${pattern}`);
+  }
+  assert.ok(!serialized.includes(PII_FIXTURES.email), `${label}: must exclude customer email`);
+  assert.ok(!serialized.includes(PII_FIXTURES.phone), `${label}: must exclude customer phone`);
+  assert.ok(!serialized.includes(PII_FIXTURES.name), `${label}: must exclude customer name`);
+}
 
 function assertEdgeBandingPolicy(exportPack: ProductionExportPackage, label: string) {
   const panelById = new Map(exportPack.productionModel.panels.map((panel) => [panel.id, panel]));
@@ -81,6 +111,95 @@ test("P1-24 production export applies all-sides edge banding policy on body and 
   });
   const exportPack = buildProductionExportFromPayload(payload);
   assertEdgeBandingPolicy(exportPack, "mixed filling wardrobe");
+});
+
+test("P1-24 accepted MVP decision is documented in factory profile and contract", () => {
+  const accepted = readFileSync("docs/planning/accepted-backlog-decisions-v1.md", "utf8");
+  assert.match(accepted, /кромку 1 мм/i);
+  assert.match(accepted, /кромку 2 мм/i);
+  assert.equal(DEFAULT_FACTORY_PROFILE.edgeBanding.otherThicknessMm, 1);
+  assert.equal(DEFAULT_FACTORY_PROFILE.edgeBanding.facadeThicknessMm, 2);
+  assert.equal(DEFAULT_FACTORY_PROFILE.edgeBanding.edgeAllSides, true);
+});
+
+test("P1-24 production export does not leak monetary or PII data in edge banding output", () => {
+  const payload = makeValidOrder({
+    customer: { ...PII_FIXTURES, comment: "Позвонить после 12:00" },
+    consent: {
+      personalData: true,
+      privacyVersion: "2026-05-24",
+      acceptedAt: "2026-06-23T18:00:00.000Z",
+    },
+  });
+  const exportPack = buildProductionExportFromPayload(payload);
+  assertForbiddenFieldsAbsent(JSON.stringify(exportPack), "edge banding export");
+  assert.ok(exportPack.productionModel.edgeBanding.length > 0, "expected edge banding entries");
+});
+
+test("P1-24 edge banding geometry is independent of customer pricing payload", () => {
+  const lowPrice = makeValidOrder({
+    totalPrice: 10_000,
+    priceBreakdown: {
+      body: 4_000,
+      facades: 3_000,
+      filling: 1_000,
+      hardware: 500,
+      production: 0,
+      materials: 7_000,
+      edgeBanding: 500,
+      services: 500,
+      delivery: 0,
+      assembly: 0,
+    },
+    consent: {
+      personalData: true,
+      privacyVersion: "2026-05-24",
+      acceptedAt: "2026-06-23T18:00:00.000Z",
+    },
+  });
+  const highPrice = makeValidOrder({
+    totalPrice: 250_000,
+    priceBreakdown: {
+      body: 120_000,
+      facades: 80_000,
+      filling: 20_000,
+      hardware: 10_000,
+      production: 0,
+      materials: 200_000,
+      edgeBanding: 20_000,
+      services: 10_000,
+      delivery: 0,
+      assembly: 0,
+    },
+    consent: {
+      personalData: true,
+      privacyVersion: "2026-05-24",
+      acceptedAt: "2026-06-23T18:00:00.000Z",
+    },
+  });
+
+  const lowExport = buildProductionExportFromPayload(lowPrice);
+  const highExport = buildProductionExportFromPayload(highPrice);
+
+  assert.equal(
+    lowExport.productionModel.totals.edgeBandingLengthMm,
+    highExport.productionModel.totals.edgeBandingLengthMm,
+  );
+  assert.deepEqual(lowExport.productionModel.edgeBanding, highExport.productionModel.edgeBanding);
+});
+
+test("P1-24 export does not claim production v4 active runtime", () => {
+  const exportPack = buildProductionExportFromPayload(makeValidOrder());
+  const serialized = JSON.stringify(exportPack);
+  assert.equal(exportPack.project.meta.schemaVersion, 3);
+  assert.equal(exportPack.schema, "razmerno.production-export.v1");
+  assert.doesNotMatch(serialized, /production-export\.v4|"schemaVersion":\s*4/);
+});
+
+test("P1-24 basis boundary remains manual JSON not auto-B3D", () => {
+  const exportPack = buildProductionExportFromPayload(makeValidOrder());
+  assert.equal(exportPack.basis.status, "manual-json-ready");
+  assert.doesNotMatch(JSON.stringify(exportPack), /create-b3d|"documentType":"b3d"/);
 });
 
 test("P1-24 edge banding length totals are deterministic for identical input", () => {
