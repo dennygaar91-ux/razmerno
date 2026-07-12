@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import { DEFAULT_FACTORY_PROFILE } from "../src/constructor/production/factoryProfile";
 import { buildProductionExportFromPayload } from "../src/constructor/production/orderExportPackage";
@@ -105,6 +106,25 @@ test("P1-23 export does not emit 4 mm HDF panels", () => {
     (panel) => panel.materialType === "hdf" && panel.thicknessMm !== MVP_HDF_THICKNESS_MM,
   );
   assert.deepEqual(invalidHdf, []);
+});
+
+test("P1-23 accepted MVP decision is documented in factory profile and contract", () => {
+  const accepted = readFileSync("docs/planning/accepted-backlog-decisions-v1.md", "utf8");
+  assert.match(accepted, /3\s*мм|3\s*mm/i);
+  assert.equal(DEFAULT_FACTORY_PROFILE.materials.backPanel.thicknessMm, MVP_HDF_THICKNESS_MM);
+  assert.doesNotMatch(
+    readFileSync("tests/production-hdf-thickness-contract.test.ts", "utf8"),
+    /4\s*mm.*default|default.*4\s*mm/i,
+  );
+});
+
+test("P1-23 golden export snapshots align with 3 mm HDF MVP rule", () => {
+  const wardrobePayload = makeValidOrder();
+  const exportPack = buildProductionExportFromPayload(wardrobePayload);
+  const hdfPanels = exportPack.productionModel.panels.filter((panel) => panel.materialType === "hdf");
+  for (const panel of hdfPanels) {
+    assert.equal(panel.thicknessMm, MVP_HDF_THICKNESS_MM);
+  }
 });
 
 async function runTests() {
