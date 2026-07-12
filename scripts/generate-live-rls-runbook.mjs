@@ -20,6 +20,63 @@ export const RUNBOOK_TARGET_TABLE = 'public.order_status_events'
 export const RUNBOOK_JSON_NAME = 'order-status-events-rls-runbook.json'
 export const RUNBOOK_MD_NAME = 'order-status-events-rls-runbook.md'
 
+export const ADDITIONAL_PLANNED_PROBE_TABLES = [
+  {
+    table: 'public.profiles',
+    migrationFile: 'supabase/migrations/20260623_add_customer_profiles.sql',
+    probeStatus: 'planned-not-executed',
+    expectedAnonBehavior: 'deny-all',
+    expectedAuthenticatedBehavior: 'deny-all',
+    expectedServiceRoleBehavior: 'api-only-writes',
+    readOnlyProbeSafe: true,
+  },
+  {
+    table: 'public.constructor_projects',
+    migrationFile: 'supabase/migrations/20260703_add_constructor_projects.sql',
+    probeStatus: 'planned-not-executed',
+    expectedAnonBehavior: 'deny-all',
+    expectedAuthenticatedBehavior: 'deny-all',
+    expectedServiceRoleBehavior: 'api-only-writes',
+    readOnlyProbeSafe: true,
+  },
+  {
+    table: 'public.order_change_requests',
+    migrationFile: 'supabase/migrations/20260703_add_order_change_requests.sql',
+    probeStatus: 'planned-not-executed',
+    expectedAnonBehavior: 'deny-all',
+    expectedAuthenticatedBehavior: 'deny-all',
+    expectedServiceRoleBehavior: 'api-only-writes',
+    readOnlyProbeSafe: true,
+  },
+  {
+    table: 'public.order_notifications',
+    migrationFile: 'supabase/migrations/20260703_add_order_notifications.sql',
+    probeStatus: 'planned-not-executed',
+    expectedAnonBehavior: 'deny-all',
+    expectedAuthenticatedBehavior: 'deny-all',
+    expectedServiceRoleBehavior: 'api-only-writes',
+    readOnlyProbeSafe: true,
+  },
+  {
+    table: 'public.order_manual_pricing_drafts',
+    migrationFile: 'supabase/migrations/20260705_add_order_manual_pricing_drafts.sql',
+    probeStatus: 'planned-not-executed',
+    expectedAnonBehavior: 'deny-all',
+    expectedAuthenticatedBehavior: 'deny-all',
+    expectedServiceRoleBehavior: 'api-only-writes',
+    readOnlyProbeSafe: true,
+  },
+  {
+    table: 'public.orders',
+    migrationFile: 'db/orders.sql',
+    probeStatus: 'planned-not-executed',
+    expectedAnonBehavior: 'deny-all',
+    expectedAuthenticatedBehavior: 'deny-all',
+    expectedServiceRoleBehavior: 'api-only-writes',
+    readOnlyProbeSafe: true,
+  },
+]
+
 export const BACKUP_RECOMMENDATIONS = [
   'Capture current pg_policy rows for public.order_status_events before apply',
   'Record current relrowsecurity state from pg_class',
@@ -71,6 +128,10 @@ export function buildLiveRlsRunbook(options = {}) {
     safetyConstraints: SAFETY_CONSTRAINTS,
     nonClosureReminder:
       'This runbook does not apply migrations, deploy, merge, or claim release closure.',
+    additionalPlannedProbes: ADDITIONAL_PLANNED_PROBE_TABLES,
+    additionalProbesExecuted: false,
+    additionalProbesExecutionNote:
+      'Additional table probes are planned for a future approved live verification package. This package does not execute them.',
     relatedArtifacts: [
       'artifacts/live/rls-apply-plan.json',
       'artifacts/live/rls-apply-plan.md',
@@ -126,6 +187,14 @@ export function renderLiveRlsRunbookMarkdown(runbook) {
     '',
     '## Safety constraints',
     ...runbook.safetyConstraints.map((item) => `- ${item}`),
+    '',
+    '## Additional planned read-only probes (not executed)',
+    ...(runbook.additionalPlannedProbes ?? []).map(
+      (item) =>
+        `- ${item.table}: status=${item.probeStatus}; anon=${item.expectedAnonBehavior}; authenticated=${item.expectedAuthenticatedBehavior}; service_role=${item.expectedServiceRoleBehavior}; migration=${item.migrationFile}`,
+    ),
+    '',
+    runbook.additionalProbesExecutionNote ?? '',
     '',
     runbook.nonClosureReminder,
   ].join('\n')

@@ -10,6 +10,7 @@ import {
   createChangeRequestNotificationBestEffort,
   createManualPaymentConfirmationNotificationBestEffort,
   createOperationsDecisionNotificationBestEffort,
+  createOrderCompletionNotificationBestEffort,
   createOrderCreatedNotificationBestEffort,
 } from "../api/_shared/customer-notification-events";
 import {
@@ -753,6 +754,63 @@ test("unread count endpoint returns zero for user without unread notifications",
   assert.equal(snapshot().statusCode, 200);
   assert.equal(body.ok, true);
   assert.equal(body.unreadCount, 0);
+});
+
+test("mapCustomerNotification excludes forbidden internal response keys", () => {
+  const mapped = mapCustomerNotification({
+    ...sampleNotificationRow,
+    user_id: USER_ID,
+  });
+  const serialized = JSON.stringify(mapped);
+  for (const key of CUSTOMER_NOTIFICATION_FORBIDDEN_RESPONSE_KEYS) {
+    assert.doesNotMatch(serialized, new RegExp(`"${key}"`));
+  }
+  assert.equal(mapped.id, NOTIFICATION_ID);
+  assert.equal(mapped.orderId, ORDER_ID);
+});
+
+test("order completion notification remains customer-safe", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const store = installNotificationStoreMock();
+
+  await createOrderCompletionNotificationBestEffort({
+    requestId: "req-order-complete",
+    businessOrderId: "RZ-20260705-1001",
+  });
+
+  const inserts = store.getInserts();
+  assert.equal(inserts.length, 1);
+  assert.match(inserts[0]?.message ?? "", /заверш/i);
+  assert.doesNotMatch(inserts[0]?.message ?? "", /internal|audit|manager_notes|production_export/i);
+});
+
+test("notifications list DTO never exposes user_id or raw operations diagnostics", async () => {
+  restoreEnvironment();
+  setRequiredServerEnv();
+  installNotificationStoreMock();
+  const { res, snapshot } = createMockResponse();
+
+  await notificationsHandler(
+    {
+      method: "GET",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: `Bearer ${ACCESS_TOKEN}`,
+      },
+      body: null,
+    },
+    res,
+  );
+
+  const body = snapshot().body as { notifications: Array<Record<string, unknown>> };
+  assert.equal(snapshot().statusCode, 200);
+  for (const notification of body.notifications) {
+    const keys = Object.keys(notification);
+    for (const forbidden of CUSTOMER_NOTIFICATION_FORBIDDEN_RESPONSE_KEYS) {
+      assert.equal(keys.includes(forbidden), false, `forbidden key ${forbidden}`);
+    }
+  }
 });
 
 async function runTests() {

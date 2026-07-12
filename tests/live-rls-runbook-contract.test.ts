@@ -7,6 +7,7 @@ import {
 } from "../scripts/plan-live-rls-apply.mjs";
 import {
   RUNBOOK_TARGET_TABLE,
+  ADDITIONAL_PLANNED_PROBE_TABLES,
   buildLiveRlsRunbook,
   parseLiveRlsRunbookArgs,
   writeLiveRlsRunbookArtifacts,
@@ -65,4 +66,21 @@ test("live RLS runbook generator avoids deploy merge push and automatic apply wo
   assert.doesNotMatch(SOURCE, /git push|gh pr create|vercel deploy/i);
 });
 
-console.log("\n5 passed");
+test("live RLS runbook documents additional planned probes without executing them", () => {
+  const runbook = buildLiveRlsRunbook({ args: parseLiveRlsRunbookArgs([]) });
+  assert.equal(runbook.additionalProbesExecuted, false);
+  assert.ok(Array.isArray(runbook.additionalPlannedProbes));
+  assert.equal(runbook.additionalPlannedProbes.length, ADDITIONAL_PLANNED_PROBE_TABLES.length);
+  const tables = runbook.additionalPlannedProbes.map((item: { table: string }) => item.table);
+  assert.ok(tables.includes("public.profiles"));
+  assert.ok(tables.includes("public.order_notifications"));
+  assert.ok(tables.includes("public.constructor_projects"));
+  assert.ok(tables.includes("public.orders"));
+  for (const probe of runbook.additionalPlannedProbes) {
+    assert.equal(probe.probeStatus, "planned-not-executed");
+    assert.equal(probe.readOnlyProbeSafe, true);
+  }
+  assert.match(String(runbook.additionalProbesExecutionNote), /does not execute/i);
+});
+
+console.log("\n6 passed");
