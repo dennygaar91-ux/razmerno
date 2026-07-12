@@ -74,6 +74,17 @@ test("P1-27 deferred customer final price / Approval View is not falsely claimed
   assert.match(CHANGE_REQUEST_CONTRACT, /totalPriceMutations/);
 });
 
+test("D-15/D-16/D-07 deferred MVP features are not exposed as finished flows", () => {
+  const backlog = readFileSync("docs/planning/current-backlog.md", "utf8");
+  const operationsBoundary = readFileSync("tests/operations-mvp-boundary-contract.test.ts", "utf8");
+
+  assert.match(backlog, /D-15[\s\S]{0,300}Deferred|deferred/i);
+  assert.match(backlog, /D-16[\s\S]{0,300}Deferred|deferred/i);
+  assert.match(backlog, /D-07[\s\S]{0,300}Deferred|deferred/i);
+  assert.doesNotMatch(ORDER_DETAIL_CARD, /код подтверждения email|email-code verification complete/i);
+  assert.match(operationsBoundary, /deferred Approval View/i);
+});
+
 function runTests() {
   for (const item of tests) {
     item.run();

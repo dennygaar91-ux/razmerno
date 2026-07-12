@@ -77,6 +77,17 @@ test("P1-28 deferred Approval View is not falsely represented as completed MVP s
   assert.doesNotMatch(readFileSync("src/shared/operations/reviewTypes.ts", "utf8"), /Approval View MVP complete/i);
 });
 
+test("deferred production v4 replacement and D-13 visual closure are not falsely claimed", () => {
+  const productionBoundary = readFileSync("tests/production-json-v4-support-policy.test.ts", "utf8");
+  const governance = readFileSync("tests/governance-closure-wording-contract.test.ts", "utf8");
+  const backlog = readFileSync("docs/planning/current-backlog.md", "utf8");
+
+  assert.match(productionBoundary, /v4 support policy layer is isolated from active v3 runtime export path/i);
+  assert.match(governance, /D-13[\s\S]{0,200}Deferred by User/i);
+  assert.match(backlog, /D-13[\s\S]{0,200}Deferred by User/i);
+  assert.doesNotMatch(backlog, /D-13[\s\S]{0,120}Closed — Formal/i);
+});
+
 function runTests() {
   for (const item of tests) {
     item.run();
