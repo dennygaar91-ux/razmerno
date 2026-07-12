@@ -104,6 +104,36 @@ export const EVIDENCE_TRACKS = [
     evidence: 'Branch-local evidence only on task/epic-b-projects-foundation',
     remainingCondition: 'Push/PR/merge only when user chooses',
   },
+  {
+    track: 'Package 15 local hardening batch',
+    category: 'Local-contract verified',
+    evidence: 'WebGL E2E; customer RLS static; golden+2; v3/v4 boundary; status matrix; payment lifecycle; CR lock; pricing isolation; governance sync; deferred guards',
+    remainingCondition: 'Formal Pending unchanged; no duplicate re-implementation unless regression',
+  },
+  {
+    track: 'Package 17 local hardening batch II',
+    category: 'Local-contract verified',
+    evidence: 'RC script sync; PII/observability; ops double-action; project resume; constructor ownership; idempotency; P1-23 HDF; notifications DTO; RLS runbook plan; public order number DTO',
+    remainingCondition: 'Formal Pending unchanged; live probes beyond order_status_events not executed',
+  },
+  {
+    track: 'P1-23 HDF 3 mm production policy',
+    category: 'Local-contract verified',
+    evidence: 'test:production-hdf-thickness-contract',
+    remainingCondition: 'Factory handoff / Basis closure not claimed',
+  },
+  {
+    track: 'public order number RZM_ DTO consistency',
+    category: 'Local-contract verified',
+    evidence: 'test:customer-workspace; test:customer-order-detail',
+    remainingCondition: 'Formal merge/main evidence still pending',
+  },
+  {
+    track: 'expanded RLS runbook planning',
+    category: 'Local-contract verified',
+    evidence: 'test:live-rls-runbook-contract; test:live-rls-apply-plan-contract; plan:rls-readonly-probes',
+    remainingCondition: 'Per-table live probes remain planned-not-executed',
+  },
 ]
 
 export const REQUIRED_WORDING = [

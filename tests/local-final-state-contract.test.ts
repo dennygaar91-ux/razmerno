@@ -75,4 +75,12 @@ test("local final state generator includes evidence tracks and non-closure wordi
   assert.match(SOURCE, /closureClaimed:\s*false/);
 });
 
-console.log("\n5 passed");
+test("local final state generator includes Package 15 and Package 17 hardening tracks", () => {
+  assert.match(SOURCE, /Package 15 local hardening batch/);
+  assert.match(SOURCE, /Package 17 local hardening batch II/);
+  assert.match(SOURCE, /P1-23 HDF 3 mm production policy/);
+  assert.match(SOURCE, /public order number RZM_ DTO consistency/);
+  assert.match(SOURCE, /expanded RLS runbook planning/);
+});
+
+console.log("\n6 passed");
