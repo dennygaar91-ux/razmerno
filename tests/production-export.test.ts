@@ -787,6 +787,200 @@ test("manufacturing specification: mixed drawers shelves rod preserves blocked r
   });
 });
 
+test("manufacturing specification: compact single-section wardrobe stays stable", () => {
+  const payload = makePayload({
+    orderId: "RZ-20260623-9006",
+    dimensions: { width: 1200, height: 2000, depth: 500 },
+    sections: 1,
+  });
+  assertManufacturingSpecificationInvariants(payload, "compact single-section spec");
+
+  const { snapshot } = extractManufacturingSpecSnapshot(payload);
+  assert.deepEqual(snapshot, {
+    derivedFrom: {
+      productionExportSchema: "razmerno.production-export.v1",
+      productionModelSchema: "razmerno.production-model.v3",
+      basisBoundary: "manual-json",
+    },
+    product: {
+      productType: "wardrobe",
+      sectionCount: 1,
+      facadeMode: "hinged",
+      openingMode: "handle-soft-close",
+      hardwareMode: "base",
+      materials: {
+        bodyMaterialId: "white-matt",
+        facadeMaterialId: "white-matt",
+        backPanelMaterialId: "white-matt",
+        bodyThicknessMm: 16,
+        facadeThicknessMm: 16,
+        backPanelThicknessMm: 3,
+      },
+    },
+    cutList: {
+      totalPanels: 10,
+      roleTotals: {
+        "back-panel": 1,
+        bottom: 1,
+        "facade-door": 2,
+        plinth: 1,
+        shelf: 2,
+        "side-left": 1,
+        "side-right": 1,
+        top: 1,
+      },
+    },
+    edgeBanding: {
+      totalEdges: 36,
+      totalLengthMm: 35358,
+      byThickness: {
+        1: { count: 28, totalLengthMm: 25464 },
+        2: { count: 8, totalLengthMm: 9894 },
+      },
+    },
+    hardware: {
+      totalItems: 18,
+      byType: { confirmat: 4, handle: 2, hinge: 8, "shelf-support": 4 },
+    },
+    drilling: {
+      totalOperations: 18,
+      requiresTechnologistCheck: true,
+      byPurpose: { confirmat: 4, handle: 2, "hinge-cup": 8, "shelf-support": 4 },
+    },
+    operations: {
+      basisManualPlanStepCount: 121,
+      byAction: {
+        "add-user-property": 17,
+        "create-drilling": 18,
+        "create-panel": 10,
+        "group-object": 2,
+        "place-hardware": 18,
+        "set-edge": 36,
+        "set-face-side": 10,
+        "set-material": 10,
+      },
+      byStatus: { "needs-check": 36, ready: 85 },
+    },
+    validation: {
+      status: "ready-for-review",
+      errorCount: 0,
+      warningCount: 14,
+      productionWarningCodes: [],
+      rulesStatus: "ready-for-review",
+    },
+    review: {
+      status: "requires-review",
+      requiresTechnologistCheck: true,
+      manualChangesAllowed: true,
+      visibleToClient: false,
+    },
+    basisManualJson: {
+      status: "manual-json-ready",
+      doesNotGenerateB3d: true,
+      manualPlanStepCount: 121,
+    },
+  });
+});
+
+test("manufacturing specification: triple-section wide wardrobe stays stable", () => {
+  const payload = makePayload({
+    orderId: "RZ-20260623-9007",
+    dimensions: { width: 2700, height: 2400, depth: 600 },
+    sections: 3,
+  });
+  assertManufacturingSpecificationInvariants(payload, "triple-section wide spec");
+
+  const { snapshot } = extractManufacturingSpecSnapshot(payload);
+  assert.deepEqual(snapshot, {
+    derivedFrom: {
+      productionExportSchema: "razmerno.production-export.v1",
+      productionModelSchema: "razmerno.production-model.v3",
+      basisBoundary: "manual-json",
+    },
+    product: {
+      productType: "wardrobe",
+      sectionCount: 3,
+      facadeMode: "hinged",
+      openingMode: "handle-soft-close",
+      hardwareMode: "base",
+      materials: {
+        bodyMaterialId: "white-matt",
+        facadeMaterialId: "white-matt",
+        backPanelMaterialId: "white-matt",
+        bodyThicknessMm: 16,
+        facadeThicknessMm: 16,
+        backPanelThicknessMm: 3,
+      },
+    },
+    cutList: {
+      totalPanels: 16,
+      roleTotals: {
+        "back-panel": 1,
+        bottom: 1,
+        "facade-door": 6,
+        plinth: 1,
+        shelf: 2,
+        "side-left": 1,
+        "side-right": 1,
+        top: 1,
+        "vertical-partition": 2,
+      },
+    },
+    edgeBanding: {
+      totalEdges: 60,
+      totalLengthMm: 80324.66666666666,
+      byThickness: {
+        1: { count: 36, totalLengthMm: 47578.66666666666 },
+        2: { count: 24, totalLengthMm: 32745.999999999993 },
+      },
+    },
+    hardware: {
+      totalItems: 44,
+      byType: { confirmat: 4, handle: 6, hinge: 30, "shelf-support": 4 },
+    },
+    drilling: {
+      totalOperations: 44,
+      requiresTechnologistCheck: true,
+      byPurpose: { confirmat: 4, handle: 6, "hinge-cup": 30, "shelf-support": 4 },
+    },
+    operations: {
+      basisManualPlanStepCount: 233,
+      byAction: {
+        "add-user-property": 35,
+        "create-drilling": 44,
+        "create-panel": 16,
+        "group-object": 2,
+        "place-hardware": 44,
+        "set-edge": 60,
+        "set-face-side": 16,
+        "set-material": 16,
+      },
+      byStatus: { "needs-check": 88, ready: 145 },
+    },
+    validation: {
+      status: "ready-for-review",
+      errorCount: 0,
+      warningCount: 31,
+      productionWarningCodes: [
+        { code: "many-hinges", severity: "warn", count: 6 },
+        { code: "tall-facade", severity: "warn", count: 3 },
+      ],
+      rulesStatus: "ready-for-review",
+    },
+    review: {
+      status: "requires-review",
+      requiresTechnologistCheck: true,
+      manualChangesAllowed: true,
+      visibleToClient: false,
+    },
+    basisManualJson: {
+      status: "manual-json-ready",
+      doesNotGenerateB3d: true,
+      manualPlanStepCount: 233,
+    },
+  });
+});
+
 test("manufacturing specification: material-aware body and facade materials stay stable", () => {
   const payload = makePayload({
     orderId: "RZ-20260623-9004",
