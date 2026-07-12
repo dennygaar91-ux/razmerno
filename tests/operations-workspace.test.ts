@@ -204,6 +204,65 @@ test("operations workspace GET returns 401 without bearer token", async () => {
   assert.deepEqual(result.body, { ok: false, message: "Unauthorized" });
 });
 
+test("operations workspace GET returns 401 for malformed Authorization header", async () => {
+  setRequiredServerEnv();
+  const { res, snapshot } = createMockResponse();
+  await workspaceHandler(
+    { method: "GET", headers: { authorization: "NotBearer bad-token" }, body: null },
+    res,
+  );
+  const result = snapshot();
+  assert.equal(result.statusCode, 401);
+  assert.deepEqual(result.body, { ok: false, message: "Unauthorized" });
+  assert.doesNotMatch(JSON.stringify(result.body), /stack|secret|ADMIN_API_KEY/i);
+});
+
+test("operations workspace GET returns 401 for wrong X-Admin-Key", async () => {
+  setRequiredServerEnv();
+  const { res, snapshot } = createMockResponse();
+  await workspaceHandler(
+    {
+      method: "GET",
+      headers: { "x-admin-key": "wrong-admin-key-with-minimum-length" },
+      body: null,
+    },
+    res,
+  );
+  const result = snapshot();
+  assert.equal(result.statusCode, 401);
+  assert.deepEqual(result.body, { ok: false, message: "Unauthorized" });
+});
+
+test("operations workspace GET returns 401 for expired admin session token", async () => {
+  setRequiredServerEnv();
+  const nineHoursAgo = Date.now() - 9 * 60 * 60 * 1000;
+  const expiredToken = createAdminSessionToken(nineHoursAgo);
+  const { res, snapshot } = createMockResponse();
+  await workspaceHandler(
+    { method: "GET", headers: { authorization: `Bearer ${expiredToken}` }, body: null },
+    res,
+  );
+  const result = snapshot();
+  assert.equal(result.statusCode, 401);
+  assert.deepEqual(result.body, { ok: false, message: "Unauthorized" });
+});
+
+test("operations workspace GET returns 401 for customer access token", async () => {
+  setRequiredServerEnv();
+  const { res, snapshot } = createMockResponse();
+  await workspaceHandler(
+    {
+      method: "GET",
+      headers: { authorization: "Bearer customer-only-access-token" },
+      body: null,
+    },
+    res,
+  );
+  const result = snapshot();
+  assert.equal(result.statusCode, 401);
+  assert.deepEqual(result.body, { ok: false, message: "Unauthorized" });
+});
+
 test("operations workspace GET returns safe read model for authorized admin session", async () => {
   setRequiredServerEnv();
   installOperationsOrdersFetchMock();

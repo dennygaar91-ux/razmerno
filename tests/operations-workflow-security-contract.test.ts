@@ -22,6 +22,17 @@ test("M9-P1-02 operations APIs return 401 without bearer token", () => {
   assert.match(OPERATIONS_CHANGE, /returns 401 without bearer token/);
 });
 
+test("M9-P1-02 operations APIs reject malformed expired and wrong-key auth", () => {
+  assert.match(OPERATIONS_WORKSPACE, /returns 401 for malformed Authorization header/);
+  assert.match(OPERATIONS_WORKSPACE, /returns 401 for wrong X-Admin-Key/);
+  assert.match(OPERATIONS_WORKSPACE, /returns 401 for expired admin session token/);
+  assert.match(OPERATIONS_WORKSPACE, /returns 401 for customer access token/);
+});
+
+test("M9-P1-02 operations auth rejection responses do not leak secrets", () => {
+  assert.match(OPERATIONS_WORKSPACE, /doesNotMatch\(JSON\.stringify\(result\.body\), \/stack\|secret\|ADMIN_API_KEY\/i\)/);
+});
+
 test("M9-P1-02 safe DTO contract forbids raw PII and production export leakage", () => {
   assert.match(MANUAL_PRICING, /forbids raw PII production export/);
 });
