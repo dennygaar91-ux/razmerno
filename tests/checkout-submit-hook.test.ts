@@ -1864,6 +1864,46 @@ test("API order flow fails when order persistence fails", async () => {
   assert.ok(((result.json as { message?: string }).message ?? "").length > 0);
 });
 
+test("API failed persistence does not mark idempotency as successful for replay", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock({ failSupabaseInsert: true });
+  const body = makeValidOrder({ orderId: "RZ-20260620-4010" });
+
+  const failed = await callOrderHandler(body, { idempotencyKey: "RZ-20260620-4010" });
+  assert.equal(failed.statusCode, 502);
+  assert.equal(records.filter((record) => record.url.includes("api.resend.com/emails")).length, 0);
+
+  restoreEnvironment();
+  setRequiredServerEnv();
+  const retryRecords = installServerFetchMock();
+  const retry = await callOrderHandler(body, { idempotencyKey: "RZ-20260620-4010" });
+  assert.equal(retry.statusCode, 200);
+  assert.equal(
+    retryRecords.filter((record) => record.url.includes("api.resend.com/emails")).length,
+    2,
+    "first successful attempt after failed persistence should send notifications once",
+  );
+});
+
+test("API idempotent replay skips manager and customer notification resend", async () => {
+  setRequiredServerEnv();
+  const records = installServerFetchMock();
+  const body = makeValidOrder({ orderId: "RZ-20260620-4011" });
+  const key = "RZ-20260620-4011";
+
+  const first = await callOrderHandler(body, { idempotencyKey: key });
+  assert.equal(first.statusCode, 200);
+  const emailsAfterFirst = records.filter((record) => record.url.includes("api.resend.com/emails")).length;
+
+  const replay = await callOrderHandler(body, { idempotencyKey: key });
+  assert.equal(replay.statusCode, 200);
+  assert.equal(
+    records.filter((record) => record.url.includes("api.resend.com/emails")).length,
+    emailsAfterFirst,
+    "idempotent replay must not resend notifications",
+  );
+});
+
 test("API order flow rejects invalid payload and unsupported methods", async () => {
   setRequiredServerEnv();
   installServerFetchMock();
