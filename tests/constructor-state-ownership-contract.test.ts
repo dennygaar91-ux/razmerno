@@ -161,6 +161,32 @@ test("M8-P0-02 active constructor route resolves to Constructor3D, not legacy pa
   assert.match(appSource, /constructor-legacy/);
 });
 
+test("M8-P0-02 order submit recomputes server price and does not trust client totalPrice", () => {
+  const ordersSource = readFileSync("api/orders.ts", "utf8");
+  assert.match(ordersSource, /calculateServerOrderPriceResolved/);
+  assert.match(ordersSource, /withServerPrice/);
+  assert.doesNotMatch(ordersSource, /total_price:\s*body\.totalPrice/);
+});
+
+test("M8-P0-02 submit payload excludes operations-owned and transient UI fields", () => {
+  const payload = buildOrderPayloadFromConstructor(baseSnapshot, quote);
+  const serialized = JSON.stringify(payload);
+  assert.doesNotMatch(serialized, /domain_status|domainStatus|reviewDecisionAllowed|manager_notes/);
+  assert.doesNotMatch(serialized, /selectedSectionId|selectedCompartmentId|selectedZoneId/);
+  assert.equal(payload.source, "constructor-store-adapter");
+});
+
+test("M8-P0-02 project snapshot and order payload boundaries stay distinct", () => {
+  const orderPayload = buildOrderPayloadFromConstructor(baseSnapshot, quote);
+  const productionOrder = buildProductionOrderRequestFromConstructor(baseSnapshot, quote);
+  const exportPack = buildProductionExportFromPayload(productionOrder);
+  const exportSerialized = JSON.stringify(exportPack);
+
+  assert.ok("customer" in orderPayload);
+  assert.ok("totalPrice" in orderPayload);
+  assert.doesNotMatch(exportSerialized, /totalPrice|priceBreakdown|customer_email/);
+});
+
 function runTests() {
   for (const item of tests) {
     item.run();
