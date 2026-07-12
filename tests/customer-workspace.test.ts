@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import workspaceHandler from "../api/customer/workspace";
 import { CUSTOMER_UNAUTHORIZED_MESSAGE } from "../api/_shared/customer-api-auth";
@@ -9,6 +10,7 @@ import {
   mapWorkspaceProfile,
   mapWorkspaceProject,
 } from "../api/_shared/customer-workspace-types";
+import { PUBLIC_ORDER_NUMBER_PATTERN } from "../api/_shared/order-domain";
 import type { ConstructorProject } from "../api/_shared/constructor-project-types";
 import type { CustomerProfile } from "../api/_shared/customer-profile";
 import type { CustomerOrderListRow } from "../api/_shared/customer-orders-store";
@@ -357,6 +359,39 @@ test("buildCustomerWorkspaceForUser excludes archived projects from workspace li
   assert.equal(built.workspace.projects.length, 1);
   assert.equal(built.workspace.stats.activeProjects, 1);
   assert.equal(built.workspace.projects[0]?.title, "Активный проект");
+});
+
+test("workspace order DTO uses publicOrderNumber pattern distinct from business order id", () => {
+  const mapped = mapWorkspaceOrder({
+    id: "660e8400-e29b-41d4-a716-446655440030",
+    public_order_number: "RZM_0001",
+    order_id: "RZ-20260703-3001",
+    domain_status: "На проверке",
+    created_at: "2026-07-03T10:00:00.000Z",
+    total_price: 86400,
+    product_type: "wardrobe",
+    dimensions: { width: 1800, height: 2400, depth: 600 },
+    delivery_enabled: false,
+    delivery_price: 0,
+    delivery_address: null,
+    assembly_enabled: false,
+    assembly_price: 0,
+  } as CustomerOrderListRow);
+
+  assert.match(mapped.publicOrderNumber ?? "", PUBLIC_ORDER_NUMBER_PATTERN);
+  assert.equal(mapped.publicOrderNumber, "RZM_0001");
+  assert.notEqual(mapped.publicOrderNumber, mapped.id);
+  assert.doesNotMatch(mapped.publicOrderNumber ?? "", /^RZ-\d{8}-\d{4}$/);
+});
+
+test("customer workspace and detail share accepted publicOrderNumber format", () => {
+  const workspaceTypes = readFileSync("api/_shared/customer-workspace-types.ts", "utf8");
+  const detailTypes = readFileSync("api/_shared/customer-order-detail-types.ts", "utf8");
+  const notifications = readFileSync("api/_shared/customer-notification-events.ts", "utf8");
+  assert.match(workspaceTypes, /publicOrderNumber/);
+  assert.match(detailTypes, /publicOrderNumber/);
+  assert.match(notifications, /publicOrderNumber|public_order_number/);
+  assert.match(String(PUBLIC_ORDER_NUMBER_PATTERN), /RZM_/);
 });
 
 async function runTests() {

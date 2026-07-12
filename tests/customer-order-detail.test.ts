@@ -355,6 +355,13 @@ test("customer order status matrix covers all domain statuses with safe labels a
   assert.doesNotMatch(timeline, /manufacturing|drilling|basisExport/i);
 });
 
+test("order detail keeps publicOrderNumber separate from internal business order id", () => {
+  const detailTypes = readFileSync("api/_shared/customer-order-detail-types.ts", "utf8");
+  assert.match(detailTypes, /publicOrderNumber/);
+  assert.match(detailTypes, /public_order_number/);
+  assert.doesNotMatch(detailTypes, /publicOrderNumber:\s*row\.id/);
+});
+
 async function runTests() {
   for (const item of tests) {
     await item.run();
