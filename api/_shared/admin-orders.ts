@@ -1,11 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
+import { INITIAL_ORDER_DOMAIN_STATUS } from './order-domain'
+import { normalizeSupabaseProjectUrl } from './supabase-url'
 
 export type AdminOrderSummary = {
   id: string
   status: string
+  domainStatus: string
   createdAt: string | null
+  updatedAt: string | null
   product: string
   totalPrice: number
+  priceBreakdown: Record<string, number> | null
   delivery: {
     enabled: boolean
     price: number
@@ -14,6 +19,13 @@ export type AdminOrderSummary = {
   assembly: {
     enabled: boolean
     price: number
+    basePrice: number | null
+  }
+  pricing: {
+    status: 'final server snapshot'
+    source: string
+    diagnostic: string | null
+    fallbackReason: string | null
   }
   customer: {
     nameMasked: string
@@ -37,25 +49,32 @@ export type AdminOrderSummary = {
 type OrderDbRow = {
   order_id: string
   status: string | null
+  domain_status: string | null
   created_at?: string | null
+  updated_at?: string | null
   product_type: string | null
   dimensions: { width?: number; height?: number; depth?: number } | null
   total_price: number | null
+  price_breakdown: Record<string, number> | null
   delivery_enabled: boolean | null
   delivery_price: number | null
   delivery_address: string | null
   assembly_enabled: boolean | null
   assembly_price: number | null
+  assembly_base_price: number | null
   customer_name: string | null
   customer_phone: string | null
   customer_email: string | null
   manager_email_status: string | null
   customer_email_status: string | null
   production_export: unknown | null
+  catalog_source_used?: string | null
+  pricing_source_diagnostic?: string | null
+  pricing_fallback_reason?: string | null
 }
 
 function getSupabaseAdminClient() {
-  const url = process.env.SUPABASE_URL
+  const url = normalizeSupabaseProjectUrl(process.env.SUPABASE_URL)
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) throw new Error('Supabase admin env is not configured')
 
@@ -93,7 +112,6 @@ function maskAddress(value: string | null): string | null {
   if (clean.toLowerCase().includes('мкад')) return 'Адрес за МКАД скрыт'
   return 'Адрес скрыт'
 }
-
 
 function productionSummary(value: unknown): AdminOrderSummary['production'] {
   const fallback = {
@@ -141,13 +159,38 @@ function productLabel(row: OrderDbRow): string {
   return `${type} ${size}`
 }
 
+function mapPricingAttribution(row: OrderDbRow): AdminOrderSummary['pricing'] {
+  const catalogSource = row.catalog_source_used?.trim() || null
+  if (!catalogSource) {
+    return {
+      status: 'final server snapshot',
+      source: 'source attribution not persisted',
+      diagnostic: null,
+      fallbackReason: null,
+    }
+  }
+
+  return {
+    status: 'final server snapshot',
+    source: catalogSource,
+    diagnostic: row.pricing_source_diagnostic?.trim() || null,
+    fallbackReason: row.pricing_fallback_reason?.trim() || null,
+  }
+}
+
 export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
   return {
     id: row.order_id,
     status: row.status ?? 'new',
+    domainStatus:
+      typeof row.domain_status === 'string' && row.domain_status.trim().length > 0
+        ? row.domain_status
+        : INITIAL_ORDER_DOMAIN_STATUS,
     createdAt: row.created_at ?? null,
+    updatedAt: row.updated_at ?? null,
     product: productLabel(row),
     totalPrice: row.total_price ?? 0,
+    priceBreakdown: row.price_breakdown ?? null,
     delivery: {
       enabled: row.delivery_enabled === true,
       price: row.delivery_price ?? 0,
@@ -156,7 +199,9 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
     assembly: {
       enabled: row.assembly_enabled === true,
       price: row.assembly_price ?? 0,
+      basePrice: row.assembly_base_price ?? null,
     },
+    pricing: mapPricingAttribution(row),
     customer: {
       nameMasked: maskName(row.customer_name),
       phoneMasked: maskPhone(row.customer_phone),
@@ -170,12 +215,30 @@ export function mapOrderRow(row: OrderDbRow): AdminOrderSummary {
   }
 }
 
+const ADMIN_ORDER_SELECT =
+  'order_id,status,domain_status,created_at,updated_at,product_type,dimensions,total_price,price_breakdown,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,assembly_base_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason'
+
+export async function getAdminOrderByOrderId(orderId: string): Promise<AdminOrderSummary | null> {
+  const supabase = getSupabaseAdminClient()
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select(ADMIN_ORDER_SELECT)
+    .eq('order_id', orderId)
+    .maybeSingle()
+
+  if (error) throw new Error(error.message)
+  if (!data) return null
+
+  return mapOrderRow(data as OrderDbRow)
+}
+
 export async function listAdminOrders(limit = 50): Promise<AdminOrderSummary[]> {
   const supabase = getSupabaseAdminClient()
 
   const { data, error } = await supabase
     .from('orders')
-    .select('order_id,status,created_at,product_type,dimensions,total_price,delivery_enabled,delivery_price,delivery_address,assembly_enabled,assembly_price,customer_name,customer_phone,customer_email,manager_email_status,customer_email_status,production_export')
+    .select(ADMIN_ORDER_SELECT)
     .order('created_at', { ascending: false })
     .limit(Math.min(Math.max(limit, 1), 100))
 
@@ -183,8 +246,6 @@ export async function listAdminOrders(limit = 50): Promise<AdminOrderSummary[]> 
 
   return (data ?? []).map((row) => mapOrderRow(row as OrderDbRow))
 }
-
-
 
 export type AdminProductionDetail = {
   orderId: string
@@ -235,7 +296,6 @@ export async function updateAdminOrderStatus(orderId: string, status: AdminOrder
   if (auditError) throw new Error(auditError.message)
 }
 
-
 export type AdminStatusEvent = {
   id: number
   orderId: string
@@ -278,7 +338,6 @@ export async function listAdminStatusEvents(limit = 50): Promise<AdminStatusEven
 
   return (data ?? []).map((row) => mapStatusEvent(row as OrderStatusEventRow))
 }
-
 
 export async function getAdminProductionDetail(orderId: string): Promise<AdminProductionDetail> {
   const supabase = getSupabaseAdminClient()

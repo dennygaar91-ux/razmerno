@@ -7,6 +7,8 @@ import {
   type ConstructorSnapshot,
 } from "./constructorPayload";
 import type { QuoteState } from "../types";
+import "./constructorCheckoutReview.test";
+import "./productionPreviewAdapter.test";
 
 function assert(condition: unknown, message: string) {
   if (!condition) throw new Error(message);
@@ -133,6 +135,29 @@ test("adapter: order payload contains layout and production-safe basics", () => 
   assert(payload.delivery?.price === quote.deliveryQuote.price, "Expected delivery price");
   assert(payload.assembly?.price === quote.assemblyQuote.price, "Expected assembly price");
   assert(payload.consent.acceptedAt === "2026-01-01T00:00:00.000Z", "Expected deterministic acceptedAt");
+});
+
+test("adapter: payload boundary excludes UI-only scene and exact-mode state", () => {
+  const payload = buildOrderPayloadFromConstructor(
+    {
+      ...baseSnapshot,
+      selectedSectionId: "section-1",
+      selectedCompartmentId: "section-1-compartment-1",
+    },
+    quote,
+    {
+      source: "constructor-store-adapter",
+    },
+  );
+
+  const payloadText = JSON.stringify(payload);
+  assert(payload.source === "constructor-store-adapter", "Expected explicit payload source");
+  assert(!payloadText.includes("sceneRenderMode"), "Payload must not serialize scene render mode");
+  assert(!payloadText.includes("sceneViewMode"), "Payload must not serialize scene view mode");
+  assert(!payloadText.includes("advancedSizes"), "Payload must not serialize UI-only advanced sizes flag");
+  assert(!payloadText.includes("advancedFill"), "Payload must not serialize UI-only advanced fill flag");
+  assert(!payloadText.includes("exactModeEnabled"), "Payload must not serialize exact mode UI flag");
+  assert(!payloadText.includes("\"step\""), "Payload must not serialize wizard step");
 });
 
 test("adapter: draft excludes PII", () => {

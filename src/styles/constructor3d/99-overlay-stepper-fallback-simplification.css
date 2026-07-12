@@ -16,29 +16,70 @@
 @media (min-width: 1101px) {
   .rzm-3d-stagebar {
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 12px;
+    gap: 16px;
   }
 
   .rzm-3d-stepper {
-    grid-template-columns: repeat(4, minmax(96px, 1fr));
-    gap: 7px;
+    grid-template-columns: repeat(4, minmax(148px, 1fr));
+    gap: 12px;
   }
 
   .rzm-3d-step {
-    min-height: 38px;
-    padding: 5px 8px;
-    gap: 6px;
+    min-height: 50px;
+    padding: 8px 14px 8px 12px;
+    gap: 10px;
+    border-radius: 18px;
+    align-items: center;
+    overflow: visible;
   }
 
   .rzm-3d-step-index {
-    width: 24px;
-    height: 24px;
-    font-size: 10px;
+    width: 26px;
+    height: 26px;
+    font-size: 10.5px;
+  }
+
+  .rzm-3d-step-copy {
+    align-content: center;
+    gap: 2px;
+    padding-top: 1px;
+    overflow: visible;
+  }
+
+  .rzm-3d-step > span.rzm-3d-step-copy {
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    border-radius: 0 !important;
+    background: transparent !important;
+    place-items: initial !important;
   }
 
   .rzm-3d-step-title {
-    font-size: 11px;
-    letter-spacing: -.02em;
+    font-size: 12.5px;
+    line-height: 1.16;
+    letter-spacing: -.025em;
+    white-space: normal;
+    text-wrap: balance;
+    overflow: visible;
+    text-overflow: clip;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .rzm-3d-step > span.rzm-3d-step-copy > span.rzm-3d-step-title {
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    display: block !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    place-items: initial !important;
   }
 }
 
@@ -186,6 +227,29 @@
     transform: translateZ(0) scale(.9);
     transform-origin: center;
   }
+
+  .rzm-3d-scene-info {
+    min-height: 54px;
+    margin-top: 14px;
+    padding: 0 18px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .94), rgba(248, 248, 251, .84));
+    box-shadow:
+      0 12px 30px rgba(42, 44, 65, .05),
+      inset 0 0 0 1px rgba(229, 231, 239, .96);
+  }
+
+  .rzm-3d-scene-info span {
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(42, 44, 65, .5);
+  }
+
+  .rzm-3d-scene-info strong {
+    font-size: 14px;
+    letter-spacing: -.03em;
+  }
 }
 
 @media (max-width: 1100px) {
@@ -259,36 +323,109 @@
 /* WebGL fallback: separate status, preview and actions. */
 .rzm-3d-blueprint-fallback {
   grid-template-rows: auto minmax(260px, 1fr) auto;
-  gap: 12px;
-  padding: 16px;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, .76), transparent 46%),
+    linear-gradient(180deg, rgba(245, 246, 249, .96), rgba(238, 240, 245, .88));
   overflow: hidden auto;
 }
 
 .rzm-3d-blueprint-status {
   overflow: hidden;
+  gap: 8px 12px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .82);
+  box-shadow:
+    0 16px 36px rgba(42, 44, 65, .06),
+    inset 0 0 0 1px rgba(229, 231, 239, .94);
 }
 
 .rzm-3d-blueprint-status span {
   max-width: 100%;
+  min-height: 24px;
+  padding-inline: 10px;
+  border-radius: 999px;
+  background: rgba(42, 44, 65, .06);
+  color: rgba(42, 44, 65, .58);
+  font-size: 10px;
+  font-weight: 820;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
 .rzm-3d-blueprint-status strong {
-  font-size: 13px;
-  line-height: 1.2;
+  font-size: 15px;
+  line-height: 1.24;
+  color: #2a2c41;
 }
 
 .rzm-3d-blueprint-status small {
-  font-size: 11px;
-  line-height: 1.3;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(42, 44, 65, .62);
 }
 
 .rzm-3d-blueprint-actions {
   position: static;
   z-index: 2;
+  width: 100%;
+  justify-self: stretch;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 0;
 }
 
 .rzm-3d-blueprint-actions .rzm-ui-btn {
   white-space: normal;
+  min-height: 42px;
+  border-radius: 16px;
+  padding-inline: 14px;
+}
+
+.rzm-3d-blueprint-actions .rzm-ui-btn--ghost {
+  background: rgba(255, 255, 255, .72);
+  color: rgba(42, 44, 65, .82);
+  box-shadow: inset 0 0 0 1px rgba(42, 44, 65, .12);
+}
+
+.rzm-3d-shell--q9 .rzm-3d-runtime-status {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  min-height: 52px;
+  padding: 12px 14px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .88), rgba(247, 248, 251, .78));
+  box-shadow:
+    0 14px 32px rgba(42, 44, 65, .04),
+    inset 0 0 0 1px rgba(229, 231, 239, .92);
+}
+
+.rzm-3d-shell--q9 .rzm-3d-runtime-status > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(42, 44, 65, .06);
+  color: #2a2c41;
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: .04em;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-runtime-status > span + span {
+  color: rgba(42, 44, 65, .62);
+  font-weight: 720;
+}
+
+.rzm-3d-shell--q9 .rzm-3d-runtime-status em {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: .02em;
 }
 
 .rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-random-chip,
@@ -298,6 +435,12 @@
 .rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-legend,
 .rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-scene-legend {
   display: none;
+}
+
+.rzm-3d-shell .rzm-3d-scene-card:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-info {
+  margin-top: 8px;
+  background: rgba(255, 255, 255, .7);
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 239, .78);
 }
 
 @media (max-width: 760px) {

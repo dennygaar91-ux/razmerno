@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { submitOrder, validateCustomer } from "../../../shared/lib/order";
 import { buildOrderPayloadFromConstructor, type ConstructorSnapshot } from "../adapters/constructorPayload";
 import { loadPricingModules } from "../pricingLoader";
+import { warnConstructorSystemConsistencyInDev } from "../validation";
 import type {
   ConstructorFormErrors,
   QuoteState,
@@ -13,6 +14,8 @@ interface UseConstructorSubmitArgs {
   quote: QuoteState | null;
   onStepChange: (step: StepKey) => void;
   onDraftSave: () => void;
+  accessToken?: string | null;
+  projectId?: string | null;
 }
 
 const RESUBMIT_COOLDOWN_MS = 30_000;
@@ -23,6 +26,8 @@ export function useConstructorSubmit({
   quote,
   onStepChange,
   onDraftSave,
+  accessToken,
+  projectId,
 }: UseConstructorSubmitArgs) {
   const [errors, setErrors] = useState<ConstructorFormErrors>({});
   const [submitStatus, setSubmitStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -91,14 +96,16 @@ export function useConstructorSubmit({
     const payload = buildOrderPayloadFromConstructor(snapshot, quote, {
       source: "constructor-store-adapter",
     });
+    warnConstructorSystemConsistencyInDev(snapshot, quote, payload);
 
-    const result = await submitOrder(payload);
+    const result = await submitOrder(payload, { accessToken, projectId });
 
     if (result.ok) {
       setSubmitStatus("success");
       setLastSuccessAt(Date.now());
       setNowMs(Date.now());
-      setSubmitMessage(`Заявка ${result.orderId ?? ""} отправлена. Мы свяжемся с вами для проверки размеров и сметы.`);
+      const orderLabel = result.publicOrderNumber ?? result.orderId ?? "";
+      setSubmitMessage(`Заявка ${orderLabel} отправлена. Мы свяжемся с вами для проверки размеров и сметы.`);
       onDraftSave();
       return;
     }
@@ -112,6 +119,8 @@ export function useConstructorSubmit({
     quote,
     isCooldownActive,
     cooldownRemainingMs,
+    accessToken,
+    projectId,
   ]);
 
   return {

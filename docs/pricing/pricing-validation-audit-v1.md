@@ -1,5 +1,7 @@
 # Pricing Validation Audit v1 — Размерно
 
+> **Предупреждение об устаревании (2026-06-26):** Это исторический audit snapshot. Выводы могут быть устаревшими относительно ветки `task/p0-03-pricing-source-lock`. Текущий authority: RPES VI (`docs/specification/volume-06-pricing-engine/README.md`), `docs/planning/pricing-source-of-truth-lock-v1.md`, backlog-задачи `P0-03` / `P0-13` в `docs/planning/current-backlog.md`. Не использовать этот audit для закрытия или переоткрытия задач без проверки текущего кода и backlog evidence.
+
 Дата: 2026-06-14  
 Статус: audit-only  
 Роль: Pricing Lead  

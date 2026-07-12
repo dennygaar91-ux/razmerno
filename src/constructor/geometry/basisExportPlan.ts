@@ -5,10 +5,10 @@
  * который описывает, что технологу/скрипту нужно сделать
  * в БАЗИС, чтобы получить модель из productionModel.
  *
- * Делается по-честному:
- *  - status "ready"      — действие можно автоматизировать прямо сейчас
+ * Делается по-честному (MVP = manual JSON only, не automatic .b3d):
+ *  - status "ready"      — шаг описан в плане; технолог выполняет вручную в БАЗИС
  *  - status "needs-check"— нужна ручная проверка технологом
- *  - status "future"     — для этого нужна доработка API/скрипта
+ *  - status "future"     — для этого нужна post-MVP доработка скрипта/API
  */
 import type {
   BasisExportPlanStep,
@@ -39,7 +39,7 @@ export function buildBasisExportPlan(input: BuildPlanInput): BasisExportPlanStep
       units: "mm",
       coordinateSystem: "right-handed, origin = front-bottom-left",
     },
-    note: "Создаётся 3D-документ изделия. В БАЗИС это «Новый объект».",
+    note: "Корневой объект изделия. Технолог вручную создаёт 3D-документ в БАЗИС (manual JSON plan, не automatic .b3d).",
     status: "ready",
   });
 
@@ -167,7 +167,7 @@ export function buildBasisExportPlan(input: BuildPlanInput): BasisExportPlanStep
     action: "group-object",
     targetId: "root",
     payload: { action: "finalize", panelCount: input.panels.length },
-    note: "Сгруппировать всё в изделие и подготовить спецификацию.",
+    note: "Сгруппировать всё в изделие и подготовить спецификацию (ручной шаг технолога в БАЗИС).",
     status: "ready",
   });
 

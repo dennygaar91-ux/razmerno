@@ -5,6 +5,10 @@ type ComparableOrderRecord = Omit<
   OrderDbInsert,
   | "order_id"
   | "status"
+  | "user_id"
+  | "public_order_number"
+  | "domain_status"
+  | "constructor_project_id"
   | "manager_email_status"
   | "customer_email_status"
   | "manager_email_error"
@@ -38,6 +42,10 @@ function toComparableRecord(record: OrderDbInsert): ComparableOrderRecord {
   const {
     order_id: _orderId,
     status: _status,
+    user_id: _userId,
+    public_order_number: _publicOrderNumber,
+    domain_status: _domainStatus,
+    constructor_project_id: _constructorProjectId,
     manager_email_status: _managerEmailStatus,
     customer_email_status: _customerEmailStatus,
     manager_email_error: _managerEmailError,
@@ -77,6 +85,9 @@ function fromStoredOrderRecord(record: StoredOrderRecord): ComparableOrderRecord
     consent: record.consent,
     config_version: record.config_version,
     utm: record.utm,
+    catalog_source_used: record.catalog_source_used,
+    pricing_source_diagnostic: record.pricing_source_diagnostic,
+    pricing_fallback_reason: record.pricing_fallback_reason,
   };
 }
 

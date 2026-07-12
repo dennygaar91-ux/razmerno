@@ -19,6 +19,7 @@ export function useCheckoutSubmit({
   assemblyEnabled,
   consentAccepted,
   onSuccess,
+  accessToken,
 }: {
   state: ConfigState;
   price: PriceBreakdown | CatalogPriceBreakdown;
@@ -29,6 +30,7 @@ export function useCheckoutSubmit({
   assemblyEnabled: boolean;
   consentAccepted: boolean;
   onSuccess: (orderId: string) => void;
+  accessToken?: string | null;
 }) {
   const [errors, setErrors] = useState<CheckoutErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,7 +77,7 @@ export function useCheckoutSubmit({
         deliveryAddress,
         assemblyEnabled,
         consentAccepted,
-      }));
+      }), { accessToken });
 
       if (result.ok && result.orderId) {
         onSuccess(result.orderId);

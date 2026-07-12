@@ -1,7 +1,4 @@
-import pricingConfig from "../../config/pricing.json";
 import {
-  calculatePriceCore,
-  quickEstimateCore,
   type FurnitureType,
   type PriceBreakdown,
   type PriceInput,
@@ -11,7 +8,7 @@ import { calculateCatalogPrice, type CatalogPriceBreakdown } from "../../pricing
 export type { FurnitureType, PriceBreakdown, PriceInput, CatalogPriceBreakdown };
 
 /**
- * Новый pricing engine по нормализованному прайсу.
+ * Active pricing wrapper around the normalized catalog engine.
  */
 export function calculatePrice(input: PriceInput): CatalogPriceBreakdown {
   return calculateCatalogPrice({
@@ -31,22 +28,9 @@ export function calculatePrice(input: PriceInput): CatalogPriceBreakdown {
   });
 }
 
-/**
- * Legacy estimate оставлен только как fallback для сравнений/миграции.
- */
-export function calculateLegacyPrice(input: PriceInput): PriceBreakdown {
-  return calculatePriceCore(pricingConfig, input);
-}
-
-/** Hero quick estimate пока остаётся быстрым приближением. */
-export function quickEstimate(width: number, height: number, depth: number): number {
-  return quickEstimateCore(pricingConfig, width, height, depth);
-}
-
 export function formatPrice(value: number): string {
-  return `${value.toLocaleString("ru-RU")} ₽`;
+  return `${value.toLocaleString("ru-RU")} \u20BD`;
 }
-
 
 export function hasCatalogBreakdown(price: PriceBreakdown | CatalogPriceBreakdown): price is CatalogPriceBreakdown {
   return "materials" in price && "edgeBanding" in price && "services" in price;

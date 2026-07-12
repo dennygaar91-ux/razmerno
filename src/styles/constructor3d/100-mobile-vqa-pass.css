@@ -59,25 +59,29 @@
 
 @media (max-width: 760px) {
   .rzm-3d-stagebar {
-    padding: 6px;
-    gap: 5px;
+    padding: 5px 6px;
+    gap: 4px;
+  }
+
+  .rzm-3d-stagebar-meta {
+    display: none;
   }
 
   .rzm-3d-stepper-mobile-summary {
     display: grid;
-    gap: 2px;
-    padding: 5px 7px;
+    gap: 1px;
+    padding: 4px 6px;
     text-align: center;
   }
 
   .rzm-3d-stepper-mobile-summary span {
-    font-size: 9px;
-    line-height: 1.15;
+    font-size: 8px;
+    line-height: 1.1;
   }
 
   .rzm-3d-stepper-mobile-summary strong {
-    font-size: 11px;
-    line-height: 1.18;
+    font-size: 10px;
+    line-height: 1.12;
   }
 
   .rzm-3d-stepper {
@@ -106,6 +110,106 @@
     min-height: 22px;
     padding-inline: 7px;
     font-size: 9px;
+  }
+
+  .rzm-3d-scene-card {
+    padding: 7px;
+    gap: 6px;
+    border-radius: 20px;
+  }
+
+  .rzm-3d-toolbar {
+    gap: 7px;
+    padding: 2px 2px 6px;
+  }
+
+  .rzm-3d-toolbar > div:first-child span {
+    font-size: 8px;
+    letter-spacing: .06em;
+  }
+
+  .rzm-3d-toolbar > div:first-child strong {
+    margin-top: 2px;
+    font-size: 11px;
+    line-height: 1.18;
+  }
+
+  .rzm-3d-view-switch,
+  .rzm-3d-render-switch {
+    padding: 3px;
+    gap: 3px;
+  }
+
+  .rzm-3d-view-switch button,
+  .rzm-3d-render-switch button {
+    min-height: 28px;
+    padding-inline: 9px;
+    font-size: 10px;
+  }
+
+  .rzm-3d-runtime-status {
+    gap: 3px 6px;
+    padding: 0 2px 4px;
+    font-size: 11px;
+  }
+
+  .rzm-3d-runtime-status > span {
+    line-height: 1.18;
+  }
+
+  .rzm-3d-runtime-status > span:first-child {
+    font-size: 10px;
+    font-weight: 760;
+  }
+
+  .rzm-3d-runtime-status > span + span::before {
+    width: 4px;
+    height: 4px;
+    margin: 0 5px 1px 0;
+  }
+
+  .rzm-3d-runtime-status em {
+    font-size: 10px;
+  }
+
+  .rzm-3d-viewport {
+    min-height: clamp(248px, 33vh, 300px);
+    border-radius: 18px;
+  }
+
+  .rzm-3d-scene-legend {
+    top: 10px;
+    left: 10px;
+    min-height: 28px;
+    padding-inline: 10px;
+    font-size: 10px;
+  }
+
+  .rzm-3d-random-chip {
+    left: 10px;
+    bottom: 10px;
+    min-height: 30px;
+    padding-inline: 10px;
+    font-size: 10px;
+  }
+
+  .rzm-3d-scene-info {
+    max-width: 100%;
+    min-height: 0;
+    margin-top: 4px;
+    padding: 8px 10px;
+    gap: 3px;
+    border-radius: 14px;
+  }
+
+  .rzm-3d-scene-info span {
+    font-size: 9px;
+    letter-spacing: .06em;
+  }
+
+  .rzm-3d-scene-info strong {
+    font-size: 11px;
+    line-height: 1.18;
   }
 }
 
@@ -266,9 +370,9 @@
 
 @media (max-width: 760px) {
   .rzm-3d-blueprint-fallback {
-    grid-template-rows: auto minmax(210px, 1fr) auto;
-    gap: 7px;
-    padding: 7px;
+    grid-template-rows: auto minmax(150px, 1fr) auto;
+    gap: 6px;
+    padding: 6px;
   }
 
   .rzm-3d-blueprint-status {
@@ -279,8 +383,8 @@
     grid-template-columns: 1fr;
     justify-items: center;
     text-align: center;
-    gap: 4px;
-    padding: 6px;
+    gap: 3px;
+    padding: 5px 6px;
   }
 
   .rzm-3d-blueprint-status span {
@@ -288,25 +392,78 @@
   }
 
   .rzm-3d-blueprint-status strong {
-    font-size: 10px;
+    font-size: 9.5px;
+    line-height: 1.12;
+  }
+
+  .rzm-3d-blueprint-status small {
+    display: block;
+    font-size: 8px;
     line-height: 1.15;
+    color: rgba(42, 44, 65, .48);
   }
 
   .rzm-3d-blueprint-actions {
     padding: 4px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, .92);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: inset 0 0 0 1px rgba(229, 231, 239, .92);
   }
 
   .rzm-3d-blueprint-actions .rzm-ui-btn {
-    min-height: 34px;
-    font-size: 10.5px;
+    min-height: 32px;
+    padding-inline: 10px;
+    font-size: 10px;
+    line-height: 1.15;
+  }
+
+  .rzm-3d-blueprint-fallback .rzm-constructor-model,
+  .rzm-3d-blueprint-fallback .rzm-constructor-svg-model {
+    width: min(100%, 310px);
+    max-height: clamp(132px, 20vh, 176px);
+    align-self: center;
+    justify-self: center;
+  }
+
+  .rzm-3d-shell .rzm-3d-scene-card:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-info {
+    margin-top: 2px;
+    padding: 7px 9px;
+  }
+
+  .rzm-3d-shell .rzm-3d-scene-card:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-info span {
+    font-size: 8px;
+  }
+
+  .rzm-3d-shell .rzm-3d-scene-card:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-info strong {
+    font-size: 10px;
   }
 }
 
 @media (max-width: 420px) {
-  .rzm-3d-blueprint-fallback {
-    grid-template-rows: auto minmax(190px, 1fr) auto;
+  .rzm-3d-scene-card {
     padding: 6px;
+  }
+
+  .rzm-3d-toolbar > div:first-child strong {
+    font-size: 10.5px;
+  }
+
+  .rzm-3d-viewport {
+    min-height: clamp(236px, 31vh, 284px);
+  }
+
+  .rzm-3d-scene-info {
+    padding: 7px 8px;
+  }
+
+  .rzm-3d-blueprint-fallback {
+    grid-template-rows: auto minmax(142px, 1fr) auto;
+    padding: 5px;
+  }
+
+  .rzm-3d-blueprint-fallback .rzm-constructor-model,
+  .rzm-3d-blueprint-fallback .rzm-constructor-svg-model {
+    width: min(100%, 292px);
+    max-height: clamp(124px, 18vh, 164px);
   }
 }

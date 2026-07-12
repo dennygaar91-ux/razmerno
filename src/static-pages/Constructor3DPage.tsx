@@ -4,6 +4,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { ConstructorDraftRow } from "./constructor/components/ConstructorDraftRow";
 import { ConstructorHeader } from "./constructor/components/ConstructorHeader";
 import { ConstructorDrawerFooter } from "./constructor/components/ConstructorDrawerFooter";
 import { ConstructorStagebar } from "./constructor/components/ConstructorStagebar";
@@ -26,6 +27,9 @@ import {
   LazyThreeFurnitureViewer,
   type ThreeRuntimeFailureReason,
 } from "./constructor/components/LazyThreeFurnitureViewer";
+import { useConstructorDraftLifecycle } from "./constructor/hooks/useConstructorDraftLifecycle";
+import { useConstructorProjectSync } from "./constructor/hooks/useConstructorProjectSync";
+import { useConstructorProjectResume } from "./constructor/hooks/useConstructorProjectResume";
 import { useWebGLDiagnostics } from "./constructor/three/useWebGLAvailable";
 import { useThreeSceneQuality } from "./constructor/three/useThreeSceneQuality";
 import { useConstructorPageState } from "./constructor/hooks/useConstructorPageState";
@@ -33,6 +37,8 @@ import { useConstructorQuote } from "./constructor/hooks/useConstructorQuote";
 import { useConstructorSubmit } from "./constructor/hooks/useConstructorSubmit";
 import { stepOrder } from "./constructor/options";
 import { formatFallbackPrice } from "./constructor/utils";
+import { useCheckoutAuthGate } from "../shared/auth/useCheckoutAuthGate";
+import { useSessionContext } from "../shared/auth/SessionProvider";
 import type {
   ConstructorSceneViewMode,
 } from "./constructor/types";
@@ -41,6 +47,7 @@ export default function Constructor3DPage() {
   const [threeFailed, setThreeFailed] = useState(false);
   const [threeFailureReason, setThreeFailureReason] =
     useState<ThreeRuntimeFailureReason | null>(null);
+  const [threeRecoveryAttempt, setThreeRecoveryAttempt] = useState(0);
   const [forceReduced3D, setForceReduced3D] = useState(false);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [activeAddTarget, setActiveAddTarget] = useState<{
@@ -61,17 +68,7 @@ export default function Constructor3DPage() {
 
   const handleThreeReady = useCallback(() => {
     setThreeFailureReason(null);
-  }, []);
-
-  const retryThreeScene = useCallback((reduced = false) => {
-    setForceReduced3D(reduced);
-    setSceneRenderMode("three");
-    setThreeFailureReason(null);
     setThreeFailed(false);
-  }, []);
-
-  const showBlueprintFallback = useCallback(() => {
-    setSceneRenderMode("svg");
   }, []);
 
   const {
@@ -147,6 +144,42 @@ export default function Constructor3DPage() {
     selectedFacadeMaterial,
     snapshot,
   } = useConstructorPageState();
+  const {
+    draftStatus,
+    hasStoredDraft,
+    saveDraft,
+    restoreDraft,
+    clearDraft,
+  } = useConstructorDraftLifecycle(snapshot);
+  const {
+    status: projectResumeStatus,
+    message: projectResumeMessage,
+    loadedProject: resumedProject,
+  } = useConstructorProjectResume();
+  const {
+    syncStatus: projectSyncStatus,
+    syncMessage: projectSyncMessage,
+    currentProjectId,
+    lastSavedProject,
+    hasExistingServerProject,
+    saveCurrentAsProject,
+    clearServerProjectIdentity,
+    canSaveToServer,
+  } = useConstructorProjectSync(snapshot, hasStoredDraft, resumedProject);
+  const { session } = useSessionContext();
+
+  const retryThreeScene = useCallback((reduced = false) => {
+    setForceReduced3D(reduced);
+    setSceneRenderMode("three");
+    setThreeFailureReason(null);
+    setThreeFailed(false);
+    setThreeRecoveryAttempt((attempt) => attempt + 1);
+  }, [setSceneRenderMode]);
+
+  const showBlueprintFallback = useCallback(() => {
+    setSceneRenderMode("svg");
+  }, [setSceneRenderMode]);
+
   const webglAvailable = webglDiagnostics.status === "available";
   const canRenderThree =
     sceneRenderMode === "three" && webglAvailable && !threeFailed;
@@ -185,8 +218,13 @@ export default function Constructor3DPage() {
     snapshot,
     quote,
     onStepChange: setStep,
-    onDraftSave: () => undefined,
+    onDraftSave: () => {
+      saveDraft();
+    },
+    accessToken: session?.access_token ?? null,
+    projectId: currentProjectId ?? lastSavedProject?.id ?? null,
   });
+  const { authGateError, attemptCheckoutSubmit, checkoutAuthModal } = useCheckoutAuthGate(submit);
   const formatPrice = quote?.formatPrice ?? formatFallbackPrice;
   const currentStepIndex = stepOrder.indexOf(step);
   const nextStep =
@@ -222,7 +260,7 @@ export default function Constructor3DPage() {
   const handlePrimaryAction = () => {
     if (step === "checkout") {
       if (checkoutBlocked || checkoutRequiredMissing || !consent || isCooldownActive) return;
-      void submit();
+      attemptCheckoutSubmit();
       return;
     }
     setStep(nextStep);
@@ -254,9 +292,11 @@ export default function Constructor3DPage() {
 
   const handleResetConfirm = () => {
     resetProject();
+    clearServerProjectIdentity();
     setActiveAddTarget(null);
     setThreeFailed(false);
     setThreeFailureReason(null);
+    setThreeRecoveryAttempt(0);
     setForceReduced3D(false);
     setResetDialogOpen(false);
   };
@@ -430,6 +470,30 @@ export default function Constructor3DPage() {
                 onDeliveryAddressChange={setDeliveryAddress}
                 onContactChange={setContact}
               />
+              <ConstructorDraftRow
+                draftStatus={draftStatus}
+                hasStoredDraft={hasStoredDraft}
+                onSaveDraft={() => {
+                  saveDraft();
+                }}
+                onRestoreDraft={() => {
+                  restoreDraft();
+                }}
+                onClearDraft={() => {
+                  clearDraft();
+                }}
+                canSaveToServer={canSaveToServer}
+                hasExistingServerProject={hasExistingServerProject}
+                onSaveToServer={() => {
+                  void saveCurrentAsProject();
+                }}
+                serverSyncMessage={projectResumeMessage ?? projectSyncMessage}
+                serverSyncStatus={
+                  projectResumeStatus === "loading"
+                    ? "importing"
+                    : projectSyncStatus
+                }
+              />
 
               <ConstructorDrawerFooter
                 step={step}
@@ -439,7 +503,7 @@ export default function Constructor3DPage() {
                 checkoutRequiredMissing={checkoutRequiredMissing}
                 checkoutSubmitDisabled={checkoutSubmitDisabled}
                 submitStatus={submitStatus}
-                submitMessage={submitMessage}
+                submitMessage={authGateError ?? submitMessage}
                 isCooldownActive={isCooldownActive}
                 cooldownRemainingMs={cooldownRemainingMs}
                 consent={consent}
@@ -541,6 +605,7 @@ export default function Constructor3DPage() {
                     input={threeInput}
                     viewMode={sceneViewMode}
                     quality={threeQuality}
+                    recoveryKey={threeRecoveryAttempt}
                     fallback={<ThreeSceneLoading quality={threeQuality} />}
                     onError={handleThreeRuntimeError}
                     onReady={handleThreeReady}
@@ -571,6 +636,7 @@ export default function Constructor3DPage() {
         onCancel={() => setResetDialogOpen(false)}
         onConfirm={handleResetConfirm}
       />
+      {checkoutAuthModal}
     </>
   );
 }

@@ -52,6 +52,20 @@ alter table if exists public.orders
 comment on column public.orders.production_export is
   'Normalized production export package generated server-side from order payload. Contains panels, drilling, hardware, edge banding and BASIS manual plan.';
 
+
+-- 4. Pricing source attribution for server-resolved orders
+alter table if exists public.orders
+  add column if not exists catalog_source_used text,
+  add column if not exists pricing_source_diagnostic text,
+  add column if not exists pricing_fallback_reason text;
+
+comment on column public.orders.catalog_source_used is
+  'Effective catalog source used for server-resolved order pricing: supabase or seed_fallback';
+comment on column public.orders.pricing_source_diagnostic is
+  'Runtime diagnostic state from server pricing resolver: supabase_success, supabase_empty, supabase_failed, or seed_fallback';
+comment on column public.orders.pricing_fallback_reason is
+  'Nullable fallback reason when seed catalog is used for server pricing';
+
 commit;
 
 -- Manual verification after run:

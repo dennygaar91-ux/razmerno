@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { normalizeSupabaseProjectUrl } from './supabase-url'
 import seedItems from '../../src/pricing/seed/price-items.json'
 import type { RawPriceItem } from '../../src/pricing/types'
 
@@ -35,7 +36,7 @@ type DbPriceItem = {
 let cachedClient: SupabaseClient | null = null
 
 function getSupabaseClient(): SupabaseClient | null {
-  const url = process.env.SUPABASE_URL
+  const url = normalizeSupabaseProjectUrl(process.env.SUPABASE_URL)
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!url || !serviceRoleKey) return null

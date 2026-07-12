@@ -130,6 +130,10 @@ export function makeAssemblyOrder(basePrice = 79_800): OrderRequest {
 export const REQUIRED_ORDER_DB_COLUMNS = [
   "order_id",
   "status",
+  "user_id",
+  "public_order_number",
+  "domain_status",
+  "constructor_project_id",
   "source",
   "product_type",
   "dimensions",
@@ -160,4 +164,7 @@ export const REQUIRED_ORDER_DB_COLUMNS = [
   "user_agent",
   "client_ip_hash",
   "production_export",
+  "catalog_source_used",
+  "pricing_source_diagnostic",
+  "pricing_fallback_reason",
 ] as const;

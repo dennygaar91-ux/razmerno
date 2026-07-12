@@ -92,7 +92,7 @@ export function ProductionReviewPanel({
           >
             <option value="requires-review">Требует проверки</option>
             <option value="manually-adjusted">Изменено вручную</option>
-            <option value="approved-for-basis">Готово для БАЗИС</option>
+            <option value="approved-for-basis">Готово для ручной сборки в БАЗИС (JSON)</option>
             <option value="blocked">Заблокировано</option>
           </select>
         </label>

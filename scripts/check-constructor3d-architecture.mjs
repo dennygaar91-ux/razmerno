@@ -3,6 +3,7 @@ import path from "node:path";
 
 const root = process.cwd();
 
+const appEntrypoint = "src/App.tsx";
 const activeEntrypoint = "src/static-pages/Constructor3DPage.tsx";
 const activeDir = "src/static-pages/constructor";
 const threeDir = "src/static-pages/constructor/three";
@@ -47,6 +48,7 @@ const errors = {
   legacy: [],
   layers: [],
   pageBypass: [],
+  routes: [],
   size: [],
 };
 
@@ -232,6 +234,42 @@ function scanPageBypass() {
   }
 }
 
+function scanRouteBoundary() {
+  if (!exists(appEntrypoint)) {
+    errors.required.push(`Missing app route entrypoint: ${appEntrypoint}`);
+    return;
+  }
+
+  const source = read(appEntrypoint).replace(/\r\n/g, "\n");
+
+  const requiredActiveAliases = [
+    'pathname === "/configurator"',
+    'pathname === "/constructor"',
+    'pathname === "/constructor.html"',
+    'pathname === "/configurator-3d"',
+    'pathname === "/constructor-3d"',
+    'pathname === "/constructor3d"',
+  ];
+
+  for (const alias of requiredActiveAliases) {
+    if (!source.includes(alias)) {
+      errors.routes.push(`${appEntrypoint} is missing active Constructor3D route alias: ${alias}`);
+    }
+  }
+
+  if (!source.includes('pathname === "/constructor-legacy" || pathname === "/configurator-legacy"')) {
+    errors.routes.push(`${appEntrypoint} must keep legacy constructor routes isolated behind constructorLegacy aliases.`);
+  }
+
+  if (!source.includes('staticPage === "constructor" ? LazyConstructor3DPage')) {
+    errors.routes.push(`${appEntrypoint} must map active constructor route to LazyConstructor3DPage.`);
+  }
+
+  if (!source.includes('staticPage === "constructorLegacy" ? LazyConstructorPage')) {
+    errors.routes.push(`${appEntrypoint} must map legacy constructor route to LazyConstructorPage quarantine entrypoint.`);
+  }
+}
+
 function scanSizes(files) {
   for (const file of files) {
     const text = read(file);
@@ -291,6 +329,7 @@ for (const file of activeFiles) {
   if (exists(file)) scanImports(file);
 }
 scanPageBypass();
+scanRouteBoundary();
 scanSizes(activeFiles.filter(exists));
 scanPackageWarnings();
 
@@ -299,6 +338,7 @@ const hardErrors = [
   ...errors.legacy,
   ...errors.layers,
   ...errors.pageBypass,
+  ...errors.routes,
 ];
 
 if (hardErrors.length) {
@@ -307,6 +347,7 @@ if (hardErrors.length) {
   printGroup("Legacy import errors:", errors.legacy);
   printGroup("Layer violation errors:", errors.layers);
   printGroup("Page bypass errors:", errors.pageBypass);
+  printGroup("Route boundary errors:", errors.routes);
   printGroup("File-size errors:", errors.size);
   printGroup("Warnings:", [...warnings.size, ...warnings.scripts]);
   process.exit(1);

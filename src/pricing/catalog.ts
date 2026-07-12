@@ -23,8 +23,23 @@ function matchesNumber(actual: number | undefined, expected: number | undefined)
 
 export const PRICE_ITEMS = priceItems as RawPriceItem[];
 
+const runtimeCatalogStack: RawPriceItem[][] = [];
+
+function getActiveCatalogItems(): RawPriceItem[] {
+  return runtimeCatalogStack[runtimeCatalogStack.length - 1] ?? PRICE_ITEMS;
+}
+
+export function withPriceCatalogItems<T>(items: RawPriceItem[], run: () => T): T {
+  runtimeCatalogStack.push(items);
+  try {
+    return run();
+  } finally {
+    runtimeCatalogStack.pop();
+  }
+}
+
 export function findPriceItems(query: PriceCatalogQuery): RawPriceItem[] {
-  return PRICE_ITEMS.filter((item) => {
+  return getActiveCatalogItems().filter((item) => {
     if (query.itemType && item.itemType !== query.itemType) return false;
     if (query.producer && norm(item.producer) !== norm(query.producer)) return false;
     if (query.article && norm(item.article) !== norm(query.article)) return false;

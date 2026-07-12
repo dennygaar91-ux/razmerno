@@ -56,6 +56,7 @@ export const createRestoreDraftPatch = (
       sectionLayout,
       facadeLayout: draft.facadeLayout ?? state.facadeLayout,
     }),
+    zoneFacadeLayout: draft.zoneFacadeLayout ?? state.zoneFacadeLayout,
     selectedCompartmentId,
     selectedZoneId: selectedCompartmentId,
     compartments: restoredCompartments,
@@ -63,6 +64,7 @@ export const createRestoreDraftPatch = (
     furniture: draft.furniture,
     material: draft.material,
     facadeMaterial: draft.facadeMaterial ?? state.facadeMaterial,
+    handleless: draft.handleless ?? state.handleless,
   } satisfies ConstructorStoreState;
   return {
     ...next,

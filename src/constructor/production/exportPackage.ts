@@ -12,4 +12,5 @@ export function buildProductionExportFromConfigState(
 }
 
 export { buildProductionExportFromOrder } from "./orderExportPackage.js";
+export { buildProductionExportFromPayload } from "./orderExportPackage.js";
 export type { ProductionExportPackage } from "./types.js";

@@ -150,8 +150,8 @@ export const DECOR_PRICES: Record<string, DecorPriceItem> = {
 
 
 export const HDF_PRICE = {
-  id: 'hdf-white-4mm',
-  title: 'ХДФ 4 мм белый / технический',
+  id: 'hdf-white-3mm',
+  title: 'ХДФ 3 мм белый / технический',
   unit: 'm2' as const,
   sourcePrice: 420,
   price: marked(420),

@@ -177,7 +177,7 @@ function evaluateEdgeBanding(
         severity: "info",
         action: "auto-repair",
         targetId: edge.panelId,
-        message: `Кромка приведена к правилу MVP: фасады 2 мм, остальные детали 0.8 мм.`,
+        message: `Кромка приведена к правилу MVP: фасады 2 мм, остальные детали 1 мм.`,
         repair: {
           kind: "set-edge-thickness",
           payload: { panelId: edge.panelId, expectedThicknessMm: expected },

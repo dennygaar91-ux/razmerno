@@ -12,7 +12,7 @@ export function makeEdge(
       materialId,
       thicknessMm,
       widthMm: thicknessMm === 2 ? 22 : 19,
-      note: thicknessMm === 2 ? 'Фасадная кромка 2 мм' : 'Корпусная кромка 0.8 мм',
+      note: thicknessMm === 2 ? 'Фасадная кромка 2 мм' : 'Корпусная кромка 1 мм',
     }
     return acc
   }, {})

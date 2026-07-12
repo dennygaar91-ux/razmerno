@@ -64,7 +64,7 @@
   cursor: pointer;
 }
 
-.rzm-3d-step span {
+.rzm-3d-step > .rzm-3d-step-index {
   width: 30px;
   height: 30px;
   border-radius: 999px;
@@ -79,7 +79,7 @@
   color: #fff;
 }
 
-.rzm-3d-step.is-active span {
+.rzm-3d-step.is-active > .rzm-3d-step-index {
   background: rgba(255,255,255,.16);
 }
 

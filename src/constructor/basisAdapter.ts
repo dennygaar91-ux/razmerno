@@ -194,7 +194,7 @@ function createDrillingCommands(model: ProductionModel): BasisCommand<BasisDrill
       ...operation,
       requiresTechnologistCheck: operation.requiresTechnologistCheck,
     },
-    note: operation.note ?? 'MVP-координата. Проверить перед генерацией .b3d.',
+    note: operation.note ?? 'MVP-координата. Проверить технологом перед ручной сборкой в БАЗИС (manual JSON, не automatic .b3d).',
   }))
 }
 
@@ -226,17 +226,17 @@ export function buildBasisScriptPlan(project: ConstructorProject): BasisScriptPl
 
   const commands: BasisCommand<unknown>[] = [
     {
-      id: 'document:create-b3d',
+      id: 'document:plan-basis-3d-doc',
       type: 'create-document',
       status: 'needs-mapping',
-      title: 'Создать 3D-документ БАЗИС-Мебельщик',
+      title: 'Запланировать 3D-документ для ручной сборки в БАЗИС-Мебельщик',
       payload: {
-        documentType: 'b3d',
+        documentType: 'basis-manual-plan',
         units: 'mm',
         productType: project.productType,
         dimensions: project.dimensions,
       },
-      note: 'В БАЗИС-Мебельщик модели создаются как 3D-документы; этот шаг является планом для будущего скрипта.',
+      note: 'MVP: manual JSON-план. Технолог вручную создаёт 3D-документ в БАЗИС; automatic .b3d generation — post-MVP.',
     },
     ...materialMappings.map<BasisCommand<unknown>>(mapping => ({
       id: `material:${mapping.materialId}`,
@@ -260,7 +260,7 @@ export function buildBasisScriptPlan(project: ConstructorProject): BasisScriptPl
         drilling: productionModel.totals.drillingCount,
         hardware: productionModel.totals.hardwareCount,
       },
-      note: 'До автоматической генерации .b3d нужна проверка координат, петель, направляющих, кромки и пазов.',
+      note: 'Перед производством технолог проверяет координаты, петли, направляющие, кромку и пазы. MVP — manual JSON only, не automatic .b3d.',
     },
   ]
 
@@ -275,7 +275,7 @@ export function buildBasisScriptPlan(project: ConstructorProject): BasisScriptPl
     materialMappings,
     commands,
     warnings: [
-      'Это не готовый .b3d-файл, а JSON-план для ручной сборки проекта в БАЗИС-Мебельщик.',
+      'Это не готовый .b3d-файл и не automatic .b3d generation — только manual JSON-план для ручной сборки в БАЗИС-Мебельщик.',
       'Материалы, кромку и фурнитуру нужно сопоставить с реальными библиотеками БАЗИС на рабочем месте технолога.',
       'drilling[] содержит координаты для проверки; перед запуском в производство обязательна проверка технологом.',
       'Подрезка заготовки, припуск и итоговый размер после кромления проверяются вручную.',
@@ -283,8 +283,8 @@ export function buildBasisScriptPlan(project: ConstructorProject): BasisScriptPl
     nextSteps: [
       'Сопоставить materialId/edge materialId с библиотеками БАЗИС.',
       'Уточнить координаты присадки под выбранные петли, направляющие, ручки и крепёж.',
-      'Создать проект вручную в БАЗИС по JSON-экспорту.',
-      'После проверки сохранить результат как .b3d на рабочем месте с установленным БАЗИС-Мебельщик.',
+      'Создать проект вручную в БАЗИС по manual JSON-экспорту.',
+      'После ручной проверки технолог может сохранить проект как .b3d в БАЗИС-Мебельщик (post-MVP automation не входит в MVP).',
     ],
     designRules: BASIS_DESIGN_RULES,
     manualWorkflow: RAZMERNO_MANUAL_BASIS_WORKFLOW,

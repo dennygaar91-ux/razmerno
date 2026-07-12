@@ -9,7 +9,7 @@ export const RAZMERNO_PRODUCTION_RULES = {
   },
   backPanel: {
     material: 'hdf',
-    thicknessMm: 4,
+    thicknessMm: 3,
     installation: 'groove',
     grooveDepthMm: 8,
     grooveOffsetMm: 10,
@@ -22,7 +22,7 @@ export const RAZMERNO_PRODUCTION_RULES = {
     edgeThicknessMm: 2,
   },
   bodyEdge: {
-    thicknessMm: 0.8,
+    thicknessMm: 1,
     sides: ['front', 'back', 'left', 'right'] as const,
   },
   shelves: {

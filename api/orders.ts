@@ -1,35 +1,72 @@
-import type { OrderRequest } from './_shared/order-types.js'
+import type { OrderPricingAttribution, OrderRequest } from './_shared/order-types.js'
 import { toOrderDbInsert } from './_shared/order-db.js'
 import { isSameOrderPayload } from './_shared/order-idempotency.js'
 import { buildClientText, buildManagerAttachments, buildManagerText, sendEmail } from './_shared/order-email.js'
 import { applyCorsHeaders, getHeader, isAllowedOrigin } from './_shared/order-cors.js'
+import { CUSTOMER_UNAUTHORIZED_MESSAGE } from './_shared/customer-api-auth.js'
+import { extractBearerToken } from './_shared/customer-cors.js'
+import { getConstructorProjectById } from './_shared/constructor-projects-store.js'
+import { isValidProjectId } from './_shared/constructor-project-types.js'
+import { createOrderCreatedNotificationBestEffort } from './_shared/customer-notification-events.js'
+import { maybeAutofillProfilePhoneFromOrder } from './_shared/order-profile-autofill.js'
+import { authorizeOrderSubmit } from './_shared/order-submit-auth.js'
 import { assertServerEnvReady } from './_shared/env.js'
 import { applyNoStoreHeaders } from './_shared/headers.js'
 import { logEvent, safeErrorMessage } from './_shared/logger.js'
 import { getClientKey, isRateLimited } from './_shared/order-rate-limit.js'
 import { applyRequestIdHeader, getRequestId } from './_shared/request-context.js'
-import {
-  applyServerDeliveryAndAssembly,
-  applyServerProductionPanelPrice,
-  calculateServerCatalogPrice,
-  withServerPrice,
-} from './_shared/server-price.js'
 import type { ServerlessRequest, ServerlessResponse } from './_shared/serverless-types.js'
-import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus } from './_shared/supabase-orders.js'
+import { isFailureResult, isNotFoundResult, readFailureError } from './_shared/result-utils.js'
+import { getOrderRecordByOrderId, insertOrderRecord, updateOrderEmailStatus, allocatePublicOrderNumber } from './_shared/supabase-orders.js'
 import { validateOrder } from './_shared/order-validation.js'
-import { buildProductionExportFromOrder } from '../src/constructor/production/orderExportPackage.js'
+import { buildProductionExportFromPayload } from '../src/constructor/production/orderExportPackage.js'
+import { calculateServerOrderPriceResolved, withServerPrice } from './_shared/server-price.js'
 
 const MANAGER_NOTIFICATION_FAILED = 'manager_notification_failed'
 const CUSTOMER_NOTIFICATION_FAILED = 'customer_notification_failed'
 const IDEMPOTENCY_CONFLICT_MESSAGE = 'Конфликт повторной отправки: состав заявки изменился. Обновите заявку и отправьте снова.'
 const GENERIC_ORDER_SUBMIT_FAILED = 'Не удалось обработать заявку. Попробуйте ещё раз или свяжитесь с нами.'
 const RATE_LIMIT_MESSAGE = 'Слишком много запросов. Попробуйте позже.'
-const SERVER_PRICE_FAILED_MESSAGE = 'Не удалось пересчитать стоимость заявки.'
+const ORDER_PREPARATION_FAILED_MESSAGE = 'Не удалось подготовить заявку.'
 const DB_INSERT_FAILED_MESSAGE = 'Не удалось сохранить заявку. Попробуйте позже.'
 const INVALID_IDEMPOTENCY_KEY_MESSAGE = 'Некорректный Idempotency-Key.'
 const ORDER_ID_MISMATCH_MESSAGE = 'Idempotency-Key должен совпадать с orderId заявки.'
 const INVALID_ORDER_ID_MESSAGE = 'Некорректный идентификатор заявки.'
+const INVALID_PROJECT_ID_MESSAGE = 'Некорректный идентификатор проекта.'
+const PROJECT_NOT_FOUND_MESSAGE = 'Проект не найден.'
 const ORDER_ID_PATTERN = /^RZ-\d{8}-\d{4}$/
+
+async function resolveConstructorProjectLink(
+  projectId: string | undefined,
+  userId: string,
+): Promise<
+  | { ok: true; constructorProjectId: string | null }
+  | { ok: false; status: number; message: string }
+> {
+  const normalized = projectId?.trim()
+  if (!normalized) {
+    return { ok: true, constructorProjectId: null }
+  }
+
+  if (!isValidProjectId(normalized)) {
+    return { ok: false, status: 400, message: INVALID_PROJECT_ID_MESSAGE }
+  }
+
+  const loaded = await getConstructorProjectById(normalized)
+  if (isFailureResult(loaded)) {
+    if (isNotFoundResult(loaded)) {
+      return { ok: false, status: 404, message: PROJECT_NOT_FOUND_MESSAGE }
+    }
+    logEvent('error', 'orders.project_lookup_failed', { projectId: normalized, reason: readFailureError(loaded) })
+    return { ok: false, status: 502, message: GENERIC_ORDER_SUBMIT_FAILED }
+  }
+
+  if (loaded.project.user_id !== userId) {
+    return { ok: false, status: 404, message: PROJECT_NOT_FOUND_MESSAGE }
+  }
+
+  return { ok: true, constructorProjectId: normalized }
+}
 
 function safeOrderId(): string {
   const now = new Date()
@@ -82,6 +119,7 @@ function buildReplayResponse(row: NonNullable<Awaited<ReturnType<typeof getOrder
   return {
     ok: true,
     orderId: row.order_id,
+    publicOrderNumber: row.public_order_number,
     receivedAt: row.created_at,
     email: {
       manager: row.manager_email_status,
@@ -124,6 +162,11 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
     return res.status(200).json({ ok: true, orderId: safeOrderId(), receivedAt: new Date().toISOString(), spam: 'filtered' })
   }
 
+  const customer = await authorizeOrderSubmit(extractBearerToken(req))
+  if (!customer) {
+    return res.status(401).json({ ok: false, message: CUSTOMER_UNAUTHORIZED_MESSAGE })
+  }
+
   const orderIdentity = resolveOrderIdentity(body.orderId, getHeader(req, 'idempotency-key'))
   if (!orderIdentity.ok) {
     return res.status(orderIdentity.status).json({ ok: false, message: orderIdentity.message })
@@ -132,42 +175,78 @@ export default async function handler(req: ServerlessRequest, res: ServerlessRes
   const validationError = validateOrder(body)
   if (validationError) return res.status(400).json({ ok: false, message: validationError })
 
-  let serverPrice
-  let pricedBody: OrderRequest
+  const projectLink = await resolveConstructorProjectLink(body.projectId, customer.userId)
+  if (isFailureResult(projectLink)) {
+    return res.status(projectLink.status).json({ ok: false, message: projectLink.message })
+  }
+
+  let orderBodyForPersistence: OrderRequest
+  let pricingAttribution: OrderPricingAttribution | null = null
   try {
-    const catalogPrice = calculateServerCatalogPrice(body)
-    const catalogServerPrice = applyServerDeliveryAndAssembly(body, catalogPrice)
-    const catalogPricedBody = withServerPrice(body, catalogServerPrice)
-    const initialProductionExport = buildProductionExportFromOrder(catalogPricedBody)
-
-    const finalBasePrice = body.source === 'production-panels'
-      ? applyServerProductionPanelPrice({
-        body,
-        catalogPrice,
-        productionExport: initialProductionExport,
-      }).price
-      : catalogPrice
-
-    serverPrice = applyServerDeliveryAndAssembly(body, finalBasePrice)
-    pricedBody = withServerPrice(body, serverPrice)
-    const productionExport = buildProductionExportFromOrder(pricedBody)
-    pricedBody = { ...pricedBody, productionExport }
+    const bodyWithOrderId = { ...body, orderId: orderIdentity.orderId }
+    const productionExport = buildProductionExportFromPayload(bodyWithOrderId)
+    const resolvedPricing = await calculateServerOrderPriceResolved({
+      body: bodyWithOrderId,
+      productionExport,
+    })
+    pricingAttribution = {
+      catalog_source_used: resolvedPricing.catalogSourceUsed,
+      pricing_source_diagnostic: resolvedPricing.source,
+      pricing_fallback_reason: resolvedPricing.fallbackReason,
+    }
+    orderBodyForPersistence = withServerPrice(
+      { ...bodyWithOrderId, productionExport },
+      resolvedPricing.price,
+    )
   } catch (error) {
-    logEvent('error', 'orders.server_price_failed', { reason: safeErrorMessage(error) })
-    return res.status(400).json({ ok: false, message: SERVER_PRICE_FAILED_MESSAGE })
+    logEvent('error', 'orders.order_preparation_failed', { reason: safeErrorMessage(error) })
+    return res.status(400).json({ ok: false, message: ORDER_PREPARATION_FAILED_MESSAGE })
   }
 
   const orderId = orderIdentity.orderId
   const idempotencyKey = orderIdentity.idempotencyKey
   const managerEmail = process.env.ORDER_MANAGER_EMAIL
 
+  const publicNumberResult = await allocatePublicOrderNumber()
+  if (isFailureResult(publicNumberResult)) {
+    logEvent('error', 'orders.public_number_allocation_failed', {
+      requestId,
+      orderId,
+      reason: readFailureError(publicNumberResult),
+    })
+    return res.status(502).json({ ok: false, message: DB_INSERT_FAILED_MESSAGE })
+  }
+
   try {
     const dbRecord = toOrderDbInsert({
       orderId,
-      body: { ...pricedBody, orderId },
+      body: orderBodyForPersistence,
       userAgent: getHeader(req, 'user-agent'),
       clientIp: clientKey,
+      pricingAttribution,
+      userId: customer.userId,
+      publicOrderNumber: publicNumberResult.value,
+      constructorProjectId: projectLink.constructorProjectId,
     })
+
+    if (idempotencyKey) {
+      const existingOrder = await getOrderRecordByOrderId(orderId)
+      if (!existingOrder.ok) {
+        logEvent('error', 'orders.idempotency_read_failed', { requestId, orderId, reason: existingOrder.error })
+        return res.status(502).json({ ok: false, message: GENERIC_ORDER_SUBMIT_FAILED })
+      }
+
+      if (existingOrder.row && isSameOrderPayload(dbRecord, existingOrder.row)) {
+        logEvent('info', 'orders.idempotent_replay', { requestId, orderId })
+        return res.status(200).json(buildReplayResponse(existingOrder.row))
+      }
+
+      if (existingOrder.row) {
+        logEvent('warn', 'orders.idempotency_conflict', { requestId, orderId })
+        return res.status(409).json({ ok: false, message: IDEMPOTENCY_CONFLICT_MESSAGE })
+      }
+    }
+
     const dbResult = await insertOrderRecord(dbRecord)
 if (dbResult.ok === false) {
   const insertError = {
@@ -195,6 +274,15 @@ if (dbResult.ok === false) {
       return res.status(502).json({ ok: false, message: DB_INSERT_FAILED_MESSAGE })
     }
 
+    void maybeAutofillProfilePhoneFromOrder(customer.userId, orderBodyForPersistence.customer?.phone ?? '')
+
+    await createOrderCreatedNotificationBestEffort({
+      requestId,
+      userId: customer.userId,
+      businessOrderId: orderId,
+      publicOrderNumber: publicNumberResult.value,
+    })
+
     let managerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
     let customerEmailStatus: 'sent' | 'skipped' | 'failed' = 'skipped'
     let managerEmailError: string | null = null
@@ -205,8 +293,8 @@ if (dbResult.ok === false) {
         const result = await sendEmail(
           managerEmail,
           `Размерно — заявка ${orderId}`,
-          buildManagerText(orderId, pricedBody),
-          buildManagerAttachments(orderId, pricedBody),
+          buildManagerText(orderId, orderBodyForPersistence),
+          buildManagerAttachments(orderId, orderBodyForPersistence),
         )
         managerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { manager_email_status: managerEmailStatus, manager_email_error: null })
@@ -229,12 +317,12 @@ if (dbResult.ok === false) {
       await persistEmailPatch(orderId, { manager_email_status: 'skipped', manager_email_error: 'ORDER_MANAGER_EMAIL is not set' })
     }
 
-    if (pricedBody.customer?.email) {
+    if (orderBodyForPersistence.customer?.email) {
       try {
         const result = await sendEmail(
-          pricedBody.customer.email,
+          orderBodyForPersistence.customer.email,
           `Размерно — заявка ${orderId}`,
-          buildClientText(orderId, pricedBody),
+          buildClientText(orderId, orderBodyForPersistence),
         )
         customerEmailStatus = result && 'skipped' in result ? 'skipped' : 'sent'
         await persistEmailPatch(orderId, { customer_email_status: customerEmailStatus, customer_email_error: null })
@@ -260,6 +348,7 @@ if (dbResult.ok === false) {
     return res.status(200).json({
       ok: true,
       orderId,
+      publicOrderNumber: publicNumberResult.value,
       receivedAt: new Date().toISOString(),
       email: {
         manager: managerEmailStatus,

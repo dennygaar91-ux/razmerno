@@ -1,10 +1,32 @@
 # Release Roadmap — Размерно
 
-Документ фиксирует последовательность этапов до MVP release candidate.
+Документ фиксирует последовательность этапов до **Release v1** candidate.
 
-Последняя сверка: `docs/planning/project-reconciliation-report-v1.md` от 2026-06-16.
+Последняя сверка: `docs/planning/project-reconciliation-report-v1.md` от 2026-06-16; Release v1 scope alignment — `docs/planning/mvp-scope.md` (Release v1 Scope path preserved).
 
-Важно: этот roadmap не запускает новый development scope. Он только синхронизирует порядок этапов с фактическим backlog state.
+Важно: этот roadmap не запускает новый development scope. Он синхронизирует порядок этапов с фактическим backlog state и Release v1 Scope.
+
+## Release v1 alignment
+
+- Продуктовый объём Release v1 описан в `docs/planning/mvp-scope.md` (legacy path preserved).
+- Backlog traceability: `Capability` / `Release Phase` — см. `docs/planning/current-backlog.md` → Release v1 Governance Traceability.
+- RPES остаётся primary product/engineering SoT; planning docs не заменяют RPES, а синхронизируются с ним.
+- Customer platform, order lifecycle, Operations Workspace, manual B3D и manual payment — обязательные Release v1 tracks, даже если часть implementation evidence ещё open в backlog.
+
+### Release Phase ↔ Roadmap traceability
+
+Decision source: Release v1 governance integration (`docs/planning/current-backlog.md` → Release v1 Governance Traceability).
+
+| Release Phase | Primary roadmap stages | Representative backlog tasks |
+|---|---|---|
+| RV1-A Constructor Core | R2, R3, R5, R6, R7 | P0-01, P0-02, P0-05, P0-06, P0-16, P0-17, P0-18, M8-P0-02, M8-P0-03, P1-10 |
+| RV1-B Pricing & Submit Reliability | R4, R9 | P0-03, P0-11, P0-12, P0-13, M8-P0-01, M8-P0-04, M8-P0-05, P1-09 |
+| RV1-C Customer Platform | R9 (post-submit continuity) | P1-27 |
+| RV1-D Orders Lifecycle | R12 | P1-28, M9-P1-02 |
+| RV1-E Operations Workspace | R12 | P1-28, P2-09, P2-25 |
+| RV1-F Production Handoff | R11 | P1-11A, P1-11B, P1-23, P1-24, БАЗИС-Мебельщик Boundary Lock, Production Export Failure Contract |
+| RV1-G Payments & Notifications | R12, R13 | P1-28, M8-P0-04, M9-P1-03, API Order Notification Failure Contracts |
+| RV1-H Release Candidate | R10, R13 | M8-P1-01, M8-P1-02, M8-P1-05, P1-21, P2-20, P2-21, Live Provider / Supabase Order Flow Verification |
 
 ---
 
@@ -287,7 +309,7 @@
 
 ## Stage R12 — Admin MVP
 
-Цель: дать менеджеру минимальный рабочий интерфейс.
+Цель: дать менеджеру минимальный рабочий **Order Operations Workspace**.
 
 Задачи:
 
@@ -298,21 +320,23 @@
 - цена;
 - production warnings;
 - статус обработки;
+- Operations View / audit log baseline;
 - admin API/integration tests.
 
 Риски:
 
-- зависит от Supabase/order storage и production layer.
+- зависит от Supabase/order storage и production layer;
+- scope drift в сторону CRM запрещён — workspace, не sales pipeline.
 
 Результат:
 
-- заявки можно обрабатывать вручную.
+- заявки можно обрабатывать вручную в operations workflow.
 
 ---
 
-## Stage R13 — Release Candidate
+## Stage R13 — Release v1 Candidate
 
-Цель: подготовить MVP к запуску.
+Цель: подготовить Release v1 к запуску.
 
 Задачи:
 
@@ -321,7 +345,9 @@
 - security checklist;
 - env validation;
 - release workflow;
-- rollback plan.
+- rollback plan;
+- customer cabinet + order lifecycle smoke;
+- manual payment + notification center verification.
 
 Риски:
 
@@ -329,7 +355,7 @@
 
 Результат:
 
-- готовность к MVP launch.
+- готовность к Release v1 launch по exit criteria из `docs/planning/mvp-scope.md`.
 
 ---
 

@@ -23,15 +23,15 @@ export const PRODUCTION_MODEL_BASIS_EXPORT_PLAN: ProductionModel['basisExportPla
     id: 'apply-drilling',
     title: 'Добавить присадку',
     status: 'requires-technologist-check',
-    note: 'drilling[] содержит MVP-координаты. Перед .b3d нужно проверить под выбранную фурнитуру.',
+    note: 'drilling[] содержит MVP-координаты. Проверить технологом перед ручной сборкой в БАЗИС (manual JSON, не automatic .b3d).',
   },
 ]
 
 export const PRODUCTION_MODEL_BASIS_NOTES: ProductionModel['basisNotes'] = [
   'Корпус: крышка между боковыми панелями, боковины опираются на дно.',
   'Задняя стенка: ХДФ в паз, параметры паза переданы в productionRules/backPanel.',
-  'Координаты и ориентации подготовлены как промежуточная JSON-модель для будущего скрипта БАЗИС-Мебельщик.',
-  'Перед генерацией .b3d нужно сопоставить materialDecorId/edge.materialId с материалами в базе БАЗИС.',
+  'Координаты и ориентации подготовлены как промежуточная manual JSON-модель для ручной сборки в БАЗИС-Мебельщик (не automatic .b3d).',
+  'Перед ручной сборкой в БАЗИС нужно сопоставить materialDecorId/edge.materialId с материалами в базе БАЗИС.',
   'Лицевая сторона панели хранится в panels[].faceSide, кромление — в panels[].edge по сторонам.',
   'ХДФ вынесен отдельным materialType=hdf и не считается как ЛДСП.',
   'drilling[] — MVP-слой присадки: координаты требуют проверки технологом под выбранную фурнитуру.',

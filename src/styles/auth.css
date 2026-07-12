@@ -1,0 +1,674 @@
+.rzm-header-auth{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-right:8px;
+}
+
+.rzm-header-auth-user{
+  max-width:160px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:14px;
+  color:var(--rzm-text-secondary, #5f6368);
+}
+
+.rzm-header-auth-link{
+  text-decoration:none;
+}
+
+.rzm-header-auth-link:hover{
+  color:var(--rzm-dark, #2A2C41);
+}
+
+.rzm-constructor-shell-actions .rzm-header-auth{
+  margin-right:0;
+}
+
+.rzm-header-notification-bell{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;
+  height:36px;
+  border-radius:999px;
+  text-decoration:none;
+  color:var(--rzm-dark, #2A2C41);
+  background:rgba(255,255,255,.72);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.9);
+}
+
+.rzm-header-notification-badge{
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  min-width:18px;
+  height:18px;
+  padding:0 5px;
+  border-radius:999px;
+  background:#4f46e5;
+  color:#fff;
+  font-size:11px;
+  font-weight:700;
+  line-height:18px;
+  text-align:center;
+}
+
+.rzm-auth-modal-root{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:rgba(16, 24, 40, 0.45);
+}
+
+.rzm-auth-modal{
+  position:relative;
+  width:min(100%, 420px);
+  padding:24px;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 20px 60px rgba(16, 24, 40, 0.18);
+}
+
+.rzm-auth-modal-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+  border:0;
+  background:transparent;
+  font-size:24px;
+  line-height:1;
+  cursor:pointer;
+}
+
+.rzm-auth-modal-title{
+  margin:0 0 8px;
+  font-size:24px;
+}
+
+.rzm-auth-modal-description{
+  margin:0 0 16px;
+  color:var(--rzm-text-secondary, #5f6368);
+}
+
+.rzm-auth-modal-tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:16px;
+}
+
+.rzm-auth-modal-tabs button{
+  flex:1;
+  border:1px solid #d0d5dd;
+  border-radius:999px;
+  padding:8px 12px;
+  background:#fff;
+  cursor:pointer;
+}
+
+.rzm-auth-modal-tabs button.is-active{
+  border-color:#111827;
+  background:#111827;
+  color:#fff;
+}
+
+.rzm-auth-modal-form{
+  display:grid;
+  gap:12px;
+}
+
+.rzm-auth-field{
+  display:grid;
+  gap:6px;
+  font-size:14px;
+}
+
+.rzm-auth-field input{
+  width:100%;
+  border:1px solid #d0d5dd;
+  border-radius:10px;
+  padding:10px 12px;
+  font:inherit;
+}
+
+.rzm-auth-modal-error{
+  margin:0;
+  color:#b42318;
+  font-size:14px;
+}
+
+.rzm-auth-modal-submit{
+  width:100%;
+}
+
+.rzm-account-main{
+  width:var(--rzm-container);
+  margin:56px auto 80px;
+  display:grid;
+  gap:28px;
+}
+
+.rzm-account-cabinet{
+  display:grid;
+  gap:28px;
+}
+
+.rzm-account-hero{
+  display:grid;
+  gap:12px;
+  padding:28px;
+  border-radius:34px;
+  background:linear-gradient(135deg, rgba(255,255,255,.72), rgba(249,249,252,.48));
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-title{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:clamp(34px, 4vw, 52px);
+  line-height:1;
+  font-weight:650;
+  letter-spacing:-.05em;
+}
+
+.rzm-account-summary{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:14px;
+}
+
+.rzm-account-summary-card{
+  padding:18px 20px;
+  border-radius:24px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-summary-label{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:13px;
+  font-weight:650;
+}
+
+.rzm-account-summary-value{
+  margin:8px 0 0;
+  color:var(--rzm-dark);
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:-.04em;
+}
+
+.rzm-account-summary-value--text{
+  font-size:16px;
+  line-height:1.35;
+  word-break:break-word;
+}
+
+.rzm-account-section{
+  display:grid;
+  gap:16px;
+}
+
+.rzm-account-section-head{
+  display:grid;
+  gap:6px;
+}
+
+.rzm-account-section-head--with-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+}
+
+.rzm-account-section-head--with-actions > div{
+  display:grid;
+  gap:6px;
+}
+
+.rzm-account-section-head h2{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:clamp(28px, 3vw, 38px);
+  line-height:1.02;
+  font-weight:650;
+  letter-spacing:-.04em;
+}
+
+.rzm-account-list{
+  display:grid;
+  gap:12px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.rzm-account-list-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:18px 20px;
+  border-radius:24px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-list-main{
+  display:grid;
+  gap:4px;
+  min-width:0;
+}
+
+.rzm-account-list-title{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:18px;
+  font-weight:650;
+  letter-spacing:-.03em;
+}
+
+.rzm-account-list-meta,
+.rzm-account-list-sub{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:14px;
+  line-height:1.45;
+}
+
+.rzm-account-order-price{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:18px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.rzm-account-preview{
+  width:72px;
+  height:72px;
+  border-radius:18px;
+  overflow:hidden;
+  flex:0 0 auto;
+  background:rgba(244,244,248,.9);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-preview img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.rzm-account-preview--placeholder{
+  background:linear-gradient(135deg, rgba(244,244,248,.9), rgba(255,255,255,.72));
+}
+
+.rzm-account-profile{
+  display:grid;
+  gap:12px;
+  margin:0;
+  padding:20px;
+  border-radius:24px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-profile div{
+  display:grid;
+  gap:4px;
+}
+
+.rzm-account-profile dt{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:13px;
+  font-weight:650;
+}
+
+.rzm-account-profile dd{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:16px;
+  font-weight:600;
+}
+
+.rzm-account-profile-form{
+  display:grid;
+  gap:12px;
+  padding:20px;
+  border-radius:24px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-profile-form input[readonly]{
+  background:rgba(244,244,248,.72);
+  color:var(--rzm-muted);
+  cursor:not-allowed;
+}
+
+.rzm-account-profile-hint{
+  margin:-4px 0 0;
+  color:var(--rzm-muted);
+  font-size:13px;
+  line-height:1.4;
+}
+
+.rzm-account-profile-success{
+  margin:0;
+  padding:12px 16px;
+  border-radius:16px;
+  background:rgba(236,253,245,.88);
+  color:#027a48;
+  font-size:14px;
+  line-height:1.4;
+}
+
+.rzm-account-empty{
+  margin:0;
+  padding:18px 20px;
+  border-radius:20px;
+  background:rgba(244,244,248,.72);
+  color:var(--rzm-muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.rzm-account-empty--inline{
+  padding:0;
+  background:transparent;
+}
+
+.rzm-account-panel{
+  display:grid;
+  gap:12px;
+  padding:28px;
+  border-radius:28px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-panel--blocked{
+  background:rgba(255,245,245,.72);
+}
+
+.rzm-account-panel-title{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:28px;
+  font-weight:650;
+}
+
+.rzm-account-panel-text{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:15px;
+  line-height:1.5;
+}
+
+.rzm-account-panel-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+}
+
+.rzm-account-list-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.rzm-account-project-open{
+  white-space:nowrap;
+}
+
+.rzm-account-order-link{
+  color:inherit;
+  text-decoration:none;
+}
+
+.rzm-account-order-link:hover{
+  color:var(--rzm-dark, #2A2C41);
+}
+
+.rzm-account-order-pricing{
+  display:grid;
+  gap:12px;
+}
+
+.rzm-account-order-pricing div{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.rzm-account-order-pricing dt{
+  margin:0;
+  color:var(--rzm-muted);
+}
+
+.rzm-account-order-pricing dd{
+  margin:0;
+  font-weight:600;
+}
+
+.rzm-account-order-pricing-total{
+  padding-top:8px;
+  border-top:1px solid rgba(229,231,239,.9);
+}
+
+.rzm-account-change-request-form{
+  display:grid;
+  gap:12px;
+  padding:20px;
+  border-radius:24px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-change-request-form select,
+.rzm-account-change-request-form textarea{
+  width:100%;
+  border:1px solid #d0d5dd;
+  border-radius:10px;
+  padding:10px 12px;
+  font:inherit;
+}
+
+.rzm-account-change-request-form textarea{
+  resize:vertical;
+  min-height:112px;
+}
+
+.rzm-account-change-request-list{
+  display:grid;
+  gap:12px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.rzm-account-change-request-item{
+  display:grid;
+  gap:8px;
+  padding:18px 20px;
+  border-radius:20px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-change-request-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.rzm-account-change-request-type{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:16px;
+  font-weight:650;
+}
+
+.rzm-account-change-request-meta{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:13px;
+}
+
+.rzm-account-change-request-message{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:14px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+.rzm-account-notification-list{
+  display:grid;
+  gap:12px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.rzm-account-notification-item{
+  display:grid;
+  gap:8px;
+  padding:18px 20px;
+  border-radius:20px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+}
+
+.rzm-account-notification-item--unread{
+  box-shadow:inset 0 0 0 2px rgba(99,102,241,.28);
+  background:rgba(248,249,255,.92);
+}
+
+.rzm-account-notification-item--read{
+  opacity:.92;
+}
+
+.rzm-account-notification-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.rzm-account-notification-title{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:16px;
+  font-weight:650;
+}
+
+.rzm-account-notification-meta{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:13px;
+}
+
+.rzm-account-notification-message{
+  margin:0;
+  color:var(--rzm-dark);
+  font-size:14px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+.rzm-account-notification-read-state{
+  margin:0;
+  color:var(--rzm-muted);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.01em;
+}
+
+.rzm-account-notification-footer{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.rzm-account-notification-mark-read{
+  white-space:nowrap;
+}
+
+.rzm-account-order-status-current{
+  display:grid;
+  gap:4px;
+  margin-bottom:16px;
+}
+
+.rzm-account-order-status-label{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+  color:var(--rzm-dark);
+}
+
+.rzm-account-order-status-timeline{
+  display:grid;
+  gap:10px;
+  margin:0 0 12px;
+  padding:0;
+  list-style:none;
+}
+
+.rzm-account-order-status-step{
+  padding:12px 14px;
+  border-radius:16px;
+  background:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(229,231,239,.72);
+  color:var(--rzm-text-muted);
+}
+
+.rzm-account-order-status-step--current{
+  color:var(--rzm-dark);
+  box-shadow:inset 0 0 0 2px rgba(99,102,241,.28);
+  background:rgba(248,249,255,.92);
+}
+
+.rzm-account-order-status-step--complete{
+  color:var(--rzm-dark);
+  opacity:.88;
+}
+
+.rzm-account-order-status-next{
+  margin:0;
+  color:var(--rzm-text-muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
+@media (max-width: 900px){
+  .rzm-account-summary{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width: 768px){
+  .rzm-header-auth-user{display:none}
+  .rzm-account-main{
+    margin-top:34px;
+  }
+  .rzm-account-list-item{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}

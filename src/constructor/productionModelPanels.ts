@@ -4,7 +4,7 @@ import { edgeLm } from './productionModelEdges'
 import type { MaterialType, ProductionPanel } from './productionModel.types'
 
 export function materialTitle(materialType: MaterialType, materialDecorId: string): string {
-  if (materialType === 'hdf') return 'ХДФ 4 мм белый / технический'
+  if (materialType === 'hdf') return 'ХДФ 3 мм белый / технический'
   if (materialType === 'mdf') return 'МДФ'
   return getMaterial(materialDecorId).title
 }

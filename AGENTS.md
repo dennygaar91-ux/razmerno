@@ -8,21 +8,27 @@ Follow this file before any code, docs, QA, planning, PR or merge work.
 
 ## Source of Truth
 
-Mandatory files:
+Current hierarchy:
 
-1. `docs/planning/current-backlog.md`
-2. `docs/planning/accepted-backlog-decisions-v1.md`
-3. `docs/planning/agent-prompt-rules-v1.md`
+1. `docs/specification/**`
+2. `docs/planning/accepted-backlog-decisions-v1.md` if it exists
+3. `docs/planning/current-backlog.md`
+4. `docs/planning/role-audit-reconciliation-v1.md`
+5. `docs/audits/role-audits/**`
+6. implementation code
+7. historical docs
 
 Rules:
 
-- `current-backlog.md` = task scope / status / evidence source of truth.
-- `accepted-backlog-decisions-v1.md` = product / UX / architecture / pricing / production decision layer.
-- `agent-prompt-rules-v1.md` = prompt, context, scope and stop-condition rules.
-- `AGENTS.md` = short root operating rules.
-- If files conflict, stop and request reconciliation.
+- RPES in `docs/specification/**` is the primary product and engineering Source of Truth.
+- `accepted-backlog-decisions-v1.md` is the active decision layer if present.
+- `current-backlog.md` is the operational backlog baseline for scope, status and closure wording.
+- `role-audit-reconciliation-v1.md` is the active cross-role reconciliation layer.
+- `docs/audits/role-audits/**` are findings-only role inputs and do not close tasks by themselves.
+- Implementation code shows current repo state, but does not override RPES or accepted decisions without explicit reconciliation.
+- Historical docs, old backlog follow-up docs, old ZIP archives, chats, open PRs, draft PRs and local branch claims are not active Source of Truth unless explicitly reconciled.
+- If these layers conflict, stop and request reconciliation.
 - Repo state and merged/main evidence beat memory, chat, open PRs, draft PRs, branch-only reports and local claims.
-- Old ZIP archives and local branches are not source of truth unless the user explicitly says so.
 
 ## Language
 
@@ -48,17 +54,28 @@ Use only repository files and PRs.
 Default workflow:
 
 1. Read `AGENTS.md`.
-2. Read only relevant task block from `current-backlog.md`.
-3. Read only relevant accepted decision section.
-4. Read relevant prompt rules.
-5. Decide whether read-only audit is required.
-6. Freeze scope.
-7. Read only target files and direct dependencies.
-8. Make minimal safe diff.
-9. Run scoped QA.
-10. Report changed files, reason, QA result and risks.
-11. Update session ledger.
-12. Stop at first risky dependency.
+2. Read `docs/specification/README.md`.
+3. Read only relevant RPES volume(s) from `docs/specification/**`.
+4. Read only relevant task block from `docs/planning/current-backlog.md`.
+5. Read `docs/planning/role-audit-reconciliation-v1.md`.
+6. Read the relevant role audit file from `docs/audits/role-audits/`.
+7. Read only relevant accepted decision section if `docs/planning/accepted-backlog-decisions-v1.md` exists.
+8. Use `docs/planning/release-roadmap.md` and `docs/planning/release-qa-maturity-matrix-v1.md` only when the task touches release sequencing or evidence policy.
+9. Decide whether read-only audit is required.
+10. Freeze scope.
+11. Read only target files and direct dependencies.
+12. Make minimal safe diff.
+13. Run scoped QA.
+14. Report changed files, commands run, git status, evidence and risks.
+15. Update session ledger.
+16. Stop at first risky dependency.
+
+Mandatory pre-work reading:
+
+- `docs/specification/README.md`
+- `docs/planning/current-backlog.md`
+- `docs/planning/role-audit-reconciliation-v1.md`
+- relevant role audit file from `docs/audits/role-audits/`
 
 ## Product Decision Priority
 
@@ -123,6 +140,12 @@ Forbidden without explicit scope:
 - package/workflow changes
 - UX redesign
 - production logic redesign
+
+During docs-only tasks:
+
+- do not touch unrelated runtime files;
+- do not mass-clean up design system or runtime code;
+- do not use docs-only audit findings as a reason to rewrite implementation.
 
 ## Large File Rule
 
@@ -264,15 +287,27 @@ Task can be marked closed only when current-backlog closure rules are satisfied:
 - main verification;
 - backlog updated with evidence.
 
+Additional evidence rules:
+
+- audit docs do not close tasks;
+- docs-only audits do not close tasks;
+- branch-only work does not close tasks;
+- draft/open PRs are not closure evidence;
+- screenshots and raw artifacts require explicit visual review before visual closure;
+- screenshot/artifact capture success alone is not visual closure.
+
 Not closure evidence by itself:
 
 - open PR;
 - draft PR;
 - branch-only tests;
 - branch-only docs;
+- branch-only audit reports;
 - report-only evidence;
 - screenshot capture success without visual review;
 - local/manual claim without CI or artifact evidence.
+
+Do not close tasks from docs-only audits, role-audit findings or reconciliation reports alone.
 
 ## Autonomous Run Limit
 
@@ -317,12 +352,20 @@ If command unavailable or fails outside scope, stop and report.
 
 Every implementation report must include:
 
+- changed files
+- commands run
+- `git status --short --branch`
+- evidence produced
+- uncertainty / `not verified`
+- next recommended scope
+
+Recommended additions when useful:
+
 - task
 - files read
-- changed files
 - why each file changed
 - diff summary
-- QA commands and results
+- QA results
 - updated session ledger
 - remaining risks
 - stop conditions hit, if any
@@ -338,7 +381,30 @@ Use only fixed project agents:
 5. `05 Infrastructure / QA Agent`
 6. `06 Three.js / Visualization Agent`
 7. `07 Production / Manufacturing Agent`
-8. `08 UX/UI / Design System Agent`
+8. `08 UX / Design System Agent`
+
+## Current Execution Order
+
+Current recommended execution order:
+
+1. planning reconciliation docs
+2. pricing source-of-truth lock
+3. constructor state ownership contract
+4. live provider / Supabase verification
+5. visual QA execution
+6. production v3 snapshot scope
+7. customer platform scope decision
+8. admin workflow scope decision
+
+## Forbidden Behavior
+
+Forbidden:
+
+- using old backlog-followup or historical planning docs as active source of truth;
+- closing tasks from docs-only audits, role audits or reconciliation docs;
+- using open PRs or draft PRs as closure evidence;
+- mass-cleaning design system or runtime code without visual evidence and explicit scope;
+- touching unrelated runtime files during docs-only tasks.
 
 Every prompt must end with:
 

@@ -128,3 +128,78 @@
 - Если `current-backlog.md` и `accepted-backlog-decisions-v1.md` конфликтуют, агент обязан остановиться и запросить reconciliation.
 - Агент не должен самостоятельно выбирать один источник против другого без явного planning decision.
 - Любая замена решения из этого документа должна быть оформлена как явное updated decision layer, а не как случайная правка backlog status.
+
+Pricing System Source-of-Truth Rule:
+
+Supabase/runtime catalog is primary source of truth.
+
+Seed files (seed/price-items.json) are fallback bootstrap only.
+
+In-memory stores are cache layer only and must never be treated as source of truth.
+
+Server pricing MUST resolve in this order:
+
+1. Supabase runtime catalog
+2. seed fallback (controlled, deterministic)
+3. failure state (no silent fallback)
+
+Any pricing computation MUST explicitly tag source:
+- supabase
+- seed-fallback
+- failed-resolution
+
+## 18. Release v1 Reconciliation Layer
+
+Decision source: `docs/planning/razmerno-release-v1-product-decisions-delta-final.md` integrated into RPES and planning on 2026-06-26.
+
+Hierarchy for agents:
+
+```text
+Accepted Decisions
+→ RPES
+→ Planning (`mvp-scope.md`, `release-roadmap.md`)
+→ Backlog (`current-backlog.md`)
+```
+
+Reconciliation rules for Release v1:
+
+1. Термин **MVP** в этом документе сохраняет принятые baseline-ограничения (pricing, production boundary, validation, release gate). Продуктовый объём Release v1 описан в `docs/planning/mvp-scope.md` и RPES и **не отменяет** baseline-ограничения из §4–§11 автоматически.
+2. §12 Admin / Operations остаётся **минимальным operational floor**: список, детали, статус, production JSON / intermediate handoff, базовая ручная проверка, manager notes.
+3. Release v1 **Order Operations Workspace** (RPES VIII, `mvp-scope.md`) — это расширение operational surface поверх §12 floor: Change Request, Approval View, audit trail, manual payment confirmation, operational queues. Расширение не отменяет §12 и не закрывает reconciliation tasks `P1-27` / `P1-28` без merged/main evidence.
+4. Customer platform (auth, drafts, cabinet, order card) входит в Release v1 scope по RPES VII и `mvp-scope.md`. Это не противоречит §10–§14 baseline validation/pricing rules, но implementation closure остаётся open до evidence (`P1-27`).
+5. Online payment, automatic `.b3d`, CRM replacement и manager manual JSON editing остаются **out of scope** и согласуются с §8 Production / Manufacturing и Release v1 planning wording.
+6. При конфликте wording между этим файлом и RPES/planning: **не выбирать молча**; использовать `P1-27`, `P1-28`, `role-audit-reconciliation-v1.md` и explicit reconciliation note до updated decision layer.
+
+## 19. Governance Source Hierarchy & Two-Level Closure
+
+Decision source: Package 13 governance reconciliation (`docs/planning/local-vs-formal-closure-governance.md`), 2026-07-12.
+
+### Source-of-truth hierarchy (agents)
+
+```text
+1. User-approved accepted decisions (this file, mvp-scope-decision-signoff.md)
+2. Local closure governance (local-vs-formal-closure-governance.md)
+3. RPES requirements (docs/specification/**)
+4. Planning documents / backlog (mvp-scope.md, release-roadmap.md, current-backlog.md)
+5. Code and test evidence
+```
+
+Clarifications:
+
+- Code and test evidence prove **implementation status** on the current branch.
+- Code and test evidence do **not** automatically override product requirements in RPES or accepted decisions.
+- Conflicts must be reconciled in planning before **Closed — Formal**.
+- Accepted decisions and user sign-off (D-01…D-16) may **explicitly defer or override** RPES items for MVP.
+
+This hierarchy **supersedes** the RPES README line "RPES > backlog > code" for agent workflow. RPES remains the product requirements catalog; accepted decisions and closure governance define how conflicts and closure layers are resolved.
+
+### Two-level closure
+
+| Level | Meaning |
+|-------|---------|
+| **Closed — Local** | Task complete for current local branch scope with passing local evidence. **Not** release readiness. **Not** formal backlog closure on `main`. **Not** full RPES compliance. |
+| **Closed — Formal** | Merge/main (or release baseline), CI/GitHub QA, remote preview/deploy where applicable, live smoke where required, human visual approval where applicable, release owner acceptance. |
+
+For local development, a task may be **Closed — Local** when local acceptance criteria pass (see `local-vs-formal-closure-governance.md`). PR, merge, main verification, remote deploy, and formal release QA are **not** required for **Closed — Local**. They are required only for **Closed — Formal** / release closure.
+
+§18 rules about Release v1 scope remain valid. Wording that required "merged/main evidence" for any progress is **replaced** for local tracking by dual fields `Local status` / `Formal status` in `current-backlog.md` (Package 13+). Legacy `closed with evidence` entries on `main` remain **Closed — Formal** historical records.

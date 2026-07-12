@@ -1,4 +1,3 @@
-import type { LayoutModel } from "../../configurator/model/compartments";
 import { trackEvent } from "./analytics";
 import manifest from "../../config/manifest.json";
 
@@ -13,12 +12,34 @@ import manifest from "../../config/manifest.json";
  * - если VITE_USE_MOCK_API === "true" — возвращаем mock-success без записи PII в localStorage.
  */
 
+export type OrderLayoutCompartmentKind = "empty" | "shelves" | "drawers" | "rod";
+
+export interface OrderLayoutCompartment {
+  id: string;
+  kind: OrderLayoutCompartmentKind;
+  heightMm: number;
+  shelves: number;
+  drawers: number;
+  hasRod: boolean;
+}
+
+export interface OrderLayoutSection {
+  id: string;
+  widthMm: number;
+  facadeMode?: "open" | "hinged";
+  compartments: OrderLayoutCompartment[];
+}
+
+export interface OrderLayoutModel {
+  sections: OrderLayoutSection[];
+}
+
 export interface OrderPayload {
   productType: "wardrobe" | "dresser" | "nightstand";
   dimensions: { width: number; height: number; depth: number };
   sections: number;
   filling: { shelves: number; drawers: number; hangingRod: boolean };
-  layout?: LayoutModel;
+  layout?: OrderLayoutModel;
   materials: { bodyId: string; facadeId: string; facadeKind?: "ldsp" | "mdf"; backPanelId?: string; backPanelKind?: "hdf" };
   style: { facadeStyleId: string; hardwareId: string };
   priceBreakdown: Record<string, number>;
@@ -36,8 +57,14 @@ export interface OrderPayload {
 export interface OrderResult {
   ok: boolean;
   orderId?: string;
+  publicOrderNumber?: string;
   error?: string;
 }
+
+export type SubmitOrderOptions = {
+  accessToken?: string | null;
+  projectId?: string | null;
+};
 
 type ViteRuntimeEnv = Record<string, string | undefined> & { DEV?: boolean };
 const viteEnv = ((import.meta as ImportMeta & { env?: ViteRuntimeEnv }).env ?? {}) as ViteRuntimeEnv;
@@ -72,14 +99,16 @@ function readUtm(): Record<string, string> {
 
 export async function submitOrder(
   payload: Omit<OrderPayload, "utm" | "source"> & { source?: string },
+  options: SubmitOrderOptions = {},
 ): Promise<OrderResult> {
   const orderId = generateOrderId();
-  const fullPayload: OrderPayload & { orderId: string } = {
+  const fullPayload: OrderPayload & { orderId: string; projectId?: string } = {
     orderId,
     ...payload,
     source: payload.source ?? "configurator",
     configVersion: manifest.configVersion,
     utm: readUtm(),
+    ...(options.projectId ? { projectId: options.projectId } : {}),
   };
 
   try {
@@ -89,12 +118,17 @@ export async function submitOrder(
       return { ok: true, orderId };
     }
 
-    const res = await fetch(ORDER_API_URL, {
-      method: "POST",
-      headers: {
+    const headers: Record<string, string> = {
         "Content-Type": "application/json",
         "Idempotency-Key": orderId,
-      },
+      };
+    if (options.accessToken) {
+      headers.Authorization = `Bearer ${options.accessToken}`;
+    }
+
+    const res = await fetch(ORDER_API_URL, {
+      method: "POST",
+      headers,
       body: JSON.stringify(fullPayload),
     });
 
@@ -105,8 +139,11 @@ export async function submitOrder(
     }
 
     const serverOrderId = (data as { orderId?: string })?.orderId ?? orderId;
+    const publicOrderNumber = (data as { publicOrderNumber?: string })?.publicOrderNumber;
     trackEvent("order_submit_success", { orderId: serverOrderId, total: payload.totalPrice, mode: "api" });
-    return { ok: true, orderId: serverOrderId };
+    return publicOrderNumber
+      ? { ok: true, orderId: serverOrderId, publicOrderNumber }
+      : { ok: true, orderId: serverOrderId };
   } catch (e) {
     trackEvent("order_submit_error", {
       error: ORDER_SUBMIT_ERROR_EVENT,

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadPricingModules } from "../pricingLoader";
+import { buildConstructorFilling } from "../adapters/constructorPayload";
 import { buildConstructorMaterialPricingContext } from "../../../pricing/materialPricing";
 import {
   buildPricingTransparencyNotice,
@@ -112,26 +113,32 @@ export function useConstructorQuote({
   facadeMaterial,
   snapshot,
 }: UseConstructorQuoteArgs) {
+  // State flow contract:
+  // - quote = derived computation layer (snapshot/material/options -> computed pricing state)
+  // - quote hook must remain read-only относительно store/snapshot (no state mutation side effects).
   const [quote, setQuote] = useState<QuoteState | null>(null);
   const [quoteError, setQuoteError] = useState("");
   const [quoteStatus, setQuoteStatus] = useState<"idle" | "calculating" | "ready" | "error">("idle");
 
   const filling = useMemo(() => {
-    const hasExplicitCounts = shelvesCount > 0 || drawersCount > 0 || rodsCount > 0;
-    if (hasExplicitCounts) {
-      return {
-        shelves: Math.max(0, shelvesCount),
-        drawers: Math.max(0, drawersCount),
-        hangingRod: rodsCount > 0,
-      };
-    }
-
-    return {
-      shelves: fill === "shelves" ? Math.max(0, sections * Math.max(1, compartments)) : 0,
-      drawers: fill === "drawers" ? Math.max(1, sections) : 0,
-      hangingRod: fill === "rod",
-    };
-  }, [compartments, drawersCount, fill, rodsCount, sections, shelvesCount]);
+    return buildConstructorFilling({
+      fill,
+      sections,
+      compartments,
+      shelvesCount,
+      drawersCount,
+      rodsCount,
+      fillingLayout: snapshot?.fillingLayout,
+    });
+  }, [
+    compartments,
+    drawersCount,
+    fill,
+    rodsCount,
+    sections,
+    shelvesCount,
+    snapshot?.fillingLayout,
+  ]);
 
   useEffect(() => {
     let cancelled = false;

@@ -29,5 +29,5 @@ export function applyCorsHeaders(req: ServerlessRequest, res: ServerlessResponse
     res.setHeader('Vary', 'Origin')
   }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Idempotency-Key')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Idempotency-Key, Authorization')
 }

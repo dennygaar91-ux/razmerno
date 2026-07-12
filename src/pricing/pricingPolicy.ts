@@ -27,7 +27,3 @@ export const PRICING_CALCULATION_RULES = {
   countPackagingSeparately: true,
   priceAccuracy: "exact",
 } as const;
-
-export function applyClientPriceMultiplier(sourcePrice: number): number {
-  return Math.round(sourcePrice * CLIENT_PRICE_MULTIPLIER * 100) / 100;
-}

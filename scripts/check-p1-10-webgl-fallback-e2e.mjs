@@ -40,8 +40,10 @@ const requiredTestFragments = [
   'data-webgl-diagnostics-status", "unavailable"',
   "proceedToCheckout(page)",
   '"**/api/orders"',
-  "P1-10-WEBGL-FALLBACK",
-  'source).toBe("constructor-store-adapter")',
+  "attemptSubmitAndExpectControlledAuthBoundary",
+  "toHaveLength(0)",
+  "Авторизация недоступна из‑за ошибки конфигурации сервиса",
+  "Войдите, чтобы отправить заявку",
 ];
 
 const requiredFallbackFragments = [

@@ -194,6 +194,9 @@ export function useConstructorPageState() {
     compartmentId: selectedCompartmentId,
   });
 
+  // State flow contract:
+  // - snapshot = UI projection layer only (store -> projection)
+  // - snapshot is consumed by quote/payload layers and must stay fresh for selected ids.
   const snapshot = useMemo<ConstructorSnapshot>(
     () => ({
       furniture,
@@ -254,6 +257,7 @@ export function useConstructorPageState() {
       sections,
       sectionLayout,
       selectedSectionId,
+      selectedZoneId,
       selectedCompartmentId,
       width,
     ],

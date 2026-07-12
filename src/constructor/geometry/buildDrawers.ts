@@ -6,7 +6,7 @@
  */
 import type { FurnitureProject, GeometryCompartment, Panel, ProductionModelWarning } from "./types.js";
 import { createGeometryBuildContext, type GeometryBuildContext } from "./buildContext.js";
-import { bodyEdgeAll, noEdge } from "./edgeBanding.js";
+import { bodyEdgeAll, facadeEdgeAll, noEdge } from "./edgeBanding.js";
 import { getSectionMetrics } from "./layoutMetrics.js";
 
 const PLINTH_HEIGHT_MM = 100;
@@ -63,6 +63,7 @@ export function buildDrawers(
       bodyThicknessMm: T,
       facadeThicknessMm: facadeT,
       depthMm: D,
+      hdfThicknessMm: p.material.backPanelThicknessMm,
     });
   }
 
@@ -139,6 +140,7 @@ function buildDrawerStack({
   bodyThicknessMm,
   facadeThicknessMm,
   depthMm,
+  hdfThicknessMm,
 }: {
   target: DrawerBuildTarget;
   panels: Panel[];
@@ -150,6 +152,7 @@ function buildDrawerStack({
   bodyThicknessMm: number;
   facadeThicknessMm: number;
   depthMm: number;
+  hdfThicknessMm: number;
 }) {
   const drawerH = target.zoneHeight / target.drawers;
   const facadeHeight = drawerH - FACADE_GAP_MM * 2;
@@ -184,7 +187,7 @@ function buildDrawerStack({
       position: { xMm: target.sectionXStart + FACADE_GAP_MM, yMm: yBottom + FACADE_GAP_MM, zMm: -facadeThicknessMm },
       rotation: { x: 0, y: 0, z: 0 },
       faceSide: "front",
-      edgeBanding: bodyEdgeAll(matFacade, facadeWidth, facadeHeight),
+      edgeBanding: facadeEdgeAll(matFacade, facadeWidth, facadeHeight),
       visible: true,
       selectable: true,
       basis: {
@@ -275,10 +278,10 @@ function buildDrawerStack({
       role: "drawer-bottom",
       materialType: "hdf",
       materialId: matBack,
-      thicknessMm: 4,
+      thicknessMm: hdfThicknessMm,
       widthMm: drawerBoxWidth - 8,
       heightMm: drawerBoxDepth - 8,
-      depthMm: 4,
+      depthMm: hdfThicknessMm,
       position: { xMm: target.sectionXStart + 17, yMm: sideY + 8, zMm: 9 },
       rotation: { x: Math.PI / 2, y: 0, z: 0 },
       faceSide: "top",

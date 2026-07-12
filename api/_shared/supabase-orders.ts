@@ -1,8 +1,13 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { OrderDbInsert } from "./order-types";
+import { normalizeSupabaseProjectUrl } from "./supabase-url";
 
 export type StoredOrderRecord = {
   order_id: string;
+  user_id: string | null;
+  public_order_number: string | null;
+  domain_status: string | null;
+  constructor_project_id: string | null;
   source: string;
   product_type: OrderDbInsert["product_type"];
   dimensions: OrderDbInsert["dimensions"];
@@ -32,13 +37,16 @@ export type StoredOrderRecord = {
   manager_email_error: string | null;
   customer_email_error: string | null;
   production_export: unknown | null;
+  catalog_source_used: OrderDbInsert["catalog_source_used"];
+  pricing_source_diagnostic: OrderDbInsert["pricing_source_diagnostic"];
+  pricing_fallback_reason: OrderDbInsert["pricing_fallback_reason"];
   created_at: string;
 };
 
 let cachedClient: SupabaseClient | null = null;
 
 function getSupabaseClient(): SupabaseClient | null {
-  const url = process.env.SUPABASE_URL;
+  const url = normalizeSupabaseProjectUrl(process.env.SUPABASE_URL);
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !serviceRoleKey) return null;
@@ -76,6 +84,27 @@ export async function insertOrderRecord(record: OrderDbInsert) {
   return { ok: true as const, skipped: false as const };
 }
 
+export async function allocatePublicOrderNumber(): Promise<
+  { ok: true; value: string } | { ok: false; error: string }
+> {
+  const client = getSupabaseClient();
+
+  if (!client) {
+    return { ok: false, error: "supabase-env-missing" };
+  }
+
+  const { data, error } = await client.rpc("next_public_order_number");
+
+  if (error || data == null) {
+    return {
+      ok: false,
+      error: error?.message || "public_number_allocation_failed",
+    };
+  }
+
+  return { ok: true, value: String(data) };
+}
+
 export async function getOrderRecordByOrderId(orderId: string) {
   const client = getSupabaseClient();
 
@@ -86,7 +115,7 @@ export async function getOrderRecordByOrderId(orderId: string) {
   const { data, error } = await client
     .from("orders")
     .select(
-      "order_id,source,product_type,dimensions,sections,filling,layout,materials,style,price_breakdown,total_price,customer_name,customer_phone,customer_email,customer_comment,delivery_enabled,delivery_address,delivery_price,assembly_enabled,assembly_price,assembly_rate,assembly_base_price,consent,config_version,utm,manager_email_status,customer_email_status,manager_email_error,customer_email_error,production_export,created_at",
+      "order_id,user_id,public_order_number,domain_status,constructor_project_id,source,product_type,dimensions,sections,filling,layout,materials,style,price_breakdown,total_price,customer_name,customer_phone,customer_email,customer_comment,delivery_enabled,delivery_address,delivery_price,assembly_enabled,assembly_price,assembly_rate,assembly_base_price,consent,config_version,utm,manager_email_status,customer_email_status,manager_email_error,customer_email_error,production_export,catalog_source_used,pricing_source_diagnostic,pricing_fallback_reason,created_at",
     )
     .eq("order_id", orderId)
     .limit(1);

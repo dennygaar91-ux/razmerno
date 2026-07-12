@@ -29,6 +29,11 @@ async function mockWebGLUnavailable(page: Page) {
   });
 }
 
+async function expectRecoveryControls(page: Page) {
+  await expect(page.getByRole("button", { name: /Повторить 3D/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Запустить упрощённое 3D/i })).toBeVisible();
+}
+
 async function openConstructor3D(page: Page, options: { forceFallback?: boolean } = {}) {
   if (options.forceFallback) {
     await mockWebGLUnavailable(page);
@@ -89,6 +94,25 @@ async function interceptOrderSubmit(page: Page) {
   return requests;
 }
 
+async function attemptSubmitAndExpectControlledAuthBoundary(
+  page: Page,
+  requests: SubmittedConstructorOrder[],
+) {
+  await expect(page.getByRole("button", { name: /Отправить заявку/i })).toBeEnabled();
+  await page.getByRole("button", { name: /Отправить заявку/i }).click();
+
+  const misconfiguredMessage = page.locator(".rzm-3d-submit-message").filter({
+    hasText: /Авторизация недоступна из‑за ошибки конфигурации сервиса/i,
+  });
+  const authModal = page.getByRole("dialog").filter({
+    hasText: /Войдите, чтобы отправить заявку/i,
+  });
+
+  await expect(misconfiguredMessage.or(authModal)).toBeVisible();
+  expect(requests).toHaveLength(0);
+  await expect(page.locator("body")).not.toContainText(/Application error|Unhandled|blank screen/i);
+}
+
 test.describe("P1-10 WebGL fallback E2E", () => {
   test("uses the main 3D viewer when WebGL is available", async ({ page }) => {
     await openConstructor3D(page);
@@ -136,13 +160,68 @@ test.describe("P1-10 WebGL fallback E2E", () => {
     await expectFallbackActive(page);
     await fillRequiredContact(page);
 
-    await expect(page.getByRole("button", { name: /Отправить заявку/i })).toBeEnabled();
-    await page.getByRole("button", { name: /Отправить заявку/i }).click();
-    await expect(page.locator(".rzm-3d-submit-message")).toContainText(/P1-10-WEBGL-FALLBACK|отправлена/i);
+    await attemptSubmitAndExpectControlledAuthBoundary(page, requests);
+    await expectFallbackActive(page);
+  });
+});
 
-    expect(requests).toHaveLength(1);
-    expect(requests[0].source).toBe("constructor-store-adapter");
-    expect(requests[0].totalPrice).toBeGreaterThan(0);
-    expect(requests[0].customer.email).toBe("p1-10-webgl@example.com");
+test.describe("M8-P0-03 WebGL fallback and recovery E2E", () => {
+  test("forced WebGL-off opens full 2D fallback with diagnostics marker", async ({ page }) => {
+    await openConstructor3D(page, { forceFallback: true });
+
+    await expectFallbackActive(page);
+    await expect(fallbackPreview(page)).toHaveAttribute("data-webgl-diagnostics-reason", "e2e-forced-webgl-off");
+    await expect(page.locator("svg")).toBeVisible();
+    await expect(page.locator(".rzm-three-viewer")).toHaveCount(0);
+  });
+
+  test("fallback exposes retry and reduced 3D recovery controls", async ({ page }) => {
+    await openConstructor3D(page, { forceFallback: true });
+    await expectFallbackActive(page);
+    await expectRecoveryControls(page);
+  });
+
+  test("retry controls keep fallback active when WebGL remains unavailable", async ({ page }) => {
+    await openConstructor3D(page, { forceFallback: true });
+    await expectFallbackActive(page);
+
+    await page.getByRole("button", { name: /Повторить 3D/i }).click();
+    await expectFallbackActive(page);
+    await expect(page.locator(".rzm-three-viewer")).toHaveCount(0);
+
+    await page.getByRole("button", { name: /Запустить упрощённое 3D/i }).click();
+    await expectFallbackActive(page);
+    await expect(page.locator(".rzm-three-viewer")).toHaveCount(0);
+    await expectRecoveryControls(page);
+  });
+
+  test("constructor flow progression remains available from fallback mode", async ({ page }) => {
+    await openConstructor3D(page, { forceFallback: true });
+    await expectFallbackActive(page);
+
+    await page.getByRole("button", { name: /Перейти к наполнению|Далее/i }).click();
+    await expect(page.locator(".rzm-3d-drawer-body")).toContainText("Наполнение");
+    await expectFallbackActive(page);
+    await expectRecoveryControls(page);
+  });
+
+  test("checkout path stays reachable after using fallback recovery controls", async ({ page }) => {
+    const requests = await interceptOrderSubmit(page);
+
+    await openConstructor3D(page, { forceFallback: true });
+    await expectFallbackActive(page);
+    await expectRecoveryControls(page);
+
+    await page.getByRole("button", { name: /Повторить 3D/i }).click();
+    await page.getByRole("button", { name: /Запустить упрощённое 3D/i }).click();
+    await expectFallbackActive(page);
+
+    await proceedToCheckout(page);
+    await expectFallbackActive(page);
+    await fillRequiredContact(page);
+
+    await attemptSubmitAndExpectControlledAuthBoundary(page, requests);
+    await expectFallbackActive(page);
+    await expectRecoveryControls(page);
   });
 });
