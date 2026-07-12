@@ -87,6 +87,43 @@ test("constructor draft: save excludes PII", () => {
   assert(!raw.includes("bot"), "Draft must not include honeypot/company");
 });
 
+test("constructor draft: load ignores corrupt JSON safely", () => {
+  storage.clear();
+  storage.setItem(CONSTRUCTOR_DRAFT_STORAGE_KEY, "{not-valid-json");
+  assert(loadConstructorDraft(storage) === null, "Corrupt JSON should be ignored");
+  assert(storage.getItem(CONSTRUCTOR_DRAFT_STORAGE_KEY) !== null, "Corrupt draft may remain until clear");
+});
+
+test("constructor draft: load ignores incompatible draft version", () => {
+  storage.clear();
+  storage.setItem(
+    CONSTRUCTOR_DRAFT_STORAGE_KEY,
+    JSON.stringify({
+      version: 99,
+      dimensions: [1900, 2450, 650],
+      furnitureType: "Шкаф",
+      material: "graphite",
+      sections: 4,
+      filling: "drawers",
+      updatedAt: "2026-07-12T10:00:00.000Z",
+    }),
+  );
+  assert(loadConstructorDraft(storage) === null, "Incompatible version should be ignored");
+});
+
+test("constructor draft: load ignores drafts missing required fields", () => {
+  storage.clear();
+  storage.setItem(
+    CONSTRUCTOR_DRAFT_STORAGE_KEY,
+    JSON.stringify({
+      version: 1,
+      dimensions: [1900, 2450, 650],
+      updatedAt: "2026-07-12T10:00:00.000Z",
+    }),
+  );
+  assert(loadConstructorDraft(storage) === null, "Incomplete draft should be ignored");
+});
+
 test("constructor draft: load validates stored shape", () => {
   storage.clear();
   storage.setItem(CONSTRUCTOR_DRAFT_STORAGE_KEY, JSON.stringify({ invalid: true }));
