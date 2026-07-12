@@ -291,6 +291,50 @@ test("workspace GET returns 401 without bearer token", async () => {
   assert.deepEqual(result.body, { ok: false, message: CUSTOMER_UNAUTHORIZED_MESSAGE });
 });
 
+test("workspace GET returns 401 for malformed Authorization header", async () => {
+  setRequiredServerEnv();
+  const { res, snapshot } = createMockResponse();
+  await workspaceHandler(
+    {
+      method: "GET",
+      headers: { origin: "http://localhost:5173", authorization: "Basic not-a-bearer" },
+      body: null,
+    },
+    res,
+  );
+  const result = snapshot();
+  assert.equal(result.statusCode, 401);
+  assert.deepEqual(result.body, { ok: false, message: CUSTOMER_UNAUTHORIZED_MESSAGE });
+  assert.doesNotMatch(JSON.stringify(result.body), /stack|secret|service_role/i);
+});
+
+test("workspace GET returns 401 for invalid or expired access token", async () => {
+  setRequiredServerEnv();
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    if (url.includes("/auth/v1/user")) {
+      return jsonResponse({ message: "Invalid JWT" }, 401);
+    }
+    return jsonResponse({}, 404);
+  }) as typeof fetch;
+
+  const { res, snapshot } = createMockResponse();
+  await workspaceHandler(
+    {
+      method: "GET",
+      headers: {
+        origin: "http://localhost:5173",
+        authorization: "Bearer expired-or-invalid-token",
+      },
+      body: null,
+    },
+    res,
+  );
+  const result = snapshot();
+  assert.equal(result.statusCode, 401);
+  assert.deepEqual(result.body, { ok: false, message: CUSTOMER_UNAUTHORIZED_MESSAGE });
+});
+
 test("workspace GET returns customer-owned read model for authenticated user", async () => {
   setRequiredServerEnv();
   const requests = installWorkspaceFetchMock();

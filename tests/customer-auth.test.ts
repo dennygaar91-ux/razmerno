@@ -195,6 +195,21 @@ test("profile GET returns 401 without bearer token", async () => {
   assert.deepEqual(result.body, { ok: false, message: "Требуется авторизация." });
 });
 
+test("profile GET returns 401 for malformed Authorization header", async () => {
+  const { res, snapshot } = createMockResponse();
+  await profileHandler(
+    {
+      method: "GET",
+      headers: { origin: "http://localhost:5173", authorization: "Token malformed" },
+      body: null,
+    },
+    res,
+  );
+  const result = snapshot();
+  assert.equal(result.statusCode, 401);
+  assert.equal((result.body as { ok: boolean }).ok, false);
+});
+
 test("profile PATCH rejects email in request body", async () => {
   const { res, snapshot } = createMockResponse();
   await profileHandler(
