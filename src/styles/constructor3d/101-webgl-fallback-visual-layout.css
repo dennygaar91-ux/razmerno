@@ -1,0 +1,179 @@
+/* P2-26B: WebGL fallback visual layout pass.
+   CSS-only release-readiness polish for the 2D fallback state. */
+
+.rzm-3d-blueprint-fallback {
+  box-sizing: border-box;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  justify-items: stretch;
+  gap: clamp(10px, 1.5vw, 18px);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.rzm-3d-blueprint-status {
+  position: static !important;
+  inset: auto !important;
+  z-index: 2;
+  box-sizing: border-box;
+  width: min(100%, 1080px);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.rzm-3d-blueprint-status span,
+.rzm-3d-blueprint-status strong,
+.rzm-3d-blueprint-status small {
+  min-width: 0;
+}
+
+.rzm-3d-blueprint-status strong,
+.rzm-3d-blueprint-status small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rzm-3d-blueprint-status small {
+  margin-left: 0;
+  justify-self: end;
+  max-width: min(32vw, 360px);
+}
+
+.rzm-3d-blueprint-fallback .rzm-constructor-model,
+.rzm-3d-blueprint-fallback .rzm-constructor-svg-model {
+  min-width: 0;
+  min-height: 0;
+  width: min(96%, 980px);
+  max-width: 100%;
+  max-height: 100%;
+  align-self: center;
+  justify-self: center;
+  overflow: hidden;
+}
+
+.rzm-3d-blueprint-fallback .rzm-blueprint-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+
+.rzm-3d-blueprint-actions {
+  position: static !important;
+  inset: auto !important;
+  z-index: 2;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  align-self: end;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.rzm-3d-blueprint-actions .rzm-ui-btn {
+  flex: 0 1 auto;
+  white-space: nowrap;
+}
+
+.rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-random-chip,
+.rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-random-chip,
+.rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-chip,
+.rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-scene-chip,
+.rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-legend,
+.rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-scene-legend,
+.rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-scene-info,
+.rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-scene-info,
+.rzm-3d-viewport:has(.rzm-3d-blueprint-fallback) .rzm-3d-selection-help,
+.rzm-3d-viewport:has(.rzm-3d-fallback) .rzm-3d-selection-help {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .rzm-3d-blueprint-fallback {
+    grid-template-rows: auto minmax(220px, 1fr) auto;
+    padding: clamp(10px, 2.5vw, 16px);
+  }
+
+  .rzm-3d-blueprint-status {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 5px;
+  }
+
+  .rzm-3d-blueprint-status small {
+    justify-self: center;
+    max-width: 100%;
+  }
+
+  .rzm-3d-blueprint-actions {
+    width: 100%;
+  }
+
+  .rzm-3d-blueprint-actions .rzm-ui-btn {
+    flex: 1 1 180px;
+  }
+}
+
+@media (max-width: 760px) {
+  .rzm-3d-blueprint-fallback {
+    grid-template-rows: auto minmax(180px, 1fr) auto;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .rzm-3d-blueprint-status {
+    padding: 8px 9px;
+    border-radius: 16px;
+  }
+
+  .rzm-3d-blueprint-status span,
+  .rzm-3d-blueprint-status small {
+    display: none;
+  }
+
+  .rzm-3d-blueprint-status strong {
+    max-width: 100%;
+    font-size: 10.5px;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  .rzm-3d-blueprint-fallback .rzm-constructor-model,
+  .rzm-3d-blueprint-fallback .rzm-constructor-svg-model {
+    width: min(100%, 520px);
+  }
+
+  .rzm-3d-blueprint-actions {
+    gap: 6px;
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .rzm-3d-blueprint-actions .rzm-ui-btn {
+    min-height: 34px;
+    padding-inline: 10px;
+    font-size: 10.5px;
+  }
+}
+
+@media (max-width: 420px) {
+  .rzm-3d-blueprint-fallback {
+    grid-template-rows: auto minmax(160px, 1fr) auto;
+    padding: 6px;
+  }
+
+  .rzm-3d-blueprint-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .rzm-3d-blueprint-actions .rzm-ui-btn {
+    width: 100%;
+  }
+}
