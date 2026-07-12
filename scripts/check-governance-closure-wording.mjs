@@ -60,6 +60,21 @@ assertMatch('backlog-m9', pkg13, /M9-P1-03[\s\S]{0,400}manual retry|manual atten
 assertNoMatch('backlog-m8', backlog, /M8-P1-02[\s\S]{0,400}full live provider verification complete/i, 'M8-P1-02 must not claim full live verification complete')
 assertMatch('backlog-m8', backlog, /M8-P1-02[\s\S]{0,600}full live provider|order-flow not executed|does \*\*not\*\* equal full M8-P1-02/i, 'M8-P1-02 must document partial live scope')
 
+// order_status_events RLS: Verified — Live, Formal Pending
+assertMatch('backlog-rls', pkg13, /order_status_events[\s\S]{0,400}Verified — Live/i, 'order_status_events must be Verified — Live')
+assertMatch('backlog-rls', pkg13, /order_status_events[\s\S]{0,600}Formal Pending/i, 'order_status_events formal closure remains Formal Pending')
+assertNoMatch('backlog-rls', pkg13, /order_status_events[\s\S]{0,300}Closed — Formal/i, 'order_status_events must not be Closed — Formal in Package 13 block')
+
+// Closed — Local must not be equated with Closed — Formal in governance hierarchy
+assertMatch('accepted-19', accepted, /Closed — Local[\s\S]{0,500}Closed — Formal/i, '§19 must distinguish Closed — Local from Closed — Formal')
+assertNoMatch('accepted-19', accepted, /Closed — Local means Closed — Formal/i, 'must not equate local and formal closure')
+
+// Local-final-state generator must not claim release readiness
+const localFinalStateScript = read('scripts/generate-local-final-state.mjs')
+assertMatch('local-final-state', localFinalStateScript, /closureClaimed:\s*false/, 'local final state must not claim closure')
+assertMatch('local-final-state', localFinalStateScript, /releaseReady:\s*false/, 'local final state must not claim release readiness')
+assertMatch('local-final-state', localFinalStateScript, /Formal Pending|formal backlog closure still requires merge\/main evidence/i, 'local final state must keep Formal Pending wording')
+
 // Planning docs: no unqualified release ready in key governance files (allow negated / anti-pattern mentions)
 for (const [name, text] of [
   ['backlog-pkg13', pkg13],

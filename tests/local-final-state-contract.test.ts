@@ -39,6 +39,8 @@ test("local final state states visual QA deferred and RLS live verification sepa
   assert.equal(state.visualStatus.d13ClosureClaimed, false);
   assert.equal(state.rlsLiveVerification.liveVerifiedNotFormalClosure, true);
   assert.match(state.requiredWording.join(" "), /Visual QA remains deferred by user/i);
+  assert.match(state.requiredWording.join(" "), /Closed — Local is not Closed — Formal/i);
+  assert.match(state.requiredWording.join(" "), /order_status_events RLS is Verified — Live/i);
 });
 
 test("local final state does not recommend PR push merge deploy by default", () => {

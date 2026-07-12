@@ -81,6 +81,24 @@ export const EVIDENCE_TRACKS = [
     remainingCondition: 'User must explicitly request deploy workflow',
   },
   {
+    track: 'governance local vs formal closure / Package 13',
+    category: 'Local-contract verified',
+    evidence: 'check:governance-closure-wording; test:governance-closure-wording-contract; test:local-final-state-contract',
+    remainingCondition: 'Closed — Local is not Closed — Formal; formal merge/main evidence still pending',
+  },
+  {
+    track: 'customer supabase RLS static contracts',
+    category: 'Local-contract verified',
+    evidence: 'test:customer-supabase-rls-static-contract; test:order-status-events-rls-migration-prep',
+    remainingCondition: 'Live RLS beyond order_status_events not probed in this package',
+  },
+  {
+    track: 'deferred MVP false-exposure guards',
+    category: 'Local-contract verified',
+    evidence: 'test:customer-platform-mvp-boundary-contract; test:operations-mvp-boundary-contract; test:email-retry-failure-contract; test:production-json-v4-support-policy',
+    remainingCondition: 'Deferred features remain explicitly not claimed as finished MVP',
+  },
+  {
     track: 'formal merge/main/GitHub QA workflow',
     category: 'Future explicit workflow',
     evidence: 'Branch-local evidence only on task/epic-b-projects-foundation',
@@ -93,6 +111,8 @@ export const REQUIRED_WORDING = [
   'No release readiness is claimed.',
   'Visual QA remains deferred by user.',
   'Push/merge/deploy were not performed.',
+  'Closed — Local is not Closed — Formal.',
+  'order_status_events RLS is Verified — Live; Formal Pending remains.',
 ]
 
 export const RECOMMENDED_NEXT_LOCAL_ACTIONS = [
@@ -189,6 +209,7 @@ export function buildLocalFinalState(options = {}) {
       'Human visual approval pending',
       'Remote preview URL missing or not verified',
       'order_status_events RLS live-verified on Supabase; formal backlog closure still requires merge/main evidence',
+      'Closed — Local evidence strengthened; Closed — Formal remains Formal Pending',
       'Formal closure requires merge/main + GitHub QA/main verification',
     ],
     recommendedNextLocalActions: RECOMMENDED_NEXT_LOCAL_ACTIONS,

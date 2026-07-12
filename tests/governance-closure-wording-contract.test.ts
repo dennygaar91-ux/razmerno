@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { buildLocalFinalState } from "../scripts/generate-local-final-state.mjs";
 
 function test(name: string, run: () => void) {
   run();
@@ -70,4 +71,18 @@ test("governance doc forbids equating Closed — Local with release readiness", 
   assert.match(text, /Closed — Local[\s\S]{0,500}Release readiness/i);
   assert.match(text, /not release readiness|is not:/i);
   assert.doesNotMatch(text, /Closed — Local means release-ready/i);
+});
+
+test("backlog keeps D-13 deferred and does not claim visual closure", () => {
+  const backlog = readFileSync(BACKLOG, "utf8");
+  const pkg13 = backlog.match(/### Package 13[\s\S]*?(?=### |$)/)?.[0] ?? backlog;
+  assert.match(pkg13, /D-13[\s\S]{0,200}Deferred by User/i);
+  assert.doesNotMatch(pkg13, /D-13[\s\S]{0,120}Closed — Formal/i);
+});
+
+test("local final state required wording includes formal pending and local-not-formal distinction", () => {
+  const state = buildLocalFinalState();
+  assert.ok(state.requiredWording.some((phrase) => /Closed — Local is not Closed — Formal/i.test(phrase)));
+  assert.ok(state.requiredWording.some((phrase) => /order_status_events RLS is Verified — Live/i.test(phrase)));
+  assert.ok(state.evidenceTracks.some((track) => /governance local vs formal closure/i.test(track.track)));
 });
