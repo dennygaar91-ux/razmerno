@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { buildProductionExportFromPayload } from "../src/constructor/production/orderExportPackage.js";
 import { buildAssemblyPolicySnapshot, calculateCarcassHeight } from "../src/constructor/production/v4/assemblyPolicy.js";
@@ -201,4 +202,40 @@ test("existing example passes support validation after enrichment", () => {
   const enriched = enrichModel(productionJsonV4Example);
   const result = validateSupportPolicyV4(enriched);
   assert.equal(result.ok, true, result.errors.map((error) => error.message).join("; "));
+});
+
+test("v4 support policy layer is isolated from active v3 runtime export path", () => {
+  const activeRuntimeSource = readFileSync("src/constructor/geometry/buildCabinetGeometry.ts", "utf8");
+  const orderExportSource = readFileSync("src/constructor/production/orderExportPackage.ts", "utf8");
+  const backlog = readFileSync("docs/planning/current-backlog.md", "utf8");
+  const rpesRecon = readFileSync("docs/planning/rpes-local-formal-reconciliation.md", "utf8");
+
+  assert.match(activeRuntimeSource, /razmerno\.production-model\.v3/);
+  assert.doesNotMatch(orderExportSource, /buildProductionJsonV4FromV3|production-model\.v4/);
+  assert.match(backlog, /production[\s\S]{0,400}v3|Production v3/i);
+  assert.match(rpesRecon, /branch runs v3 export|Production v4[\s\S]{0,300}v3/i);
+  assert.doesNotMatch(backlog, /production v4 active runtime replacement complete/i);
+});
+
+test("v4 adapter remains manual-json boundary without auto-b3d claims", () => {
+  const v4 = buildProductionJsonV4FromV3(
+    buildProductionExportFromPayload({
+      orderId: "RZ-V4-BOUNDARY",
+      productType: "wardrobe",
+      dimensions: { width: 1800, height: 2400, depth: 600 },
+      sections: 2,
+      filling: { shelves: 2, drawers: 0, hangingRod: false },
+      layout: { sections: [] },
+      materials: { bodyId: "body", facadeId: "facade", facadeKind: "mdf" },
+      consent: {
+        personalData: true,
+        privacyVersion: "test",
+        acceptedAt: "2026-06-23T18:00:00.000Z",
+      },
+    }),
+  );
+
+  const serialized = JSON.stringify(v4);
+  assert.doesNotMatch(serialized, /create-b3d|"documentType":"b3d"/);
+  assert.doesNotMatch(serialized, /автоматической генерации/i);
 });

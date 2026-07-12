@@ -29,6 +29,8 @@ const V3_GOLDEN_CASE_PATTERNS = [
   /manufacturing specification: handleless wardrobe/i,
   /manufacturing specification: mixed drawers shelves rod/i,
   /manufacturing specification: material-aware body and facade materials/i,
+  /manufacturing specification: compact single-section wardrobe/i,
+  /manufacturing specification: triple-section wide wardrobe/i,
   /manufacturing document: baseline wardrobe markdown/i,
   /manufacturing document: handleless wardrobe/i,
   /manufacturing document: mixed blocked case/i,
@@ -48,12 +50,22 @@ test("P1-11B active production path is v3, not legacy v2", () => {
   assert.doesNotMatch(PRODUCTION_EXPORT_TEST, /razmerno\.production-model\.v2/);
 });
 
-test("P1-11B at least four v3 golden manufacturing cases exist", () => {
+test("P1-11B at least six v3 golden manufacturing cases exist", () => {
   let matched = 0;
   for (const pattern of V3_GOLDEN_CASE_PATTERNS) {
     if (pattern.test(PRODUCTION_EXPORT_TEST)) matched += 1;
   }
-  assert.ok(matched >= 4, `expected >=4 v3 golden cases, got ${matched}`);
+  assert.ok(matched >= 6, `expected >=6 v3 golden cases, got ${matched}`);
+});
+
+test("P1-11B active runtime export path is v3 and v4 replacement remains deferred", () => {
+  const activeRuntimeSource = readFileSync("src/constructor/geometry/buildCabinetGeometry.ts", "utf8");
+  const rpesRecon = readFileSync("docs/planning/rpes-local-formal-reconciliation.md", "utf8");
+
+  assert.match(activeRuntimeSource, /razmerno\.production-model\.v3/);
+  assert.match(rpesRecon, /branch runs v3 export/i);
+  assert.match(rpesRecon, /Production v4[\s\S]{0,300}v3|v4 replaces v3/i);
+  assert.doesNotMatch(PRODUCTION_EXPORT_TEST, /razmerno\.production-model\.v2/);
 });
 
 test("P1-11B snapshots cover panels edgeBanding hardware drilling warnings validation Basis", () => {
