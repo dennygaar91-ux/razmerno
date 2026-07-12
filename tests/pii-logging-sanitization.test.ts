@@ -171,6 +171,58 @@ test("frontend analytics uses stable submit error markers instead of raw excepti
   assert.doesNotMatch(analyticsBlock, /e\.message/);
 });
 
+const PII_SAFE_API_SOURCES = [
+  "api/orders.ts",
+  "api/operations/order-decision.ts",
+  "api/operations/payment-confirmation.ts",
+  "api/operations/order-completion.ts",
+  "api/customer/notifications.ts",
+  "api/customer/change-request.ts",
+  "api/profile.ts",
+] as const;
+
+test("PII contract: key API handlers avoid logging customer identity fields in logEvent payloads", () => {
+  for (const file of PII_SAFE_API_SOURCES) {
+    const source = readFileSync(file, "utf8");
+    const logBlocks = source.match(/logEvent\([^)]+\{[\s\S]*?\}\)/g) ?? [];
+    for (const block of logBlocks) {
+      const payload = block.slice(block.indexOf("{"));
+      assert.doesNotMatch(payload, /customer_name|customer_phone|customer_email|delivery_address/);
+      assert.doesNotMatch(payload, /SUPABASE_SERVICE_ROLE_KEY|SUPABASE_ANON_KEY|process\.env\./);
+    }
+  }
+});
+
+test("PII contract: idempotency conflict and email failure paths use safe logging", () => {
+  const orders = readFileSync("api/orders.ts", "utf8");
+  assert.match(orders, /logEvent\('warn', 'orders\.customer_email_failed'/);
+  assert.match(orders, /reason: safeErrorMessage/);
+  assert.doesNotMatch(orders, /logEvent\([^)]*\{[^}]*customer_email\s*:/);
+});
+
+test("PII contract: logger blocks secret-like keys from structured output", () => {
+  const captured = captureConsole();
+  try {
+    logEvent("warn", "pii.logging.secrets", {
+      token: "secret-token-value",
+      key: "api-key-value",
+      secret: "hidden-secret",
+      authorization: "Bearer abc.def.ghi",
+      requestId: SAFE_REQUEST_ID,
+    });
+    const record = parseSingleLogLine(captured.warns);
+    const line = JSON.stringify(record);
+    assert.equal(record.token, "[redacted]");
+    assert.equal(record.key, "[redacted]");
+    assert.equal(record.secret, "[redacted]");
+    assert.equal(record.authorization, "[redacted]");
+    assert.equal(record.requestId, SAFE_REQUEST_ID);
+    assert.doesNotMatch(line, /secret-token-value|api-key-value|hidden-secret|abc\.def\.ghi/);
+  } finally {
+    captured.restore();
+  }
+});
+
 for (const item of tests) {
   await item.run();
   console.log(`OK ${item.name}`);
